@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KDM BF6 Rankings</title>
+  <meta name="description" content="KDM clan Battlefield 6 leaderboards, stat history, and rankings." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎖️%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="assets/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#/">
+      <span class="brand-tag">KDM</span>
+      <span class="brand-title">BF6 RANKINGS</span>
+    </a>
+    <nav class="site-nav" id="site-nav">
+      <a href="#/" data-nav="board">Leaderboards</a>
+      <a href="#/players" data-nav="players">Players</a>
+      <a href="#/compare" data-nav="compare">Compare</a>
+      <a href="#/history" data-nav="history">Time Machine</a>
+      <a href="#/activity" data-nav="activity">Activity</a>
+      <a href="#/audit" data-nav="audit">Audit Log</a>
+    </nav>
+  </header>
+
+  <main id="app">
+    <div class="loading">Loading battlefield intel…</div>
+  </main>
+
+  <footer class="site-footer">
+    <span id="footer-updated"></span>
+    <span>
+      Stats via <a href="https://gametools.network" target="_blank" rel="noopener">GameTools</a> · updated daily ·
+      <a href="https://github.com/raymdl/kdm-bf6-rankings" target="_blank" rel="noopener">data &amp; source</a>
+    </span>
+  </footer>
+
+  <script type="module" src="assets/app.js"></script>
+</body>
+</html>
