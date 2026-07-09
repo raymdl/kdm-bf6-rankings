@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "updatedAt": "2026-07-09T23:29:38.288Z",
+  "siteUrl": "https://raymdl.github.io/kdm-bf6-rankings/",
+  "stats": [
+    {
+      "key": "infantryKillDeath",
+      "title": "Player K/D",
+      "label": "Player K/D",
+      "format": "decimal",
+      "decimals": 2,
+      "higherIsBetter": true
+    },
+    {
+      "key": "killDeath",
+      "title": "K/D Ratio",
+      "label": "K/D Ratio",
+      "format": "decimal",
+      "decimals": 2,
+      "higherIsBetter": true
+    },
+    {
+      "key": "killsPerMinute",
+      "title": "Kills/Min",
+      "label": "Kills/Min",
+      "format": "decimal",
+      "decimals": 2,
+      "higherIsBetter": true
+    },
+    {
+      "key": "timePlayedHours",
+      "title": "Time Played",
+      "label": "Time Played",
+      "format": "hours",
+      "decimals": null,
+      "higherIsBetter": true
+    },
+    {
+      "key": "kills",
+      "title": "Kills",
+      "label": "Kills",
+      "format": "integer",
+      "decimals": null,
+      "higherIsBetter": true
+    },
+    {
+      "key": "vehicleKills",
+      "title": "Vehicle Kills",
+      "label": "Vehicle Kills",
+      "format": "integer",
+      "decimals": null,
+      "higherIsBetter": true
+    },
+    {
+      "key": "headshotPercent",
+      "title": "Headshot %",
+      "label": "HS%",
+      "format": "decimal",
+      "decimals": 2,
+      "higherIsBetter": true
+    },
+    {
+      "key": "playerRank",
+      "title": "Player Rank",
+      "label": "Player Rank",
+      "format": "integer",
+      "decimals": null,
+      "higherIsBetter": true
+    },
+    {
+      "key": "objectiveCaptures",
+      "title": "Objective Captures",
+      "label": "Objectives",
+      "format": "integer",
+      "decimals": null,
+      "higherIsBetter": true
+    },
+    {
+      "key": "revives",
+      "title": "Revives",
+      "label": "Revives",
+      "format": "integer",
+      "decimals": null,
+      "higherIsBetter": true
+    }
+  ]
+}
