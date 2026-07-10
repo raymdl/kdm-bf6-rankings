@@ -515,6 +515,9 @@ tr.r3 .rank-cell { color: var(--bronze); }
 }
 
 .mini-stat .k {
+  display: block;
+  min-height: 1.8em;
+  line-height: 1.25;
   color: var(--text-faint);
   font-size: 0.72rem;
   text-transform: uppercase;
