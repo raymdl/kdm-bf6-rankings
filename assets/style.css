@@ -452,6 +452,7 @@ tr.r3 .rank-cell { color: var(--bronze); }
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  white-space: nowrap;
 }
 
 .mini-stat .v {
