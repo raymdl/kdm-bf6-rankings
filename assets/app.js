@@ -308,7 +308,7 @@ function renderLeaderboard(statKey) {
           return `<div class="podium-card p${index + 1}">
             <div class="podium-rank">#${index + 1}${index === 0 ? " · TOP DOG" : ""}</div>
             <div class="podium-name"><a class="player-link" href="${playerHref(row.discordId)}">${esc(memberName(row.discordId))}</a></div>
-            <div class="podium-value">${fmtStat(stat, row.value)}</div>
+            <div class="podium-value">${fmtStat(stat, row.value)} <span class="podium-stat-label">${esc(stat.title)}</span></div>
             <div class="podium-delta">${delta ? `${delta} since previous snapshot` : "&nbsp;"}</div>
           </div>`;
         })

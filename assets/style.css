@@ -319,6 +319,13 @@ main {
   line-height: 1.1;
 }
 
+.podium-stat-label {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
 .podium-delta {
   font-size: 0.8rem;
   color: var(--text-dim);
