@@ -317,8 +317,10 @@ tbody tr:hover {
   background: var(--bg-hover);
 }
 
-/* Keep Audit Log column labels visible while reading its long event history. */
-.audit-floating-header {
+/* Keep column labels visible while scrolling long tables (Leaderboard, Time
+   Machine, Audit Log): a fixed clone of the header row pinned below the
+   sticky site header. */
+.floating-table-header {
   position: fixed;
   z-index: 19;
   overflow: hidden;
@@ -327,8 +329,8 @@ tbody tr:hover {
   pointer-events: none;
 }
 
-.audit-floating-header table,
-.audit-floating-header th {
+.floating-table-header table,
+.floating-table-header th {
   background: var(--bg-card);
 }
 

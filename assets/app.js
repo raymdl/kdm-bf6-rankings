@@ -12,7 +12,7 @@ const state = {
 };
 
 let charts = [];
-let auditHeaderCleanup = null;
+let floatingHeaderCleanups = [];
 
 /* ---------- utilities ---------- */
 
@@ -604,17 +604,16 @@ function renderActivity() {
 
 const auditFilterState = { text: "", action: "all", outcome: "all" };
 
-function wireAuditFloatingHeader() {
-  const wrapper = app.querySelector(".audit-table-wrap");
-  const table = wrapper?.querySelector("table");
+function wireFloatingTableHeader(wrapper) {
+  const table = wrapper.querySelector("table");
   const sourceHead = table?.querySelector("thead");
   const siteHeader = document.querySelector(".site-header");
-  if (!wrapper || !table || !sourceHead || !siteHeader) {
+  if (!table || !sourceHead || !siteHeader) {
     return;
   }
 
   const overlay = document.createElement("div");
-  overlay.className = "audit-floating-header";
+  overlay.className = "floating-table-header";
   overlay.setAttribute("aria-hidden", "true");
   const cloneTable = table.cloneNode(false);
   cloneTable.append(sourceHead.cloneNode(true));
@@ -670,12 +669,21 @@ function wireAuditFloatingHeader() {
     scheduleUpdate();
   };
   window.addEventListener("resize", handleResize);
-  auditHeaderCleanup = () => {
+  floatingHeaderCleanups.push(() => {
     window.removeEventListener("scroll", scheduleUpdate);
     wrapper.removeEventListener("scroll", scheduleUpdate);
     window.removeEventListener("resize", handleResize);
     overlay.remove();
-  };
+  });
+}
+
+// Keep column labels visible on every long table (Leaderboard, Time Machine,
+// Audit Log): pin a fixed clone of each table's header row just below the
+// sticky site header while the real header is scrolled out of view.
+function wireFloatingTableHeaders() {
+  for (const wrapper of app.querySelectorAll(".table-wrap")) {
+    wireFloatingTableHeader(wrapper);
+  }
 }
 
 function renderAudit() {
@@ -731,7 +739,7 @@ function renderAudit() {
           .join("")}
       </select>
     </div>
-    <div class="table-wrap audit-table-wrap">
+    <div class="table-wrap">
       <table>
         <thead><tr><th>When</th><th>Action</th><th>Result</th><th>Discord member</th><th>EA account</th><th>Persona / Player ID</th><th>User / Nucleus ID</th><th>Profile</th></tr></thead>
         <tbody>${filtered
@@ -773,15 +781,16 @@ function renderAudit() {
     auditFilterState.outcome = event.target.value;
     render();
   });
-  wireAuditFloatingHeader();
 }
 
 /* ---------- router ---------- */
 
 function render() {
   destroyCharts();
-  auditHeaderCleanup?.();
-  auditHeaderCleanup = null;
+  for (const cleanup of floatingHeaderCleanups) {
+    cleanup();
+  }
+  floatingHeaderCleanups = [];
   const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
   const [route] = parts;
 
@@ -813,6 +822,7 @@ function render() {
   for (const link of document.querySelectorAll("#site-nav a")) {
     link.classList.toggle("active", link.dataset.nav === nav);
   }
+  wireFloatingTableHeaders();
   window.scrollTo(0, 0);
 }
 
