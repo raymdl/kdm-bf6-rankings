@@ -218,15 +218,16 @@ main {
 }
 
 .sparkline-range-select::after {
-  content: "⌄";
+  content: "";
   position: absolute;
-  top: 45%;
-  right: 0.6rem;
-  color: var(--accent);
-  font-size: 0.9rem;
-  line-height: 1;
+  top: 50%;
+  right: 0.72rem;
+  width: 0.32rem;
+  height: 0.32rem;
+  border-right: 1.5px solid var(--accent);
+  border-bottom: 1.5px solid var(--accent);
   pointer-events: none;
-  transform: translateY(-50%);
+  transform: translateY(-65%) rotate(45deg);
 }
 
 .sparkline-range-select select {
