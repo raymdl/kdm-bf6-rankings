@@ -318,24 +318,18 @@ tbody tr:hover {
 }
 
 /* Keep Audit Log column labels visible while reading its long event history. */
-.audit-table-wrap {
-  position: sticky;
-  top: 64px;
-  max-height: calc(100vh - 5.5rem);
-  overflow: auto;
-}
-
-.audit-table-wrap thead {
-  position: sticky;
-  top: 0;
-  z-index: 10;
+.audit-floating-header {
+  position: fixed;
+  z-index: 19;
+  overflow: hidden;
   background: var(--bg-card);
   box-shadow: 0 1px 0 var(--border);
+  pointer-events: none;
 }
 
-.audit-table-wrap th {
+.audit-floating-header table,
+.audit-floating-header th {
   background: var(--bg-card);
-  border-bottom: none;
 }
 
 td.num, th.num {

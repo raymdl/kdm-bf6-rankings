@@ -12,6 +12,7 @@ const state = {
 };
 
 let charts = [];
+let auditHeaderCleanup = null;
 
 /* ---------- utilities ---------- */
 
@@ -603,6 +604,80 @@ function renderActivity() {
 
 const auditFilterState = { text: "", action: "all", outcome: "all" };
 
+function wireAuditFloatingHeader() {
+  const wrapper = app.querySelector(".audit-table-wrap");
+  const table = wrapper?.querySelector("table");
+  const sourceHead = table?.querySelector("thead");
+  const siteHeader = document.querySelector(".site-header");
+  if (!wrapper || !table || !sourceHead || !siteHeader) {
+    return;
+  }
+
+  const overlay = document.createElement("div");
+  overlay.className = "audit-floating-header";
+  overlay.setAttribute("aria-hidden", "true");
+  const cloneTable = table.cloneNode(false);
+  cloneTable.append(sourceHead.cloneNode(true));
+  overlay.append(cloneTable);
+  document.body.append(overlay);
+
+  const syncWidths = () => {
+    cloneTable.style.width = `${table.offsetWidth}px`;
+    const sourceCells = sourceHead.querySelectorAll("th");
+    const clonedCells = cloneTable.querySelectorAll("th");
+    for (const [index, cell] of sourceCells.entries()) {
+      const width = `${cell.getBoundingClientRect().width}px`;
+      clonedCells[index].style.width = width;
+      clonedCells[index].style.minWidth = width;
+      clonedCells[index].style.maxWidth = width;
+    }
+  };
+
+  const update = () => {
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const headerBottom = siteHeader.getBoundingClientRect().bottom;
+    const headerHeight = sourceHead.getBoundingClientRect().height;
+    const visible = wrapperRect.top < headerBottom && wrapperRect.bottom > headerBottom + headerHeight;
+    overlay.hidden = !visible;
+    if (!visible) {
+      return;
+    }
+
+    overlay.style.top = `${Math.round(headerBottom)}px`;
+    overlay.style.left = `${Math.round(wrapperRect.left)}px`;
+    overlay.style.width = `${Math.round(wrapperRect.width)}px`;
+    overlay.style.height = `${Math.round(headerHeight)}px`;
+    cloneTable.style.transform = `translateX(${-wrapper.scrollLeft}px)`;
+  };
+
+  let frame = null;
+  const scheduleUpdate = () => {
+    if (frame !== null) {
+      return;
+    }
+    frame = requestAnimationFrame(() => {
+      frame = null;
+      update();
+    });
+  };
+
+  syncWidths();
+  update();
+  window.addEventListener("scroll", scheduleUpdate, { passive: true });
+  wrapper.addEventListener("scroll", scheduleUpdate, { passive: true });
+  const handleResize = () => {
+    syncWidths();
+    scheduleUpdate();
+  };
+  window.addEventListener("resize", handleResize);
+  auditHeaderCleanup = () => {
+    window.removeEventListener("scroll", scheduleUpdate);
+    wrapper.removeEventListener("scroll", scheduleUpdate);
+    window.removeEventListener("resize", handleResize);
+    overlay.remove();
+  };
+}
+
 function renderAudit() {
   const events = [...(state.audit.events ?? [])].reverse();
   const text = auditFilterState.text.toLowerCase();
@@ -698,12 +773,15 @@ function renderAudit() {
     auditFilterState.outcome = event.target.value;
     render();
   });
+  wireAuditFloatingHeader();
 }
 
 /* ---------- router ---------- */
 
 function render() {
   destroyCharts();
+  auditHeaderCleanup?.();
+  auditHeaderCleanup = null;
   const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
   const [route] = parts;
 
