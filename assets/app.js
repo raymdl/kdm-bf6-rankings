@@ -206,25 +206,22 @@ function wireStatTabs(onSelect) {
   }
 }
 
-function sparklineRangeHtml() {
-  return `<div class="sparkline-range" role="group" aria-label="Sparkline date range">
-    <span class="sparkline-range-label">Trend range</span>
-    <div class="sparkline-range-options">${SPARKLINE_RANGES.map(
-      (range) =>
-        `<button type="button" class="${range.value === leaderboardSparklineRange ? "active" : ""}" data-sparkline-range="${range.value}" aria-pressed="${range.value === leaderboardSparklineRange}">${range.label}</button>`
-    ).join("")}</div>
-  </div>`;
+function sparklineRangeSelectHtml() {
+  return `<label class="sparkline-range-select">
+    <select id="sparkline-range-select" aria-label="Sparkline date range">${SPARKLINE_RANGES.map(
+      (range) => `<option value="${range.value}" ${range.value === leaderboardSparklineRange ? "selected" : ""}>${range.label}</option>`
+    ).join("")}</select>
+  </label>`;
 }
 
 function wireSparklineRange() {
-  for (const button of app.querySelectorAll("[data-sparkline-range]")) {
-    button.addEventListener("click", () => {
-      leaderboardSparklineRange = button.dataset.sparklineRange === "all" ? "all" : Number(button.dataset.sparklineRange);
-      const scrollY = window.scrollY;
-      render();
-      window.scrollTo(0, scrollY);
-    });
-  }
+  const select = document.getElementById("sparkline-range-select");
+  select?.addEventListener("change", () => {
+    leaderboardSparklineRange = select.value === "all" ? "all" : Number(select.value);
+    const scrollY = window.scrollY;
+    render();
+    window.scrollTo(0, scrollY);
+  });
 }
 
 const CHART_COLORS = ["#f26522", "#60a5fa", "#4ade80", "#c084fc", "#facc15", "#22d3ee", "#fb7185", "#a3e635"];
@@ -292,7 +289,6 @@ function renderLeaderboard(statKey) {
   const sparkPointCount = leaderboardSparklineRange === 1 ? 2 : leaderboardSparklineRange;
   const sparkStart =
     sparkPointCount === "all" ? 0 : Math.max(0, lastIndex - sparkPointCount + 1);
-  const selectedRange = SPARKLINE_RANGES.find((range) => range.value === leaderboardSparklineRange);
 
   const podium = ranking.slice(0, 3);
   const podiumHtml = podium.length
@@ -331,9 +327,8 @@ function renderLeaderboard(statKey) {
 
   app.innerHTML = `
     <h1 class="page-title">${esc(stat.title)} Leaderboard</h1>
-    <p class="page-sub">Movement and deltas vs the previous daily snapshot · ${leaderboardSparklineRange === 1 ? "sparklines show day-over-day" : `sparklines show ${esc(selectedRange?.label ?? "14 Days")}`}</p>
+    <p class="page-sub">Movement and deltas vs the previous daily snapshot · sparkline shows ${sparklineRangeSelectHtml()}${leaderboardSparklineRange === 1 ? " (day-over-day)" : ""}</p>
     ${statTabsHtml(stat.key, (key) => `/board/${key}`)}
-    ${sparklineRangeHtml()}
     ${podiumHtml}
     <div class="table-wrap">
       <table>
