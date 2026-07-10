@@ -645,6 +645,39 @@ tr.r3 .rank-cell { color: var(--bronze); }
   margin-bottom: 0.4rem;
 }
 
+.compare-players-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.compare-clear {
+  font: inherit;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.compare-clear:hover:not(:disabled) {
+  color: #fff;
+}
+
+.compare-clear:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.compare-clear:disabled {
+  color: var(--text-faint);
+  cursor: default;
+}
+
 .chip-row {
   display: flex;
   gap: 0.4rem;

@@ -492,7 +492,7 @@ function renderCompare() {
     <p class="page-sub">Pick players and a stat to overlay their daily history · showing ${compareRangeSelectHtml()}${compareState.range === 1 ? " (day-over-day)" : ""}</p>
     <div class="group-label">Stat</div>
     ${statTabsHtml(stat.key)}
-    <div class="group-label">Players</div>
+    <div class="group-label compare-players-label"><span>Players</span><button class="compare-clear" type="button" ${compareState.selected.length === 0 ? "disabled" : ""}>Unselect all</button></div>
     <div class="chip-row">${candidates
       .map(
         (member) =>
@@ -514,6 +514,11 @@ function renderCompare() {
     const scrollY = window.scrollY;
     render();
     window.scrollTo(0, scrollY);
+  });
+  app.querySelector(".compare-clear")?.addEventListener("click", () => {
+    compareState.selectionMode = "manual";
+    compareState.selected = [];
+    render();
   });
   for (const chip of app.querySelectorAll(".chip[data-id]")) {
     chip.addEventListener("click", () => {
