@@ -222,6 +222,9 @@ function lineChart(canvas, labels, datasets, stat) {
       plugins: {
         legend: { display: datasets.length > 1, labels: { boxWidth: 12, boxHeight: 12 } },
         tooltip: {
+          // Keep the tooltip clear of the hovered points instead of sitting
+          // on top of them (it flips to the other side near the chart edge).
+          caretPadding: 24,
           callbacks: {
             label: (ctx) => `${ctx.dataset.label}: ${fmtStat(stat, ctx.parsed.y)}`
           }
@@ -401,7 +404,7 @@ function renderPlayer(discordId, statKey) {
   }
 }
 
-const compareState = { selected: [], statKey: null };
+const compareState = { selected: [], statKey: null, cleared: false };
 
 function renderCompare() {
   const stat = statByKey(compareState.statKey) ?? state.meta.stats[0];
@@ -410,7 +413,7 @@ function renderCompare() {
   const candidates = [...state.latest.members].sort((a, b) =>
     String(a.displayName ?? "").localeCompare(String(b.displayName ?? ""))
   );
-  if (compareState.selected.length === 0) {
+  if (compareState.selected.length === 0 && !compareState.cleared) {
     compareState.selected = latestRanking(stat.key)
       .slice(0, 2)
       .map((row) => row.discordId);
@@ -419,7 +422,9 @@ function renderCompare() {
   app.innerHTML = `
     <h1 class="page-title">Head to Head</h1>
     <p class="page-sub">Pick players and a stat to overlay their daily history</p>
+    <div class="group-label">Stat</div>
     ${statTabsHtml(stat.key)}
+    <div class="group-label">Players</div>
     <div class="chip-row">${candidates
       .map(
         (member) =>
@@ -435,12 +440,14 @@ function renderCompare() {
     compareState.statKey = key;
     render();
   });
-  for (const chip of app.querySelectorAll(".chip")) {
+  for (const chip of app.querySelectorAll(".chip[data-id]")) {
     chip.addEventListener("click", () => {
       const id = chip.dataset.id;
       compareState.selected = compareState.selected.includes(id)
         ? compareState.selected.filter((existing) => existing !== id)
         : [...compareState.selected, id];
+      // Deliberately emptied selections must not re-seed the top-2 default.
+      compareState.cleared = compareState.selected.length === 0;
       render();
     });
   }
@@ -651,14 +658,14 @@ function renderAudit() {
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>When</th><th>Result</th><th>Action</th><th>Discord member</th><th>EA account</th><th>Player ID</th><th>User / Nucleus ID</th><th>Profile</th></tr></thead>
+        <thead><tr><th>When</th><th>Action</th><th>Result</th><th>Discord member</th><th>EA account</th><th>Persona / Player ID</th><th>User / Nucleus ID</th><th>Profile</th></tr></thead>
         <tbody>${filtered
           .map(
             (event) => `<tr>
               <td>${fmtDateTime(event.at)}</td>
-              <td><span class="badge ${esc(auditOutcome(event))}">${esc(auditOutcome(event))}</span></td>
-              <td><span class="badge ${esc(event.action)}">${esc(auditActionLabel(event.action))}</span>${
-                event.failureReason ? ` <span class="muted">${esc(auditFailureLabel(event.failureReason))}</span>` : ""
+              <td><span class="badge ${esc(event.action)}">${esc(auditActionLabel(event.action))}</span></td>
+              <td><span class="badge ${esc(auditOutcome(event))}">${esc(auditOutcome(event))}</span>${
+                event.failureReason ? ` <span class="muted">(${esc(auditFailureLabel(event.failureReason))})</span>` : ""
               }</td>
               <td>${auditMemberHtml(event)}</td>
               <td>${

@@ -12,7 +12,10 @@
   --up: #4ade80;
   --down: #f87171;
   --gold: #fbbf24;
-  --silver: #cbd5e1;
+  /* An icy platinum-blue rather than literal grey silver: real silver tones
+     were indistinguishable from the grey used for ranks 4+. Matches the blue
+     already used in the chart palette. */
+  --silver: #7ab8ff;
   --bronze: #d97706;
   --font-display: "Rajdhani", "Segoe UI", system-ui, sans-serif;
   --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
@@ -177,11 +180,9 @@ main {
 
 .stat-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.4rem;
-  overflow-x: auto;
-  padding-bottom: 0.5rem;
   margin-bottom: 1rem;
-  scrollbar-width: thin;
 }
 
 .stat-tabs button {
@@ -321,10 +322,12 @@ td.num, th.num {
   font-variant-numeric: tabular-nums;
 }
 
+/* Ranks 4+ stay faint so the gold/silver/bronze podium colors read clearly;
+   silver in particular needs the contrast against ordinary grey rows. */
 .rank-cell {
   font-family: var(--font-display);
   font-weight: 700;
-  color: var(--text-dim);
+  color: var(--text-faint);
   width: 2.5rem;
 }
 
@@ -537,6 +540,16 @@ tr.r3 .rank-cell { color: var(--bronze); }
 
 /* ---------- compare ---------- */
 
+.group-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.4rem;
+}
+
 .chip-row {
   display: flex;
   gap: 0.4rem;
@@ -544,16 +557,18 @@ tr.r3 .rank-cell { color: var(--bronze); }
   margin-bottom: 1rem;
 }
 
+/* Player chips are square-cornered and darker than the pill-shaped stat tabs
+   so the two wrapped button groups on the Compare view read as different
+   controls at a glance. */
 .chip {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 0.88rem;
-  letter-spacing: 0.04em;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.85rem;
   color: var(--text-dim);
-  background: var(--bg-card);
+  background: var(--bg-raise);
   border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
   cursor: pointer;
 }
 
