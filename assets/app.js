@@ -455,7 +455,7 @@ function renderPlayer(discordId, statKey) {
   }
 }
 
-const compareState = { selected: [], statKey: null, cleared: false, range: 14 };
+const compareState = { selected: [], statKey: null, selectionMode: "default", range: 14 };
 
 function compareRangeSelectHtml() {
   return `<label class="sparkline-range-select">
@@ -481,7 +481,7 @@ function renderCompare() {
   const candidates = [...state.latest.members].sort((a, b) =>
     String(a.displayName ?? "").localeCompare(String(b.displayName ?? ""))
   );
-  if (compareState.selected.length === 0 && !compareState.cleared) {
+  if (compareState.selectionMode === "default") {
     compareState.selected = latestRanking(stat.key)
       .slice(0, 2)
       .map((row) => row.discordId);
@@ -518,11 +518,13 @@ function renderCompare() {
   for (const chip of app.querySelectorAll(".chip[data-id]")) {
     chip.addEventListener("click", () => {
       const id = chip.dataset.id;
+      // Until a player chip is touched, every stat gets its own top-two
+      // default. A manual selection (including an intentionally empty one)
+      // remains stable while the user switches stats.
+      compareState.selectionMode = "manual";
       compareState.selected = compareState.selected.includes(id)
         ? compareState.selected.filter((existing) => existing !== id)
         : [...compareState.selected, id];
-      // Deliberately emptied selections must not re-seed the top-2 default.
-      compareState.cleared = compareState.selected.length === 0;
       render();
     });
   }
