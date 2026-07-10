@@ -13,6 +13,16 @@ const state = {
 
 let charts = [];
 let floatingHeaderCleanups = [];
+let leaderboardSparklineRange = 14;
+
+const SPARKLINE_RANGES = [
+  { value: 1, label: "1 Day" },
+  { value: 7, label: "7 Days" },
+  { value: 14, label: "14 Days" },
+  { value: 30, label: "30 Days" },
+  { value: 90, label: "90 Days" },
+  { value: "all", label: "All Time" }
+];
 
 /* ---------- utilities ---------- */
 
@@ -135,8 +145,13 @@ function shiftDateString(date, days) {
 
 function sparklineSvg(values, width = 110, height = 28) {
   const points = values.filter((value) => Number.isFinite(value));
-  if (points.length < 2) {
+  if (points.length === 0) {
     return "";
+  }
+  if (points.length === 1) {
+    return `<svg class="sparkline" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" aria-hidden="true">
+      <circle cx="${width / 2}" cy="${height / 2}" r="2.2"></circle>
+    </svg>`;
   }
   const min = Math.min(...points);
   const max = Math.max(...points);
@@ -187,6 +202,27 @@ function wireStatTabs(onSelect) {
       } else {
         onSelect?.(button.dataset.stat);
       }
+    });
+  }
+}
+
+function sparklineRangeHtml() {
+  return `<div class="sparkline-range" role="group" aria-label="Sparkline date range">
+    <span class="sparkline-range-label">Trend range</span>
+    <div class="sparkline-range-options">${SPARKLINE_RANGES.map(
+      (range) =>
+        `<button type="button" class="${range.value === leaderboardSparklineRange ? "active" : ""}" data-sparkline-range="${range.value}" aria-pressed="${range.value === leaderboardSparklineRange}">${range.label}</button>`
+    ).join("")}</div>
+  </div>`;
+}
+
+function wireSparklineRange() {
+  for (const button of app.querySelectorAll("[data-sparkline-range]")) {
+    button.addEventListener("click", () => {
+      leaderboardSparklineRange = button.dataset.sparklineRange === "all" ? "all" : Number(button.dataset.sparklineRange);
+      const scrollY = window.scrollY;
+      render();
+      window.scrollTo(0, scrollY);
     });
   }
 }
@@ -252,7 +288,9 @@ function renderLeaderboard(statKey) {
   const prevRankById = new Map(prevRanking.map((row, index) => [row.discordId, index + 1]));
   const prevValueById = new Map(prevRanking.map((row) => [row.discordId, row.value]));
   const lastIndex = state.history.dates.length - 1;
-  const sparkStart = Math.max(0, lastIndex - 13);
+  const sparkStart =
+    leaderboardSparklineRange === "all" ? 0 : Math.max(0, lastIndex - leaderboardSparklineRange + 1);
+  const selectedRange = SPARKLINE_RANGES.find((range) => range.value === leaderboardSparklineRange);
 
   const podium = ranking.slice(0, 3);
   const podiumHtml = podium.length
@@ -291,8 +329,9 @@ function renderLeaderboard(statKey) {
 
   app.innerHTML = `
     <h1 class="page-title">${esc(stat.title)} Leaderboard</h1>
-    <p class="page-sub">Movement and deltas vs the previous daily snapshot · sparkline shows the last 14 days</p>
+    <p class="page-sub">Movement and deltas vs the previous daily snapshot · sparklines show ${esc(selectedRange?.label ?? "14 Days")}</p>
     ${statTabsHtml(stat.key, (key) => `/board/${key}`)}
+    ${sparklineRangeHtml()}
     ${podiumHtml}
     <div class="table-wrap">
       <table>
@@ -301,6 +340,7 @@ function renderLeaderboard(statKey) {
       </table>
     </div>`;
   wireStatTabs();
+  wireSparklineRange();
 }
 
 function renderPlayers() {

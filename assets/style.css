@@ -211,6 +211,51 @@ main {
   border-color: var(--accent);
 }
 
+.sparkline-range {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  margin: 0 0 1.25rem;
+}
+
+.sparkline-range-label {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.sparkline-range-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.sparkline-range button {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+}
+
+.sparkline-range button:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
+.sparkline-range button.active {
+  color: #0d0f12;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
 /* ---------- podium ---------- */
 
 .podium {
