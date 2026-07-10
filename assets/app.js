@@ -455,7 +455,24 @@ function renderPlayer(discordId, statKey) {
   }
 }
 
-const compareState = { selected: [], statKey: null, cleared: false };
+const compareState = { selected: [], statKey: null, cleared: false, range: 14 };
+
+function compareRangeSelectHtml() {
+  return `<label class="sparkline-range-select">
+    <select id="compare-range-select" aria-label="Comparison date range">${SPARKLINE_RANGES.map(
+      (range) => `<option value="${range.value}" ${range.value === compareState.range ? "selected" : ""}>${range.label}</option>`
+    ).join("")}</select>
+  </label>`;
+}
+
+function compareHistoryWindow() {
+  const pointCount = compareState.range === 1 ? 2 : compareState.range;
+  const start = pointCount === "all" ? 0 : Math.max(0, state.history.dates.length - pointCount);
+  return {
+    labels: state.history.dates.slice(start),
+    start
+  };
+}
 
 function renderCompare() {
   const stat = statByKey(compareState.statKey) ?? state.meta.stats[0];
@@ -472,7 +489,7 @@ function renderCompare() {
 
   app.innerHTML = `
     <h1 class="page-title">Head to Head</h1>
-    <p class="page-sub">Pick players and a stat to overlay their daily history</p>
+    <p class="page-sub">Pick players and a stat to overlay their daily history · showing ${compareRangeSelectHtml()}${compareState.range === 1 ? " (day-over-day)" : ""}</p>
     <div class="group-label">Stat</div>
     ${statTabsHtml(stat.key)}
     <div class="group-label">Players</div>
@@ -491,6 +508,13 @@ function renderCompare() {
     compareState.statKey = key;
     render();
   });
+  const rangeSelect = document.getElementById("compare-range-select");
+  rangeSelect?.addEventListener("change", () => {
+    compareState.range = rangeSelect.value === "all" ? "all" : Number(rangeSelect.value);
+    const scrollY = window.scrollY;
+    render();
+    window.scrollTo(0, scrollY);
+  });
   for (const chip of app.querySelectorAll(".chip[data-id]")) {
     chip.addEventListener("click", () => {
       const id = chip.dataset.id;
@@ -504,10 +528,11 @@ function renderCompare() {
   }
 
   if (state.history.dates.length > 0 && compareState.selected.length > 0) {
+    const window = compareHistoryWindow();
     lineChart(
       document.getElementById("compare-chart"),
-      state.history.dates,
-      compareState.selected.map((id) => ({ label: memberName(id), data: series(id, stat.key) })),
+      window.labels,
+      compareState.selected.map((id) => ({ label: memberName(id), data: series(id, stat.key).slice(window.start) })),
       stat
     );
   }
