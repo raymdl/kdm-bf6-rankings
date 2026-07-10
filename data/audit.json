@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-07-10T01:35:47.943Z",
+  "updatedAt": "2026-07-10T13:11:26.381Z",
   "events": [
     {
       "at": "2026-07-06T15:06:25.829Z",
@@ -577,6 +577,54 @@
       "profileName": "eMp_RaCiNE",
       "messageId": "1524930316861571163",
       "resultMessageId": "1524930379507830786"
+    },
+    {
+      "at": "2026-07-10T06:51:34.427Z",
+      "action": "link_attempt",
+      "outcome": "failed",
+      "failureReason": "profile_not_found",
+      "discordId": "307279962795409429",
+      "discordUsername": "zyfs",
+      "displayName": "Zyfs",
+      "eaName": "1009665627149",
+      "previousEaName": null,
+      "playerId": null,
+      "nucleusId": null,
+      "profileName": null,
+      "messageId": "1525031714378879066",
+      "resultMessageId": "1525031720577929328"
+    },
+    {
+      "at": "2026-07-10T06:55:11.197Z",
+      "action": "link_attempt",
+      "outcome": "failed",
+      "failureReason": "profile_not_found",
+      "discordId": "307279962795409429",
+      "discordUsername": "zyfs",
+      "displayName": "Zyfs",
+      "eaName": "1008832527149",
+      "previousEaName": null,
+      "playerId": null,
+      "nucleusId": null,
+      "profileName": null,
+      "messageId": "1525032623578026105",
+      "resultMessageId": "1525032628510658560"
+    },
+    {
+      "at": "2026-07-10T06:57:46.253Z",
+      "action": "linked",
+      "outcome": "success",
+      "failureReason": null,
+      "discordId": "307279962795409429",
+      "discordUsername": "zyfs",
+      "displayName": "Zyfs",
+      "eaName": "Zyfs17",
+      "previousEaName": null,
+      "playerId": "1004348727149",
+      "nucleusId": "1008832527149",
+      "profileName": "Zyfs17",
+      "messageId": "1525033273930023083",
+      "resultMessageId": "1525033362601935051"
     }
   ]
 }
