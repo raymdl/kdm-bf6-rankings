@@ -515,10 +515,51 @@ function overtakeText(event) {
     in <strong>${esc(stat?.title ?? event.statKey)}</strong></span>`;
 }
 
+function auditOutcome(event) {
+  return event.outcome ?? "success";
+}
+
+function auditActionLabel(action) {
+  return (
+    {
+      linked: "linked",
+      relinked: "relinked",
+      unlinked: "unlinked",
+      link_attempt: "link attempt",
+      relink_attempt: "relink attempt",
+      unlink_attempt: "unlink attempt"
+    }[action] ?? action
+  );
+}
+
+function auditFailureLabel(reason) {
+  return (
+    {
+      profile_not_found: "profile not found",
+      profile_already_linked: "profile already linked",
+      lookup_unavailable: "lookup unavailable"
+    }[reason] ?? "link failed"
+  );
+}
+
+function auditMemberHtml(event) {
+  const name = event.displayName ?? (event.discordId ? memberName(event.discordId) : "Unknown member");
+  const member = event.discordId
+    ? `<a class="who player-link" href="${playerHref(event.discordId)}">${esc(name)}</a>`
+    : `<strong>${esc(name)}</strong>`;
+  return `${member}${event.discordUsername ? ` <span class="mono">@${esc(event.discordUsername)}</span>` : ""}`;
+}
+
 function auditText(event) {
-  const who = `<a class="who player-link" href="${playerHref(event.discordId)}">${esc(
-    event.displayName ?? memberName(event.discordId)
-  )}</a>${event.discordUsername ? ` <span class="mono">@${esc(event.discordUsername)}</span>` : ""}`;
+  const who = auditMemberHtml(event);
+
+  if (auditOutcome(event) === "failed") {
+    return `<span class="feed-text"><span class="badge failed">failed</span> ${auditMemberHtml(event)} could not ${
+      event.action === "relink_attempt" ? "relink" : "link"
+    } EA account <span class="mono">${esc(event.eaName ?? "unknown")}</span> <span class="muted">(${esc(
+      auditFailureLabel(event.failureReason)
+    )})</span></span>`;
+  }
 
   if (event.action === "unlinked") {
     return `<span class="feed-text"><span class="badge unlinked">unlinked</span> ${who} detached EA account <span class="mono">${esc(
@@ -536,26 +577,24 @@ function auditText(event) {
 }
 
 function renderActivity() {
-  const items = [
-    ...(state.notifications.events ?? []).map((event) => ({ at: event.at, html: overtakeText(event) })),
-    ...(state.audit.events ?? []).map((event) => ({ at: event.at, html: auditText(event) }))
-  ]
+  const items = (state.notifications.events ?? [])
+    .map((event) => ({ at: event.at, html: overtakeText(event) }))
     .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
     .slice(0, 120);
 
   app.innerHTML = `
     <h1 class="page-title">Activity</h1>
-    <p class="page-sub">Recent overtakes and roster changes</p>
+    <p class="page-sub">Recent leaderboard overtakes</p>
     ${
       items.length
         ? `<div class="feed">${items
             .map((item) => `<div class="feed-item"><span class="feed-date">${fmtDateTime(item.at)}</span>${item.html}</div>`)
             .join("")}</div>`
-        : `<div class="empty">Nothing yet — the feed fills up as members link profiles and trade ranks.</div>`
+        : `<div class="empty">No overtakes yet — this feed records leaderboard changes only.</div>`
     }`;
 }
 
-const auditFilterState = { text: "", action: "all" };
+const auditFilterState = { text: "", action: "all", outcome: "all" };
 
 function renderAudit() {
   const events = [...(state.audit.events ?? [])].reverse();
@@ -564,49 +603,75 @@ function renderAudit() {
     if (auditFilterState.action !== "all" && event.action !== auditFilterState.action) {
       return false;
     }
+    if (auditFilterState.outcome !== "all" && auditOutcome(event) !== auditFilterState.outcome) {
+      return false;
+    }
     if (!text) {
       return true;
     }
-    return [event.displayName, event.discordUsername, event.eaName, event.previousEaName, event.profileName, event.playerId]
+    return [
+      event.displayName,
+      event.discordUsername,
+      event.eaName,
+      event.previousEaName,
+      event.profileName,
+      event.playerId,
+      event.nucleusId,
+      event.failureReason
+    ]
       .filter(Boolean)
       .some((field) => String(field).toLowerCase().includes(text));
   });
 
   app.innerHTML = `
     <h1 class="page-title">Audit Log</h1>
-    <p class="page-sub">Every profile link, relink, and unlink pulled from the Discord link channel</p>
+    <p class="page-sub">Completed profile changes and failed link attempts pulled from the Discord link channel</p>
     <div class="filter-row">
-      <input type="search" id="audit-search" placeholder="Filter by name, EA account, player ID…" value="${esc(auditFilterState.text)}" />
+      <input type="search" id="audit-search" placeholder="Filter by name, EA account, player or nucleus ID…" value="${esc(auditFilterState.text)}" />
       <select id="audit-action">
-        ${["all", "linked", "relinked", "unlinked"]
+        ${["all", "linked", "relinked", "unlinked", "link_attempt", "relink_attempt"]
           .map(
             (action) =>
-              `<option value="${action}" ${auditFilterState.action === action ? "selected" : ""}>${action === "all" ? "All actions" : action}</option>`
+              `<option value="${action}" ${auditFilterState.action === action ? "selected" : ""}>${
+                action === "all" ? "All actions" : auditActionLabel(action)
+              }</option>`
+          )
+          .join("")}
+      </select>
+      <select id="audit-outcome">
+        ${["all", "success", "failed"]
+          .map(
+            (outcome) =>
+              `<option value="${outcome}" ${auditFilterState.outcome === outcome ? "selected" : ""}>${
+                outcome === "all" ? "All results" : outcome
+              }</option>`
           )
           .join("")}
       </select>
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>When</th><th>Action</th><th>Discord member</th><th>EA account</th><th>Player ID</th><th>Profile</th></tr></thead>
+        <thead><tr><th>When</th><th>Result</th><th>Action</th><th>Discord member</th><th>EA account</th><th>Player ID</th><th>User / Nucleus ID</th><th>Profile</th></tr></thead>
         <tbody>${filtered
           .map(
             (event) => `<tr>
               <td>${fmtDateTime(event.at)}</td>
-              <td><span class="badge ${esc(event.action)}">${esc(event.action)}</span></td>
-              <td><a class="player-link" href="${playerHref(event.discordId)}">${esc(event.displayName ?? memberName(event.discordId))}</a>${
-                event.discordUsername ? ` <span class="mono">@${esc(event.discordUsername)}</span>` : ""
+              <td><span class="badge ${esc(auditOutcome(event))}">${esc(auditOutcome(event))}</span></td>
+              <td><span class="badge ${esc(event.action)}">${esc(auditActionLabel(event.action))}</span>${
+                event.failureReason ? ` <span class="muted">${esc(auditFailureLabel(event.failureReason))}</span>` : ""
               }</td>
+              <td>${auditMemberHtml(event)}</td>
               <td>${
-                event.action === "relinked"
+                event.action === "relinked" || event.action === "relink_attempt"
                   ? `<span class="mono">${esc(event.previousEaName ?? "?")}</span> <span class="arrow">→</span> <span class="mono">${esc(event.eaName)}</span>`
                   : `<span class="mono">${esc(event.eaName ?? "—")}</span>`
               }</td>
               <td class="mono">${esc(event.playerId ?? "—")}</td>
+              <td class="mono">${esc(event.nucleusId ?? "—")}</td>
               <td>${esc(event.profileName ?? "—")}</td>
             </tr>`
           )
-          .join("") || `<tr><td colspan="6" class="empty">No matching events.</td></tr>`}</tbody>
+          .join("") || `<tr><td colspan="8" class="empty">No matching events.</td></tr>`}</tbody>
       </table>
     </div>`;
 
@@ -620,6 +685,10 @@ function renderAudit() {
   });
   document.getElementById("audit-action").addEventListener("change", (event) => {
     auditFilterState.action = event.target.value;
+    render();
+  });
+  document.getElementById("audit-outcome").addEventListener("change", (event) => {
+    auditFilterState.outcome = event.target.value;
     render();
   });
 }
