@@ -222,6 +222,9 @@ function lineChart(canvas, labels, datasets, stat) {
       plugins: {
         legend: { display: datasets.length > 1, labels: { boxWidth: 12, boxHeight: 12 } },
         tooltip: {
+          // Keep the tooltip clear of the hovered points instead of sitting
+          // on top of them (it flips to the other side near the chart edge).
+          caretPadding: 24,
           callbacks: {
             label: (ctx) => `${ctx.dataset.label}: ${fmtStat(stat, ctx.parsed.y)}`
           }
@@ -419,16 +422,15 @@ function renderCompare() {
   app.innerHTML = `
     <h1 class="page-title">Head to Head</h1>
     <p class="page-sub">Pick players and a stat to overlay their daily history</p>
+    <div class="group-label">Stat</div>
     ${statTabsHtml(stat.key)}
-    <div class="chip-row">
-      <button class="chip chip-action" id="compare-select-all">Select all</button>
-      <button class="chip chip-action" id="compare-clear-all">Unselect all</button>
-      ${candidates
-        .map(
-          (member) =>
-            `<button class="chip ${compareState.selected.includes(member.discordId) ? "active" : ""}" data-id="${member.discordId}">${esc(member.displayName ?? member.discordId)}</button>`
-        )
-        .join("")}</div>
+    <div class="group-label">Players</div>
+    <div class="chip-row">${candidates
+      .map(
+        (member) =>
+          `<button class="chip ${compareState.selected.includes(member.discordId) ? "active" : ""}" data-id="${member.discordId}">${esc(member.displayName ?? member.discordId)}</button>`
+      )
+      .join("")}</div>
     <div class="chart-card">
       <h3>${esc(stat.title)}</h3>
       <div class="chart-box"><canvas id="compare-chart"></canvas></div>
@@ -438,23 +440,13 @@ function renderCompare() {
     compareState.statKey = key;
     render();
   });
-  document.getElementById("compare-select-all").addEventListener("click", () => {
-    compareState.selected = candidates.map((member) => member.discordId);
-    render();
-  });
-  document.getElementById("compare-clear-all").addEventListener("click", () => {
-    // Explicitly emptied, so the "default to top 2" seeding must not kick in
-    // on the rerender.
-    compareState.cleared = true;
-    compareState.selected = [];
-    render();
-  });
   for (const chip of app.querySelectorAll(".chip[data-id]")) {
     chip.addEventListener("click", () => {
       const id = chip.dataset.id;
       compareState.selected = compareState.selected.includes(id)
         ? compareState.selected.filter((existing) => existing !== id)
         : [...compareState.selected, id];
+      // Deliberately emptied selections must not re-seed the top-2 default.
       compareState.cleared = compareState.selected.length === 0;
       render();
     });
@@ -666,7 +658,7 @@ function renderAudit() {
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>When</th><th>Action</th><th>Result</th><th>Discord member</th><th>EA account</th><th>Persona/Player ID</th><th>User / Nucleus ID</th><th>Profile</th></tr></thead>
+        <thead><tr><th>When</th><th>Action</th><th>Result</th><th>Discord member</th><th>EA account</th><th>Persona / Player ID</th><th>User / Nucleus ID</th><th>Profile</th></tr></thead>
         <tbody>${filtered
           .map(
             (event) => `<tr>
