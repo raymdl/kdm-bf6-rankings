@@ -361,13 +361,22 @@ function renderPlayers() {
       numeric: true
     })
   );
+  const playerSearchText = (member) =>
+    [member.displayName, member.discordUsername, member.eaName, member.profileName]
+      .filter(Boolean)
+      .join(" ")
+      .toLocaleLowerCase();
 
   app.innerHTML = `
+    <div class="players-toolbar"><div>
     <h1 class="page-title">Players</h1>
     <p class="page-sub">${sorted.length} linked member(s) · click a player for full history</p>
+      </div>
+      <label class="player-search"><span class="sr-only">Search players</span><input id="player-search" type="search" placeholder="Search players" autocomplete="off"></label>
+    </div>
     <div class="player-grid">${sorted
       .map(
-        (member) => `<a class="player-card" href="${playerHref(member.discordId)}">
+        (member) => `<a class="player-card" data-player-search="${esc(playerSearchText(member))}" href="${playerHref(member.discordId)}">
           <div class="player-card-name">${esc(member.displayName ?? member.discordId)}${
             member.cachedStats ? cachedMarkerHtml() : ""
           }</div>
@@ -380,7 +389,21 @@ function renderPlayers() {
         </a>`
       )
       .join("")}</div>
+    <p id="player-search-empty" class="empty" hidden>No players match that search.</p>
     ${cachedFootnoteHtml(sorted.some((member) => member.cachedStats))}`;
+
+  const search = document.getElementById("player-search");
+  const empty = document.getElementById("player-search-empty");
+  const cards = [...app.querySelectorAll(".player-card")];
+  search?.addEventListener("input", () => {
+    const query = search.value.trim().toLocaleLowerCase();
+    const visibleCount = cards.reduce((total, card) => {
+      const matches = !query || card.dataset.playerSearch.includes(query);
+      card.hidden = !matches;
+      return total + Number(matches);
+    }, 0);
+    empty.hidden = visibleCount > 0;
+  });
 }
 
 function renderPlayer(discordId, statKey) {
