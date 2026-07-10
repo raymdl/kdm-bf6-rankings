@@ -536,10 +536,8 @@ tr.r3 .rank-cell { color: var(--bronze); }
   color: var(--text-faint);
 }
 
-.player-search input:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-color: var(--accent);
+.player-search input:focus {
+  outline: 1px solid var(--accent);
 }
 
 .sr-only {
@@ -567,6 +565,10 @@ tr.r3 .rank-cell { color: var(--bronze); }
   padding: 1rem;
   color: var(--text);
   display: block;
+}
+
+.player-card[hidden] {
+  display: none;
 }
 
 .player-card:hover {
