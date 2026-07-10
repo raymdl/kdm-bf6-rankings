@@ -231,6 +231,7 @@ main {
 
 .sparkline-range-select select {
   appearance: none;
+  color-scheme: dark;
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 0.76rem;
@@ -242,6 +243,11 @@ main {
   border-radius: 999px;
   padding: 0.22rem 1.75rem 0.22rem 0.65rem;
   cursor: pointer;
+}
+
+.sparkline-range-select option {
+  color: var(--text);
+  background: var(--bg-card);
 }
 
 .sparkline-range-select select:hover {
