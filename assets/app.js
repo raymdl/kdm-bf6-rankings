@@ -401,7 +401,7 @@ function renderPlayer(discordId, statKey) {
   }
 }
 
-const compareState = { selected: [], statKey: null };
+const compareState = { selected: [], statKey: null, cleared: false };
 
 function renderCompare() {
   const stat = statByKey(compareState.statKey) ?? state.meta.stats[0];
@@ -410,7 +410,7 @@ function renderCompare() {
   const candidates = [...state.latest.members].sort((a, b) =>
     String(a.displayName ?? "").localeCompare(String(b.displayName ?? ""))
   );
-  if (compareState.selected.length === 0) {
+  if (compareState.selected.length === 0 && !compareState.cleared) {
     compareState.selected = latestRanking(stat.key)
       .slice(0, 2)
       .map((row) => row.discordId);
@@ -420,12 +420,15 @@ function renderCompare() {
     <h1 class="page-title">Head to Head</h1>
     <p class="page-sub">Pick players and a stat to overlay their daily history</p>
     ${statTabsHtml(stat.key)}
-    <div class="chip-row">${candidates
-      .map(
-        (member) =>
-          `<button class="chip ${compareState.selected.includes(member.discordId) ? "active" : ""}" data-id="${member.discordId}">${esc(member.displayName ?? member.discordId)}</button>`
-      )
-      .join("")}</div>
+    <div class="chip-row">
+      <button class="chip chip-action" id="compare-select-all">Select all</button>
+      <button class="chip chip-action" id="compare-clear-all">Unselect all</button>
+      ${candidates
+        .map(
+          (member) =>
+            `<button class="chip ${compareState.selected.includes(member.discordId) ? "active" : ""}" data-id="${member.discordId}">${esc(member.displayName ?? member.discordId)}</button>`
+        )
+        .join("")}</div>
     <div class="chart-card">
       <h3>${esc(stat.title)}</h3>
       <div class="chart-box"><canvas id="compare-chart"></canvas></div>
@@ -435,12 +438,24 @@ function renderCompare() {
     compareState.statKey = key;
     render();
   });
-  for (const chip of app.querySelectorAll(".chip")) {
+  document.getElementById("compare-select-all").addEventListener("click", () => {
+    compareState.selected = candidates.map((member) => member.discordId);
+    render();
+  });
+  document.getElementById("compare-clear-all").addEventListener("click", () => {
+    // Explicitly emptied, so the "default to top 2" seeding must not kick in
+    // on the rerender.
+    compareState.cleared = true;
+    compareState.selected = [];
+    render();
+  });
+  for (const chip of app.querySelectorAll(".chip[data-id]")) {
     chip.addEventListener("click", () => {
       const id = chip.dataset.id;
       compareState.selected = compareState.selected.includes(id)
         ? compareState.selected.filter((existing) => existing !== id)
         : [...compareState.selected, id];
+      compareState.cleared = compareState.selected.length === 0;
       render();
     });
   }
@@ -651,7 +666,7 @@ function renderAudit() {
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>When</th><th>Action</th><th>Result</th><th>Discord member</th><th>EA account</th><th>Player ID</th><th>User / Nucleus ID</th><th>Profile</th></tr></thead>
+        <thead><tr><th>When</th><th>Action</th><th>Result</th><th>Discord member</th><th>EA account</th><th>Persona/Player ID</th><th>User / Nucleus ID</th><th>Profile</th></tr></thead>
         <tbody>${filtered
           .map(
             (event) => `<tr>

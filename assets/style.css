@@ -12,7 +12,7 @@
   --up: #4ade80;
   --down: #f87171;
   --gold: #fbbf24;
-  --silver: #cbd5e1;
+  --silver: #f1f5f9;
   --bronze: #d97706;
   --font-display: "Rajdhani", "Segoe UI", system-ui, sans-serif;
   --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
@@ -321,10 +321,12 @@ td.num, th.num {
   font-variant-numeric: tabular-nums;
 }
 
+/* Ranks 4+ stay faint so the gold/silver/bronze podium colors read clearly;
+   silver in particular needs the contrast against ordinary grey rows. */
 .rank-cell {
   font-family: var(--font-display);
   font-weight: 700;
-  color: var(--text-dim);
+  color: var(--text-faint);
   width: 2.5rem;
 }
 
@@ -566,6 +568,14 @@ tr.r3 .rank-cell { color: var(--bronze); }
   color: var(--text);
   border-color: var(--accent);
   background: var(--accent-soft);
+}
+
+.chip.chip-action {
+  color: var(--accent);
+  border-style: dashed;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
 }
 
 /* ---------- time machine ---------- */
