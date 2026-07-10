@@ -651,14 +651,14 @@ function renderAudit() {
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>When</th><th>Result</th><th>Action</th><th>Discord member</th><th>EA account</th><th>Player ID</th><th>User / Nucleus ID</th><th>Profile</th></tr></thead>
+        <thead><tr><th>When</th><th>Action</th><th>Result</th><th>Discord member</th><th>EA account</th><th>Player ID</th><th>User / Nucleus ID</th><th>Profile</th></tr></thead>
         <tbody>${filtered
           .map(
             (event) => `<tr>
               <td>${fmtDateTime(event.at)}</td>
-              <td><span class="badge ${esc(auditOutcome(event))}">${esc(auditOutcome(event))}</span></td>
-              <td><span class="badge ${esc(event.action)}">${esc(auditActionLabel(event.action))}</span>${
-                event.failureReason ? ` <span class="muted">${esc(auditFailureLabel(event.failureReason))}</span>` : ""
+              <td><span class="badge ${esc(event.action)}">${esc(auditActionLabel(event.action))}</span></td>
+              <td><span class="badge ${esc(auditOutcome(event))}">${esc(auditOutcome(event))}</span>${
+                event.failureReason ? ` <span class="muted">(${esc(auditFailureLabel(event.failureReason))})</span>` : ""
               }</td>
               <td>${auditMemberHtml(event)}</td>
               <td>${
