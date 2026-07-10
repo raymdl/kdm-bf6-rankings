@@ -471,8 +471,28 @@ tr.r3 .rank-cell { color: var(--bronze); }
 .badge.success { color: var(--up); border-color: rgba(74, 222, 128, 0.4); }
 .badge.failed { color: var(--down); border-color: rgba(248, 113, 113, 0.4); }
 .badge.link_attempt, .badge.relink_attempt { color: var(--gold); border-color: rgba(251, 191, 36, 0.4); }
-.badge.cached { color: var(--gold); border-color: rgba(251, 191, 36, 0.4); }
 .badge.overtake { color: var(--accent); border-color: rgba(242, 101, 34, 0.45); }
+
+.cached-marker {
+  display: inline-block;
+  margin-left: 0.3rem;
+  color: var(--gold);
+  font-family: "Segoe UI Symbol", sans-serif;
+  font-size: 0.9em;
+  line-height: 1;
+  vertical-align: baseline;
+}
+
+.cached-footnote {
+  margin: 0.85rem 0 0;
+  color: var(--text-faint);
+  font-size: 0.82rem;
+}
+
+.cached-footnote .cached-marker {
+  margin-left: 0;
+  margin-right: 0.25rem;
+}
 
 /* ---------- player cards / profile ---------- */
 

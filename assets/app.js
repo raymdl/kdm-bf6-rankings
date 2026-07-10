@@ -206,6 +206,16 @@ function wireStatTabs(onSelect) {
   }
 }
 
+function cachedMarkerHtml() {
+  return `<span class="cached-marker" role="img" aria-label="Cached stats" title="Cached stats">◷</span>`;
+}
+
+function cachedFootnoteHtml(hasCachedStats) {
+  return hasCachedStats
+    ? `<p class="cached-footnote">${cachedMarkerHtml()} Cached stats are from the last successful GameTools refresh.</p>`
+    : "";
+}
+
 function sparklineRangeSelectHtml() {
   return `<label class="sparkline-range-select">
     <select id="sparkline-range-select" aria-label="Sparkline date range">${SPARKLINE_RANGES.map(
@@ -313,7 +323,7 @@ function renderLeaderboard(statKey) {
       const delta = fmtDelta(stat, row.value - (prevValue ?? NaN));
       const deltaClass = delta ? (row.value > prevValue ? "up" : "down") : "flat";
       const spark = series(row.discordId, stat.key).slice(sparkStart, lastIndex + 1);
-      const cached = row.member?.cachedStats ? ` <span class="badge cached" title="GameTools fetch failed; showing last known stats">cached</span>` : "";
+      const cached = row.member?.cachedStats ? cachedMarkerHtml() : "";
       return `<tr class="r${rank}">
         <td class="rank-cell">${rank}</td>
         <td>${movementHtml(prevRank, rank)}</td>
@@ -335,7 +345,8 @@ function renderLeaderboard(statKey) {
         <thead><tr><th>#</th><th>Δ</th><th>Player</th><th class="num">${esc(stat.title)}</th><th class="num">Change</th><th>Trend</th></tr></thead>
         <tbody>${rows || `<tr><td colspan="6" class="empty">No stats yet.</td></tr>`}</tbody>
       </table>
-    </div>`;
+    </div>
+    ${cachedFootnoteHtml(ranking.some((row) => row.member?.cachedStats))}`;
   wireStatTabs();
   wireSparklineRange();
 }
@@ -355,7 +366,7 @@ function renderPlayers() {
       .map(
         (member) => `<a class="player-card" href="${playerHref(member.discordId)}">
           <div class="player-card-name">${esc(member.displayName ?? member.discordId)}${
-            member.cachedStats ? ` <span class="badge cached">cached</span>` : ""
+            member.cachedStats ? cachedMarkerHtml() : ""
           }</div>
           <div class="player-card-sub">${esc(member.profileName ?? member.eaName ?? "")}</div>
           <div class="player-card-stats">
@@ -365,7 +376,8 @@ function renderPlayers() {
           </div>
         </a>`
       )
-      .join("")}</div>`;
+      .join("")}</div>
+    ${cachedFootnoteHtml(sorted.some((member) => member.cachedStats))}`;
 }
 
 function renderPlayer(discordId, statKey) {
@@ -411,7 +423,7 @@ function renderPlayer(discordId, statKey) {
   app.innerHTML = `
     <div class="profile-head">
       <h1 class="page-title">${esc(name)}</h1>
-      ${member?.cachedStats ? `<span class="badge cached" title="GameTools fetch failed; showing last known stats">cached stats</span>` : ""}
+      ${member?.cachedStats ? cachedMarkerHtml() : ""}
     </div>
     <p class="profile-sub">
       ${member?.profileName ? `Profile <strong>${esc(member.profileName)}</strong> · ` : ""}
@@ -424,7 +436,8 @@ function renderPlayer(discordId, statKey) {
       <h3>${esc(stat.title)} over time</h3>
       <div class="chart-box"><canvas id="player-chart"></canvas></div>
     </div>
-    ${auditHtml}`;
+    ${auditHtml}
+    ${cachedFootnoteHtml(Boolean(member?.cachedStats))}`;
 
   for (const card of app.querySelectorAll(".stat-summary")) {
     card.addEventListener("click", () => {
