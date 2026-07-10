@@ -355,8 +355,11 @@ function renderPlayers() {
   const kd = statByKey("infantryKillDeath") ?? state.meta.stats[0];
   const kpm = statByKey("killsPerMinute");
   const kills = statByKey("kills");
-  const sorted = [...state.latest.members].sort(
-    (a, b) => (b.stats[kd.key] ?? -Infinity) - (a.stats[kd.key] ?? -Infinity)
+  const sorted = [...state.latest.members].sort((a, b) =>
+    String(a.displayName ?? a.discordId).localeCompare(String(b.displayName ?? b.discordId), undefined, {
+      sensitivity: "base",
+      numeric: true
+    })
   );
 
   app.innerHTML = `
