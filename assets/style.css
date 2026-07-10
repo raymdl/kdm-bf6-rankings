@@ -317,6 +317,14 @@ tbody tr:hover {
   background: var(--bg-hover);
 }
 
+/* Keep Audit Log column labels visible while reading its long event history. */
+.audit-table-wrap th {
+  position: sticky;
+  top: 64px;
+  z-index: 10;
+  background: var(--bg-card);
+}
+
 td.num, th.num {
   text-align: right;
   font-variant-numeric: tabular-nums;

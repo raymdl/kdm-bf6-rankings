@@ -656,7 +656,7 @@ function renderAudit() {
           .join("")}
       </select>
     </div>
-    <div class="table-wrap">
+    <div class="table-wrap audit-table-wrap">
       <table>
         <thead><tr><th>When</th><th>Action</th><th>Result</th><th>Discord member</th><th>EA account</th><th>Persona / Player ID</th><th>User / Nucleus ID</th><th>Profile</th></tr></thead>
         <tbody>${filtered
