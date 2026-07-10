@@ -12,6 +12,7 @@ const state = {
 };
 
 let charts = [];
+let auditStickyCleanup = null;
 
 /* ---------- utilities ---------- */
 
@@ -603,6 +604,31 @@ function renderActivity() {
 
 const auditFilterState = { text: "", action: "all", outcome: "all" };
 
+function wireAuditStickyHeader() {
+  const wrapper = app.querySelector(".audit-table-wrap");
+  const tableHead = wrapper?.querySelector("thead");
+  const siteHeader = document.querySelector(".site-header");
+  if (!wrapper || !tableHead || !siteHeader) {
+    return;
+  }
+
+  const update = () => {
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const headerBottom = siteHeader.getBoundingClientRect().bottom;
+    const maxOffset = Math.max(0, wrapperRect.height - tableHead.offsetHeight);
+    const offset = Math.min(Math.max(0, headerBottom - wrapperRect.top), maxOffset);
+    tableHead.style.transform = `translateY(${Math.round(offset)}px)`;
+  };
+
+  window.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update);
+  auditStickyCleanup = () => {
+    window.removeEventListener("scroll", update);
+    window.removeEventListener("resize", update);
+  };
+  update();
+}
+
 function renderAudit() {
   const events = [...(state.audit.events ?? [])].reverse();
   const text = auditFilterState.text.toLowerCase();
@@ -698,12 +724,15 @@ function renderAudit() {
     auditFilterState.outcome = event.target.value;
     render();
   });
+  wireAuditStickyHeader();
 }
 
 /* ---------- router ---------- */
 
 function render() {
   destroyCharts();
+  auditStickyCleanup?.();
+  auditStickyCleanup = null;
   const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
   const [route] = parts;
 

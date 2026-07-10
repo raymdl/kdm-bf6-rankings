@@ -318,10 +318,13 @@ tbody tr:hover {
 }
 
 /* Keep Audit Log column labels visible while reading its long event history. */
-.audit-table-wrap th {
-  position: sticky;
-  top: 64px;
+.audit-table-wrap thead {
+  position: relative;
   z-index: 10;
+  will-change: transform;
+}
+
+.audit-table-wrap th {
   background: var(--bg-card);
 }
 
