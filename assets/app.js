@@ -288,8 +288,10 @@ function renderLeaderboard(statKey) {
   const prevRankById = new Map(prevRanking.map((row, index) => [row.discordId, index + 1]));
   const prevValueById = new Map(prevRanking.map((row) => [row.discordId, row.value]));
   const lastIndex = state.history.dates.length - 1;
+  // A one-day view means yesterday-to-today, so it needs two snapshot points.
+  const sparkPointCount = leaderboardSparklineRange === 1 ? 2 : leaderboardSparklineRange;
   const sparkStart =
-    leaderboardSparklineRange === "all" ? 0 : Math.max(0, lastIndex - leaderboardSparklineRange + 1);
+    sparkPointCount === "all" ? 0 : Math.max(0, lastIndex - sparkPointCount + 1);
   const selectedRange = SPARKLINE_RANGES.find((range) => range.value === leaderboardSparklineRange);
 
   const podium = ranking.slice(0, 3);
@@ -329,7 +331,7 @@ function renderLeaderboard(statKey) {
 
   app.innerHTML = `
     <h1 class="page-title">${esc(stat.title)} Leaderboard</h1>
-    <p class="page-sub">Movement and deltas vs the previous daily snapshot · sparklines show ${esc(selectedRange?.label ?? "14 Days")}</p>
+    <p class="page-sub">Movement and deltas vs the previous daily snapshot · ${leaderboardSparklineRange === 1 ? "sparklines show day-over-day" : `sparklines show ${esc(selectedRange?.label ?? "14 Days")}`}</p>
     ${statTabsHtml(stat.key, (key) => `/board/${key}`)}
     ${sparklineRangeHtml()}
     ${podiumHtml}
