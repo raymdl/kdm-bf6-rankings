@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-11T20:37:03.239Z",
+  "updatedAt": "2026-07-11T21:05:05.193Z",
   "siteUrl": "https://raymdl.github.io/kdm-bf6-rankings/",
   "stats": [
     {
@@ -20,9 +20,9 @@
       "higherIsBetter": true
     },
     {
-      "key": "killsPerMinute",
-      "title": "Kills/Min",
-      "label": "Kills Per Min",
+      "key": "playerKillsPerMinute",
+      "title": "Player Kills/Min",
+      "label": "Player Kills/Min",
       "format": "decimal",
       "decimals": 2,
       "higherIsBetter": true
