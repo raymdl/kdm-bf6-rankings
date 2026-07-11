@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-11T01:15:27.864Z",
+  "updatedAt": "2026-07-11T03:24:19.394Z",
   "siteUrl": "https://raymdl.github.io/kdm-bf6-rankings/",
   "stats": [
     {
@@ -87,6 +87,30 @@
       "key": "revives",
       "title": "Revives",
       "label": "Revives",
+      "format": "integer",
+      "decimals": null,
+      "higherIsBetter": true
+    },
+    {
+      "key": "assists",
+      "title": "Assists",
+      "label": "Assists",
+      "format": "integer",
+      "decimals": null,
+      "higherIsBetter": true
+    },
+    {
+      "key": "multiKills",
+      "title": "Multi Kills",
+      "label": "Multi Kills",
+      "format": "integer",
+      "decimals": null,
+      "higherIsBetter": true
+    },
+    {
+      "key": "defibKills",
+      "title": "Defib Kills",
+      "label": "Defib Kills",
       "format": "integer",
       "decimals": null,
       "higherIsBetter": true
