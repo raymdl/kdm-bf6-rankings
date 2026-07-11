@@ -353,7 +353,7 @@ function renderLeaderboard(statKey) {
 
 function renderPlayers() {
   const kd = statByKey("infantryKillDeath") ?? state.meta.stats[0];
-  const kpm = statByKey("killsPerMinute");
+  const playerKpm = statByKey("playerKillsPerMinute");
   const kills = statByKey("kills");
   const sorted = [...state.latest.members].sort((a, b) =>
     String(a.displayName ?? a.discordId).localeCompare(String(b.displayName ?? b.discordId), undefined, {
@@ -383,7 +383,7 @@ function renderPlayers() {
           <div class="player-card-sub">${esc(member.profileName ?? member.eaName ?? "")}</div>
           <div class="player-card-stats">
             <div class="mini-stat"><div class="k">${esc(kd.label)}</div><div class="v">${fmtStat(kd, member.stats[kd.key])}</div></div>
-            ${kpm ? `<div class="mini-stat"><div class="k">${esc(kpm.label)}</div><div class="v">${fmtStat(kpm, member.stats[kpm.key])}</div></div>` : ""}
+            ${playerKpm ? `<div class="mini-stat"><div class="k">Player KPM</div><div class="v">${fmtStat(playerKpm, member.stats[playerKpm.key])}</div></div>` : ""}
             ${kills ? `<div class="mini-stat"><div class="k">${esc(kills.label)}</div><div class="v">${fmtStat(kills, member.stats[kills.key])}</div></div>` : ""}
           </div>
         </a>`
