@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-11T20:29:36.770Z",
+  "updatedAt": "2026-07-11T20:37:03.239Z",
   "siteUrl": "https://raymdl.github.io/kdm-bf6-rankings/",
   "stats": [
     {
@@ -36,14 +36,6 @@
       "higherIsBetter": true
     },
     {
-      "key": "timePlayedHours",
-      "title": "Time Played",
-      "label": "Time Played",
-      "format": "hours",
-      "decimals": null,
-      "higherIsBetter": true
-    },
-    {
       "key": "kills",
       "title": "Player Kills",
       "label": "Player Kills",
@@ -60,17 +52,17 @@
       "higherIsBetter": true
     },
     {
-      "key": "revives",
-      "title": "Revives",
-      "label": "Revives",
+      "key": "vehicleKills",
+      "title": "Vehicle Kills",
+      "label": "Vehicle Kills",
       "format": "integer",
       "decimals": null,
       "higherIsBetter": true
     },
     {
-      "key": "vehicleKills",
-      "title": "Vehicle Kills",
-      "label": "Vehicle Kills",
+      "key": "revives",
+      "title": "Revives",
+      "label": "Revives",
       "format": "integer",
       "decimals": null,
       "higherIsBetter": true
@@ -88,6 +80,14 @@
       "title": "Player Rank",
       "label": "Player Rank",
       "format": "integer",
+      "decimals": null,
+      "higherIsBetter": true
+    },
+    {
+      "key": "timePlayedHours",
+      "title": "Time Played",
+      "label": "Time Played",
+      "format": "hours",
       "decimals": null,
       "higherIsBetter": true
     },
