@@ -82,6 +82,74 @@ function playerHref(discordId) {
   return `#/player/${encodeURIComponent(discordId)}`;
 }
 
+function hashRoute(route, params = {}) {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== null && value !== undefined) {
+      query.set(key, Array.isArray(value) ? value.join(",") : String(value));
+    }
+  }
+  const suffix = query.toString();
+  return `#/${route}${suffix ? `?${suffix}` : ""}`;
+}
+
+function parsedHashRoute() {
+  const raw = location.hash.replace(/^#\/?/, "");
+  const question = raw.indexOf("?");
+  const path = question >= 0 ? raw.slice(0, question) : raw;
+  const query = question >= 0 ? raw.slice(question + 1) : "";
+  return {
+    parts: path.split("/").filter(Boolean),
+    params: new URLSearchParams(query)
+  };
+}
+
+function replaceHashAndRender(hash, { preserveScroll = true } = {}) {
+  const scrollY = window.scrollY;
+  history.replaceState(null, "", hash);
+  render();
+  if (preserveScroll) {
+    window.scrollTo(0, scrollY);
+  }
+}
+
+function shareButtonHtml() {
+  return `<button class="share-button" type="button">Share</button>`;
+}
+
+async function copyText(text) {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.append(textarea);
+  textarea.select();
+  const copied = document.execCommand("copy");
+  textarea.remove();
+  if (copied) {
+    return;
+  }
+  await navigator.clipboard.writeText(text);
+}
+
+function wireShareButton() {
+  const button = app.querySelector(".share-button");
+  button?.addEventListener("click", async () => {
+    try {
+      await copyText(location.href);
+      button.textContent = "Copied!";
+      setTimeout(() => {
+        if (button.isConnected) {
+          button.textContent = "Share";
+        }
+      }, 1600);
+    } catch {
+      button.textContent = "Copy failed";
+    }
+  });
+}
+
 function destroyCharts() {
   for (const chart of charts) {
     chart.destroy();
@@ -483,6 +551,32 @@ function renderPlayer(discordId, statKey) {
 
 const compareState = { selected: [], statKey: null, selectionMode: "default", range: 14 };
 
+function normalizedRange(value, fallback = 14) {
+  if (value === "all") {
+    return "all";
+  }
+  const numeric = Number(value);
+  return SPARKLINE_RANGES.some((range) => range.value === numeric) ? numeric : fallback;
+}
+
+function compareHref(statKey = compareState.statKey, selected = compareState.selected, range = compareState.range) {
+  return hashRoute("compare", { stat: statKey, players: selected, range });
+}
+
+function loadCompareState(params) {
+  const stat = statByKey(params.get("stat")) ?? state.meta.stats[0];
+  const candidateIds = new Set(state.latest.members.map((member) => member.discordId));
+  compareState.statKey = stat.key;
+  compareState.range = normalizedRange(params.get("range"), 14);
+  if (params.has("players")) {
+    compareState.selectionMode = "manual";
+    compareState.selected = [...new Set((params.get("players") ?? "").split(",").filter((id) => candidateIds.has(id)))];
+  } else {
+    compareState.selectionMode = "default";
+    compareState.selected = latestRanking(stat.key).slice(0, 2).map((row) => row.discordId);
+  }
+}
+
 function compareRangeSelectHtml() {
   return `<label class="sparkline-range-select">
     <select id="compare-range-select" aria-label="Comparison date range">${SPARKLINE_RANGES.map(
@@ -512,9 +606,10 @@ function renderCompare() {
       .slice(0, 2)
       .map((row) => row.discordId);
   }
+  history.replaceState(null, "", compareHref());
 
   app.innerHTML = `
-    <h1 class="page-title">Head to Head</h1>
+    <div class="page-heading-row"><h1 class="page-title">Head to Head</h1>${shareButtonHtml()}</div>
     <p class="page-sub">Pick players and a stat to overlay their daily history · showing ${compareRangeSelectHtml()}${compareState.range === 1 ? " (day-over-day)" : ""}</p>
     <div class="group-label">Stat</div>
     ${statTabsHtml(stat.key)}
@@ -530,21 +625,16 @@ function renderCompare() {
       <div class="chart-box"><canvas id="compare-chart"></canvas></div>
     </div>`;
 
-  wireStatTabs((key) => {
-    compareState.statKey = key;
-    render();
-  });
+  wireStatTabs((key) => replaceHashAndRender(compareHref(key)));
   const rangeSelect = document.getElementById("compare-range-select");
   rangeSelect?.addEventListener("change", () => {
-    compareState.range = rangeSelect.value === "all" ? "all" : Number(rangeSelect.value);
-    const scrollY = window.scrollY;
-    render();
-    window.scrollTo(0, scrollY);
+    compareState.range = normalizedRange(rangeSelect.value, 14);
+    replaceHashAndRender(compareHref());
   });
   app.querySelector(".compare-clear")?.addEventListener("click", () => {
     compareState.selectionMode = "manual";
     compareState.selected = [];
-    render();
+    replaceHashAndRender(compareHref());
   });
   for (const chip of app.querySelectorAll(".chip[data-id]")) {
     chip.addEventListener("click", () => {
@@ -556,7 +646,7 @@ function renderCompare() {
       compareState.selected = compareState.selected.includes(id)
         ? compareState.selected.filter((existing) => existing !== id)
         : [...compareState.selected, id];
-      render();
+      replaceHashAndRender(compareHref());
     });
   }
 
@@ -569,9 +659,21 @@ function renderCompare() {
       stat
     );
   }
+  wireShareButton();
 }
 
 const timeMachineState = { index: null, statKey: null };
+
+function timeMachineHref(statKey = timeMachineState.statKey, index = timeMachineState.index) {
+  return hashRoute("history", { stat: statKey, date: state.history.dates[index] });
+}
+
+function loadTimeMachineState(params) {
+  const dates = state.history.dates;
+  const requestedDate = params.get("date");
+  timeMachineState.statKey = (statByKey(params.get("stat")) ?? state.meta.stats[0]).key;
+  timeMachineState.index = requestedDate && dates.includes(requestedDate) ? dates.indexOf(requestedDate) : dates.length - 1;
+}
 
 function renderTimeMachine() {
   const dates = state.history.dates;
@@ -584,12 +686,13 @@ function renderTimeMachine() {
   timeMachineState.statKey = stat.key;
   const index = timeMachineState.index ?? dates.length - 1;
   timeMachineState.index = index;
+  history.replaceState(null, "", timeMachineHref(stat.key, index));
 
   const memberIds = Object.keys(state.history.members ?? {});
   const ranking = rankingAt(stat.key, index, memberIds);
 
   app.innerHTML = `
-    <h1 class="page-title">Time Machine</h1>
+    <div class="page-heading-row"><h1 class="page-title">Time Machine</h1>${shareButtonHtml()}</div>
     <p class="page-sub">The ${esc(stat.title)} leaderboard as it stood on any snapshot day</p>
     ${statTabsHtml(stat.key)}
     <div class="date-control">
@@ -612,23 +715,24 @@ function renderTimeMachine() {
       </table>
     </div>`;
 
-  wireStatTabs((key) => {
-    timeMachineState.statKey = key;
-    render();
-  });
+  wireStatTabs((key) => replaceHashAndRender(timeMachineHref(key, index)));
   document.getElementById("date-slider").addEventListener("input", (event) => {
     timeMachineState.index = Number(event.target.value);
-    render();
+    replaceHashAndRender(timeMachineHref(stat.key, timeMachineState.index));
   });
+  wireShareButton();
 }
 
 function overtakeText(event) {
   const stat = statByKey(event.statKey);
+  const compare = stat
+    ? `<a class="feed-action" href="${compareHref(stat.key, [event.overtakerId, event.overtakenId], 14)}">Compare</a>`
+    : "";
   return `<span class="feed-text"><span class="badge overtake">overtake</span>
     <a class="who player-link" href="${playerHref(event.overtakerId)}">${esc(memberName(event.overtakerId))}</a>
     passed
     <a class="who player-link" href="${playerHref(event.overtakenId)}">${esc(memberName(event.overtakenId))}</a>
-    in <strong>${esc(stat?.title ?? event.statKey)}</strong></span>`;
+    in <strong>${esc(stat?.title ?? event.statKey)}</strong>${compare}</span>`;
 }
 
 function auditOutcome(event) {
@@ -899,7 +1003,7 @@ function render() {
     cleanup();
   }
   floatingHeaderCleanups = [];
-  const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
+  const { parts, params } = parsedHashRoute();
   const [route] = parts;
 
   let nav = "board";
@@ -913,9 +1017,11 @@ function render() {
     renderPlayer(decodeURIComponent(parts[1] ?? ""), parts[2]);
   } else if (route === "compare") {
     nav = "compare";
+    loadCompareState(params);
     renderCompare();
   } else if (route === "history") {
     nav = "history";
+    loadTimeMachineState(params);
     renderTimeMachine();
   } else if (route === "activity") {
     nav = "activity";
