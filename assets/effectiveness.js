@@ -100,10 +100,7 @@ function buildRawRow(discordId, member, current) {
   const playerKills = finite(tracked.kills, finite(stats.dividedKills?.human));
   const playerKillDeath = finite(tracked.infantryKillDeath, finite(stats.infantryKillDeath));
   const playerKillsPerMinute = finite(tracked.playerKillsPerMinute, playerKills / activeMinutes);
-  const weightedObjectiveActions =
-    finite(objective.captured) +
-    finite(objective.neutralized) +
-    2 * (finite(objective.armed) + finite(objective.defused) + finite(objective.destroyed));
+  const breakthroughObjectiveActions = finite(objective.captured) + finite(objective.neutralized);
 
   return {
     discordId,
@@ -118,10 +115,9 @@ function buildRawRow(discordId, member, current) {
       infantryKpm: playerKillsPerMinute,
       playerKillsPerMatch: playerKills / Math.max(1, finite(stats.matchesPlayed)),
       assistsPerHour: finite(tracked.assists, finite(stats.assists)) / hours,
-      objectiveActionsPerHour: weightedObjectiveActions / hours,
+      objectiveActionsPerHour: breakthroughObjectiveActions / hours,
       objectivePresence: finite(objectiveTime.total) / seconds,
-      clutchObjectivesPerHour:
-        (finite(objective.armed) + finite(objective.defused) + finite(objective.destroyed)) / hours,
+      breakthroughPressure: (finite(objectiveTime.attacked) + finite(objectiveTime.defended)) / seconds,
       revivesPerHour: finite(stats.revives) / hours,
       squadRevivesPerHour: finite(stats.squadmateRevive) / hours,
       healsPerHour: finite(stats.heals) / hours,
@@ -160,7 +156,7 @@ export function calculateEffectiveness(archive, latest = { members: [] }) {
     assistsPerHour: 1,
     objectiveActionsPerHour: 1,
     objectivePresence: 1,
-    clutchObjectivesPerHour: 1,
+    breakthroughPressure: 1,
     revivesPerHour: 1,
     squadRevivesPerHour: 1,
     healsPerHour: 1,
@@ -182,8 +178,8 @@ export function calculateEffectiveness(archive, latest = { members: [] }) {
       [0.4, 0.35, 0.15, 0.1]
     );
     row.pillars.objective = weightedGeometric(
-      [p.objectiveActionsPerHour, p.objectivePresence, p.clutchObjectivesPerHour],
-      [0.45, 0.4, 0.15]
+      [p.objectiveActionsPerHour, p.objectivePresence, p.breakthroughPressure],
+      [0.5, 0.3, 0.2]
     );
     row.lanes.medic = weightedGeometric([p.revivesPerHour, p.squadRevivesPerHour, p.healsPerHour], [0.45, 0.2, 0.35]);
     row.lanes.logistics = weightedGeometric([p.resuppliesPerHour, p.repairsPerHour], [0.55, 0.45]);
