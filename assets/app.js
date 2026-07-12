@@ -87,12 +87,70 @@ const PLATFORM_LABELS = {
   ps5: "PlayStation"
 };
 
+const PLATFORM_ICONS = {
+  ea: {
+    key: "ea",
+    label: "EA",
+    src: "https://api.iconify.design/simple-icons:ea.svg?color=%230d0f12"
+  },
+  pc: {
+    key: "ea",
+    label: "EA / PC",
+    src: "https://api.iconify.design/simple-icons:ea.svg?color=%230d0f12"
+  },
+  psn: {
+    key: "playstation",
+    label: "PlayStation",
+    src: "https://api.iconify.design/simple-icons:playstation.svg?color=%239aa3ad"
+  },
+  ps4: {
+    key: "playstation",
+    label: "PlayStation",
+    src: "https://api.iconify.design/simple-icons:playstation.svg?color=%239aa3ad"
+  },
+  ps5: {
+    key: "playstation",
+    label: "PlayStation",
+    src: "https://api.iconify.design/simple-icons:playstation.svg?color=%239aa3ad"
+  },
+  steam: {
+    key: "steam",
+    label: "Steam",
+    src: "https://api.iconify.design/simple-icons:steam.svg?color=%239aa3ad"
+  },
+  xbox: {
+    key: "xbox",
+    label: "Xbox",
+    src: "https://api.iconify.design/simple-icons:xbox.svg?color=%239aa3ad"
+  },
+  xboxone: {
+    key: "xbox",
+    label: "Xbox",
+    src: "https://api.iconify.design/simple-icons:xbox.svg?color=%239aa3ad"
+  },
+  xboxseries: {
+    key: "xbox",
+    label: "Xbox",
+    src: "https://api.iconify.design/simple-icons:xbox.svg?color=%239aa3ad"
+  }
+};
+
 function platformLabel(platform) {
   if (!platform) {
     return null;
   }
   const key = String(platform).trim().toLowerCase();
   return PLATFORM_LABELS[key] ?? key.charAt(0).toUpperCase() + key.slice(1);
+}
+
+function platformIconHtml(platform) {
+  const icon = PLATFORM_ICONS[String(platform ?? "").trim().toLowerCase()];
+  if (!icon) {
+    return "";
+  }
+
+  const accessibleLabel = `${icon.label} platform`;
+  return `<span class="platform-icon platform-icon-${icon.key}" role="img" aria-label="${esc(accessibleLabel)}" title="${esc(accessibleLabel)}"><img src="${icon.src}" alt="" aria-hidden="true" loading="lazy" decoding="async"></span>`;
 }
 
 function memberName(discordId) {
@@ -505,7 +563,7 @@ function renderPlayers() {
     <div class="player-grid">${sorted
       .map(
         (member) => `<a class="player-card" data-player-search="${esc(playerSearchText(member))}" href="${playerHref(member.discordId)}">
-          <div class="player-card-name">${esc(member.displayName ?? member.discordId)}${
+          <div class="player-card-name"><span>${esc(member.displayName ?? member.discordId)}</span>${platformIconHtml(member.platform)}${
             member.cachedStats ? cachedMarkerHtml() : ""
           }</div>
           <div class="player-card-sub">${esc(member.profileName ?? member.eaName ?? "")}</div>
