@@ -1149,7 +1149,7 @@ function effectivenessMethodHtml(key, constants) {
       </div>
       <div class="pillar-list">
         <div><span class="pillar-letter combat">C</span><p><strong>Combat</strong><br>Player K/D, Player Kills/Min, Player Kills per match and assists/hour. Player-only kill counters exclude bots; headshot rate and accuracy stay out because weapon choice distorts them.</p></div>
-        <div><span class="pillar-letter objective">O</span><p><strong>Objective</strong><br>Weighted captures/neutralizations, objective-time share, and high-leverage arms, defuses and destroys.</p></div>
+        <div><span class="pillar-letter objective">O</span><p><strong>Breakthrough Objective</strong><br>Captures and neutralizations (50%), objective-zone presence (30%), and time attacking or defending objectives (20%). Armed, defused and destroyed events are excluded.</p></div>
         <div><span class="pillar-letter teamwork">T</span><p><strong>Teamwork</strong><br>70% best + 30% second-best of Medic, Logistics and Intel lanes. Specialists count, but one spammed action cannot own the score.</p></div>
       </div>
     </div>`;
@@ -1236,7 +1236,7 @@ function renderEffectiveness(requestedKey) {
     <div class="effectiveness-hero">
       <div class="effectiveness-eyebrow">KDM analytics &middot; snapshot ${esc(calculation.archiveDate ?? "latest")}</div>
       <h1 class="page-title">The Effectiveness Lab</h1>
-      <p class="page-sub">Three answers to one messy Battlefield question: who creates the most value? Each lens rewards a different kind of winning contribution.</p>
+      <p class="page-sub">Three answers to one messy Battlefield question: who creates the most value? Each lens is calibrated for KDM's primary mode, Breakthrough.</p>
     </div>
     ${effectivenessTabsHtml(key)}
     <div class="measure-heading"><div><span class="measure-number">PROPOSAL 0${EFFECTIVENESS_KEYS.indexOf(key) + 1}</span><h2>${esc(definition.title)}</h2></div><p>${recommendation}</p></div>
@@ -1247,7 +1247,7 @@ function renderEffectiveness(requestedKey) {
     ${effectivenessTableHtml(key, ranking)}
     <details class="guardrails" open><summary>Why these are harder to game</summary><div>
       <p><strong>Rate stats over totals:</strong> playing longer does not automatically score higher. <strong>25-hour shrinkage:</strong> small samples are pulled toward the clan median. <strong>Robust percentiles:</strong> extreme raw values cannot blow up the scale.</p>
-      <p><strong>Role-aware support:</strong> Medic, Logistics and Intel are separate lanes; the best two are blended. <strong>No accuracy or headshot rate:</strong> sniper and weapon-choice bias is avoided. <strong>Transparent caveat:</strong> Win Rate Residual still contains team-composition effects and should be read beside the two individual-impact scores.</p>
+      <p><strong>Breakthrough-specific PTFO:</strong> the objective pillar uses captures, neutralizations and attack/defense zone time; arm, defuse and destroy events are excluded. <strong>Role-aware support:</strong> Medic, Logistics and Intel are separate lanes; the best two are blended. <strong>No accuracy or headshot rate:</strong> sniper and weapon-choice bias is avoided. <strong>Transparent caveat:</strong> Win Rate Residual still contains team-composition effects.</p>
     </div></details>`;
 }
 
