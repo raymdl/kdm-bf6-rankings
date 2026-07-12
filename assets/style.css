@@ -616,6 +616,38 @@ tr.r3 .rank-cell { color: var(--bronze); }
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.platform-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 0.95rem;
+  height: 0.95rem;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.82;
+  vertical-align: middle;
+}
+
+.platform-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.platform-icon-ea {
+  padding: 0.1rem;
+  background: var(--text-dim);
+  border-radius: 50%;
+  opacity: 1;
+}
+
+.player-card-name .cached-marker {
+  margin-left: 0;
 }
 
 .player-card-sub {
