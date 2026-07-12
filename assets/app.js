@@ -197,9 +197,33 @@ function valueAt(discordId, statKey, dateIndex) {
   return null;
 }
 
+// Earliest finite value at or after the window start, stopping before the
+// current column. A newly promoted stat can have leading null history cells;
+// those cells should not make every member look NEW in the delta baseline.
+function baselineValueAt(discordId, statKey, fromIndex, lastIndex) {
+  const values = series(discordId, statKey);
+  const end = Math.min(lastIndex - 1, values.length - 1);
+  for (let i = Math.max(0, fromIndex); i <= end; i += 1) {
+    if (Number.isFinite(values[i])) {
+      return values[i];
+    }
+  }
+  return null;
+}
+
 function rankingAt(statKey, dateIndex, memberIds) {
   return memberIds
     .map((discordId) => ({ discordId, value: valueAt(discordId, statKey, dateIndex) }))
+    .filter((row) => Number.isFinite(row.value))
+    .sort((a, b) => b.value - a.value);
+}
+
+function baselineRankingAt(statKey, fromIndex, lastIndex, memberIds) {
+  return memberIds
+    .map((discordId) => ({
+      discordId,
+      value: baselineValueAt(discordId, statKey, fromIndex, lastIndex)
+    }))
     .filter((row) => Number.isFinite(row.value))
     .sort((a, b) => b.value - a.value);
 }
@@ -398,7 +422,9 @@ function renderLeaderboard(statKey) {
   const windowText = rangeWindowText(leaderboardSparklineRange);
   const baselineIndex = sparkStart;
   const prevRanking =
-    baselineIndex >= 0 && baselineIndex < lastIndex ? rankingAt(stat.key, baselineIndex, memberIds) : [];
+    baselineIndex >= 0 && baselineIndex < lastIndex
+      ? baselineRankingAt(stat.key, baselineIndex, lastIndex, memberIds)
+      : [];
   const prevRankById = new Map(prevRanking.map((row, index) => [row.discordId, index + 1]));
   const prevValueById = new Map(prevRanking.map((row) => [row.discordId, row.value]));
 
