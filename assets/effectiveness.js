@@ -3,6 +3,8 @@ const MAX_PERCENTILE = 98;
 const PRIOR_HOURS = 25;
 const WIN_PRIOR_MATCHES = 50;
 const RIDGE_LAMBDA = 4;
+const AIM_RIDGE_LAMBDA = 1;
+const WEAPON_CATEGORIES = ["ar", "smg", "carbine", "mg", "dmr", "sniper", "shotgun", "pistol"];
 
 const finite = (value, fallback = 0) => (Number.isFinite(Number(value)) ? Number(value) : fallback);
 const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
@@ -84,6 +86,71 @@ function ridgePredict(trainingRows, target) {
   );
 }
 
+function weaponCategory(weaponId) {
+  if (weaponId.startsWith("wp_ar_")) return "ar";
+  if (weaponId.startsWith("wp_smg_")) return "smg";
+  if (weaponId.startsWith("wp_crb_")) return "carbine";
+  if (weaponId.startsWith("wp_mg_")) return "mg";
+  if (weaponId.startsWith("wp_dmr_")) return "dmr";
+  if (weaponId.startsWith("wp_snp_")) return "sniper";
+  if (weaponId.startsWith("wp_sg_")) return "shotgun";
+  if (weaponId.startsWith("wp_pst_")) return "pistol";
+  return null;
+}
+
+function weaponKillMix(stats) {
+  const kills = Object.fromEntries(WEAPON_CATEGORIES.map((category) => [category, 0]));
+  for (const [weaponId, weapon] of Object.entries(stats.weapons ?? {})) {
+    const category = weaponCategory(weaponId);
+    if (category) kills[category] += Math.max(0, finite(weapon?.kills));
+  }
+  const total = sum(Object.values(kills));
+  return Object.fromEntries(WEAPON_CATEGORIES.map((category) => [category, total > 0 ? kills[category] / total : 0]));
+}
+
+function ridgeAimPredict(trainingRows, target, outcomeKey) {
+  const dimension = WEAPON_CATEGORIES.length + 1;
+  const xtx = Array.from({ length: dimension }, () => Array(dimension).fill(0));
+  const xty = Array(dimension).fill(0);
+  for (const row of trainingRows) {
+    const x = [1, ...row.weaponModel];
+    for (let i = 0; i < dimension; i += 1) {
+      xty[i] += x[i] * row.raw[outcomeKey];
+      for (let j = 0; j < dimension; j += 1) xtx[i][j] += x[i] * x[j];
+    }
+  }
+  for (let index = 1; index < dimension; index += 1) xtx[index][index] += AIM_RIDGE_LAMBDA;
+  const coefficients = solveLinearSystem(xtx, xty);
+  return clamp(
+    coefficients[0] + target.weaponModel.reduce((total, value, index) => total + value * coefficients[index + 1], 0),
+    0,
+    100
+  );
+}
+
+function addWeaponAdjustedAim(rows) {
+  const means = Object.fromEntries(
+    WEAPON_CATEGORIES.map((category) => [category, sum(rows.map((row) => row.weaponMix[category])) / rows.length])
+  );
+  const deviations = Object.fromEntries(
+    WEAPON_CATEGORIES.map((category) => [
+      category,
+      Math.sqrt(sum(rows.map((row) => (row.weaponMix[category] - means[category]) ** 2)) / rows.length) || 1
+    ])
+  );
+  for (const row of rows) {
+    row.weaponModel = WEAPON_CATEGORIES.map(
+      (category) => (row.weaponMix[category] - means[category]) / deviations[category]
+    );
+  }
+  for (const row of rows) {
+    row.expectedAccuracy = ridgeAimPredict(rows, row, "accuracy");
+    row.expectedHeadshotPercent = ridgeAimPredict(rows, row, "headshotPercent");
+    row.raw.accuracyResidual = row.raw.accuracy - row.expectedAccuracy;
+    row.raw.headshotResidual = row.raw.headshotPercent - row.expectedHeadshotPercent;
+  }
+}
+
 function buildRawRow(discordId, member, current) {
   const stats = member?.stats ?? {};
   const tracked = current?.stats ?? {};
@@ -110,11 +177,14 @@ function buildRawRow(discordId, member, current) {
     wins: Math.max(0, finite(stats.wins)),
     losses: Math.max(0, finite(stats.loses)),
     cachedStats: false,
+    weaponMix: weaponKillMix(stats),
     raw: {
       infantryKd: playerKillDeath,
       infantryKpm: playerKillsPerMinute,
       playerKillsPerMatch: playerKills / Math.max(1, finite(stats.matchesPlayed)),
       assistsPerHour: finite(tracked.assists, finite(stats.assists)) / hours,
+      accuracy: finite(stats.accuracy),
+      headshotPercent: finite(tracked.headshotPercent, finite(stats.headshots)),
       objectiveActionsPerHour: breakthroughObjectiveActions / hours,
       objectivePresence: finite(objectiveTime.total) / seconds,
       breakthroughPressure: (finite(objectiveTime.attacked) + finite(objectiveTime.defended)) / seconds,
@@ -149,11 +219,15 @@ export function calculateEffectiveness(archive, latest = { members: [] }) {
 
   if (!rows.length) return { rows: [], archiveDate: archive?.date ?? null, constants: {} };
 
+  addWeaponAdjustedAim(rows);
+
   const featureDirections = {
     infantryKd: 1,
     infantryKpm: 1,
     playerKillsPerMatch: 1,
     assistsPerHour: 1,
+    accuracyResidual: 1,
+    headshotResidual: 1,
     objectiveActionsPerHour: 1,
     objectivePresence: 1,
     breakthroughPressure: 1,
@@ -174,9 +248,10 @@ export function calculateEffectiveness(archive, latest = { members: [] }) {
   for (const row of rows) {
     const p = row.percentiles;
     row.pillars.combat = weightedGeometric(
-      [p.infantryKd, p.infantryKpm, p.playerKillsPerMatch, p.assistsPerHour],
-      [0.4, 0.35, 0.15, 0.1]
+      [p.infantryKd, p.infantryKpm, p.playerKillsPerMatch, p.assistsPerHour, p.accuracyResidual, p.headshotResidual],
+      [0.3, 0.3, 0.1, 0.1, 0.1, 0.1]
     );
+    row.aimScore = weightedGeometric([p.accuracyResidual, p.headshotResidual], [0.5, 0.5]);
     row.pillars.objective = weightedGeometric(
       [p.objectiveActionsPerHour, p.objectivePresence, p.breakthroughPressure],
       [0.5, 0.3, 0.2]
@@ -237,6 +312,7 @@ export function calculateEffectiveness(archive, latest = { members: [] }) {
       priorHours: PRIOR_HOURS,
       winPriorMatches: WIN_PRIOR_MATCHES,
       ridgeLambda: RIDGE_LAMBDA,
+      aimRidgeLambda: AIM_RIDGE_LAMBDA,
       clanWinPercent: clanWinRate * 100,
       medianDeathsPerHour
     }
