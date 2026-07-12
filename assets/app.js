@@ -1144,7 +1144,7 @@ function effectivenessMethodHtml(key, constants) {
     return `<div class="effectiveness-method-grid">
       <div class="formula-card">
         <div class="formula-kicker">The equation</div>
-        <div class="formula">Trident = C<sup>0.40</sup> &times; O<sup>0.30</sup> &times; T<sup>0.30</sup></div>
+        <div class="formula">CEI = C<sup>0.40</sup> &times; O<sup>0.30</sup> &times; T<sup>0.30</sup></div>
         <p>A weighted geometric mean of three 2&ndash;98 clan percentiles. The geometric mean is the anti-one-trick device: a missing pillar drags the whole score down, while a strength can still carry its fair share.</p>
       </div>
       <div class="pillar-list">
@@ -1158,8 +1158,8 @@ function effectivenessMethodHtml(key, constants) {
     return `<div class="effectiveness-method-grid">
       <div class="formula-card">
         <div class="formula-kicker">The equation</div>
-        <div class="formula formula-small">Raw = (0.40C + 0.30O + 0.30T) &divide; (Deaths/hr &divide; ${constants.medianDeathsPerHour.toFixed(1)})<sup>0.35</sup></div>
-        <p>The published score is the raw result's 2&ndash;98 clan percentile. Like a finance Sortino ratio, only downside is penalized. The mild exponent and capped penalty keep a cautious camper from winning merely by avoiding deaths.</p>
+        <div class="formula formula-small">RAIS<sub>raw</sub> = (0.40C + 0.30O + 0.30T) &divide; (Deaths/hr &divide; ${constants.medianDeathsPerHour.toFixed(1)})<sup>0.35</sup></div>
+        <p>The published score is the raw result's 2&ndash;98 clan percentile. Following a downside-risk framework, only deaths are penalized. The mild exponent and capped penalty keep a cautious camper from winning merely by avoiding deaths.</p>
       </div>
       <div class="pillar-list">
         <div><span class="pillar-letter combat">&uarr;</span><p><strong>Upside production</strong><br>Combat supplies 40%; objective pressure and teamwork supply 30% each. A strong gun alone is not enough.</p></div>
@@ -1171,13 +1171,13 @@ function effectivenessMethodHtml(key, constants) {
   return `<div class="effectiveness-method-grid">
     <div class="formula-card">
       <div class="formula-kicker">The equation</div>
-      <div class="formula formula-small">Alpha = smoothed Win% &minus; expected Win%(zC, zO, zT)</div>
+      <div class="formula formula-small">WRR = smoothed Win% &minus; expected Win%(zC, zO, zT)</div>
       <p>Expected win rate comes from a leave-one-player-out ridge model (&lambda;=${constants.ridgeLambda}) trained on the other KDM members. Positive alpha is the percentage-point win lift not explained by the three visible performance pillars.</p>
     </div>
     <div class="pillar-list">
       <div><span class="pillar-letter combat">W</span><p><strong>Observed winning</strong><br>Lifetime wins and losses, stabilized with a ${constants.winPriorMatches}-match prior at the clan's ${constants.clanWinPercent.toFixed(1)}% win rate.</p></div>
       <div><span class="pillar-letter objective">E</span><p><strong>Expected winning</strong><br>The model asks what win rate normally accompanies the same combat, objective and teamwork profile.</p></div>
-      <div><span class="pillar-letter risk">&alpha;</span><p><strong>The unexplained gap</strong><br>Potential squad leadership, positioning, comms and timing live here&mdash;along with team-stack effects. Treat Alpha as a clue, not proof of causation.</p></div>
+      <div><span class="pillar-letter risk">&epsilon;</span><p><strong>The unexplained gap</strong><br>Potential squad leadership, positioning, comms and timing live here&mdash;along with team-stack effects. Treat the residual as a clue, not proof of causation.</p></div>
     </div>
   </div>`;
 }
@@ -1207,7 +1207,7 @@ function effectivenessBarsHtml(key, ranking) {
 
 function effectivenessTableHtml(key, ranking) {
   const header = key === "alpha"
-    ? `<th class="num">Alpha</th><th class="num">Win%</th><th class="num">Expected</th>`
+    ? `<th class="num">Residual</th><th class="num">Win%</th><th class="num">Expected</th>`
     : key === "sortino"
       ? `<th class="num">Score</th><th class="num">Upside</th><th class="num">Deaths/hr</th>`
       : `<th class="num">Score</th><th>Support lanes</th>`;
@@ -1247,7 +1247,7 @@ function renderEffectiveness(requestedKey) {
     ${effectivenessTableHtml(key, ranking)}
     <details class="guardrails" open><summary>Why these are harder to game</summary><div>
       <p><strong>Rate stats over totals:</strong> playing longer does not automatically score higher. <strong>25-hour shrinkage:</strong> small samples are pulled toward the clan median. <strong>Robust percentiles:</strong> extreme raw values cannot blow up the scale.</p>
-      <p><strong>Role-aware support:</strong> Medic, Logistics and Intel are separate lanes; the best two are blended. <strong>No accuracy or headshot rate:</strong> sniper and weapon-choice bias is avoided. <strong>Transparent caveat:</strong> Squadlift Alpha still contains team-composition effects and should be read beside the two individual-impact scores.</p>
+      <p><strong>Role-aware support:</strong> Medic, Logistics and Intel are separate lanes; the best two are blended. <strong>No accuracy or headshot rate:</strong> sniper and weapon-choice bias is avoided. <strong>Transparent caveat:</strong> Win Rate Residual still contains team-composition effects and should be read beside the two individual-impact scores.</p>
     </div></details>`;
 }
 

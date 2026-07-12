@@ -241,7 +241,7 @@ export function calculateEffectiveness(archive, latest = { members: [] }) {
 }
 
 export const effectivenessDefinitions = {
-  trident: { title: "KDM Trident", scoreLabel: "score", higherIsBetter: true },
-  sortino: { title: "Frontline Sortino", scoreLabel: "percentile", higherIsBetter: true },
-  alpha: { title: "Squadlift Alpha", scoreLabel: "pp", higherIsBetter: true }
+  trident: { title: "Composite Effectiveness Index", scoreLabel: "score", higherIsBetter: true },
+  sortino: { title: "Risk-Adjusted Impact Score", scoreLabel: "percentile", higherIsBetter: true },
+  alpha: { title: "Win Rate Residual", scoreLabel: "pp", higherIsBetter: true }
 };
