@@ -189,10 +189,6 @@ function latestRanking(statKey) {
     .sort((a, b) => b.value - a.value);
 }
 
-function previousDateIndex() {
-  return state.history.dates.length >= 2 ? state.history.dates.length - 2 : -1;
-}
-
 function indexOnOrBefore(targetDate) {
   const dates = state.history.dates;
   for (let i = dates.length - 1; i >= 0; i -= 1) {
@@ -238,16 +234,28 @@ function sparklineSvg(values, width = 110, height = 28) {
   </svg>`;
 }
 
-function movementHtml(prevRank, currentRank) {
+// Human-readable description of the selected date range, used consistently for
+// the leaderboard/compare sub-headings, movement tooltips, and podium deltas.
+function rangeWindowText(range) {
+  if (range === "all") {
+    return "all snapshots";
+  }
+  if (range === 1) {
+    return "the previous day";
+  }
+  return `the last ${range} days`;
+}
+
+function movementHtml(prevRank, currentRank, windowText = "the previous day") {
   if (prevRank == null) {
     return `<span class="movement flat" title="New to this leaderboard">NEW</span>`;
   }
   const diff = prevRank - currentRank;
   if (diff > 0) {
-    return `<span class="movement up" title="Up ${diff} since previous snapshot">▲${diff}</span>`;
+    return `<span class="movement up" title="Up ${diff} vs ${windowText}">▲${diff}</span>`;
   }
   if (diff < 0) {
-    return `<span class="movement down" title="Down ${-diff} since previous snapshot">▼${-diff}</span>`;
+    return `<span class="movement down" title="Down ${-diff} vs ${windowText}">▼${-diff}</span>`;
   }
   return `<span class="movement flat">–</span>`;
 }
@@ -357,16 +365,20 @@ function lineChart(canvas, labels, datasets, stat) {
 function renderLeaderboard(statKey) {
   const stat = statByKey(statKey) ?? state.meta.stats[0];
   const ranking = latestRanking(stat.key);
-  const prevIndex = previousDateIndex();
   const memberIds = Object.keys(state.history.members ?? {});
-  const prevRanking = prevIndex >= 0 ? rankingAt(stat.key, prevIndex, memberIds) : [];
-  const prevRankById = new Map(prevRanking.map((row, index) => [row.discordId, index + 1]));
-  const prevValueById = new Map(prevRanking.map((row) => [row.discordId, row.value]));
   const lastIndex = state.history.dates.length - 1;
   // A one-day view means yesterday-to-today, so it needs two snapshot points.
   const sparkPointCount = leaderboardSparklineRange === 1 ? 2 : leaderboardSparklineRange;
   const sparkStart =
     sparkPointCount === "all" ? 0 : Math.max(0, lastIndex - sparkPointCount + 1);
+  // Movement and deltas compare the current standings against the start of the
+  // same window the sparkline covers, so the selected range drives both.
+  const windowText = rangeWindowText(leaderboardSparklineRange);
+  const baselineIndex = sparkStart;
+  const prevRanking =
+    baselineIndex >= 0 && baselineIndex < lastIndex ? rankingAt(stat.key, baselineIndex, memberIds) : [];
+  const prevRankById = new Map(prevRanking.map((row, index) => [row.discordId, index + 1]));
+  const prevValueById = new Map(prevRanking.map((row) => [row.discordId, row.value]));
 
   const podium = ranking.slice(0, 3);
   const podiumHtml = podium.length
@@ -377,7 +389,7 @@ function renderLeaderboard(statKey) {
             <div class="podium-rank">#${index + 1}${index === 0 ? " · TOP DOG" : ""}</div>
             <div class="podium-name"><a class="player-link" href="${playerHref(row.discordId)}">${esc(memberName(row.discordId))}</a></div>
             <div class="podium-value">${fmtStat(stat, row.value)} <span class="podium-stat-label">${esc(stat.title)}</span></div>
-            <div class="podium-delta">${delta ? `${delta} since previous snapshot` : "&nbsp;"}</div>
+            <div class="podium-delta">${delta ? `${delta} vs ${windowText}` : "&nbsp;"}</div>
           </div>`;
         })
         .join("")}</div>`
@@ -394,7 +406,7 @@ function renderLeaderboard(statKey) {
       const cached = row.member?.cachedStats ? cachedMarkerHtml() : "";
       return `<tr class="r${rank}">
         <td class="rank-cell">${rank}</td>
-        <td>${movementHtml(prevRank, rank)}</td>
+        <td>${movementHtml(prevRank, rank, windowText)}</td>
         <td><a class="player-link" href="${playerHref(row.discordId)}">${esc(memberName(row.discordId))}</a>${cached}</td>
         <td class="num value-cell">${fmtStat(stat, row.value)}</td>
         <td class="num"><span class="delta ${deltaClass}">${delta ?? "–"}</span></td>
@@ -405,7 +417,7 @@ function renderLeaderboard(statKey) {
 
   app.innerHTML = `
     <h1 class="page-title">${esc(stat.title)} Leaderboard</h1>
-    <p class="page-sub">Movement and deltas vs the previous daily snapshot · sparkline shows ${sparklineRangeSelectHtml()}${leaderboardSparklineRange === 1 ? " (day-over-day)" : ""}</p>
+    <p class="page-sub">Movement, deltas, and sparkline reflect ${sparklineRangeSelectHtml()} · comparing to ${windowText}</p>
     ${statTabsHtml(stat.key, (key) => `/board/${key}`)}
     ${podiumHtml}
     <div class="table-wrap">
@@ -610,7 +622,7 @@ function renderCompare() {
 
   app.innerHTML = `
     <div class="page-heading-row"><h1 class="page-title">Head to Head</h1>${shareButtonHtml()}</div>
-    <p class="page-sub">Pick players and a stat to overlay their daily history · showing ${compareRangeSelectHtml()}${compareState.range === 1 ? " (day-over-day)" : ""}</p>
+    <p class="page-sub">Pick players and a stat to overlay their daily history · showing ${compareRangeSelectHtml()} · comparing to ${rangeWindowText(compareState.range)}</p>
     <div class="group-label">Stat</div>
     ${statTabsHtml(stat.key)}
     <div class="group-label compare-players-label"><span>Players</span><button class="compare-clear" type="button" ${compareState.selected.length === 0 ? "disabled" : ""}>Unselect all</button></div>
