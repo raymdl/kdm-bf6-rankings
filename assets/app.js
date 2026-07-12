@@ -73,6 +73,28 @@ function statByKey(key) {
   return state.meta.stats.find((stat) => stat.key === key) ?? null;
 }
 
+// Friendly, player-facing label for a stored GameTools identity platform. The
+// audit log shows the raw value instead (research/debugging focused). Unknown
+// or missing values yield null so callers can omit platform entirely.
+const PLATFORM_LABELS = {
+  ea: "EA / PC",
+  pc: "PC",
+  steam: "Steam",
+  xboxone: "Xbox",
+  xboxseries: "Xbox",
+  psn: "PlayStation",
+  ps4: "PlayStation",
+  ps5: "PlayStation"
+};
+
+function platformLabel(platform) {
+  if (!platform) {
+    return null;
+  }
+  const key = String(platform).trim().toLowerCase();
+  return PLATFORM_LABELS[key] ?? key.charAt(0).toUpperCase() + key.slice(1);
+}
+
 function memberName(discordId) {
   const latest = state.latest.members.find((member) => member.discordId === discordId);
   return latest?.displayName ?? state.history.members?.[discordId]?.name ?? `Member ${discordId}`;
@@ -534,6 +556,7 @@ function renderPlayer(discordId, statKey) {
     <p class="profile-sub">
       ${member?.profileName ? `Profile <strong>${esc(member.profileName)}</strong> · ` : ""}
       ${member?.eaName ? `EA <span class="mono">${esc(member.eaName)}</span> · ` : ""}
+      ${platformLabel(member?.platform) ? `Platform <strong>${esc(platformLabel(member.platform))}</strong> · ` : ""}
       ${member?.gameToolsUrl ? `<a href="${esc(member.gameToolsUrl)}" target="_blank" rel="noopener">GameTools profile ↗</a>` : ""}
       ${!member ? `<span class="badge unlinked">no longer linked</span>` : ""}
     </p>
@@ -965,7 +988,7 @@ function renderAudit() {
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>When</th><th>Action</th><th>Result</th><th>Discord member</th><th>EA account</th><th>Persona / Player ID</th><th>User / Nucleus ID</th><th>Profile</th></tr></thead>
+        <thead><tr><th>When</th><th>Action</th><th>Result</th><th>Discord member</th><th>EA account</th><th>Platform</th><th>Persona / Player ID</th><th>User / Nucleus ID</th><th>Profile</th></tr></thead>
         <tbody>${filtered
           .map(
             (event) => `<tr>
@@ -980,12 +1003,13 @@ function renderAudit() {
                   ? `<span class="mono">${esc(event.previousEaName ?? "?")}</span> <span class="arrow">→</span> <span class="mono">${esc(event.eaName)}</span>`
                   : `<span class="mono">${esc(event.eaName ?? "—")}</span>`
               }</td>
+              <td class="mono">${esc(event.platform ?? "—")}</td>
               <td class="mono">${esc(event.playerId ?? "—")}</td>
               <td class="mono">${esc(event.nucleusId ?? "—")}</td>
               <td>${esc(event.profileName ?? "—")}</td>
             </tr>`
           )
-          .join("") || `<tr><td colspan="8" class="empty">No matching events.</td></tr>`}</tbody>
+          .join("") || `<tr><td colspan="9" class="empty">No matching events.</td></tr>`}</tbody>
       </table>
     </div>`;
 
