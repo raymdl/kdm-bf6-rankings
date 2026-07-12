@@ -1072,7 +1072,7 @@ function renderAudit() {
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>When</th><th>Action</th><th>Result</th><th>Discord member</th><th>EA account</th><th>Platform</th><th>Persona / Player ID</th><th>User / Nucleus ID</th><th>Profile</th></tr></thead>
+        <thead><tr><th>When</th><th>Action</th><th>Result</th><th>Discord member</th><th>EA account</th><th>Persona / Player ID</th><th>User / Nucleus ID</th><th>Platform</th><th>Profile</th></tr></thead>
         <tbody>${filtered
           .map(
             (event) => `<tr>
@@ -1087,9 +1087,9 @@ function renderAudit() {
                   ? `<span class="mono">${esc(event.previousEaName ?? "?")}</span> <span class="arrow">→</span> <span class="mono">${esc(event.eaName)}</span>`
                   : `<span class="mono">${esc(event.eaName ?? "—")}</span>`
               }</td>
-              <td class="mono">${esc(event.platform ?? "—")}</td>
               <td class="mono">${esc(event.playerId ?? "—")}</td>
               <td class="mono">${esc(event.nucleusId ?? "—")}</td>
+              <td class="mono">${esc(event.platform ?? "—")}</td>
               <td>${esc(event.profileName ?? "—")}</td>
             </tr>`
           )
