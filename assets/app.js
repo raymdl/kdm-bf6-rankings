@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { calculateEffectiveness, effectivenessDefinitions } from "./effectiveness.js";
+import { effectivenessDefinitions } from "./effectiveness.js";
 
 const app = document.getElementById("app");
 
@@ -11,8 +11,8 @@ const state = {
   history: null,
   audit: null,
   notifications: null,
-  archive: null,
-  effectiveness: null
+  effectiveness: null,
+  effectivenessHistory: null
 };
 
 let charts = [];
@@ -1288,7 +1288,7 @@ function renderEffectiveness(requestedKey) {
   const key = EFFECTIVENESS_KEYS.includes(requestedKey) ? requestedKey : "trident";
   const calculation = state.effectiveness;
   if (!calculation?.rows?.length) {
-    app.innerHTML = `<div class="error-box"><strong>No raw snapshot available.</strong><br>The Effectiveness Lab needs the latest GameTools archive.</div>`;
+    app.innerHTML = `<div class="error-box"><strong>Effectiveness data has not been published yet.</strong><br>The next tracker refresh will generate it.</div>`;
     return;
   }
   const ranking = [...calculation.rows].sort((a, b) => b.scores[key] - a.scores[key]);
@@ -1373,12 +1373,13 @@ async function fetchJson(path, fallback) {
 }
 
 async function boot() {
-  const [meta, latest, history, audit, notifications] = await Promise.all([
+  const [meta, latest, history, audit, notifications, effectivenessHistory] = await Promise.all([
     fetchJson("data/meta.json", null),
     fetchJson("data/latest.json", { members: [] }),
     fetchJson("data/history.json", { dates: [], members: {} }),
     fetchJson("data/audit.json", { events: [] }),
-    fetchJson("data/notifications.json", { events: [] })
+    fetchJson("data/notifications.json", { events: [] }),
+    fetchJson("data/effectiveness-history.json", null)
   ]);
 
   if (!meta) {
@@ -1387,10 +1388,20 @@ async function boot() {
     return;
   }
 
-  const archiveDate = history?.dates?.at?.(-1) ?? String(meta.updatedAt).slice(0, 10);
-  const archive = await fetchJson(`data/archive/${archiveDate}.json`, null);
-  const effectiveness = calculateEffectiveness(archive, latest);
-  Object.assign(state, { meta, latest, history, audit, notifications, archive, effectiveness });
+  const compatibleEffectiveness =
+    effectivenessHistory?.version === 1 && Number.isInteger(effectivenessHistory?.modelVersion)
+      ? effectivenessHistory
+      : null;
+  const effectiveness = compatibleEffectiveness?.current ?? null;
+  Object.assign(state, {
+    meta,
+    latest,
+    history,
+    audit,
+    notifications,
+    effectiveness,
+    effectivenessHistory: compatibleEffectiveness
+  });
 
   const updated = document.getElementById("footer-updated");
   updated.textContent = `Last updated ${fmtDateTime(meta.updatedAt)}`;

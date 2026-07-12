@@ -2,7 +2,7 @@
 
 Static GitHub Pages site with the KDM community's Battlefield 6 leaderboards, per-player history charts, head-to-head comparisons, an activity feed, and an audit log.
 
-The **Effectiveness Lab** adds three experimental, role-aware overall measures: Composite Effectiveness Index, Risk-Adjusted Impact Score, and Win Rate Residual. The browser calculates them from the newest raw archive on each load, so new tracker snapshots and linked members flow into the rankings without a separate build step.
+The **Effectiveness Lab** adds three role-aware overall measures: Composite Effectiveness Index (CEI), Risk-Adjusted Impact Score (RAIS), and Win Rate Residual (WRR). The bot publisher calculates the full cohort during each tracker publish and writes `data/effectiveness-history.json`; the browser only sorts and renders the generated current snapshot.
 
 See [EFFECTIVENESS_MEASURES.md](EFFECTIVENESS_MEASURES.md) for the complete formulas, normalization pipeline, season weighting, interpretation, and player-level breakdown reference.
 

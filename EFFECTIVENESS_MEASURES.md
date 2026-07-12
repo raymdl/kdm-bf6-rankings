@@ -6,7 +6,7 @@ This document specifies the three experimental measures in the KDM BF6 Effective
 2. **Risk-Adjusted Impact Score (RAIS)** — contribution adjusted for death exposure.
 3. **Win Rate Residual (WRR)** — Breakthrough winning above or below the rate predicted by visible performance.
 
-The formulas are calculated in the browser from the newest `data/archive/<date>.json` snapshot. Scores are relative to the currently tracked KDM population, so they can move when players are added, removed, or improve.
+The formulas run in the bot publisher from the complete cohort for each retained `data/archive/<date>.json` snapshot. The generated `data/effectiveness-history.json` contains compact CEI/RAIS/WRR, Combat, Objective, and Teamwork series plus the detailed current snapshot. Scores are relative to the currently tracked KDM population, so they can move when players are added, removed, or improve.
 
 ## Design scope
 
@@ -325,8 +325,10 @@ Every row in the Full KDM Ranking table has a **Breakdown** control. Expanding i
 
 ## Implementation reference
 
-- Formulas and normalization: [`assets/effectiveness.js`](assets/effectiveness.js)
+- Display definitions: [`assets/effectiveness.js`](assets/effectiveness.js)
 - Page rendering and row breakdowns: [`assets/app.js`](assets/app.js)
+- Canonical formulas and model version: [`kdm-discord-bot/src/bf6-effectiveness.js`](https://github.com/raymdl/kdm-discord-bot/blob/main/src/bf6-effectiveness.js)
+- Generated current/history contract: [`data/effectiveness-history.json`](data/effectiveness-history.json)
 - Current raw snapshots: [`data/archive/`](data/archive/)
 
-The code is the authoritative implementation if this document and the live calculation ever diverge.
+The bot's `EFFECTIVENESS_MODEL_VERSION` must be incremented whenever a formula, weight, normalization rule, input definition, prior, or regression configuration changes. A version change triggers a complete historical rebuild. Raw archives remain the rebuild source.
