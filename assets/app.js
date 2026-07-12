@@ -1146,9 +1146,10 @@ function effectivenessMethodHtml(key, constants) {
         <div class="formula-kicker">The equation</div>
         <div class="formula">CEI = C<sup>0.40</sup> &times; O<sup>0.30</sup> &times; T<sup>0.30</sup></div>
         <p>A weighted geometric mean of three 2&ndash;98 clan percentiles. The geometric mean is the anti-one-trick device: a missing pillar drags the whole score down, while a strength can still carry its fair share.</p>
+        <p><strong>Weapon-adjusted aim:</strong> Accuracy and Headshot % are scored as residuals above or below a ridge-regression baseline predicted from each player's weapon-kill mix. A 30% AR accuracy therefore earns more credit than the same accuracy from a sniper-heavy mix. Weapon-kill share is the usage proxy because the dump has no per-weapon shot or playtime totals.</p>
       </div>
       <div class="pillar-list">
-        <div><span class="pillar-letter combat">C</span><p><strong>Combat</strong><br>Player K/D, Player Kills/Min, Player Kills per match and assists/hour. Player-only kill counters exclude bots; headshot rate and accuracy stay out because weapon choice distorts them.</p></div>
+        <div><span class="pillar-letter combat">C</span><p><strong>Combat</strong><br>Player K/D (30%), Player Kills/Min (30%), Player Kills per match (10%), assists/hour (10%), weapon-adjusted Accuracy (10%), and weapon-adjusted Headshot % (10%). Bot kills remain excluded.</p></div>
         <div><span class="pillar-letter objective">O</span><p><strong>Breakthrough Objective</strong><br>Captures and neutralizations (50%), objective-zone presence (30%), and time attacking or defending objectives (20%). Armed, defused and destroyed events are excluded.</p></div>
         <div><span class="pillar-letter teamwork">T</span><p><strong>Teamwork</strong><br>70% best + 30% second-best of Medic, Logistics and Intel lanes. Specialists count, but one spammed action cannot own the score.</p></div>
       </div>
@@ -1217,9 +1218,9 @@ function effectivenessTableHtml(key, ranking) {
       : key === "sortino"
         ? `<td class="num value-cell">${row.scores.sortino.toFixed(1)}</td><td class="num">${row.sortinoUpside.toFixed(1)}</td><td class="num">${row.adjusted.deathsPerHour.toFixed(1)}</td>`
         : `<td class="num value-cell">${row.scores.trident.toFixed(1)}</td><td>${row.bestSupportLanes.map((lane) => lane[0].toUpperCase() + lane.slice(1)).join(" + ")}</td>`;
-    return `<tr class="r${index + 1}"><td class="rank-cell">${index + 1}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${row.cachedStats ? cachedMarkerHtml() : ""}</td>${detail}<td class="num pillar-score">${row.pillars.combat.toFixed(1)}</td><td class="num pillar-score">${row.pillars.objective.toFixed(1)}</td><td class="num pillar-score">${row.pillars.teamwork.toFixed(1)}</td></tr>`;
+    return `<tr class="r${index + 1}"><td class="rank-cell">${index + 1}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${row.cachedStats ? cachedMarkerHtml() : ""}</td>${detail}<td class="num pillar-score">${row.aimScore.toFixed(1)}</td><td class="num pillar-score">${row.pillars.combat.toFixed(1)}</td><td class="num pillar-score">${row.pillars.objective.toFixed(1)}</td><td class="num pillar-score">${row.pillars.teamwork.toFixed(1)}</td></tr>`;
   }).join("");
-  return `<div class="table-wrap effectiveness-table"><table><thead><tr><th>#</th><th>Player</th>${header}<th class="num">Combat</th><th class="num">Objective</th><th class="num">Teamwork</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  return `<div class="table-wrap effectiveness-table"><table><thead><tr><th>#</th><th>Player</th>${header}<th class="num">Aim adj.</th><th class="num">Combat</th><th class="num">Objective</th><th class="num">Teamwork</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 function renderEffectiveness(requestedKey) {
@@ -1244,11 +1245,7 @@ function renderEffectiveness(requestedKey) {
     ${effectivenessPodiumHtml(key, ranking)}
     ${effectivenessBarsHtml(key, ranking)}
     <div class="ranking-heading"><h2>Full KDM ranking</h2><p>${ranking.length} tracked players &middot; rates and stabilized percentages, never lifetime-volume totals</p></div>
-    ${effectivenessTableHtml(key, ranking)}
-    <details class="guardrails" open><summary>Why these are harder to game</summary><div>
-      <p><strong>Rate stats over totals:</strong> playing longer does not automatically score higher. <strong>25-hour shrinkage:</strong> small samples are pulled toward the clan median. <strong>Robust percentiles:</strong> extreme raw values cannot blow up the scale.</p>
-      <p><strong>Breakthrough-specific PTFO:</strong> the objective pillar uses captures, neutralizations and attack/defense zone time; arm, defuse and destroy events are excluded. <strong>Role-aware support:</strong> Medic, Logistics and Intel are separate lanes; the best two are blended. <strong>No accuracy or headshot rate:</strong> sniper and weapon-choice bias is avoided. <strong>Transparent caveat:</strong> Win Rate Residual still contains team-composition effects.</p>
-    </div></details>`;
+    ${effectivenessTableHtml(key, ranking)}`;
 }
 
 /* ---------- router ---------- */

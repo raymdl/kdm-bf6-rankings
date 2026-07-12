@@ -1074,6 +1074,9 @@ tr.r3 .rank-cell { color: var(--bronze); }
   margin: 0;
 }
 
+.formula-card p + p { margin-top: 0.75rem; }
+.formula-card strong { color: var(--text); }
+
 .pillar-list {
   display: grid;
   gap: 0.65rem;
@@ -1170,28 +1173,6 @@ tr.r3 .rank-cell { color: var(--bronze); }
 .pillar-score { color: var(--text-dim); }
 .positive-score { color: var(--up); }
 .negative-score { color: var(--down); }
-
-.guardrails {
-  margin-top: 1rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: var(--text-dim);
-}
-
-.guardrails summary {
-  padding: 0.8rem 1rem;
-  color: var(--text);
-  cursor: pointer;
-  font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.guardrails > div { padding: 0 1rem 0.3rem; }
-.guardrails p { margin: 0 0 0.75rem; }
-.guardrails strong { color: var(--text); }
 
 /* ---------- responsive ---------- */
 
