@@ -84,15 +84,22 @@ function ridgePredict(trainingRows, target) {
   );
 }
 
-function buildRawRow(discordId, member, displayName) {
+function buildRawRow(discordId, member, current) {
   const stats = member?.stats ?? {};
-  const seconds = Math.max(1, finite(stats.secondsPlayed));
+  const tracked = current?.stats ?? {};
+  const allClass = stats.classes?.kit ?? {};
+  const activeSeconds = Math.max(1, finite(allClass.secondsPlayed));
+  const activeMinutes = activeSeconds / 60;
+  const seconds = Math.max(1, finite(stats.secondsPlayed, activeSeconds));
   const hours = seconds / 3600;
-  const minutes = seconds / 60;
   const objective = stats.objective ?? {};
   const objectiveTime = objective.time ?? {};
   const spotAssists = finite(stats.devidedAssists?.spot);
-  const humanKills = finite(stats.dividedKills?.human, finite(stats.kills));
+  // Prefer the public tracker's player-only fields. Raw GameTools dividedKills.human
+  // is the only allowed fallback; top-level kills and KPM include bots.
+  const playerKills = finite(tracked.kills, finite(stats.dividedKills?.human));
+  const playerKillDeath = finite(tracked.infantryKillDeath, finite(stats.infantryKillDeath));
+  const playerKillsPerMinute = finite(tracked.playerKillsPerMinute, playerKills / activeMinutes);
   const weightedObjectiveActions =
     finite(objective.captured) +
     finite(objective.neutralized) +
@@ -100,17 +107,17 @@ function buildRawRow(discordId, member, displayName) {
 
   return {
     discordId,
-    name: displayName ?? member?.name ?? discordId,
+    name: current?.displayName ?? member?.name ?? discordId,
     hours,
     matches: Math.max(0, finite(stats.matchesPlayed)),
     wins: Math.max(0, finite(stats.wins)),
     losses: Math.max(0, finite(stats.loses)),
     cachedStats: false,
     raw: {
-      infantryKd: finite(stats.infantryKillDeath, finite(stats.killDeath)),
-      infantryKpm: humanKills / minutes,
-      damagePerMinute: finite(stats.damagePerMinute),
-      assistsPerHour: finite(stats.killAssists, finite(stats.assists)) / hours,
+      infantryKd: playerKillDeath,
+      infantryKpm: playerKillsPerMinute,
+      playerKillsPerMatch: playerKills / Math.max(1, finite(stats.matchesPlayed)),
+      assistsPerHour: finite(tracked.assists, finite(stats.assists)) / hours,
       objectiveActionsPerHour: weightedObjectiveActions / hours,
       objectivePresence: finite(objectiveTime.total) / seconds,
       clutchObjectivesPerHour:
@@ -138,7 +145,7 @@ export function calculateEffectiveness(archive, latest = { members: [] }) {
   const rows = Object.entries(archive?.members ?? {})
     .map(([discordId, member]) => {
       const current = latestById.get(String(discordId));
-      const row = buildRawRow(discordId, member, current?.displayName);
+      const row = buildRawRow(discordId, member, current);
       row.cachedStats = Boolean(current?.cachedStats);
       return row;
     })
@@ -149,7 +156,7 @@ export function calculateEffectiveness(archive, latest = { members: [] }) {
   const featureDirections = {
     infantryKd: 1,
     infantryKpm: 1,
-    damagePerMinute: 1,
+    playerKillsPerMatch: 1,
     assistsPerHour: 1,
     objectiveActionsPerHour: 1,
     objectivePresence: 1,
@@ -171,8 +178,8 @@ export function calculateEffectiveness(archive, latest = { members: [] }) {
   for (const row of rows) {
     const p = row.percentiles;
     row.pillars.combat = weightedGeometric(
-      [p.infantryKd, p.infantryKpm, p.damagePerMinute, p.assistsPerHour],
-      [0.35, 0.35, 0.2, 0.1]
+      [p.infantryKd, p.infantryKpm, p.playerKillsPerMatch, p.assistsPerHour],
+      [0.4, 0.35, 0.15, 0.1]
     );
     row.pillars.objective = weightedGeometric(
       [p.objectiveActionsPerHour, p.objectivePresence, p.clutchObjectivesPerHour],
