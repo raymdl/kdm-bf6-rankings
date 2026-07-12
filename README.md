@@ -4,6 +4,8 @@ Static GitHub Pages site with the KDM community's Battlefield 6 leaderboards, pe
 
 The **Effectiveness Lab** adds three experimental, role-aware overall measures: Composite Effectiveness Index, Risk-Adjusted Impact Score, and Win Rate Residual. The browser calculates them from the newest raw archive on each load, so new tracker snapshots and linked members flow into the rankings without a separate build step.
 
+See [EFFECTIVENESS_MEASURES.md](EFFECTIVENESS_MEASURES.md) for the complete formulas, normalization pipeline, season weighting, interpretation, and player-level breakdown reference.
+
 Win Rate Residual uses Breakthrough-only season records with 15% / 30% / 55% weights for Seasons 1 / 2 / 3. Each season is stabilized with a 25-match clan prior before the weighted rate is compared with the player's expected win rate.
 
 **Live site:** <https://raymdl.github.io/kdm-bf6-rankings/>
