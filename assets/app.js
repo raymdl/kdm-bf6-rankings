@@ -1149,7 +1149,7 @@ function effectivenessMethodHtml(key, constants) {
         <p>A weighted geometric mean of three 2&ndash;98 clan percentiles. The geometric mean is the anti-one-trick device: a missing pillar drags the whole score down, while a strength can still carry its fair share.</p>
       </div>
       <div class="pillar-list">
-        <div><span class="pillar-letter combat">C</span><p><strong>Combat</strong><br>Player K/D (30%), Player Kills/Min (30%), Player Kills per match (10%), assists/hour (10%), weapon-adjusted Accuracy (10%), and weapon-adjusted Headshot % (10%). Aim is part of Combat, not a separate CEI pillar.</p></div>
+        <div><span class="pillar-letter combat">C</span><p><strong>Combat</strong><br>A 70/30 blend of the weighted geometric and arithmetic scores for Player K/D (30%), Player Kills/Min (30%), Player Kills per match (10%), assists/hour (10%), weapon-adjusted Accuracy (10%), and weapon-adjusted Headshot % (10%). Aim is part of Combat, not a separate CEI pillar.</p></div>
         <div><span class="pillar-letter objective">O</span><p><strong>Breakthrough Objective</strong><br>Captures and neutralizations (50%), objective-zone presence (30%), and time attacking or defending objectives (20%).</p></div>
         <div><span class="pillar-letter teamwork">T</span><p><strong>Teamwork</strong><br>70% best + 30% second-best of Medic, Logistics and Intel lanes. Specialists count, but one spammed action cannot own the score.</p></div>
       </div>
@@ -1231,6 +1231,8 @@ function effectivenessBreakdownHtml(key, row) {
     <div class="breakdown-equation"><span>Score calculation</span><div>${scoreLine}</div></div>
     <div class="breakdown-pillar-grid">
       ${breakdownStatHtml("Combat pillar", row.pillars.combat.toFixed(1), "40% CEI / RAIS input")}
+      ${breakdownStatHtml("Balanced Combat", row.combatGeometric.toFixed(1), "70% of Combat · geometric mean")}
+      ${breakdownStatHtml("Additive Combat", row.combatArithmetic.toFixed(1), "30% of Combat · arithmetic mean")}
       ${breakdownStatHtml("Objective pillar", row.pillars.objective.toFixed(1), "30% CEI / RAIS input")}
       ${breakdownStatHtml("Teamwork pillar", row.pillars.teamwork.toFixed(1), `30% · ${row.bestSupportLanes.join(" + ")}`)}
       ${key === "sortino" ? breakdownStatHtml("Deaths / hour", row.adjusted.deathsPerHour.toFixed(1), `clan median ${state.effectiveness.constants.medianDeathsPerHour.toFixed(1)}`) : ""}

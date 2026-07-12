@@ -69,7 +69,7 @@ CEI and RAIS share three underlying pillars: Combat (`C`), Breakthrough Objectiv
 
 ### Combat pillar (`C`)
 
-Combat is a weighted geometric mean of six clan-relative percentiles:
+Combat blends two summaries of the same six clan-relative percentiles: 70% weighted geometric mean and 30% weighted arithmetic mean. The geometric portion continues to reward a balanced combat profile, while the arithmetic portion softens an excessive penalty from one unusually weak input.
 
 | Input | Combat weight | Raw definition |
 | --- | ---: | --- |
@@ -81,7 +81,7 @@ Combat is a weighted geometric mean of six clan-relative percentiles:
 | Weapon-adjusted Headshot % | 10% | Headshot residual percentile |
 
 ```text
-C = geometric_mean(
+G = geometric_mean(
   Player K/D percentile             weight 0.30,
   Player Kills/Min percentile       weight 0.30,
   Player Kills/match percentile     weight 0.10,
@@ -89,7 +89,13 @@ C = geometric_mean(
   adjusted Accuracy percentile      weight 0.10,
   adjusted Headshot % percentile    weight 0.10
 )
+
+A = arithmetic_mean(same inputs and weights)
+
+C = 0.70 × G + 0.30 × A
 ```
+
+The blend retains most of the geometric mean's resistance to one-stat specialization. The 30% arithmetic component gives proportionate credit for the rest of a player's combat production when one submetric is exceptionally low.
 
 Weapon-adjusted aim is **inside Combat**. It is not a separate CEI pillar.
 
