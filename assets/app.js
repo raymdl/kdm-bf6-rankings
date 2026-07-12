@@ -1175,7 +1175,7 @@ function effectivenessMethodHtml(key, constants) {
       <div class="formula-kicker">The equation</div>
       <p class="measure-summary">The percentage-point gap between a player's stabilized win rate and the rate predicted by their Combat, Objective, and Teamwork profile. A positive residual means they win more often than their visible statistics predict.</p>
       <div class="formula formula-small">WRR = weighted Breakthrough Win% &minus; expected Win%(zC, zO, zT)</div>
-      <p>Observed win rate blends Breakthrough results from Season 1 (15%), Season 2 (30%), and Season 3 (55%). Each season is stabilized with a ${constants.seasonWinPriorMatches}-match clan prior before weighting; expected win rate comes from a leave-one-player-out ridge model (&lambda;=${constants.ridgeLambda}).</p>
+      <p>Observed win rate blends Breakthrough results from Season 1 (20%), Season 2 (35%), and Season 3 (45%). Each season is stabilized with a ${constants.seasonWinPriorMatches}-match clan prior before weighting; expected win rate comes from a leave-one-player-out ridge model (&lambda;=${constants.ridgeLambda}).</p>
     </div>
     <div class="pillar-list">
       <div><span class="pillar-letter combat">W</span><p><strong>Observed winning</strong><br>Breakthrough wins and losses by season, with Season 3 weighted most heavily so recent improvement matters more.</p></div>
@@ -1220,7 +1220,7 @@ function effectivenessBreakdownHtml(key, row) {
       ? `RAIS<sub>raw</sub> = ${row.sortinoUpside.toFixed(1)} &divide; ${row.sortinoDownside.toFixed(3)} = ${row.sortinoRaw.toFixed(1)} &rarr; <strong>${row.scores.sortino.toFixed(1)} percentile</strong>`
       : `WRR = ${row.smoothedWinPercent.toFixed(1)}% &minus; ${row.expectedWinPercent.toFixed(1)}% = <strong>${effectivenessScoreText("alpha", row.scores.alpha)}</strong>`;
   const seasonHtml = key === "alpha"
-    ? `<div class="breakdown-season-grid">${Object.entries({ Season1: "Season 1 · 15%", Season2: "Season 2 · 30%", Season3: "Season 3 · 55%" }).map(([seasonId, label]) => {
+    ? `<div class="breakdown-season-grid">${Object.entries({ Season1: "Season 1 · 20%", Season2: "Season 2 · 35%", Season3: "Season 3 · 45%" }).map(([seasonId, label]) => {
         const season = row.seasonWinRates[seasonId];
         return season
           ? breakdownStatHtml(label, `${(season.rawRate * 100).toFixed(1)}%`, `${season.wins}-${season.losses} · stabilized ${(season.smoothedRate * 100).toFixed(1)}%`)
