@@ -2,6 +2,8 @@ const MIN_PERCENTILE = 2;
 const MAX_PERCENTILE = 98;
 const PRIOR_HOURS = 25;
 const WIN_PRIOR_MATCHES = 50;
+const SEASON_WIN_PRIOR_MATCHES = 25;
+const SEASON_WEIGHTS = { Season1: 0.15, Season2: 0.3, Season3: 0.55 };
 const RIDGE_LAMBDA = 4;
 const AIM_RIDGE_LAMBDA = 1;
 const WEAPON_CATEGORIES = ["ar", "smg", "carbine", "mg", "dmr", "sniper", "shotgun", "pistol"];
@@ -151,6 +153,20 @@ function addWeaponAdjustedAim(rows) {
   }
 }
 
+function breakthroughSeasonRecords(stats) {
+  const records = {};
+  for (const [seasonId, season] of Object.entries(stats.seasons ?? {})) {
+    const modes = season?.modes ?? {};
+    const breakthrough = Object.entries(modes).find(([modeId]) => /^breakthrough/i.test(modeId))?.[1];
+    if (!breakthrough) continue;
+    const wins = Math.max(0, finite(breakthrough.wins));
+    const losses = Math.max(0, finite(breakthrough.losses, finite(breakthrough.loses)));
+    const matches = Math.max(wins + losses, finite(breakthrough.matches));
+    if (matches > 0) records[seasonId] = { wins, losses, matches };
+  }
+  return records;
+}
+
 function buildRawRow(discordId, member, current) {
   const stats = member?.stats ?? {};
   const tracked = current?.stats ?? {};
@@ -178,6 +194,7 @@ function buildRawRow(discordId, member, current) {
     losses: Math.max(0, finite(stats.loses)),
     cachedStats: false,
     weaponMix: weaponKillMix(stats),
+    breakthroughSeasons: breakthroughSeasonRecords(stats),
     raw: {
       infantryKd: playerKillDeath,
       infantryKpm: playerKillsPerMinute,
@@ -273,13 +290,21 @@ export function calculateEffectiveness(archive, latest = { members: [] }) {
   const medianDeathsPerHour = median(rows.map((row) => row.adjusted.deathsPerHour));
   for (const row of rows) {
     const downside = clamp((row.adjusted.deathsPerHour / Math.max(0.01, medianDeathsPerHour)) ** 0.35, 0.72, 1.4);
+    row.sortinoDownside = downside;
     row.sortinoRaw = row.sortinoUpside / downside;
     row.adjusted.sortinoRaw = row.sortinoRaw;
   }
   addPercentiles(rows, "sortinoRaw", 1);
   for (const row of rows) row.scores.sortino = row.percentiles.sortinoRaw;
 
-  const clanWinRate = sum(rows.map((row) => row.wins)) / Math.max(1, sum(rows.map((row) => row.wins + row.losses)));
+  const lifetimeClanWinRate = sum(rows.map((row) => row.wins)) / Math.max(1, sum(rows.map((row) => row.wins + row.losses)));
+  const seasonClanRates = Object.fromEntries(
+    Object.keys(SEASON_WEIGHTS).map((seasonId) => {
+      const wins = sum(rows.map((row) => row.breakthroughSeasons[seasonId]?.wins ?? 0));
+      const losses = sum(rows.map((row) => row.breakthroughSeasons[seasonId]?.losses ?? 0));
+      return [seasonId, wins / Math.max(1, wins + losses)];
+    })
+  );
   const means = {
     combat: sum(rows.map((row) => row.pillars.combat)) / rows.length,
     objective: sum(rows.map((row) => row.pillars.objective)) / rows.length,
@@ -291,15 +316,37 @@ export function calculateEffectiveness(archive, latest = { members: [] }) {
     teamwork: Math.sqrt(sum(rows.map((row) => (row.pillars.teamwork - means.teamwork) ** 2)) / rows.length) || 1
   };
   for (const row of rows) {
-    const decisions = Math.max(1, row.wins + row.losses);
-    row.smoothedWinPercent =
-      (100 * (row.wins + WIN_PRIOR_MATCHES * clanWinRate)) / (decisions + WIN_PRIOR_MATCHES);
+    row.seasonWinRates = {};
+    let weightedRate = 0;
+    let availableWeight = 0;
+    for (const [seasonId, weight] of Object.entries(SEASON_WEIGHTS)) {
+      const record = row.breakthroughSeasons[seasonId];
+      if (!record) continue;
+      const decisions = Math.max(1, record.wins + record.losses);
+      const rawRate = record.wins / decisions;
+      const smoothedRate =
+        (record.wins + SEASON_WIN_PRIOR_MATCHES * seasonClanRates[seasonId]) /
+        (decisions + SEASON_WIN_PRIOR_MATCHES);
+      row.seasonWinRates[seasonId] = { ...record, rawRate, smoothedRate, weight };
+      weightedRate += weight * smoothedRate;
+      availableWeight += weight;
+    }
+    if (availableWeight > 0) {
+      row.smoothedWinPercent = (100 * weightedRate) / availableWeight;
+      row.winDataSource = "season-breakthrough";
+    } else {
+      const decisions = Math.max(1, row.wins + row.losses);
+      row.smoothedWinPercent =
+        (100 * (row.wins + WIN_PRIOR_MATCHES * lifetimeClanWinRate)) / (decisions + WIN_PRIOR_MATCHES);
+      row.winDataSource = "lifetime-fallback";
+    }
     row.model = {
       combat: (row.pillars.combat - means.combat) / deviations.combat,
       objective: (row.pillars.objective - means.objective) / deviations.objective,
       teamwork: (row.pillars.teamwork - means.teamwork) / deviations.teamwork
     };
   }
+  const clanWinPercent = sum(rows.map((row) => row.smoothedWinPercent)) / rows.length;
   for (const row of rows) {
     row.expectedWinPercent = ridgePredict(rows.filter((candidate) => candidate !== row), row);
     row.scores.alpha = row.smoothedWinPercent - row.expectedWinPercent;
@@ -311,9 +358,12 @@ export function calculateEffectiveness(archive, latest = { members: [] }) {
     constants: {
       priorHours: PRIOR_HOURS,
       winPriorMatches: WIN_PRIOR_MATCHES,
+      seasonWinPriorMatches: SEASON_WIN_PRIOR_MATCHES,
+      seasonWeights: SEASON_WEIGHTS,
+      seasonClanRates,
       ridgeLambda: RIDGE_LAMBDA,
       aimRidgeLambda: AIM_RIDGE_LAMBDA,
-      clanWinPercent: clanWinRate * 100,
+      clanWinPercent,
       medianDeathsPerHour
     }
   };
