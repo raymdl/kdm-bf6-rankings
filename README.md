@@ -2,6 +2,8 @@
 
 Static GitHub Pages site with the KDM community's Battlefield 6 leaderboards, per-player history charts, head-to-head comparisons, an activity feed, and an audit log.
 
+The **Effectiveness Lab** adds three experimental, role-aware overall measures: KDM Trident, Frontline Sortino, and Squadlift Alpha. The browser calculates them from the newest raw archive on each load, so new tracker snapshots and linked members flow into the rankings without a separate build step.
+
 **Live site:** <https://raymdl.github.io/kdm-bf6-rankings/>
 
 ## Layout

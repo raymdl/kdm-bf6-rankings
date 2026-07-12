@@ -1,6 +1,8 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
+import { calculateEffectiveness, effectivenessDefinitions } from "./effectiveness.js";
+
 const app = document.getElementById("app");
 
 const state = {
@@ -8,7 +10,9 @@ const state = {
   latest: null,
   history: null,
   audit: null,
-  notifications: null
+  notifications: null,
+  archive: null,
+  effectiveness: null
 };
 
 let charts = [];
@@ -1115,6 +1119,138 @@ function renderAudit() {
   });
 }
 
+/* ---------- effectiveness lab ---------- */
+
+const EFFECTIVENESS_KEYS = ["trident", "sortino", "alpha"];
+
+function effectivenessScoreText(key, value) {
+  if (key === "alpha") return `${value >= 0 ? "+" : ""}${value.toFixed(2)} pp`;
+  return value.toFixed(1);
+}
+
+function effectivenessTabsHtml(activeKey) {
+  return `<div class="effectiveness-tabs" role="navigation" aria-label="Effectiveness measures">${EFFECTIVENESS_KEYS.map((key, index) => {
+    const definition = effectivenessDefinitions[key];
+    const subtitle = key === "trident" ? "balanced all-round value" : key === "sortino" ? "risk-adjusted impact" : "wins above expectation";
+    return `<a class="effectiveness-tab ${key === activeKey ? "active" : ""}" href="#/effectiveness/${key}">
+      <span class="effectiveness-tab-number">0${index + 1}</span>
+      <span><strong>${esc(definition.title)}</strong><small>${subtitle}</small></span>
+    </a>`;
+  }).join("")}</div>`;
+}
+
+function effectivenessMethodHtml(key, constants) {
+  if (key === "trident") {
+    return `<div class="effectiveness-method-grid">
+      <div class="formula-card">
+        <div class="formula-kicker">The equation</div>
+        <div class="formula">Trident = C<sup>0.40</sup> &times; O<sup>0.30</sup> &times; T<sup>0.30</sup></div>
+        <p>A weighted geometric mean of three 2&ndash;98 clan percentiles. The geometric mean is the anti-one-trick device: a missing pillar drags the whole score down, while a strength can still carry its fair share.</p>
+      </div>
+      <div class="pillar-list">
+        <div><span class="pillar-letter combat">C</span><p><strong>Combat</strong><br>K/D, human KPM, damage/min and assists/hour. Tempo and survival both matter; headshot rate and accuracy stay out because weapon choice distorts them.</p></div>
+        <div><span class="pillar-letter objective">O</span><p><strong>Objective</strong><br>Weighted captures/neutralizations, objective-time share, and high-leverage arms, defuses and destroys.</p></div>
+        <div><span class="pillar-letter teamwork">T</span><p><strong>Teamwork</strong><br>70% best + 30% second-best of Medic, Logistics and Intel lanes. Specialists count, but one spammed action cannot own the score.</p></div>
+      </div>
+    </div>`;
+  }
+  if (key === "sortino") {
+    return `<div class="effectiveness-method-grid">
+      <div class="formula-card">
+        <div class="formula-kicker">The equation</div>
+        <div class="formula formula-small">Raw = (0.40C + 0.30O + 0.30T) &divide; (Deaths/hr &divide; ${constants.medianDeathsPerHour.toFixed(1)})<sup>0.35</sup></div>
+        <p>The published score is the raw result's 2&ndash;98 clan percentile. Like a finance Sortino ratio, only downside is penalized. The mild exponent and capped penalty keep a cautious camper from winning merely by avoiding deaths.</p>
+      </div>
+      <div class="pillar-list">
+        <div><span class="pillar-letter combat">&uarr;</span><p><strong>Upside production</strong><br>Combat supplies 40%; objective pressure and teamwork supply 30% each. A strong gun alone is not enough.</p></div>
+        <div><span class="pillar-letter risk">&darr;</span><p><strong>Downside exposure</strong><br>Deaths per hour versus the clan median. The adjustment is deliberately soft and capped from 0.72&times; to 1.40&times;.</p></div>
+        <div><span class="pillar-letter teamwork">%</span><p><strong>Clan-relative finish</strong><br>The final percentile makes the number readable: 90 means the player beats roughly 90% of the current tracked field on risk-adjusted impact.</p></div>
+      </div>
+    </div>`;
+  }
+  return `<div class="effectiveness-method-grid">
+    <div class="formula-card">
+      <div class="formula-kicker">The equation</div>
+      <div class="formula formula-small">Alpha = smoothed Win% &minus; expected Win%(zC, zO, zT)</div>
+      <p>Expected win rate comes from a leave-one-player-out ridge model (&lambda;=${constants.ridgeLambda}) trained on the other KDM members. Positive alpha is the percentage-point win lift not explained by the three visible performance pillars.</p>
+    </div>
+    <div class="pillar-list">
+      <div><span class="pillar-letter combat">W</span><p><strong>Observed winning</strong><br>Lifetime wins and losses, stabilized with a ${constants.winPriorMatches}-match prior at the clan's ${constants.clanWinPercent.toFixed(1)}% win rate.</p></div>
+      <div><span class="pillar-letter objective">E</span><p><strong>Expected winning</strong><br>The model asks what win rate normally accompanies the same combat, objective and teamwork profile.</p></div>
+      <div><span class="pillar-letter risk">&alpha;</span><p><strong>The unexplained gap</strong><br>Potential squad leadership, positioning, comms and timing live here&mdash;along with team-stack effects. Treat Alpha as a clue, not proof of causation.</p></div>
+    </div>
+  </div>`;
+}
+
+function effectivenessPodiumHtml(key, ranking) {
+  return `<div class="podium effectiveness-podium">${ranking.slice(0, 3).map((row, index) => `<div class="podium-card p${index + 1}">
+    <div class="podium-rank">#${index + 1}${index === 0 ? " &middot; STANDARD BEARER" : ""}</div>
+    <div class="podium-name"><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a></div>
+    <div class="podium-value">${effectivenessScoreText(key, row.scores[key])}</div>
+    <div class="podium-delta">C ${row.pillars.combat.toFixed(0)} &middot; O ${row.pillars.objective.toFixed(0)} &middot; T ${row.pillars.teamwork.toFixed(0)}</div>
+  </div>`).join("")}</div>`;
+}
+
+function effectivenessBarsHtml(key, ranking) {
+  const top = ranking.slice(0, 10);
+  const values = ranking.map((row) => row.scores[key]);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  return `<div class="effectiveness-chart" role="img" aria-label="Top ten ${esc(effectivenessDefinitions[key].title)} scores">
+    <div class="effectiveness-chart-title">Top 10 at a glance</div>
+    ${top.map((row, index) => {
+      const width = 12 + 88 * ((row.scores[key] - min) / Math.max(0.001, max - min));
+      return `<div class="effectiveness-bar-row"><span class="effectiveness-bar-rank">${index + 1}</span><span class="effectiveness-bar-name">${esc(row.name)}</span><span class="effectiveness-bar-track"><span style="width:${width.toFixed(1)}%"></span></span><strong>${effectivenessScoreText(key, row.scores[key])}</strong></div>`;
+    }).join("")}
+  </div>`;
+}
+
+function effectivenessTableHtml(key, ranking) {
+  const header = key === "alpha"
+    ? `<th class="num">Alpha</th><th class="num">Win%</th><th class="num">Expected</th>`
+    : key === "sortino"
+      ? `<th class="num">Score</th><th class="num">Upside</th><th class="num">Deaths/hr</th>`
+      : `<th class="num">Score</th><th>Support lanes</th>`;
+  const rows = ranking.map((row, index) => {
+    const detail = key === "alpha"
+      ? `<td class="num value-cell ${row.scores.alpha >= 0 ? "positive-score" : "negative-score"}">${effectivenessScoreText(key, row.scores.alpha)}</td><td class="num">${row.smoothedWinPercent.toFixed(1)}%</td><td class="num">${row.expectedWinPercent.toFixed(1)}%</td>`
+      : key === "sortino"
+        ? `<td class="num value-cell">${row.scores.sortino.toFixed(1)}</td><td class="num">${row.sortinoUpside.toFixed(1)}</td><td class="num">${row.adjusted.deathsPerHour.toFixed(1)}</td>`
+        : `<td class="num value-cell">${row.scores.trident.toFixed(1)}</td><td>${row.bestSupportLanes.map((lane) => lane[0].toUpperCase() + lane.slice(1)).join(" + ")}</td>`;
+    return `<tr class="r${index + 1}"><td class="rank-cell">${index + 1}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${row.cachedStats ? cachedMarkerHtml() : ""}</td>${detail}<td class="num pillar-score">${row.pillars.combat.toFixed(1)}</td><td class="num pillar-score">${row.pillars.objective.toFixed(1)}</td><td class="num pillar-score">${row.pillars.teamwork.toFixed(1)}</td></tr>`;
+  }).join("");
+  return `<div class="table-wrap effectiveness-table"><table><thead><tr><th>#</th><th>Player</th>${header}<th class="num">Combat</th><th class="num">Objective</th><th class="num">Teamwork</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function renderEffectiveness(requestedKey) {
+  const key = EFFECTIVENESS_KEYS.includes(requestedKey) ? requestedKey : "trident";
+  const calculation = state.effectiveness;
+  if (!calculation?.rows?.length) {
+    app.innerHTML = `<div class="error-box"><strong>No raw snapshot available.</strong><br>The Effectiveness Lab needs the latest GameTools archive.</div>`;
+    return;
+  }
+  const ranking = [...calculation.rows].sort((a, b) => b.scores[key] - a.scores[key]);
+  const definition = effectivenessDefinitions[key];
+  const recommendation = key === "trident" ? "Best default overall ranking" : key === "sortino" ? "Best for efficient, repeatable impact" : "Best for finding hidden winning influence";
+  app.innerHTML = `
+    <div class="effectiveness-hero">
+      <div class="effectiveness-eyebrow">KDM analytics &middot; snapshot ${esc(calculation.archiveDate ?? "latest")}</div>
+      <h1 class="page-title">The Effectiveness Lab</h1>
+      <p class="page-sub">Three answers to one messy Battlefield question: who creates the most value? Each lens rewards a different kind of winning contribution.</p>
+    </div>
+    ${effectivenessTabsHtml(key)}
+    <div class="measure-heading"><div><span class="measure-number">PROPOSAL 0${EFFECTIVENESS_KEYS.indexOf(key) + 1}</span><h2>${esc(definition.title)}</h2></div><p>${recommendation}</p></div>
+    ${effectivenessMethodHtml(key, calculation.constants)}
+    ${effectivenessPodiumHtml(key, ranking)}
+    ${effectivenessBarsHtml(key, ranking)}
+    <div class="ranking-heading"><h2>Full KDM ranking</h2><p>${ranking.length} tracked players &middot; rates and stabilized percentages, never lifetime-volume totals</p></div>
+    ${effectivenessTableHtml(key, ranking)}
+    <details class="guardrails" open><summary>Why these are harder to game</summary><div>
+      <p><strong>Rate stats over totals:</strong> playing longer does not automatically score higher. <strong>25-hour shrinkage:</strong> small samples are pulled toward the clan median. <strong>Robust percentiles:</strong> extreme raw values cannot blow up the scale.</p>
+      <p><strong>Role-aware support:</strong> Medic, Logistics and Intel are separate lanes; the best two are blended. <strong>No accuracy or headshot rate:</strong> sniper and weapon-choice bias is avoided. <strong>Transparent caveat:</strong> Squadlift Alpha still contains team-composition effects and should be read beside the two individual-impact scores.</p>
+    </div></details>`;
+}
+
 /* ---------- router ---------- */
 
 function render() {
@@ -1149,6 +1285,9 @@ function render() {
   } else if (route === "audit") {
     nav = "audit";
     renderAudit();
+  } else if (route === "effectiveness") {
+    nav = "effectiveness";
+    renderEffectiveness(parts[1]);
   } else {
     renderLeaderboard(state.meta.stats[0].key);
   }
@@ -1189,7 +1328,10 @@ async function boot() {
     return;
   }
 
-  Object.assign(state, { meta, latest, history, audit, notifications });
+  const archiveDate = history?.dates?.at?.(-1) ?? String(meta.updatedAt).slice(0, 10);
+  const archive = await fetchJson(`data/archive/${archiveDate}.json`, null);
+  const effectiveness = calculateEffectiveness(archive, latest);
+  Object.assign(state, { meta, latest, history, audit, notifications, archive, effectiveness });
 
   const updated = document.getElementById("footer-updated");
   updated.textContent = `Last updated ${fmtDateTime(meta.updatedAt)}`;
