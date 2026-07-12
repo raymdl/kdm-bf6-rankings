@@ -258,9 +258,9 @@ This prevents a very small seasonal record from receiving the same confidence as
 
 ```text
 weighted Breakthrough win rate =
-  0.15 × Season 1 stabilized rate
-  + 0.30 × Season 2 stabilized rate
-  + 0.55 × Season 3 stabilized rate
+  0.20 × Season 1 stabilized rate
+  + 0.35 × Season 2 stabilized rate
+  + 0.45 × Season 3 stabilized rate
 ```
 
 If a season is unavailable, the remaining weights are renormalized. Season 3 therefore has the largest influence, allowing recent improvement or decline to affect WRR more strongly.
@@ -300,6 +300,8 @@ Interpretation:
 - Near-zero WRR: their winning is broadly consistent with their measured profile.
 - Negative WRR: their weighted win rate is below the model expectation.
 - WRR may reflect positioning, coordination, communication, timing, leadership, or recurring team composition. It identifies unexplained winning association; it does not prove individual causation.
+
+GameTools does not expose an explicit abandoned-match or early-exit counter. Seasonal `matches` is effectively the sum of recorded wins and losses, so the model cannot distinguish a completed loss from a match that was left before a loss was recorded. Win/loss count still affects confidence through the 25-match prior: large records are trusted more, but raw win volume does not earn a separate score bonus because that would primarily reward playtime.
 
 If season-mode data is temporarily unavailable, the implementation falls back to lifetime wins/losses stabilized by a 50-match clan prior. Current published data includes Breakthrough season records for all tracked players.
 
