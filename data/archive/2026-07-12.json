@@ -1,13 +1,11 @@
 {
   "version": 1,
   "date": "2026-07-12",
-  "updatedAt": "2026-07-12T18:03:59.983Z",
+  "updatedAt": "2026-07-12T20:00:52.696Z",
   "members": {
     "106533246161948672": {
       "name": "Bobbitthehobbit",
       "stats": {
-        "userId": 1011781925456,
-        "id": 1003443625456,
         "humanPrecentage": 99.56,
         "score": 18496712,
         "kills": 38565,
@@ -43,6 +41,8 @@
         "killAssists": 29845,
         "vehiclesDestroyed": 145,
         "enemiesSpotted": 4593,
+        "id": 1003443625456,
+        "userId": 1011781925456,
         "platformId": 1,
         "dividedKills": {
           "confirmed": 26961,
@@ -975,70 +975,146 @@
             "spawns": 786,
             "assists": 1476
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 1183,
+                "wins": 668,
+                "losses": 515
+              },
+              "Rush0": {
+                "matches": 28,
+                "wins": 14,
+                "losses": 14
+              },
+              "Conquest0": {
+                "matches": 22,
+                "wins": 13,
+                "losses": 9
+              },
+              "MP_Escalation0": {
+                "matches": 96,
+                "wins": 43,
+                "losses": 53
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 490,
+                "wins": 286,
+                "losses": 204
+              },
+              "ModBuilderCustom0": {
+                "matches": 1
+              },
+              "Rush0": {
+                "matches": 4,
+                "wins": 2,
+                "losses": 2
+              },
+              "Conquest0": {
+                "matches": 3,
+                "wins": 3
+              },
+              "MP_Escalation0": {
+                "matches": 8,
+                "wins": 6,
+                "losses": 2
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 182,
+                "wins": 122,
+                "losses": 60
+              },
+              "Rush0": {
+                "matches": 2,
+                "wins": 1,
+                "losses": 1
+              },
+              "Conquest0": {
+                "matches": 14,
+                "wins": 9,
+                "losses": 5
+              },
+              "MP_Escalation0": {
+                "matches": 3,
+                "wins": 2,
+                "losses": 1
+              }
+            }
+          }
         }
       }
     },
     "1087330539800895498": {
       "name": "ITzFAMiLY",
       "stats": {
-        "userId": 1002717913150,
-        "id": 1008309113150,
         "humanPrecentage": 99.49,
-        "score": 8516555,
-        "kills": 23951,
-        "deaths": 9771,
-        "wins": 728,
+        "score": 8541705,
+        "kills": 24007,
+        "deaths": 9789,
+        "wins": 732,
         "loses": 189,
-        "assists": 10236,
+        "assists": 10260,
         "killsPerMinute": 1.24,
-        "damagePerMinute": 156.07,
-        "killsPerMatch": 26.06,
-        "damagePerMatch": 3293.22,
-        "headShots": 2885,
-        "winPercent": 79.39,
+        "damagePerMinute": 156.02,
+        "killsPerMatch": 26.01,
+        "damagePerMatch": 3285.65,
+        "headShots": 2894,
+        "winPercent": 79.48,
         "headshots": 12.05,
         "killDeath": 2.45,
         "infantryKillDeath": 2.44,
-        "damage": 3026465,
+        "damage": 3032651,
         "accuracy": 19.6,
-        "revives": 13565,
-        "heals": 123500,
-        "resupplies": 33499,
+        "revives": 13616,
+        "heals": 123947,
+        "resupplies": 33581,
         "repairs": 5580,
-        "squadmateRevive": 3292,
-        "thrownThrowables": 15523,
-        "gadgetsDestoyed": 1403,
+        "squadmateRevive": 3297,
+        "thrownThrowables": 15583,
+        "gadgetsDestoyed": 1405,
         "playerTakeDowns": 18,
-        "matchesPlayed": 919,
-        "secondsPlayed": 1163491,
-        "saviorKills": 4300,
-        "shotsFired": 642798,
-        "shotsHit": 125999,
-        "humanShotsHit": 87599,
-        "killAssists": 10239,
+        "matchesPlayed": 923,
+        "secondsPlayed": 1166236,
+        "saviorKills": 4311,
+        "shotsFired": 643843,
+        "shotsHit": 126204,
+        "humanShotsHit": 87796,
+        "killAssists": 10263,
         "vehiclesDestroyed": 114,
         "enemiesSpotted": 37,
         "lastPlacement": 0,
+        "id": 1008309113150,
+        "userId": 1002717913150,
         "platformId": 7,
         "dividedKills": {
-          "confirmed": 18737,
-          "fullConfirmed": 18737,
-          "ads": 18520,
+          "confirmed": 18786,
+          "fullConfirmed": 18786,
+          "ads": 18576,
           "grenades": 31,
           "hipfire": 5072,
           "longDistance": 308,
           "melee": 39,
-          "multiKills": 3719,
+          "multiKills": 3729,
           "passenger": 2,
           "vehicle": 12,
           "roadkills": 4,
           "parachute": 107,
-          "human": 23829,
+          "human": 23885,
           "weapons": {
             "SMG": 2589,
             "LMG": 0,
             "DMR": 0,
-            "AR": 10531,
+            "AR": 10581,
             "MG": 1721,
             "Pistols": 18,
             "Snipers": 49,
@@ -1047,14 +1123,14 @@
         },
         "objective": {
           "armed": 30,
-          "captured": 3446,
-          "neutralized": 2442,
+          "captured": 3462,
+          "neutralized": 2452,
           "defused": 7,
           "destroyed": 9,
           "time": {
-            "total": 159848,
-            "attacked": 52174,
-            "defended": 57926
+            "total": 160525,
+            "attacked": 52244,
+            "defended": 58229
           }
         },
         "dividedSecondsPlayed": {
@@ -1062,18 +1138,18 @@
           "driving": 468
         },
         "devidedDamage": {
-          "human": 2173440,
+          "human": 2179583,
           "explosive": 493949,
           "passenger": 571,
           "vehicleDriver": 4825,
-          "toVehicle": 420520,
+          "toVehicle": 420647,
           "withVehicle": 510
         },
         "devidedAssists": {
-          "human": 7698,
+          "human": 7722,
           "driver": 18,
           "passenger": 96,
-          "spot": 1318,
+          "spot": 1322,
           "pilot": 0
         },
         "weapons": {
@@ -1183,11 +1259,11 @@
             "damage": 185
           },
           "wp_crb_m4a1": {
-            "kills": 3274,
+            "kills": 3280,
             "headshots": 13.87,
-            "damage": 347785,
+            "damage": 348216,
             "multiKills": 482,
-            "spawns": 1676
+            "spawns": 1678
           },
           "wp_mg_kts100mk8": {
             "kills": 204,
@@ -1213,7 +1289,7 @@
             "headshots": 25,
             "damage": 749,
             "multiKills": 1,
-            "spawns": 4054
+            "spawns": 4073
           },
           "wp_smg_sl9": {
             "kills": 1,
@@ -1229,11 +1305,11 @@
             "spawns": 29
           },
           "wp_ar_nvo228e": {
-            "kills": 6468,
-            "headshots": 11.77,
-            "damage": 692548,
-            "multiKills": 983,
-            "spawns": 3264
+            "kills": 6518,
+            "headshots": 11.8,
+            "damage": 698283,
+            "multiKills": 993,
+            "spawns": 3280
           },
           "wp_ar_ak4d": {
             "damage": 33
@@ -1243,7 +1319,7 @@
             "headshots": 12.45,
             "damage": 530525,
             "multiKills": 857,
-            "spawns": 2424
+            "spawns": 2425
           },
           "wp_snp_sv98": {
             "kills": 1,
@@ -1367,9 +1443,9 @@
             "assists": 1
           },
           "gad_sup_pouch": {
-            "uses": 14836,
-            "secondsPlayed": 5218,
-            "spawns": 8551
+            "uses": 14902,
+            "secondsPlayed": 5243,
+            "spawns": 8570
           },
           "gad_rl_igla": {
             "uses": 13,
@@ -1405,8 +1481,8 @@
             "assists": 2
           },
           "gad_sup_bag": {
-            "uses": 14847,
-            "secondsPlayed": 12753
+            "uses": 14895,
+            "secondsPlayed": 12828
           },
           "gad_deplocover": {
             "uses": 84,
@@ -1417,9 +1493,9 @@
             "uses": 2
           },
           "gad_gren_smoke": {
-            "uses": 17766,
+            "uses": 17806,
             "damage": 210,
-            "secondsPlayed": 8445,
+            "secondsPlayed": 8465,
             "assists": 21
           },
           "gad_adren": {
@@ -1433,9 +1509,9 @@
             "uses": 3
           },
           "gad_deployable": {
-            "uses": 29985,
-            "secondsPlayed": 18641,
-            "spawns": 11894,
+            "uses": 30099,
+            "secondsPlayed": 18741,
+            "spawns": 11913,
             "assists": 42
           },
           "gad_gasmask": {
@@ -1454,7 +1530,7 @@
             "spawns": 9
           },
           "veh_sur_strf09a4": {
-            "spawns": 479,
+            "spawns": 480,
             "assists": 27
           },
           "veh_sur_m1a2sepv3": {
@@ -1524,10 +1600,10 @@
         "battlePickups": {},
         "classes": {
           "kit": {
-            "kills": 23950,
-            "secondsPlayed": 865999,
-            "spawns": 11904,
-            "assists": 9945
+            "kills": 24006,
+            "secondsPlayed": 868598,
+            "spawns": 11923,
+            "assists": 9969
           },
           "kit_assault": {
             "kills": 9,
@@ -1542,10 +1618,10 @@
             "assists": 1382
           },
           "kit_support": {
-            "kills": 21076,
-            "secondsPlayed": 756693,
-            "spawns": 10219,
-            "assists": 8552
+            "kills": 21132,
+            "secondsPlayed": 759292,
+            "spawns": 10238,
+            "assists": 8576
           },
           "kit_recon": {
             "kills": 2,
@@ -1553,14 +1629,85 @@
             "spawns": 3,
             "assists": 6
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 84,
+                "wins": 65,
+                "losses": 19
+              },
+              "ModBuilderCustom0": {
+                "matches": 2,
+                "losses": 2
+              },
+              "Rush0": {
+                "matches": 17,
+                "wins": 12,
+                "losses": 5
+              },
+              "Conquest0": {
+                "matches": 49,
+                "wins": 27,
+                "losses": 22
+              },
+              "MP_Escalation0": {
+                "matches": 88,
+                "wins": 58,
+                "losses": 30
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 68,
+                "wins": 54,
+                "losses": 14
+              },
+              "Conquest0": {
+                "matches": 86,
+                "wins": 63,
+                "losses": 23
+              },
+              "MP_Escalation0": {
+                "matches": 59,
+                "wins": 46,
+                "losses": 13
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 288,
+                "wins": 263,
+                "losses": 25
+              },
+              "Rush0": {
+                "matches": 5,
+                "wins": 4,
+                "losses": 1
+              },
+              "Conquest0": {
+                "matches": 99,
+                "wins": 86,
+                "losses": 13
+              },
+              "MP_Escalation0": {
+                "matches": 6,
+                "wins": 3,
+                "losses": 3
+              }
+            }
+          }
         }
       }
     },
     "110501250566492160": {
       "name": "[KDM] rawwwly ᵀᴿᴵᴾᴾᴺ",
       "stats": {
-        "userId": 1008945096090,
-        "id": 1005436296090,
         "humanPrecentage": 99.93,
         "score": 16422330,
         "kills": 75808,
@@ -1597,7 +1744,9 @@
         "vehiclesDestroyed": 19,
         "enemiesSpotted": 9982,
         "lastPlacement": 0,
-        "platformId": 1,
+        "id": 1005436296090,
+        "userId": 1008945096090,
+        "platformId": 7,
         "dividedKills": {
           "confirmed": 56264,
           "fullConfirmed": 43715,
@@ -2329,14 +2478,54 @@
             "spawns": 374,
             "assists": 920
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 742,
+                "wins": 542,
+                "losses": 200
+              },
+              "Conquest0": {
+                "matches": 1,
+                "losses": 1
+              },
+              "MP_Escalation0": {
+                "matches": 2,
+                "wins": 1,
+                "losses": 1
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 451,
+                "wins": 381,
+                "losses": 70
+              },
+              "MP_Escalation0": {
+                "matches": 1,
+                "losses": 1
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 341,
+                "wins": 309,
+                "losses": 32
+              }
+            }
+          }
         }
       }
     },
     "1198566495475732564": {
       "name": "JJFatz",
       "stats": {
-        "userId": 1022854426126,
-        "id": 1010300426126,
         "humanPrecentage": 99.05,
         "score": 10644185,
         "kills": 25769,
@@ -2372,6 +2561,8 @@
         "killAssists": 18861,
         "vehiclesDestroyed": 484,
         "enemiesSpotted": 1465,
+        "id": 1010300426126,
+        "userId": 1022854426126,
         "platformId": 3,
         "dividedKills": {
           "confirmed": 19864,
@@ -3149,104 +3340,162 @@
             "spawns": 163,
             "assists": 499
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 9,
+                "wins": 3,
+                "losses": 6
+              },
+              "Conquest0": {
+                "matches": 305,
+                "wins": 148,
+                "losses": 157
+              },
+              "MP_Escalation0": {
+                "matches": 275,
+                "wins": 132,
+                "losses": 143
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 1,
+                "wins": 1
+              },
+              "Conquest0": {
+                "matches": 168,
+                "wins": 101,
+                "losses": 67
+              },
+              "MP_Escalation0": {
+                "matches": 194,
+                "wins": 97,
+                "losses": 97
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 288,
+                "wins": 270,
+                "losses": 18
+              },
+              "Conquest0": {
+                "matches": 126,
+                "wins": 77,
+                "losses": 49
+              },
+              "MP_Escalation0": {
+                "matches": 102,
+                "wins": 59,
+                "losses": 43
+              }
+            }
+          }
         }
       }
     },
     "123261494958751744": {
       "name": "RaCiNE",
       "stats": {
-        "userId": 2561333531,
-        "id": 1003447033531,
         "humanPrecentage": 99.54,
-        "score": 17639738,
-        "kills": 68109,
-        "deaths": 10219,
-        "wins": 1390,
-        "loses": 336,
-        "assists": 35264,
+        "score": 17677052,
+        "kills": 68254,
+        "deaths": 10253,
+        "wins": 1391,
+        "loses": 338,
+        "assists": 35335,
         "killsPerMinute": 1.9,
-        "damagePerMinute": 244.3,
-        "killsPerMatch": 39.44,
-        "damagePerMatch": 5060.79,
-        "headShots": 13497,
-        "winPercent": 80.53,
-        "headshots": 19.82,
+        "damagePerMinute": 244.4,
+        "killsPerMatch": 39.45,
+        "damagePerMatch": 5063.42,
+        "headShots": 13537,
+        "winPercent": 80.45,
+        "headshots": 19.83,
         "killDeath": 6.66,
         "infantryKillDeath": 6.63,
-        "damage": 8739978,
-        "accuracy": 33.15,
-        "revives": 10650,
-        "heals": 159316,
-        "resupplies": 41055,
+        "damage": 8759716,
+        "accuracy": 33.14,
+        "revives": 10697,
+        "heals": 159771,
+        "resupplies": 41104,
         "repairs": 13332,
-        "squadmateRevive": 4063,
-        "thrownThrowables": 9114,
-        "gadgetsDestoyed": 6107,
+        "squadmateRevive": 4074,
+        "thrownThrowables": 9202,
+        "gadgetsDestoyed": 6135,
         "playerTakeDowns": 105,
-        "matchesPlayed": 1727,
-        "secondsPlayed": 2146528,
-        "saviorKills": 12104,
-        "shotsFired": 1092075,
-        "shotsHit": 362013,
-        "humanShotsHit": 125595,
-        "killAssists": 35308,
-        "vehiclesDestroyed": 302,
-        "enemiesSpotted": 22756,
+        "matchesPlayed": 1730,
+        "secondsPlayed": 2150516,
+        "saviorKills": 12124,
+        "shotsFired": 1095320,
+        "shotsHit": 363014,
+        "humanShotsHit": 126592,
+        "killAssists": 35379,
+        "vehiclesDestroyed": 304,
+        "enemiesSpotted": 22793,
+        "id": 1003447033531,
+        "userId": 2561333531,
         "platformId": 7,
         "dividedKills": {
-          "confirmed": 49574,
-          "fullConfirmed": 36872,
-          "ads": 47176,
-          "grenades": 740,
-          "hipfire": 10175,
+          "confirmed": 49677,
+          "fullConfirmed": 36975,
+          "ads": 47289,
+          "grenades": 744,
+          "hipfire": 10187,
           "longDistance": 997,
           "melee": 71,
-          "multiKills": 12628,
+          "multiKills": 12653,
           "passenger": 2709,
-          "vehicle": 8314,
+          "vehicle": 8329,
           "roadkills": 90,
           "parachute": 53,
-          "human": 67793,
+          "human": 67938,
           "weapons": {
-            "SMG": 9198,
+            "SMG": 9217,
             "LMG": 0,
             "DMR": 1197,
             "AR": 11605,
-            "MG": 12661,
+            "MG": 12702,
             "Pistols": 2177,
-            "Snipers": 7266,
-            "Shotguns": 2356
+            "Snipers": 7277,
+            "Shotguns": 2360
           }
         },
         "objective": {
           "armed": 33,
-          "captured": 2740,
-          "neutralized": 2593,
+          "captured": 2744,
+          "neutralized": 2597,
           "defused": 1,
           "destroyed": 15,
           "time": {
-            "total": 212559,
-            "attacked": 69119,
-            "defended": 95109
+            "total": 213111,
+            "attacked": 69332,
+            "defended": 95344
           }
         },
         "dividedSecondsPlayed": {
           "flying": 2574,
-          "driving": 119981
+          "driving": 120201
         },
         "devidedDamage": {
-          "human": 3083315,
-          "explosive": 1234580,
+          "human": 3102445,
+          "explosive": 1239039,
           "passenger": 440197,
-          "vehicleDriver": 1128844,
-          "toVehicle": 1070756,
-          "withVehicle": 1506631
+          "vehicleDriver": 1132202,
+          "toVehicle": 1072938,
+          "withVehicle": 1509726
         },
         "devidedAssists": {
-          "human": 13286,
-          "driver": 3557,
+          "human": 13357,
+          "driver": 3563,
           "passenger": 1201,
-          "spot": 10350,
+          "spot": 10377,
           "pilot": 2106
         },
         "weapons": {
@@ -3274,7 +3523,7 @@
           "wp_mg_rpkm": {
             "kills": 1137,
             "headshots": 12.84,
-            "damage": 135317,
+            "damage": 135515,
             "multiKills": 203,
             "spawns": 239
           },
@@ -3313,11 +3562,11 @@
             "spawns": 215
           },
           "wp_snp_m2010": {
-            "kills": 2633,
-            "headshots": 69.43,
-            "damage": 291059,
-            "multiKills": 423,
-            "spawns": 486
+            "kills": 2644,
+            "headshots": 69.52,
+            "damage": 292200,
+            "multiKills": 425,
+            "spawns": 489
           },
           "wp_sg_m1014": {
             "kills": 807,
@@ -3340,11 +3589,11 @@
             "spawns": 161
           },
           "wp_smg_sgx": {
-            "kills": 1620,
-            "headshots": 13.4,
-            "damage": 170037,
+            "kills": 1623,
+            "headshots": 13.37,
+            "damage": 170400,
             "multiKills": 287,
-            "spawns": 488
+            "spawns": 491
           },
           "wp_dmr_lmr27": {
             "kills": 6,
@@ -3359,18 +3608,18 @@
             "spawns": 383
           },
           "wp_crb_m417a2": {
-            "kills": 1235,
-            "headshots": 13.36,
-            "damage": 131644,
-            "multiKills": 235,
-            "spawns": 225
+            "kills": 1240,
+            "headshots": 13.47,
+            "damage": 132414,
+            "multiKills": 236,
+            "spawns": 227
           },
           "wp_mg_drsiar": {
-            "kills": 3035,
-            "headshots": 15.91,
-            "damage": 322867,
-            "multiKills": 546,
-            "spawns": 576
+            "kills": 3067,
+            "headshots": 15.98,
+            "damage": 327063,
+            "multiKills": 552,
+            "spawns": 587
           },
           "wp_ar_kord6p67": {
             "kills": 1243,
@@ -3387,25 +3636,25 @@
             "spawns": 174
           },
           "wp_crb_m4a1": {
-            "kills": 1857,
-            "headshots": 17.72,
-            "damage": 203331,
-            "multiKills": 339,
-            "spawns": 427
+            "kills": 1870,
+            "headshots": 17.86,
+            "damage": 205351,
+            "multiKills": 342,
+            "spawns": 429
           },
           "wp_mg_kts100mk8": {
-            "kills": 1607,
-            "headshots": 14.37,
-            "damage": 188195,
+            "kills": 1616,
+            "headshots": 14.36,
+            "damage": 189359,
             "multiKills": 307,
-            "spawns": 302
+            "spawns": 303
           },
           "wp_pst_m45a1": {
             "kills": 383,
             "headshots": 12.53,
-            "damage": 33084,
+            "damage": 33260,
             "multiKills": 66,
-            "spawns": 1668
+            "spawns": 1699
           },
           "wp_smg_kv9": {
             "kills": 717,
@@ -3520,30 +3769,30 @@
             "spawns": 271
           },
           "wp_crb_sor300sc": {
-            "kills": 818,
-            "headshots": 11.86,
-            "damage": 89474,
+            "kills": 819,
+            "headshots": 11.84,
+            "damage": 89680,
             "multiKills": 158,
             "spawns": 189
           },
           "wp_crb_sg553r": {
-            "kills": 2232,
-            "headshots": 12.59,
-            "damage": 232782,
-            "multiKills": 441,
-            "spawns": 467
+            "kills": 2262,
+            "headshots": 12.86,
+            "damage": 235465,
+            "multiKills": 446,
+            "spawns": 475
           },
           "wp_crb_grtbc": {
-            "kills": 1153,
-            "headshots": 15.44,
-            "damage": 117315,
+            "kills": 1154,
+            "headshots": 15.51,
+            "damage": 117474,
             "multiKills": 205,
-            "spawns": 201
+            "spawns": 202
           },
           "wp_sg_185ksk": {
-            "kills": 468,
-            "headshots": 13.68,
-            "damage": 48502,
+            "kills": 472,
+            "headshots": 13.77,
+            "damage": 48698,
             "multiKills": 104
           },
           "wp_pst_es57": {
@@ -3605,14 +3854,14 @@
             "headshots": 9.96,
             "damage": 20904,
             "multiKills": 33,
-            "spawns": 672
+            "spawns": 675
           },
           "wp_smg_cz3a1": {
-            "kills": 828,
-            "headshots": 14.13,
-            "damage": 84304,
-            "multiKills": 164,
-            "spawns": 178
+            "kills": 844,
+            "headshots": 14.1,
+            "damage": 86048,
+            "multiKills": 167,
+            "spawns": 181
           },
           "wp_mg_mg525btk": {
             "kills": 780,
@@ -3668,31 +3917,31 @@
           },
           "gad_c4": {
             "kills": 179,
-            "uses": 1989,
+            "uses": 1994,
             "damage": 119274,
             "multiKills": 77,
             "vehiclesDestroyedWith": 49,
-            "secondsPlayed": 4302,
+            "secondsPlayed": 4307,
             "spawns": 202,
             "assists": 57
           },
           "gad_gl_he": {
-            "kills": 780,
-            "uses": 3571,
-            "damage": 107736,
+            "kills": 781,
+            "uses": 3580,
+            "damage": 108060,
             "multiKills": 175,
             "vehiclesDestroyedWith": 2,
-            "secondsPlayed": 16088,
-            "spawns": 1322,
-            "assists": 573
+            "secondsPlayed": 16113,
+            "spawns": 1324,
+            "assists": 576
           },
           "gad_rl_ungui": {
             "kills": 273,
-            "uses": 1510,
-            "damage": 351809,
+            "uses": 1513,
+            "damage": 352059,
             "multiKills": 77,
             "vehiclesDestroyedWith": 71,
-            "secondsPlayed": 11061,
+            "secondsPlayed": 11076,
             "assists": 309
           },
           "gad_rl_aimgui": {
@@ -3703,12 +3952,12 @@
           },
           "gad_mine_press": {
             "kills": 37,
-            "uses": 983,
+            "uses": 986,
             "damage": 81384,
             "multiKills": 18,
             "vehiclesDestroyedWith": 19,
-            "secondsPlayed": 1992,
-            "spawns": 801,
+            "secondsPlayed": 1997,
+            "spawns": 804,
             "assists": 12
           },
           "gad_gl_tb": {
@@ -3729,11 +3978,11 @@
           },
           "gad_mine_ap": {
             "kills": 87,
-            "uses": 615,
+            "uses": 616,
             "damage": 11634,
             "multiKills": 25,
             "secondsPlayed": 864,
-            "spawns": 808,
+            "spawns": 811,
             "assists": 38
           },
           "gad_mine_tws": {
@@ -3817,11 +4066,11 @@
             "assists": 1
           },
           "gad_gren_av": {
-            "kills": 6,
-            "uses": 432,
-            "damage": 13965,
-            "multiKills": 2,
-            "vehiclesDestroyedWith": 3,
+            "kills": 9,
+            "uses": 434,
+            "damage": 14565,
+            "multiKills": 4,
+            "vehiclesDestroyedWith": 4,
             "secondsPlayed": 279,
             "assists": 24
           },
@@ -3839,9 +4088,9 @@
             "secondsPlayed": 15
           },
           "gad_tugs": {
-            "uses": 2153,
-            "secondsPlayed": 3541,
-            "assists": 1551
+            "uses": 2158,
+            "secondsPlayed": 3561,
+            "assists": 1558
           },
           "gad_ladder": {
             "uses": 398,
@@ -3850,9 +4099,9 @@
             "assists": 65
           },
           "gad_sup_pouch": {
-            "uses": 1341,
-            "secondsPlayed": 449,
-            "spawns": 445
+            "uses": 1402,
+            "secondsPlayed": 474,
+            "spawns": 470
           },
           "gad_rl_igla": {
             "uses": 11,
@@ -3864,12 +4113,12 @@
             "secondsPlayed": 60
           },
           "gad_gren_frag": {
-            "kills": 734,
-            "uses": 9135,
-            "damage": 106958,
+            "kills": 735,
+            "uses": 9149,
+            "damage": 107148,
             "multiKills": 210,
             "vehiclesDestroyedWith": 1,
-            "secondsPlayed": 4034,
+            "secondsPlayed": 4039,
             "assists": 644
           },
           "gad_repair": {
@@ -3888,13 +4137,13 @@
             "assists": 3
           },
           "gad_sup_bag": {
-            "uses": 15067,
-            "secondsPlayed": 12779
+            "uses": 15117,
+            "secondsPlayed": 12849
           },
           "gad_deplocover": {
             "uses": 2889,
             "secondsPlayed": 3874,
-            "spawns": 2370
+            "spawns": 2371
           },
           "gad_gren_stun": {
             "uses": 56,
@@ -3902,9 +4151,9 @@
             "assists": 1
           },
           "gad_gren_smoke": {
-            "uses": 11843,
+            "uses": 11915,
             "damage": 188,
-            "secondsPlayed": 5496,
+            "secondsPlayed": 5501,
             "assists": 11
           },
           "gad_gren_flash": {
@@ -3926,8 +4175,8 @@
             "assists": 81
           },
           "gad_adren": {
-            "uses": 4070,
-            "secondsPlayed": 6178
+            "uses": 4077,
+            "secondsPlayed": 6183
           },
           "gad_vehsupcra": {
             "uses": 29,
@@ -3945,10 +4194,10 @@
             "assists": 1
           },
           "gad_deployable": {
-            "uses": 25914,
-            "secondsPlayed": 31662,
-            "spawns": 6907,
-            "assists": 2699
+            "uses": 26034,
+            "secondsPlayed": 31782,
+            "spawns": 6939,
+            "assists": 2706
           },
           "gad_decoy": {
             "uses": 67,
@@ -4006,7 +4255,7 @@
             "damage": 455054,
             "multiKills": 400,
             "vehiclesDestroyedWith": 47,
-            "spawns": 202,
+            "spawns": 203,
             "assists": 1494
           },
           "veh_sur_cheetah1a2": {
@@ -4022,12 +4271,12 @@
             "assists": 47
           },
           "veh_sur_bradley": {
-            "kills": 2524,
-            "damage": 464633,
-            "multiKills": 519,
-            "vehiclesDestroyedWith": 34,
-            "spawns": 612,
-            "assists": 1309
+            "kills": 2539,
+            "damage": 467991,
+            "multiKills": 523,
+            "vehiclesDestroyedWith": 35,
+            "spawns": 618,
+            "assists": 1315
           },
           "veh_air_su57": {
             "damage": 1189,
@@ -4121,34 +4370,92 @@
         },
         "classes": {
           "kit": {
-            "kills": 68108,
-            "secondsPlayed": 1744324,
-            "spawns": 11563,
-            "assists": 34992
+            "kills": 68253,
+            "secondsPlayed": 1747917,
+            "spawns": 11597,
+            "assists": 35062
           },
           "kit_assault": {
-            "kills": 19010,
-            "secondsPlayed": 457373,
-            "spawns": 3327,
-            "assists": 8362
+            "kills": 19022,
+            "secondsPlayed": 457703,
+            "spawns": 3329,
+            "assists": 8369
           },
           "kit_engineer": {
-            "kills": 4469,
-            "secondsPlayed": 140035,
-            "spawns": 981,
-            "assists": 2641
+            "kills": 4475,
+            "secondsPlayed": 140224,
+            "spawns": 984,
+            "assists": 2643
           },
           "kit_support": {
-            "kills": 34557,
-            "secondsPlayed": 870451,
-            "spawns": 5683,
-            "assists": 16089
+            "kills": 34664,
+            "secondsPlayed": 873075,
+            "spawns": 5709,
+            "assists": 16128
           },
           "kit_recon": {
-            "kills": 10072,
-            "secondsPlayed": 276465,
-            "spawns": 1572,
-            "assists": 7900
+            "kills": 10092,
+            "secondsPlayed": 276915,
+            "spawns": 1575,
+            "assists": 7922
+          }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 911,
+                "wins": 739,
+                "losses": 172
+              },
+              "Rush0": {
+                "matches": 5,
+                "wins": 3,
+                "losses": 2
+              },
+              "Conquest0": {
+                "matches": 3,
+                "wins": 2,
+                "losses": 1
+              },
+              "MP_Escalation0": {
+                "matches": 13,
+                "wins": 10,
+                "losses": 3
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 263,
+                "wins": 207,
+                "losses": 56
+              },
+              "Rush0": {
+                "matches": 3,
+                "wins": 2,
+                "losses": 1
+              },
+              "Conquest0": {
+                "matches": 3,
+                "wins": 2,
+                "losses": 1
+              },
+              "MP_Escalation0": {
+                "matches": 8,
+                "wins": 8
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 255,
+                "wins": 221,
+                "losses": 34
+              }
+            }
           }
         }
       }
@@ -4156,48 +4463,48 @@
     "124870403742105600": {
       "name": "[KDM] Synthest",
       "stats": {
-        "userId": 2457476222,
-        "id": 416355896,
         "humanPrecentage": 98.02,
-        "score": 12111430,
-        "kills": 42764,
-        "deaths": 11876,
+        "score": 12114745,
+        "kills": 42778,
+        "deaths": 11884,
         "wins": 1012,
         "loses": 377,
-        "assists": 20457,
+        "assists": 20463,
         "killsPerMinute": 1.49,
-        "damagePerMinute": 177.53,
-        "killsPerMatch": 30.79,
-        "damagePerMatch": 3657.7,
-        "headShots": 6543,
+        "damagePerMinute": 177.36,
+        "killsPerMatch": 30.8,
+        "damagePerMatch": 3659.04,
+        "headShots": 6544,
         "winPercent": 72.86,
         "headshots": 15.3,
         "killDeath": 3.6,
         "infantryKillDeath": 3.53,
-        "damage": 5080547,
+        "damage": 5082403,
         "accuracy": 23.39,
-        "revives": 11336,
-        "heals": 105480,
+        "revives": 11340,
+        "heals": 105485,
         "resupplies": 20647,
         "repairs": 10842,
         "squadmateRevive": 4974,
-        "thrownThrowables": 4322,
-        "gadgetsDestoyed": 2168,
+        "thrownThrowables": 4328,
+        "gadgetsDestoyed": 2169,
         "playerTakeDowns": 8,
         "matchesPlayed": 1389,
-        "secondsPlayed": 1717036,
-        "saviorKills": 10348,
-        "shotsFired": 986550,
-        "shotsHit": 230795,
-        "humanShotsHit": 106841,
-        "killAssists": 20884,
+        "secondsPlayed": 1719388,
+        "saviorKills": 10352,
+        "shotsFired": 987040,
+        "shotsHit": 230894,
+        "humanShotsHit": 106940,
+        "killAssists": 20890,
         "vehiclesDestroyed": 88,
-        "enemiesSpotted": 8732,
+        "enemiesSpotted": 8735,
+        "id": 416355896,
+        "userId": 2457476222,
         "platformId": 1,
         "dividedKills": {
-          "confirmed": 31815,
-          "fullConfirmed": 16706,
-          "ads": 36794,
+          "confirmed": 31827,
+          "fullConfirmed": 16718,
+          "ads": 36808,
           "grenades": 113,
           "hipfire": 4997,
           "longDistance": 1265,
@@ -4207,13 +4514,13 @@
           "vehicle": 539,
           "roadkills": 1,
           "parachute": 99,
-          "human": 41919,
+          "human": 41933,
           "weapons": {
             "SMG": 7169,
             "LMG": 0,
             "DMR": 79,
             "AR": 9968,
-            "MG": 9610,
+            "MG": 9624,
             "Pistols": 867,
             "Snipers": 991,
             "Shotguns": 603
@@ -4221,14 +4528,14 @@
         },
         "objective": {
           "armed": 99,
-          "captured": 3464,
-          "neutralized": 2520,
+          "captured": 3465,
+          "neutralized": 2521,
           "defused": 0,
           "destroyed": 134,
           "time": {
-            "total": 181992,
-            "attacked": 51254,
-            "defended": 77348
+            "total": 182022,
+            "attacked": 51259,
+            "defended": 77363
           }
         },
         "dividedSecondsPlayed": {
@@ -4236,7 +4543,7 @@
           "driving": 6980
         },
         "devidedDamage": {
-          "human": 2143904,
+          "human": 2145760,
           "explosive": 167917,
           "passenger": 83366,
           "vehicleDriver": 79039,
@@ -4244,10 +4551,10 @@
           "withVehicle": 145540
         },
         "devidedAssists": {
-          "human": 10274,
+          "human": 10280,
           "driver": 70,
           "passenger": 310,
-          "spot": 5124,
+          "spot": 5127,
           "pilot": 60
         },
         "weapons": {
@@ -4361,11 +4668,11 @@
             "spawns": 395
           },
           "wp_mg_drsiar": {
-            "kills": 5163,
-            "headshots": 15.79,
-            "damage": 572890,
+            "kills": 5177,
+            "headshots": 15.76,
+            "damage": 574746,
             "multiKills": 815,
-            "spawns": 1403
+            "spawns": 1411
           },
           "wp_ar_kord6p67": {
             "kills": 1000,
@@ -4554,7 +4861,7 @@
             "headshots": 7.69,
             "damage": 14530,
             "multiKills": 40,
-            "spawns": 2280
+            "spawns": 2288
           },
           "wp_smg_cz3a1": {
             "kills": 538,
@@ -4756,9 +5063,9 @@
             "assists": 9
           },
           "gad_sup_pouch": {
-            "uses": 1483,
+            "uses": 1487,
             "secondsPlayed": 484,
-            "spawns": 1414
+            "spawns": 1422
           },
           "gad_lancet": {
             "uses": 16,
@@ -4799,7 +5106,7 @@
             "assists": 2
           },
           "gad_sup_bag": {
-            "uses": 9520,
+            "uses": 9522,
             "secondsPlayed": 8030
           },
           "gad_deplocover": {
@@ -4814,7 +5121,7 @@
             "assists": 11
           },
           "gad_gren_smoke": {
-            "uses": 7079,
+            "uses": 7085,
             "damage": 221,
             "secondsPlayed": 3297,
             "assists": 12
@@ -4848,9 +5155,9 @@
             "assists": 20
           },
           "gad_deployable": {
-            "uses": 14534,
+            "uses": 14540,
             "secondsPlayed": 16508,
-            "spawns": 11882,
+            "spawns": 11890,
             "assists": 344
           },
           "gad_gasmask": {
@@ -4920,7 +5227,7 @@
             "damage": 13506,
             "multiKills": 15,
             "vehiclesDestroyedWith": 1,
-            "spawns": 380,
+            "spawns": 381,
             "assists": 83
           },
           "veh_air_m77efalchion": {
@@ -5008,10 +5315,10 @@
         },
         "classes": {
           "kit": {
-            "kills": 42764,
-            "secondsPlayed": 1389686,
-            "spawns": 13014,
-            "assists": 20179
+            "kills": 42778,
+            "secondsPlayed": 1390285,
+            "spawns": 13022,
+            "assists": 20185
           },
           "kit_assault": {
             "kills": 1388,
@@ -5026,10 +5333,10 @@
             "assists": 643
           },
           "kit_support": {
-            "kills": 38859,
-            "secondsPlayed": 1240330,
-            "spawns": 11442,
-            "assists": 17676
+            "kills": 38873,
+            "secondsPlayed": 1240929,
+            "spawns": 11450,
+            "assists": 17682
           },
           "kit_recon": {
             "kills": 1411,
@@ -5037,14 +5344,66 @@
             "spawns": 470,
             "assists": 1356
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 118,
+                "wins": 67,
+                "losses": 51
+              },
+              "Rush0": {
+                "matches": 15,
+                "wins": 14,
+                "losses": 1
+              },
+              "Conquest0": {
+                "matches": 230,
+                "wins": 150,
+                "losses": 80
+              },
+              "MP_Escalation0": {
+                "matches": 8,
+                "wins": 4,
+                "losses": 4
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 7,
+                "wins": 6,
+                "losses": 1
+              },
+              "Conquest0": {
+                "matches": 79,
+                "wins": 50,
+                "losses": 29
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 421,
+                "wins": 378,
+                "losses": 43
+              },
+              "Conquest0": {
+                "matches": 69,
+                "wins": 49,
+                "losses": 20
+              }
+            }
+          }
         }
       }
     },
     "132955607509630977": {
       "name": "InfiniteDolphin",
       "stats": {
-        "userId": 2278825716,
-        "id": 943927856,
         "humanPrecentage": 90.98,
         "score": 16891966,
         "kills": 79329,
@@ -5080,6 +5439,8 @@
         "killAssists": 29650,
         "vehiclesDestroyed": 432,
         "enemiesSpotted": 28865,
+        "id": 943927856,
+        "userId": 2278825716,
         "platformId": 1,
         "dividedKills": {
           "confirmed": 54689,
@@ -6073,14 +6434,83 @@
             "spawns": 2851,
             "assists": 7408
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 119,
+                "wins": 93,
+                "losses": 26
+              },
+              "ModBuilderCustom0": {
+                "matches": 2,
+                "losses": 2
+              },
+              "Rush0": {
+                "matches": 3,
+                "wins": 3
+              },
+              "Conquest0": {
+                "matches": 53,
+                "wins": 44,
+                "losses": 9
+              },
+              "MP_Escalation0": {
+                "matches": 51,
+                "wins": 42,
+                "losses": 9
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 181,
+                "wins": 177,
+                "losses": 4
+              },
+              "Rush0": {
+                "matches": 1,
+                "wins": 1
+              },
+              "Conquest0": {
+                "matches": 51,
+                "wins": 46,
+                "losses": 5
+              },
+              "MP_Escalation0": {
+                "matches": 67,
+                "wins": 59,
+                "losses": 8
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 354,
+                "wins": 348,
+                "losses": 6
+              },
+              "Conquest0": {
+                "matches": 25,
+                "wins": 24,
+                "losses": 1
+              },
+              "MP_Escalation0": {
+                "matches": 16,
+                "wins": 14,
+                "losses": 2
+              }
+            }
+          }
         }
       }
     },
     "168790441779658752": {
       "name": "AryanDemon",
       "stats": {
-        "userId": 2250366764,
-        "id": 187997469,
         "humanPrecentage": 99.88,
         "score": 22889018,
         "kills": 73319,
@@ -6117,6 +6547,8 @@
         "vehiclesDestroyed": 560,
         "enemiesSpotted": 27207,
         "lastPlacement": 0,
+        "id": 187997469,
+        "userId": 2250366764,
         "platformId": 1,
         "dividedKills": {
           "confirmed": 53947,
@@ -7052,72 +7484,129 @@
             "spawns": 1806,
             "assists": 9187
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 1200,
+                "wins": 902,
+                "losses": 298
+              },
+              "Rush0": {
+                "matches": 12,
+                "wins": 9,
+                "losses": 3
+              },
+              "Conquest0": {
+                "matches": 16,
+                "wins": 7,
+                "losses": 9
+              },
+              "MP_Escalation0": {
+                "matches": 8,
+                "wins": 8,
+                "losses": 1
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 387,
+                "wins": 322,
+                "losses": 65
+              },
+              "MP_Escalation0": {
+                "matches": 3,
+                "wins": 3
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 473,
+                "wins": 423,
+                "losses": 50
+              },
+              "Conquest0": {
+                "matches": 6,
+                "wins": 5,
+                "losses": 1
+              },
+              "MP_Escalation0": {
+                "matches": 1,
+                "wins": 1
+              }
+            }
+          }
         }
       }
     },
     "199335576220991489": {
       "name": "[KDM] Kamikaze ᴼᵂᴺᴱᴿ",
       "stats": {
-        "userId": 2335746960,
-        "id": 860904773,
         "humanPrecentage": 99.78,
-        "score": 23283032,
-        "kills": 102375,
-        "deaths": 19093,
+        "score": 23317494,
+        "kills": 102579,
+        "deaths": 19134,
         "wins": 2179,
-        "loses": 676,
-        "assists": 43378,
+        "loses": 678,
+        "assists": 43437,
         "killsPerMinute": 1.96,
-        "damagePerMinute": 222.31,
-        "killsPerMatch": 35.85,
-        "damagePerMatch": 4076.04,
-        "headShots": 21663,
-        "winPercent": 76.32,
-        "headshots": 21.16,
+        "damagePerMinute": 222.44,
+        "killsPerMatch": 35.89,
+        "damagePerMatch": 4081.45,
+        "headShots": 21728,
+        "winPercent": 76.27,
+        "headshots": 21.18,
         "killDeath": 5.36,
         "infantryKillDeath": 5.35,
-        "damage": 11641156,
-        "accuracy": 24.17,
-        "revives": 13556,
-        "heals": 358759,
-        "resupplies": 62688,
+        "damage": 11664795,
+        "accuracy": 24.18,
+        "revives": 13576,
+        "heals": 358979,
+        "resupplies": 62703,
         "repairs": 834,
-        "squadmateRevive": 5754,
-        "thrownThrowables": 15855,
-        "gadgetsDestoyed": 4702,
+        "squadmateRevive": 5771,
+        "thrownThrowables": 15926,
+        "gadgetsDestoyed": 4716,
         "playerTakeDowns": 8,
-        "matchesPlayed": 2856,
-        "secondsPlayed": 3141879,
-        "saviorKills": 22079,
-        "shotsFired": 2071554,
-        "shotsHit": 500774,
-        "humanShotsHit": 287412,
-        "killAssists": 43378,
+        "matchesPlayed": 2858,
+        "secondsPlayed": 3146463,
+        "saviorKills": 22128,
+        "shotsFired": 2075152,
+        "shotsHit": 501695,
+        "humanShotsHit": 288322,
+        "killAssists": 43437,
         "vehiclesDestroyed": 13,
         "enemiesSpotted": 8154,
         "lastPlacement": 0,
+        "id": 860904773,
+        "userId": 2335746960,
         "platformId": 1,
         "dividedKills": {
-          "confirmed": 74693,
-          "fullConfirmed": 61548,
-          "ads": 94302,
+          "confirmed": 74845,
+          "fullConfirmed": 61700,
+          "ads": 94490,
           "grenades": 48,
-          "hipfire": 7435,
+          "hipfire": 7451,
           "longDistance": 389,
           "melee": 12,
-          "multiKills": 17223,
+          "multiKills": 17262,
           "passenger": 438,
           "vehicle": 484,
           "roadkills": 8,
           "parachute": 213,
-          "human": 102145,
+          "human": 102349,
           "weapons": {
-            "SMG": 17269,
+            "SMG": 17334,
             "LMG": 0,
             "DMR": 3582,
-            "AR": 35786,
-            "MG": 20119,
-            "Pistols": 1540,
+            "AR": 35809,
+            "MG": 20212,
+            "Pistols": 1546,
             "Snipers": 6084,
             "Shotguns": 1810
           }
@@ -7125,21 +7614,21 @@
         "objective": {
           "armed": 13,
           "captured": 2517,
-          "neutralized": 2360,
+          "neutralized": 2361,
           "defused": 0,
           "destroyed": 3,
           "time": {
-            "total": 235640,
-            "attacked": 59700,
-            "defended": 132334
+            "total": 235765,
+            "attacked": 59750,
+            "defended": 132384
           }
         },
         "dividedSecondsPlayed": {
           "flying": 39,
-          "driving": 4587
+          "driving": 4617
         },
         "devidedDamage": {
-          "human": 6291005,
+          "human": 6314644,
           "explosive": 30612,
           "passenger": 54162,
           "vehicleDriver": 6638,
@@ -7147,10 +7636,10 @@
           "withVehicle": 57126
         },
         "devidedAssists": {
-          "human": 25049,
+          "human": 25108,
           "driver": 75,
           "passenger": 446,
-          "spot": 9015,
+          "spot": 9033,
           "pilot": 10
         },
         "weapons": {
@@ -7169,11 +7658,11 @@
             "spawns": 255
           },
           "wp_ar_m433": {
-            "kills": 10351,
-            "headshots": 13.06,
-            "damage": 1096151,
-            "multiKills": 2031,
-            "spawns": 2045
+            "kills": 10370,
+            "headshots": 13.07,
+            "damage": 1098081,
+            "multiKills": 2036,
+            "spawns": 2051
           },
           "wp_mg_rpkm": {
             "kills": 1484,
@@ -7232,11 +7721,11 @@
             "spawns": 132
           },
           "wp_crb_ak205": {
-            "kills": 1529,
-            "headshots": 37.61,
-            "damage": 179403,
-            "multiKills": 195,
-            "spawns": 260
+            "kills": 1546,
+            "headshots": 37.58,
+            "damage": 181448,
+            "multiKills": 196,
+            "spawns": 264
           },
           "wp_dmr_svk86": {
             "kills": 763,
@@ -7278,7 +7767,7 @@
             "headshots": 18.22,
             "damage": 885279,
             "multiKills": 1344,
-            "spawns": 1489
+            "spawns": 1490
           },
           "wp_ar_kord6p67": {
             "kills": 3866,
@@ -7288,11 +7777,11 @@
             "spawns": 695
           },
           "wp_smg_usg90": {
-            "kills": 1552,
-            "headshots": 13.66,
-            "damage": 166384,
-            "multiKills": 271,
-            "spawns": 389
+            "kills": 1614,
+            "headshots": 13.88,
+            "damage": 173254,
+            "multiKills": 282,
+            "spawns": 404
           },
           "wp_crb_m4a1": {
             "kills": 1210,
@@ -7302,11 +7791,11 @@
             "spawns": 361
           },
           "wp_mg_kts100mk8": {
-            "kills": 1712,
-            "headshots": 27.04,
-            "damage": 211669,
-            "multiKills": 269,
-            "spawns": 267
+            "kills": 1755,
+            "headshots": 27.35,
+            "damage": 217137,
+            "multiKills": 277,
+            "spawns": 272
           },
           "wp_pst_m45a1": {
             "kills": 306,
@@ -7344,11 +7833,11 @@
             "spawns": 390
           },
           "wp_pst_m44": {
-            "kills": 763,
-            "headshots": 27.65,
-            "damage": 74915,
-            "multiKills": 116,
-            "spawns": 8809
+            "kills": 769,
+            "headshots": 27.96,
+            "damage": 75614,
+            "multiKills": 119,
+            "spawns": 8851
           },
           "wp_mg_xm250": {
             "kills": 1077,
@@ -7386,18 +7875,18 @@
             "spawns": 313
           },
           "wp_smg_scw10": {
-            "kills": 3162,
-            "headshots": 13.6,
-            "damage": 329600,
+            "kills": 3165,
+            "headshots": 13.59,
+            "damage": 330060,
             "multiKills": 614,
-            "spawns": 817
+            "spawns": 819
           },
           "wp_ar_nvo228e": {
-            "kills": 5838,
-            "headshots": 14.1,
-            "damage": 615018,
-            "multiKills": 1172,
-            "spawns": 939
+            "kills": 5842,
+            "headshots": 14.09,
+            "damage": 615632,
+            "multiKills": 1173,
+            "spawns": 941
           },
           "wp_mg_m60": {
             "kills": 949,
@@ -7544,11 +8033,11 @@
             "spawns": 110
           },
           "wp_mg_rpk74m": {
-            "kills": 1841,
-            "headshots": 38.67,
-            "damage": 206110,
-            "multiKills": 299,
-            "spawns": 220
+            "kills": 1891,
+            "headshots": 38.87,
+            "damage": 211587,
+            "multiKills": 309,
+            "spawns": 227
           }
         },
         "gadgets": {
@@ -7650,8 +8139,8 @@
             "assists": 1
           },
           "gad_sup_pouch": {
-            "uses": 35775,
-            "secondsPlayed": 15810
+            "uses": 35843,
+            "secondsPlayed": 15830
           },
           "gad_gren_mfrag": {
             "kills": 1,
@@ -7675,18 +8164,18 @@
           "gad_gren_inc": {
             "kills": 1,
             "uses": 12,
-            "damage": 66,
+            "damage": 102,
             "secondsPlayed": 10,
-            "assists": 1
+            "assists": 2
           },
           "gad_sup_bag": {
-            "uses": 17851,
-            "secondsPlayed": 16254
+            "uses": 17869,
+            "secondsPlayed": 16279
           },
           "gad_deplocover": {
-            "uses": 12337,
-            "secondsPlayed": 15787,
-            "spawns": 18184
+            "uses": 12349,
+            "secondsPlayed": 15792,
+            "spawns": 18226
           },
           "gad_gren_stun": {
             "uses": 2,
@@ -7694,9 +8183,9 @@
           },
           "gad_gren_smoke": {
             "kills": 1,
-            "uses": 22444,
+            "uses": 22495,
             "damage": 319,
-            "secondsPlayed": 11938,
+            "secondsPlayed": 11968,
             "assists": 17
           },
           "gad_recondrone": {
@@ -7722,9 +8211,9 @@
             "assists": 7
           },
           "gad_deployable": {
-            "uses": 66526,
-            "secondsPlayed": 49490,
-            "spawns": 19522,
+            "uses": 66624,
+            "secondsPlayed": 49540,
+            "spawns": 19564,
             "assists": 371
           },
           "gad_decoy": {
@@ -7753,7 +8242,7 @@
             "kills": 41,
             "damage": 5323,
             "multiKills": 5,
-            "spawns": 797,
+            "spawns": 800,
             "assists": 94
           },
           "veh_sur_m1a2sepv3": {
@@ -7774,7 +8263,7 @@
             "kills": 164,
             "damage": 22332,
             "multiKills": 31,
-            "spawns": 675,
+            "spawns": 678,
             "assists": 189
           },
           "veh_sur_vector": {
@@ -7785,7 +8274,7 @@
             "kills": 53,
             "damage": 5134,
             "multiKills": 12,
-            "spawns": 250,
+            "spawns": 251,
             "assists": 26
           },
           "veh_sur_quadbike": {
@@ -7814,7 +8303,7 @@
             "kills": 23,
             "damage": 2681,
             "multiKills": 2,
-            "spawns": 182,
+            "spawns": 185,
             "assists": 24
           }
         },
@@ -7849,10 +8338,10 @@
         },
         "classes": {
           "kit": {
-            "kills": 102375,
-            "secondsPlayed": 2768937,
-            "spawns": 19887,
-            "assists": 42834
+            "kills": 102579,
+            "secondsPlayed": 2772765,
+            "spawns": 19929,
+            "assists": 42893
           },
           "kit_assault": {
             "kills": 1614,
@@ -7867,10 +8356,10 @@
             "assists": 332
           },
           "kit_support": {
-            "kills": 94452,
-            "secondsPlayed": 2518796,
-            "spawns": 18188,
-            "assists": 38719
+            "kills": 94656,
+            "secondsPlayed": 2522624,
+            "spawns": 18230,
+            "assists": 38778
           },
           "kit_recon": {
             "kills": 5653,
@@ -7878,71 +8367,122 @@
             "spawns": 971,
             "assists": 3110
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 1098,
+                "wins": 766,
+                "losses": 332
+              },
+              "Rush0": {
+                "matches": 7,
+                "wins": 5,
+                "losses": 2
+              },
+              "Conquest0": {
+                "matches": 6,
+                "wins": 2,
+                "losses": 4
+              },
+              "MP_Escalation0": {
+                "matches": 2,
+                "wins": 2
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 664,
+                "wins": 526,
+                "losses": 138
+              },
+              "Conquest0": {
+                "matches": 1,
+                "wins": 1
+              },
+              "MP_Escalation0": {
+                "matches": 1,
+                "losses": 1
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 730,
+                "wins": 648,
+                "losses": 82
+              }
+            }
+          }
         }
       }
     },
     "199574297541476352": {
       "name": "Diet Matt",
       "stats": {
-        "userId": 2256685267,
-        "id": 368561669,
         "humanPrecentage": 99.09,
-        "score": 15135060,
-        "kills": 40638,
-        "deaths": 15028,
-        "wins": 1579,
-        "loses": 438,
-        "assists": 33367,
+        "score": 15142930,
+        "kills": 40671,
+        "deaths": 15056,
+        "wins": 1580,
+        "loses": 439,
+        "assists": 33389,
         "killsPerMinute": 1.08,
-        "damagePerMinute": 153.87,
-        "killsPerMatch": 20.11,
-        "damagePerMatch": 2870.19,
-        "headShots": 6282,
-        "winPercent": 78.28,
-        "headshots": 15.46,
+        "damagePerMinute": 153.79,
+        "killsPerMatch": 20.1,
+        "damagePerMatch": 2869.84,
+        "headShots": 6285,
+        "winPercent": 78.26,
+        "headshots": 15.45,
         "killDeath": 2.7,
         "infantryKillDeath": 2.68,
-        "damage": 5800658,
+        "damage": 5805684,
         "accuracy": 15.59,
-        "revives": 10459,
+        "revives": 10466,
         "heals": 112722,
         "resupplies": 28011,
         "repairs": 27050,
-        "squadmateRevive": 3026,
-        "thrownThrowables": 8360,
-        "gadgetsDestoyed": 5657,
+        "squadmateRevive": 3029,
+        "thrownThrowables": 8372,
+        "gadgetsDestoyed": 5662,
         "playerTakeDowns": 43,
-        "matchesPlayed": 2021,
-        "secondsPlayed": 2261952,
-        "saviorKills": 10157,
-        "shotsFired": 1567873,
-        "shotsHit": 244405,
-        "humanShotsHit": 155962,
-        "killAssists": 33471,
-        "vehiclesDestroyed": 207,
-        "enemiesSpotted": 15588,
+        "matchesPlayed": 2023,
+        "secondsPlayed": 2265063,
+        "saviorKills": 10160,
+        "shotsFired": 1568778,
+        "shotsHit": 244601,
+        "humanShotsHit": 156156,
+        "killAssists": 33493,
+        "vehiclesDestroyed": 208,
+        "enemiesSpotted": 15600,
         "lastPlacement": 0,
+        "id": 368561669,
+        "userId": 2256685267,
         "platformId": 1,
         "dividedKills": {
-          "confirmed": 29393,
-          "fullConfirmed": 24996,
-          "ads": 28544,
+          "confirmed": 29418,
+          "fullConfirmed": 25021,
+          "ads": 28560,
           "grenades": 1270,
-          "hipfire": 8253,
+          "hipfire": 8266,
           "longDistance": 630,
           "melee": 67,
-          "multiKills": 5774,
+          "multiKills": 5779,
           "passenger": 629,
           "vehicle": 651,
           "roadkills": 2,
           "parachute": 43,
-          "human": 40269,
+          "human": 40302,
           "weapons": {
-            "SMG": 7735,
+            "SMG": 7747,
             "LMG": 0,
             "DMR": 532,
-            "AR": 11880,
-            "MG": 4548,
+            "AR": 11889,
+            "MG": 4552,
             "Pistols": 858,
             "Snipers": 534,
             "Shotguns": 475
@@ -7955,9 +8495,9 @@
           "defused": 12,
           "destroyed": 35,
           "time": {
-            "total": 291918,
-            "attacked": 73702,
-            "defended": 147819
+            "total": 292048,
+            "attacked": 73737,
+            "defended": 147904
           }
         },
         "dividedSecondsPlayed": {
@@ -7965,18 +8505,18 @@
           "driving": 2012
         },
         "devidedDamage": {
-          "human": 3678777,
-          "explosive": 975535,
+          "human": 3683803,
+          "explosive": 976775,
           "passenger": 86286,
           "vehicleDriver": 11651,
-          "toVehicle": 843045,
+          "toVehicle": 843765,
           "withVehicle": 77223
         },
         "devidedAssists": {
-          "human": 21569,
+          "human": 21591,
           "driver": 46,
-          "passenger": 1000,
-          "spot": 10245,
+          "passenger": 1001,
+          "spot": 10250,
           "pilot": 4
         },
         "weapons": {
@@ -7995,11 +8535,11 @@
             "spawns": 583
           },
           "wp_ar_m433": {
-            "kills": 1959,
+            "kills": 1965,
             "headshots": 15.52,
-            "damage": 236044,
-            "multiKills": 272,
-            "spawns": 972
+            "damage": 236735,
+            "multiKills": 273,
+            "spawns": 976
           },
           "wp_mg_rpkm": {
             "kills": 439,
@@ -8093,18 +8633,18 @@
             "spawns": 614
           },
           "wp_crb_m417a2": {
-            "kills": 1109,
-            "headshots": 15.69,
-            "damage": 132798,
+            "kills": 1110,
+            "headshots": 15.77,
+            "damage": 132841,
             "multiKills": 135,
-            "spawns": 489
+            "spawns": 490
           },
           "wp_mg_drsiar": {
-            "kills": 1984,
-            "headshots": 15.93,
-            "damage": 241596,
-            "multiKills": 273,
-            "spawns": 856
+            "kills": 1987,
+            "headshots": 15.9,
+            "damage": 241932,
+            "multiKills": 274,
+            "spawns": 859
           },
           "wp_ar_kord6p67": {
             "kills": 2130,
@@ -8121,11 +8661,11 @@
             "spawns": 297
           },
           "wp_crb_m4a1": {
-            "kills": 1747,
-            "headshots": 17.29,
-            "damage": 212866,
+            "kills": 1748,
+            "headshots": 17.28,
+            "damage": 212907,
             "multiKills": 214,
-            "spawns": 982
+            "spawns": 983
           },
           "wp_mg_kts100mk8": {
             "kills": 408,
@@ -8139,7 +8679,7 @@
             "headshots": 13.98,
             "damage": 31155,
             "multiKills": 90,
-            "spawns": 7056
+            "spawns": 7085
           },
           "wp_smg_kv9": {
             "kills": 552,
@@ -8163,11 +8703,11 @@
             "spawns": 493
           },
           "wp_mg_m123k": {
-            "kills": 455,
-            "headshots": 16.26,
-            "damage": 52931,
+            "kills": 456,
+            "headshots": 16.23,
+            "damage": 53153,
             "multiKills": 81,
-            "spawns": 160
+            "spawns": 164
           },
           "wp_pst_m44": {
             "kills": 121,
@@ -8184,18 +8724,18 @@
             "spawns": 16
           },
           "wp_smg_umg40": {
-            "kills": 749,
-            "headshots": 16.15,
-            "damage": 86454,
-            "multiKills": 74,
-            "spawns": 404
+            "kills": 759,
+            "headshots": 16.07,
+            "damage": 87619,
+            "multiKills": 75,
+            "spawns": 411
           },
           "wp_ar_tr7": {
-            "kills": 765,
-            "headshots": 15.95,
-            "damage": 87441,
+            "kills": 767,
+            "headshots": 15.91,
+            "damage": 87691,
             "multiKills": 98,
-            "spawns": 342
+            "spawns": 343
           },
           "wp_smg_sl9": {
             "kills": 633,
@@ -8219,11 +8759,11 @@
             "spawns": 353
           },
           "wp_ar_nvo228e": {
-            "kills": 1561,
-            "headshots": 17.68,
-            "damage": 182586,
+            "kills": 1562,
+            "headshots": 17.67,
+            "damage": 183000,
             "multiKills": 227,
-            "spawns": 630
+            "spawns": 632
           },
           "wp_mg_m60": {
             "kills": 17,
@@ -8261,11 +8801,11 @@
             "spawns": 314
           },
           "wp_crb_sg553r": {
-            "kills": 2322,
-            "headshots": 15.76,
-            "damage": 270309,
-            "multiKills": 347,
-            "spawns": 1020
+            "kills": 2324,
+            "headshots": 15.75,
+            "damage": 270578,
+            "multiKills": 348,
+            "spawns": 1023
           },
           "wp_crb_grtbc": {
             "kills": 854,
@@ -8349,11 +8889,11 @@
             "spawns": 93
           },
           "wp_smg_cz3a1": {
-            "kills": 898,
-            "headshots": 18.37,
-            "damage": 104461,
+            "kills": 900,
+            "headshots": 18.33,
+            "damage": 104724,
             "multiKills": 140,
-            "spawns": 298
+            "spawns": 301
           },
           "wp_mg_mg525btk": {
             "kills": 17,
@@ -8395,23 +8935,23 @@
             "spawns": 829
           },
           "gad_c4": {
-            "kills": 188,
-            "uses": 2077,
-            "damage": 120018,
-            "multiKills": 74,
-            "vehiclesDestroyedWith": 50,
-            "secondsPlayed": 5806,
-            "spawns": 1936,
+            "kills": 190,
+            "uses": 2083,
+            "damage": 120404,
+            "multiKills": 75,
+            "vehiclesDestroyedWith": 51,
+            "secondsPlayed": 5811,
+            "spawns": 1940,
             "assists": 57
           },
           "gad_gl_he": {
             "kills": 578,
-            "uses": 3032,
+            "uses": 3033,
             "damage": 86737,
             "multiKills": 131,
             "vehiclesDestroyedWith": 1,
             "secondsPlayed": 14487,
-            "spawns": 2576,
+            "spawns": 2580,
             "assists": 513
           },
           "gad_rl_ungui": {
@@ -8455,7 +8995,7 @@
           },
           "gad_mine_ap": {
             "kills": 116,
-            "uses": 474,
+            "uses": 475,
             "damage": 16228,
             "multiKills": 31,
             "secondsPlayed": 1189,
@@ -8489,11 +9029,11 @@
           },
           "gad_il_airburst": {
             "kills": 162,
-            "uses": 1439,
-            "damage": 26457,
+            "uses": 1440,
+            "damage": 26549,
             "multiKills": 22,
             "secondsPlayed": 6127,
-            "spawns": 114,
+            "spawns": 121,
             "assists": 154
           },
           "gad_deploymortar": {
@@ -8540,9 +9080,9 @@
             "spawns": 35
           },
           "gad_tugs": {
-            "uses": 1619,
-            "secondsPlayed": 2691,
-            "assists": 1789
+            "uses": 1621,
+            "secondsPlayed": 2696,
+            "assists": 1790
           },
           "gad_ladder": {
             "uses": 71,
@@ -8574,10 +9114,10 @@
           },
           "gad_gren_frag": {
             "kills": 1260,
-            "uses": 8359,
-            "damage": 150708,
+            "uses": 8371,
+            "damage": 150729,
             "multiKills": 341,
-            "secondsPlayed": 9793,
+            "secondsPlayed": 9808,
             "assists": 924
           },
           "gad_repair": {
@@ -8649,10 +9189,10 @@
             "assists": 4
           },
           "gad_deployable": {
-            "uses": 11777,
-            "secondsPlayed": 21669,
+            "uses": 11780,
+            "secondsPlayed": 21674,
             "spawns": 3755,
-            "assists": 2693
+            "assists": 2694
           },
           "gad_decoy": {
             "uses": 54,
@@ -8714,8 +9254,8 @@
             "kills": 126,
             "damage": 18903,
             "multiKills": 16,
-            "spawns": 684,
-            "assists": 268
+            "spawns": 688,
+            "assists": 269
           },
           "veh_sur_vector": {
             "kills": 1,
@@ -8790,34 +9330,90 @@
         "battlePickups": {},
         "classes": {
           "kit": {
-            "kills": 40633,
-            "secondsPlayed": 1763621,
-            "spawns": 15867,
-            "assists": 32789
+            "kills": 40666,
+            "secondsPlayed": 1764959,
+            "spawns": 15896,
+            "assists": 32809
           },
           "kit_assault": {
-            "kills": 9000,
-            "secondsPlayed": 356284,
-            "spawns": 3363,
-            "assists": 6158
+            "kills": 9003,
+            "secondsPlayed": 356418,
+            "spawns": 3367,
+            "assists": 6159
           },
           "kit_engineer": {
-            "kills": 5750,
-            "secondsPlayed": 275360,
-            "spawns": 2866,
-            "assists": 4816
+            "kills": 5767,
+            "secondsPlayed": 276059,
+            "spawns": 2880,
+            "assists": 4829
           },
           "kit_support": {
-            "kills": 20515,
-            "secondsPlayed": 878926,
-            "spawns": 7280,
-            "assists": 14896
+            "kills": 20520,
+            "secondsPlayed": 879281,
+            "spawns": 7287,
+            "assists": 14898
           },
           "kit_recon": {
-            "kills": 5368,
-            "secondsPlayed": 253051,
-            "spawns": 2358,
-            "assists": 6919
+            "kills": 5376,
+            "secondsPlayed": 253201,
+            "spawns": 2362,
+            "assists": 6923
+          }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 533,
+                "wins": 406,
+                "losses": 127
+              },
+              "ModBuilderCustom0": {
+                "matches": 4,
+                "losses": 4
+              },
+              "Rush0": {
+                "matches": 18,
+                "wins": 10,
+                "losses": 8
+              },
+              "Conquest0": {
+                "matches": 4,
+                "wins": 2,
+                "losses": 2
+              },
+              "MP_Escalation0": {
+                "matches": 7,
+                "wins": 5,
+                "losses": 2
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 573,
+                "wins": 437,
+                "losses": 136
+              },
+              "Conquest0": {
+                "matches": 2,
+                "wins": 2
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 614,
+                "wins": 544,
+                "losses": 70
+              },
+              "MP_Escalation0": {
+                "matches": 1,
+                "wins": 1
+              }
+            }
           }
         }
       }
@@ -8825,64 +9421,64 @@
     "206528087578378240": {
       "name": "[KDM] Naded",
       "stats": {
-        "userId": 2301274288,
-        "id": 921387013,
         "humanPrecentage": 99.27,
-        "score": 3920270,
-        "kills": 9886,
-        "deaths": 3425,
+        "score": 3927900,
+        "kills": 9907,
+        "deaths": 3434,
         "wins": 339,
-        "loses": 155,
-        "assists": 5764,
+        "loses": 156,
+        "assists": 5787,
         "killsPerMinute": 0.95,
-        "damagePerMinute": 118.32,
+        "damagePerMinute": 118.1,
         "killsPerMatch": 20.01,
-        "damagePerMatch": 2495.34,
-        "headShots": 1373,
-        "winPercent": 68.62,
-        "headshots": 13.89,
-        "killDeath": 2.89,
-        "infantryKillDeath": 2.87,
-        "damage": 1232696,
-        "accuracy": 22.66,
-        "revives": 3270,
-        "heals": 36193,
-        "resupplies": 5578,
+        "damagePerMatch": 2495.53,
+        "headShots": 1377,
+        "winPercent": 68.48,
+        "headshots": 13.9,
+        "killDeath": 2.88,
+        "infantryKillDeath": 2.86,
+        "damage": 1235289,
+        "accuracy": 22.64,
+        "revives": 3283,
+        "heals": 36341,
+        "resupplies": 5588,
         "repairs": 0,
-        "squadmateRevive": 1635,
-        "thrownThrowables": 1234,
+        "squadmateRevive": 1640,
+        "thrownThrowables": 1260,
         "gadgetsDestoyed": 717,
         "playerTakeDowns": 30,
-        "matchesPlayed": 494,
-        "secondsPlayed": 625111,
-        "saviorKills": 2809,
-        "shotsFired": 299241,
-        "shotsHit": 67816,
-        "humanShotsHit": 11759,
-        "killAssists": 5766,
+        "matchesPlayed": 495,
+        "secondsPlayed": 627602,
+        "saviorKills": 2815,
+        "shotsFired": 300158,
+        "shotsHit": 67962,
+        "humanShotsHit": 11905,
+        "killAssists": 5789,
         "vehiclesDestroyed": 9,
         "enemiesSpotted": 621,
+        "id": 921387013,
+        "userId": 2301274288,
         "platformId": 1,
         "dividedKills": {
-          "confirmed": 6942,
-          "fullConfirmed": 1666,
-          "ads": 6306,
+          "confirmed": 6958,
+          "fullConfirmed": 1682,
+          "ads": 6325,
           "grenades": 22,
-          "hipfire": 3098,
+          "hipfire": 3099,
           "longDistance": 271,
           "melee": 13,
           "multiKills": 1080,
-          "passenger": 141,
-          "vehicle": 298,
+          "passenger": 142,
+          "vehicle": 299,
           "roadkills": 2,
           "parachute": 39,
-          "human": 9814,
+          "human": 9835,
           "weapons": {
             "SMG": 335,
             "LMG": 0,
             "DMR": 420,
-            "AR": 6138,
-            "MG": 77,
+            "AR": 6140,
+            "MG": 95,
             "Pistols": 50,
             "Snipers": 0,
             "Shotguns": 114
@@ -8890,14 +9486,14 @@
         },
         "objective": {
           "armed": 24,
-          "captured": 1225,
-          "neutralized": 950,
+          "captured": 1227,
+          "neutralized": 951,
           "defused": 4,
           "destroyed": 9,
           "time": {
-            "total": 69941,
-            "attacked": 21391,
-            "defended": 28809
+            "total": 70101,
+            "attacked": 21451,
+            "defended": 28864
           }
         },
         "dividedSecondsPlayed": {
@@ -8905,18 +9501,18 @@
           "driving": 10220
         },
         "devidedDamage": {
-          "human": 204861,
+          "human": 207454,
           "explosive": 7755,
-          "passenger": 22586,
+          "passenger": 22670,
           "vehicleDriver": 61266,
           "toVehicle": 59707,
-          "withVehicle": 68594
+          "withVehicle": 68678
         },
         "devidedAssists": {
-          "human": 1427,
+          "human": 1450,
           "driver": 132,
-          "passenger": 206,
-          "spot": 607,
+          "passenger": 207,
+          "spot": 614,
           "pilot": 108
         },
         "weapons": {
@@ -8956,7 +9552,7 @@
             "headshots": 12,
             "damage": 5333,
             "multiKills": 8,
-            "spawns": 3583
+            "spawns": 3593
           },
           "wp_crb_x277": {
             "kills": 20,
@@ -9019,11 +9615,11 @@
             "multiKills": 1
           },
           "wp_ar_kord6p67": {
-            "kills": 5160,
-            "headshots": 14.92,
-            "damage": 593443,
+            "kills": 5162,
+            "headshots": 14.94,
+            "damage": 593821,
             "multiKills": 551,
-            "spawns": 1617
+            "spawns": 1620
           },
           "wp_smg_usg90": {
             "kills": 8,
@@ -9152,6 +9748,12 @@
             "damage": 2665,
             "multiKills": 2,
             "spawns": 15
+          },
+          "wp_mg_rpk74m": {
+            "kills": 18,
+            "headshots": 16.67,
+            "damage": 2131,
+            "spawns": 7
           }
         },
         "gadgets": {
@@ -9167,9 +9769,9 @@
             "spawns": 52
           },
           "gad_gpdis": {
-            "uses": 268,
+            "uses": 273,
             "secondsPlayed": 525,
-            "spawns": 237
+            "spawns": 247
           },
           "gad_gl_he": {
             "kills": 84,
@@ -9303,8 +9905,8 @@
             "assists": 2
           },
           "gad_sup_bag": {
-            "uses": 2270,
-            "secondsPlayed": 2216
+            "uses": 2286,
+            "secondsPlayed": 2226
           },
           "gad_deplocover": {
             "uses": 969,
@@ -9318,9 +9920,9 @@
             "assists": 7
           },
           "gad_gren_smoke": {
-            "uses": 2979,
+            "uses": 3005,
             "damage": 166,
-            "secondsPlayed": 1426,
+            "secondsPlayed": 1436,
             "assists": 7
           },
           "gad_gren_flash": {
@@ -9342,9 +9944,9 @@
             "uses": 7
           },
           "gad_deployable": {
-            "uses": 3658,
-            "secondsPlayed": 6579,
-            "spawns": 2760,
+            "uses": 3679,
+            "secondsPlayed": 6589,
+            "spawns": 2770,
             "assists": 121
           },
           "gad_callin_resupply": {
@@ -9391,10 +9993,10 @@
             "assists": 4
           },
           "veh_sur_bradley": {
-            "kills": 49,
-            "damage": 8017,
+            "kills": 50,
+            "damage": 8101,
             "multiKills": 8,
-            "spawns": 120,
+            "spawns": 125,
             "assists": 62
           },
           "veh_air_f61v": {
@@ -9444,8 +10046,8 @@
             "kills": 21,
             "damage": 2244,
             "multiKills": 4,
-            "spawns": 16,
-            "assists": 31
+            "spawns": 18,
+            "assists": 32
           }
         },
         "melee": {
@@ -9462,10 +10064,10 @@
         "battlePickups": {},
         "classes": {
           "kit": {
-            "kills": 9886,
-            "secondsPlayed": 516504,
-            "spawns": 3751,
-            "assists": 5687
+            "kills": 9907,
+            "secondsPlayed": 517947,
+            "spawns": 3761,
+            "assists": 5710
           },
           "kit_assault": {
             "kills": 1289,
@@ -9480,10 +10082,10 @@
             "assists": 17
           },
           "kit_support": {
-            "kills": 8581,
-            "secondsPlayed": 452918,
-            "spawns": 3067,
-            "assists": 4818
+            "kills": 8602,
+            "secondsPlayed": 454361,
+            "spawns": 3077,
+            "assists": 4841
           },
           "kit_recon": {
             "kills": 7,
@@ -9491,31 +10093,73 @@
             "spawns": 8,
             "assists": 153
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 72,
+                "wins": 42,
+                "losses": 30
+              },
+              "Rush0": {
+                "matches": 17,
+                "wins": 11,
+                "losses": 6
+              },
+              "Conquest0": {
+                "matches": 44,
+                "wins": 32,
+                "losses": 12
+              },
+              "MP_Escalation0": {
+                "matches": 4,
+                "wins": 2,
+                "losses": 2
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 120,
+                "wins": 104,
+                "losses": 16
+              },
+              "Conquest0": {
+                "matches": 9,
+                "wins": 4,
+                "losses": 5
+              },
+              "MP_Escalation0": {
+                "matches": 1,
+                "wins": 1
+              }
+            }
+          }
         }
       }
     },
     "208693345768308736": {
       "name": "[KDM] jas",
       "stats": {
-        "userId": 2391166918,
-        "id": 1149116838,
         "humanPrecentage": 98.71,
-        "score": 8618555,
-        "kills": 41252,
+        "score": 8618785,
+        "kills": 41254,
         "deaths": 9875,
         "wins": 607,
         "loses": 172,
         "assists": 15851,
-        "killsPerMinute": 1.66,
-        "damagePerMinute": 178.25,
+        "killsPerMinute": 1.65,
+        "damagePerMinute": 178.08,
         "killsPerMatch": 52.96,
-        "damagePerMatch": 5699.01,
+        "damagePerMatch": 5699.39,
         "headShots": 11116,
         "winPercent": 77.92,
         "headshots": 26.95,
         "killDeath": 4.18,
         "infantryKillDeath": 4.12,
-        "damage": 4439530,
+        "damage": 4439826,
         "accuracy": 28.61,
         "revives": 5734,
         "heals": 68808,
@@ -9526,19 +10170,21 @@
         "gadgetsDestoyed": 1987,
         "playerTakeDowns": 12,
         "matchesPlayed": 779,
-        "secondsPlayed": 1494393,
-        "saviorKills": 9647,
-        "shotsFired": 546729,
-        "shotsHit": 156424,
-        "humanShotsHit": 69142,
+        "secondsPlayed": 1495933,
+        "saviorKills": 9648,
+        "shotsFired": 546772,
+        "shotsHit": 156430,
+        "humanShotsHit": 69148,
         "killAssists": 15956,
         "vehiclesDestroyed": 43,
         "enemiesSpotted": 15148,
+        "id": 1149116838,
+        "userId": 2391166918,
         "platformId": 1,
         "dividedKills": {
-          "confirmed": 29743,
-          "fullConfirmed": 17341,
-          "ads": 35681,
+          "confirmed": 29745,
+          "fullConfirmed": 17343,
+          "ads": 35683,
           "grenades": 47,
           "hipfire": 3833,
           "longDistance": 673,
@@ -9548,7 +10194,7 @@
           "vehicle": 1517,
           "roadkills": 8,
           "parachute": 77,
-          "human": 40721,
+          "human": 40723,
           "weapons": {
             "SMG": 4734,
             "LMG": 0,
@@ -9567,9 +10213,9 @@
           "defused": 1,
           "destroyed": 2,
           "time": {
-            "total": 88057,
+            "total": 88072,
             "attacked": 30169,
-            "defended": 41894
+            "defended": 41909
           }
         },
         "dividedSecondsPlayed": {
@@ -9577,7 +10223,7 @@
           "driving": 11758
         },
         "devidedDamage": {
-          "human": 1763009,
+          "human": 1763305,
           "explosive": 108335,
           "passenger": 116835,
           "vehicleDriver": 151215,
@@ -9778,7 +10424,7 @@
             "headshots": 40.54,
             "damage": 144457,
             "multiKills": 289,
-            "spawns": 9532
+            "spawns": 9534
           },
           "wp_mg_xm250": {
             "kills": 14,
@@ -9854,11 +10500,11 @@
             "spawns": 264
           },
           "wp_crb_sg553r": {
-            "kills": 3111,
-            "headshots": 13.02,
-            "damage": 317498,
+            "kills": 3113,
+            "headshots": 13.01,
+            "damage": 317794,
             "multiKills": 608,
-            "spawns": 870
+            "spawns": 872
           },
           "wp_crb_grtbc": {
             "kills": 28,
@@ -10039,7 +10685,7 @@
           "gad_sup_pouch": {
             "uses": 6400,
             "secondsPlayed": 2883,
-            "spawns": 7128
+            "spawns": 7130
           },
           "gad_gren_mfrag": {
             "uses": 9,
@@ -10120,7 +10766,7 @@
           "gad_deployable": {
             "uses": 13087,
             "secondsPlayed": 12056,
-            "spawns": 9100,
+            "spawns": 9102,
             "assists": 905
           },
           "gad_decoy": {
@@ -10263,7 +10909,7 @@
           },
           "melee_light_gekoknife": {
             "kills": 18,
-            "uses": 662,
+            "uses": 663,
             "damage": 8819
           },
           "melee_heavy_sledge": {
@@ -10284,9 +10930,9 @@
         },
         "classes": {
           "kit": {
-            "kills": 41249,
-            "secondsPlayed": 838765,
-            "spawns": 10822,
+            "kills": 41251,
+            "secondsPlayed": 838869,
+            "spawns": 10824,
             "assists": 15118
           },
           "kit_assault": {
@@ -10302,9 +10948,9 @@
             "assists": 214
           },
           "kit_support": {
-            "kills": 31169,
-            "secondsPlayed": 627037,
-            "spawns": 8865,
+            "kills": 31171,
+            "secondsPlayed": 627141,
+            "spawns": 8867,
             "assists": 9719
           },
           "kit_recon": {
@@ -10313,14 +10959,64 @@
             "spawns": 1762,
             "assists": 5105
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 303,
+                "wins": 226,
+                "losses": 77
+              },
+              "Rush0": {
+                "matches": 3,
+                "wins": 1,
+                "losses": 2
+              },
+              "MP_Escalation0": {
+                "matches": 3,
+                "wins": 1,
+                "losses": 2
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 70,
+                "wins": 64,
+                "losses": 6
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 190,
+                "wins": 176,
+                "losses": 14
+              },
+              "Rush0": {
+                "matches": 2,
+                "wins": 2
+              },
+              "Conquest0": {
+                "matches": 30,
+                "wins": 25,
+                "losses": 5
+              },
+              "MP_Escalation0": {
+                "matches": 1,
+                "wins": 1
+              }
+            }
+          }
         }
       }
     },
     "210550539887312896": {
       "name": "[KDM] Medic_Wolfy",
       "stats": {
-        "userId": 1007559541150,
-        "id": 1003815741150,
         "humanPrecentage": 99.41,
         "score": 21766012,
         "kills": 83224,
@@ -10357,6 +11053,8 @@
         "vehiclesDestroyed": 712,
         "enemiesSpotted": 26949,
         "lastPlacement": 0,
+        "id": 1003815741150,
+        "userId": 1007559541150,
         "platformId": 1,
         "dividedKills": {
           "confirmed": 61896,
@@ -11336,14 +12034,86 @@
             "spawns": 3192,
             "assists": 9028
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 810,
+                "wins": 475,
+                "losses": 335
+              },
+              "Rush0": {
+                "matches": 200,
+                "wins": 127,
+                "losses": 73
+              },
+              "Conquest0": {
+                "matches": 28,
+                "wins": 16,
+                "losses": 12
+              },
+              "MP_Escalation0": {
+                "matches": 56,
+                "wins": 32,
+                "losses": 24
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 339,
+                "wins": 210,
+                "losses": 129
+              },
+              "Rush0": {
+                "matches": 76,
+                "wins": 63,
+                "losses": 13
+              },
+              "Conquest0": {
+                "matches": 11,
+                "wins": 6,
+                "losses": 5
+              },
+              "MP_Escalation0": {
+                "matches": 11,
+                "wins": 8,
+                "losses": 3
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 569,
+                "wins": 480,
+                "losses": 89
+              },
+              "Rush0": {
+                "matches": 8,
+                "wins": 7,
+                "losses": 1
+              },
+              "Conquest0": {
+                "matches": 25,
+                "wins": 16,
+                "losses": 9
+              },
+              "MP_Escalation0": {
+                "matches": 20,
+                "wins": 13,
+                "losses": 7
+              }
+            }
+          }
         }
       }
     },
     "211731212480282624": {
       "name": "Terrae",
       "stats": {
-        "userId": 2364300627,
-        "id": 363127164,
         "humanPrecentage": 95.99,
         "score": 12784915,
         "kills": 52170,
@@ -11379,6 +12149,8 @@
         "killAssists": 30929,
         "vehiclesDestroyed": 1192,
         "enemiesSpotted": 16796,
+        "id": 363127164,
+        "userId": 2364300627,
         "platformId": 1,
         "dividedKills": {
           "confirmed": 40210,
@@ -12313,14 +13085,76 @@
             "spawns": 1319,
             "assists": 4856
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 228,
+                "wins": 167,
+                "losses": 61
+              },
+              "ModBuilderCustom0": {
+                "matches": 1,
+                "losses": 1
+              },
+              "Rush0": {
+                "matches": 17,
+                "wins": 10,
+                "losses": 7
+              },
+              "Conquest0": {
+                "matches": 5,
+                "wins": 3,
+                "losses": 2
+              },
+              "MP_Escalation0": {
+                "matches": 1,
+                "wins": 1
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 5,
+                "wins": 4,
+                "losses": 1
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 625,
+                "wins": 560,
+                "losses": 65
+              },
+              "ModBuilderCustom0": {
+                "matches": 1,
+                "wins": 1
+              },
+              "Rush0": {
+                "matches": 2,
+                "wins": 2
+              },
+              "Conquest0": {
+                "matches": 120,
+                "wins": 103,
+                "losses": 17
+              },
+              "MP_Escalation0": {
+                "matches": 3,
+                "wins": 3
+              }
+            }
+          }
         }
       }
     },
     "232628344477188096": {
       "name": "[KDM] Rogue 3",
       "stats": {
-        "userId": 2415278326,
-        "id": 587688399,
         "humanPrecentage": 80.87,
         "score": 5872630,
         "kills": 21018,
@@ -12357,6 +13191,8 @@
         "vehiclesDestroyed": 487,
         "enemiesSpotted": 11037,
         "lastPlacement": 0,
+        "id": 587688399,
+        "userId": 2415278326,
         "platformId": 1,
         "dividedKills": {
           "confirmed": 15703,
@@ -13252,14 +14088,62 @@
             "spawns": 1404,
             "assists": 3950
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 6,
+                "wins": 6
+              },
+              "Rush0": {
+                "matches": 1,
+                "wins": 1
+              },
+              "Conquest0": {
+                "matches": 44,
+                "wins": 20,
+                "losses": 24
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "MP_Escalation0": {
+                "matches": 1,
+                "wins": 1
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 347,
+                "wins": 260,
+                "losses": 87
+              },
+              "Rush0": {
+                "matches": 2,
+                "wins": 2
+              },
+              "Conquest0": {
+                "matches": 12,
+                "wins": 8,
+                "losses": 4
+              },
+              "MP_Escalation0": {
+                "matches": 10,
+                "wins": 6,
+                "losses": 4
+              }
+            }
+          }
         }
       }
     },
     "234840069305925633": {
       "name": "Yuna",
       "stats": {
-        "userId": 1003763701071,
-        "id": 1781483313,
         "humanPrecentage": 99.38,
         "score": 15808770,
         "kills": 76368,
@@ -13296,6 +14180,8 @@
         "vehiclesDestroyed": 233,
         "enemiesSpotted": 15506,
         "lastPlacement": 0,
+        "id": 1781483313,
+        "userId": 1003763701071,
         "platformId": 1,
         "dividedKills": {
           "confirmed": 54950,
@@ -14141,14 +15027,69 @@
             "spawns": 2182,
             "assists": 5919
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 795,
+                "wins": 530,
+                "losses": 265
+              },
+              "Rush0": {
+                "matches": 15,
+                "wins": 11,
+                "losses": 4
+              },
+              "Conquest0": {
+                "matches": 228,
+                "wins": 158,
+                "losses": 70
+              },
+              "MP_Escalation0": {
+                "matches": 11,
+                "wins": 7,
+                "losses": 4
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 338,
+                "wins": 242,
+                "losses": 96
+              },
+              "Conquest0": {
+                "matches": 1,
+                "wins": 1
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 209,
+                "wins": 157,
+                "losses": 52
+              },
+              "Conquest0": {
+                "matches": 8,
+                "wins": 5,
+                "losses": 3
+              },
+              "MP_Escalation0": {
+                "matches": 1,
+                "losses": 1
+              }
+            }
+          }
         }
       }
     },
     "277535059274104832": {
       "name": "Watokosha (Watt-oh-Ko-Sha)",
       "stats": {
-        "userId": 2379664128,
-        "id": 308857391,
         "humanPrecentage": 94.06,
         "score": 12453170,
         "kills": 37000,
@@ -14185,6 +15126,8 @@
         "vehiclesDestroyed": 835,
         "enemiesSpotted": 19787,
         "lastPlacement": 0,
+        "id": 308857391,
+        "userId": 2379664128,
         "platformId": 1,
         "dividedKills": {
           "confirmed": 26860,
@@ -15151,14 +16094,75 @@
             "spawns": 602,
             "assists": 7823
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 570,
+                "wins": 385,
+                "losses": 185
+              },
+              "Rush0": {
+                "matches": 10,
+                "wins": 9,
+                "losses": 1
+              },
+              "Conquest0": {
+                "matches": 26,
+                "wins": 18,
+                "losses": 8
+              },
+              "MP_Escalation0": {
+                "matches": 17,
+                "wins": 13,
+                "losses": 4
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 333,
+                "wins": 258,
+                "losses": 75
+              },
+              "Conquest0": {
+                "matches": 5,
+                "wins": 3,
+                "losses": 2
+              },
+              "MP_Escalation0": {
+                "matches": 6,
+                "wins": 3,
+                "losses": 3
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 306,
+                "wins": 258,
+                "losses": 48
+              },
+              "Conquest0": {
+                "matches": 6,
+                "wins": 4,
+                "losses": 2
+              },
+              "MP_Escalation0": {
+                "matches": 2,
+                "wins": 2
+              }
+            }
+          }
         }
       }
     },
     "307279962795409429": {
       "name": "Zyfs",
       "stats": {
-        "userId": 1008832527149,
-        "id": 1004348727149,
         "humanPrecentage": 95.84,
         "score": 18035688,
         "kills": 78414,
@@ -15194,6 +16198,8 @@
         "killAssists": 29692,
         "vehiclesDestroyed": 81,
         "enemiesSpotted": 6650,
+        "id": 1004348727149,
+        "userId": 1008832527149,
         "platformId": 1,
         "dividedKills": {
           "confirmed": 53334,
@@ -16086,104 +17092,151 @@
             "spawns": 671,
             "assists": 1826
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 429,
+                "wins": 268,
+                "losses": 161
+              },
+              "Conquest0": {
+                "matches": 3,
+                "wins": 1,
+                "losses": 2
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 584,
+                "wins": 399,
+                "losses": 185
+              },
+              "Rush0": {
+                "matches": 4,
+                "wins": 3,
+                "losses": 1
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 457,
+                "wins": 378,
+                "losses": 79
+              },
+              "Conquest0": {
+                "matches": 6,
+                "wins": 6
+              },
+              "MP_Escalation0": {
+                "matches": 1,
+                "wins": 1
+              }
+            }
+          }
         }
       }
     },
     "310748119765745665": {
       "name": "[KDM] Sapper",
       "stats": {
-        "userId": 2413856252,
-        "id": 861124547,
         "humanPrecentage": 98.45,
-        "score": 30504452,
-        "kills": 105747,
-        "deaths": 29687,
+        "score": 30518004,
+        "kills": 105792,
+        "deaths": 29710,
         "wins": 2925,
         "loses": 1208,
-        "assists": 66674,
-        "killsPerMinute": 1.39,
-        "damagePerMinute": 227.37,
-        "killsPerMatch": 25.57,
-        "damagePerMatch": 4198.1,
-        "headShots": 27046,
+        "assists": 66700,
+        "killsPerMinute": 1.38,
+        "damagePerMinute": 227.04,
+        "killsPerMatch": 25.58,
+        "damagePerMatch": 4199.34,
+        "headShots": 27069,
         "winPercent": 70.77,
-        "headshots": 25.58,
+        "headshots": 25.59,
         "killDeath": 3.56,
         "infantryKillDeath": 3.51,
-        "damage": 17359132,
-        "accuracy": 27.04,
-        "revives": 12234,
-        "heals": 115526,
-        "resupplies": 24132,
-        "repairs": 103488,
-        "squadmateRevive": 7707,
-        "thrownThrowables": 9188,
-        "gadgetsDestoyed": 15278,
+        "damage": 17364264,
+        "accuracy": 27.03,
+        "revives": 12255,
+        "heals": 115532,
+        "resupplies": 24146,
+        "repairs": 103664,
+        "squadmateRevive": 7716,
+        "thrownThrowables": 9217,
+        "gadgetsDestoyed": 15281,
         "playerTakeDowns": 149,
         "matchesPlayed": 4135,
-        "secondsPlayed": 4580818,
-        "saviorKills": 19788,
-        "shotsFired": 1875333,
-        "shotsHit": 507035,
-        "humanShotsHit": 154271,
-        "killAssists": 67228,
+        "secondsPlayed": 4588766,
+        "saviorKills": 19807,
+        "shotsFired": 1875777,
+        "shotsHit": 507102,
+        "humanShotsHit": 154337,
+        "killAssists": 67254,
         "vehiclesDestroyed": 1215,
-        "enemiesSpotted": 73913,
+        "enemiesSpotted": 73954,
+        "id": 861124547,
+        "userId": 2413856252,
         "platformId": 1,
         "dividedKills": {
-          "confirmed": 77556,
-          "fullConfirmed": 56330,
-          "ads": 77064,
+          "confirmed": 77594,
+          "fullConfirmed": 56368,
+          "ads": 77103,
           "grenades": 2268,
-          "hipfire": 14443,
+          "hipfire": 14448,
           "longDistance": 7111,
           "melee": 198,
-          "multiKills": 16178,
+          "multiKills": 16183,
           "passenger": 3062,
-          "vehicle": 7074,
-          "roadkills": 144,
+          "vehicle": 7075,
+          "roadkills": 145,
           "parachute": 106,
-          "human": 104112,
+          "human": 104157,
           "weapons": {
-            "SMG": 13973,
+            "SMG": 13978,
             "LMG": 0,
             "DMR": 5958,
-            "AR": 18396,
-            "MG": 11842,
-            "Pistols": 4173,
-            "Snipers": 20742,
-            "Shotguns": 5699
+            "AR": 18397,
+            "MG": 11854,
+            "Pistols": 4175,
+            "Snipers": 20765,
+            "Shotguns": 5700
           }
         },
         "objective": {
           "armed": 284,
-          "captured": 6468,
-          "neutralized": 4552,
+          "captured": 6471,
+          "neutralized": 4553,
           "defused": 75,
           "destroyed": 429,
           "time": {
-            "total": 487491,
-            "attacked": 142139,
-            "defended": 245347
+            "total": 487645,
+            "attacked": 142199,
+            "defended": 245387
           }
         },
         "dividedSecondsPlayed": {
-          "flying": 13245,
-          "driving": 159789
+          "flying": 13285,
+          "driving": 160429
         },
         "devidedDamage": {
-          "human": 5307778,
-          "explosive": 3335234,
-          "passenger": 620057,
-          "vehicleDriver": 2640243,
-          "toVehicle": 4374199,
-          "withVehicle": 3019002
+          "human": 5312922,
+          "explosive": 3336016,
+          "passenger": 620088,
+          "vehicleDriver": 2641125,
+          "toVehicle": 4374981,
+          "withVehicle": 3019815
         },
         "devidedAssists": {
-          "human": 34143,
-          "driver": 2700,
+          "human": 34169,
+          "driver": 2701,
           "passenger": 1799,
-          "spot": 28608,
+          "spot": 28624,
           "pilot": 1439
         },
         "weapons": {
@@ -16202,11 +17255,11 @@
             "spawns": 854
           },
           "wp_ar_m433": {
-            "kills": 2006,
-            "headshots": 16.15,
-            "damage": 219438,
+            "kills": 2007,
+            "headshots": 16.14,
+            "damage": 219547,
             "multiKills": 323,
-            "spawns": 917
+            "spawns": 920
           },
           "wp_mg_rpkm": {
             "kills": 896,
@@ -16258,9 +17311,9 @@
             "spawns": 687
           },
           "wp_sg_m1014": {
-            "kills": 1409,
+            "kills": 1410,
             "headshots": 8.87,
-            "damage": 147372,
+            "damage": 147472,
             "multiKills": 191,
             "spawns": 718
           },
@@ -16349,11 +17402,11 @@
             "spawns": 9743
           },
           "wp_smg_kv9": {
-            "kills": 1577,
-            "headshots": 14.01,
-            "damage": 175870,
-            "multiKills": 193,
-            "spawns": 1116
+            "kills": 1582,
+            "headshots": 14.16,
+            "damage": 176356,
+            "multiKills": 194,
+            "spawns": 1123
           },
           "wp_ar_sor556mk2": {
             "kills": 1405,
@@ -16370,11 +17423,11 @@
             "spawns": 699
           },
           "wp_mg_m123k": {
-            "kills": 1594,
-            "headshots": 14.93,
-            "damage": 189333,
-            "multiKills": 287,
-            "spawns": 637
+            "kills": 1599,
+            "headshots": 14.95,
+            "damage": 189884,
+            "multiKills": 288,
+            "spawns": 641
           },
           "wp_pst_m44": {
             "kills": 753,
@@ -16412,11 +17465,11 @@
             "spawns": 624
           },
           "wp_mg_m240l": {
-            "kills": 2039,
-            "headshots": 12.7,
-            "damage": 237817,
-            "multiKills": 335,
-            "spawns": 920
+            "kills": 2045,
+            "headshots": 12.71,
+            "damage": 238301,
+            "multiKills": 336,
+            "spawns": 922
           },
           "wp_smg_scw10": {
             "kills": 2696,
@@ -16510,11 +17563,11 @@
             "spawns": 271
           },
           "wp_pst_m357trait": {
-            "kills": 1249,
-            "headshots": 11.85,
-            "damage": 134028,
+            "kills": 1251,
+            "headshots": 11.91,
+            "damage": 134400,
             "multiKills": 158,
-            "spawns": 6836
+            "spawns": 6860
           },
           "wp_pst_ggh22": {
             "kills": 615,
@@ -16524,11 +17577,11 @@
             "spawns": 10772
           },
           "wp_snp_miniscout": {
-            "kills": 15253,
-            "headshots": 76.78,
-            "damage": 1664145,
-            "multiKills": 2373,
-            "spawns": 3154
+            "kills": 15276,
+            "headshots": 76.77,
+            "damage": 1666123,
+            "multiKills": 2375,
+            "spawns": 3161
           },
           "wp_sg_db12": {
             "kills": 626,
@@ -16566,11 +17619,11 @@
             "spawns": 728
           },
           "wp_mg_mg525btk": {
-            "kills": 1133,
-            "headshots": 14.47,
-            "damage": 125157,
+            "kills": 1134,
+            "headshots": 14.55,
+            "damage": 125256,
             "multiKills": 189,
-            "spawns": 399
+            "spawns": 400
           },
           "wp_snp_l115": {
             "kills": 544,
@@ -16612,18 +17665,18 @@
             "spawns": 221
           },
           "gad_gpdis": {
-            "uses": 4640,
-            "secondsPlayed": 6742,
+            "uses": 4643,
+            "secondsPlayed": 6747,
             "spawns": 4613
           },
           "gad_c4": {
             "kills": 777,
-            "uses": 6734,
+            "uses": 6739,
             "damage": 262488,
             "multiKills": 262,
             "vehiclesDestroyedWith": 111,
-            "secondsPlayed": 25431,
-            "spawns": 5025,
+            "secondsPlayed": 25436,
+            "spawns": 5032,
             "assists": 269
           },
           "gad_gl_he": {
@@ -16786,9 +17839,9 @@
             "assists": 17
           },
           "gad_tugs": {
-            "uses": 4335,
-            "secondsPlayed": 6996,
-            "assists": 6564
+            "uses": 4339,
+            "secondsPlayed": 7006,
+            "assists": 6569
           },
           "gad_ladder": {
             "uses": 1713,
@@ -16829,21 +17882,21 @@
           },
           "gad_gren_frag": {
             "kills": 2261,
-            "uses": 14315,
+            "uses": 14318,
             "damage": 280108,
             "multiKills": 562,
             "vehiclesDestroyedWith": 1,
-            "secondsPlayed": 12377,
+            "secondsPlayed": 12382,
             "assists": 1528
           },
           "gad_repair": {
             "kills": 7,
-            "uses": 128479,
+            "uses": 128664,
             "damage": 20512,
             "multiKills": 2,
             "vehiclesDestroyedWith": 5,
-            "secondsPlayed": 79784,
-            "repairs": 102836,
+            "secondsPlayed": 79809,
+            "repairs": 103012,
             "assists": 700
           },
           "gad_gren_inc": {
@@ -16854,8 +17907,8 @@
             "assists": 24
           },
           "gad_sup_bag": {
-            "uses": 8295,
-            "secondsPlayed": 7607
+            "uses": 8299,
+            "secondsPlayed": 7631
           },
           "gad_deplocover": {
             "uses": 2716,
@@ -16870,20 +17923,20 @@
           },
           "gad_gren_smoke": {
             "kills": 2,
-            "uses": 1799,
-            "damage": 171,
-            "secondsPlayed": 1413,
+            "uses": 1806,
+            "damage": 173,
+            "secondsPlayed": 1418,
             "assists": 7
           },
           "gad_gren_flash": {
-            "uses": 259,
+            "uses": 260,
             "damage": 100,
             "secondsPlayed": 224,
             "assists": 64
           },
           "gad_recondrone": {
-            "uses": 387,
-            "secondsPlayed": 14723,
+            "uses": 389,
+            "secondsPlayed": 14728,
             "spawns": 70,
             "assists": 1500
           },
@@ -16899,7 +17952,7 @@
           "gad_vehsupcra": {
             "uses": 98,
             "secondsPlayed": 250,
-            "spawns": 823
+            "spawns": 828
           },
           "gad_tknife": {
             "kills": 5,
@@ -16915,10 +17968,10 @@
             "assists": 15
           },
           "gad_deployable": {
-            "uses": 37281,
-            "secondsPlayed": 81590,
-            "spawns": 14054,
-            "assists": 9745
+            "uses": 37294,
+            "secondsPlayed": 81634,
+            "spawns": 14059,
+            "assists": 9750
           },
           "gad_decoy": {
             "uses": 1855,
@@ -16964,7 +18017,7 @@
             "damage": 353544,
             "multiKills": 226,
             "vehiclesDestroyedWith": 45,
-            "spawns": 976,
+            "spawns": 979,
             "assists": 1013
           },
           "veh_sur_m1a2sepv3": {
@@ -16977,10 +18030,10 @@
           },
           "veh_sur_cheetah1a2": {
             "kills": 46,
-            "damage": 161687,
+            "damage": 162469,
             "multiKills": 4,
             "vehiclesDestroyedWith": 23,
-            "spawns": 13
+            "spawns": 14
           },
           "veh_sur_glider96": {
             "kills": 278,
@@ -17051,10 +18104,10 @@
           },
           "veh_air_uh06": {
             "kills": 55,
-            "damage": 12262,
+            "damage": 12293,
             "multiKills": 9,
             "vehiclesDestroyedWith": 1,
-            "spawns": 123,
+            "spawns": 126,
             "assists": 111
           },
           "veh_air_mh47": {
@@ -17080,15 +18133,15 @@
             "spawns": 13
           },
           "veh_sur_moto_db02": {
-            "spawns": 5
+            "spawns": 6
           },
           "veh_sur_ltv": {
-            "kills": 266,
-            "damage": 33237,
+            "kills": 267,
+            "damage": 33337,
             "multiKills": 54,
             "vehiclesDestroyedWith": 1,
-            "spawns": 121,
-            "assists": 382
+            "spawns": 123,
+            "assists": 383
           }
         },
         "melee": {
@@ -17134,34 +18187,103 @@
         },
         "classes": {
           "kit": {
-            "kills": 105729,
-            "secondsPlayed": 3863670,
-            "spawns": 35006,
-            "assists": 65606
+            "kills": 105774,
+            "secondsPlayed": 3866231,
+            "spawns": 35030,
+            "assists": 65631
           },
           "kit_assault": {
-            "kills": 40656,
-            "secondsPlayed": 1362725,
-            "spawns": 13752,
+            "kills": 40658,
+            "secondsPlayed": 1362830,
+            "spawns": 13755,
             "assists": 17342
           },
           "kit_engineer": {
             "kills": 18000,
-            "secondsPlayed": 735847,
-            "spawns": 7764,
-            "assists": 11702
+            "secondsPlayed": 736617,
+            "spawns": 7769,
+            "assists": 11703
           },
           "kit_support": {
-            "kills": 22243,
-            "secondsPlayed": 881368,
-            "spawns": 8195,
-            "assists": 10982
+            "kills": 22260,
+            "secondsPlayed": 882275,
+            "spawns": 8204,
+            "assists": 10990
           },
           "kit_recon": {
-            "kills": 24830,
-            "secondsPlayed": 883730,
-            "spawns": 5295,
-            "assists": 25580
+            "kills": 24856,
+            "secondsPlayed": 884509,
+            "spawns": 5302,
+            "assists": 25596
+          }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 1634,
+                "wins": 1109,
+                "losses": 525
+              },
+              "Rush0": {
+                "matches": 220,
+                "wins": 136,
+                "losses": 84
+              },
+              "Conquest0": {
+                "matches": 105,
+                "wins": 60,
+                "losses": 45
+              },
+              "MP_Escalation0": {
+                "matches": 18,
+                "wins": 10,
+                "losses": 8
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 869,
+                "wins": 650,
+                "losses": 219
+              },
+              "Rush0": {
+                "matches": 12,
+                "wins": 10,
+                "losses": 2
+              },
+              "Conquest0": {
+                "matches": 3,
+                "wins": 1,
+                "losses": 2
+              },
+              "MP_Escalation0": {
+                "matches": 9,
+                "wins": 8,
+                "losses": 1
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 513,
+                "wins": 478,
+                "losses": 35
+              },
+              "Conquest0": {
+                "matches": 16,
+                "wins": 9,
+                "losses": 7
+              },
+              "MP_Escalation0": {
+                "matches": 2,
+                "wins": 1,
+                "losses": 1
+              }
+            }
           }
         }
       }
@@ -17169,8 +18291,6 @@
     "379816775526776832": {
       "name": "[KDM] Muscle Mommy",
       "stats": {
-        "userId": 2389227852,
-        "id": 854974311,
         "humanPrecentage": 99.84,
         "score": 14909850,
         "kills": 59346,
@@ -17206,6 +18326,8 @@
         "killAssists": 26471,
         "vehiclesDestroyed": 391,
         "enemiesSpotted": 8260,
+        "id": 854974311,
+        "userId": 2389227852,
         "platformId": 1,
         "dividedKills": {
           "confirmed": 42629,
@@ -18022,14 +19144,70 @@
             "spawns": 938,
             "assists": 2203
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 632,
+                "wins": 437,
+                "losses": 195
+              },
+              "Rush0": {
+                "matches": 6,
+                "wins": 5,
+                "losses": 1
+              },
+              "Conquest0": {
+                "matches": 42,
+                "wins": 21,
+                "losses": 21
+              },
+              "MP_Escalation0": {
+                "matches": 7,
+                "wins": 5,
+                "losses": 2
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 329,
+                "wins": 267,
+                "losses": 62
+              },
+              "Conquest0": {
+                "matches": 9,
+                "wins": 6,
+                "losses": 3
+              },
+              "MP_Escalation0": {
+                "matches": 14,
+                "wins": 12,
+                "losses": 2
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 175,
+                "wins": 150,
+                "losses": 25
+              },
+              "Conquest0": {
+                "matches": 3,
+                "wins": 3
+              }
+            }
+          }
         }
       }
     },
     "391072156353822722": {
       "name": "[KDM] Shindyz",
       "stats": {
-        "userId": 2351342578,
-        "id": 1008096442578,
         "humanPrecentage": 97.09,
         "score": 21815746,
         "kills": 79510,
@@ -18066,6 +19244,8 @@
         "vehiclesDestroyed": 891,
         "enemiesSpotted": 13765,
         "lastPlacement": 0,
+        "id": 1008096442578,
+        "userId": 2351342578,
         "platformId": 7,
         "dividedKills": {
           "confirmed": 56498,
@@ -18790,85 +19970,123 @@
             "spawns": 59,
             "assists": 313
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 797,
+                "wins": 575,
+                "losses": 222
+              },
+              "Rush0": {
+                "matches": 4,
+                "wins": 3,
+                "losses": 1
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 529,
+                "wins": 409,
+                "losses": 120
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 634,
+                "wins": 567,
+                "losses": 67
+              },
+              "MP_Escalation0": {
+                "matches": 1,
+                "wins": 1
+              }
+            }
+          }
         }
       }
     },
     "399026036685144066": {
       "name": "NICK.",
       "stats": {
-        "userId": 1008484368216,
-        "id": 1004183168216,
         "humanPrecentage": 99.7,
-        "score": 15821390,
-        "kills": 63977,
-        "deaths": 9181,
-        "wins": 1373,
+        "score": 15833935,
+        "kills": 64040,
+        "deaths": 9188,
+        "wins": 1375,
         "loses": 273,
-        "assists": 25154,
+        "assists": 25187,
         "killsPerMinute": 1.94,
-        "damagePerMinute": 214.9,
-        "killsPerMatch": 38.82,
-        "damagePerMatch": 4294.25,
-        "headShots": 10076,
-        "winPercent": 83.41,
-        "headshots": 15.75,
+        "damagePerMinute": 214.93,
+        "killsPerMatch": 38.81,
+        "damagePerMatch": 4293.43,
+        "headShots": 10091,
+        "winPercent": 83.43,
+        "headshots": 15.76,
         "killDeath": 6.97,
         "infantryKillDeath": 6.95,
-        "damage": 7076926,
-        "accuracy": 28.89,
-        "revives": 14033,
-        "heals": 263861,
-        "resupplies": 57579,
+        "damage": 7084161,
+        "accuracy": 28.88,
+        "revives": 14044,
+        "heals": 264078,
+        "resupplies": 57595,
         "repairs": 4544,
-        "squadmateRevive": 3438,
-        "thrownThrowables": 28401,
-        "gadgetsDestoyed": 3782,
+        "squadmateRevive": 3439,
+        "thrownThrowables": 28453,
+        "gadgetsDestoyed": 3786,
         "playerTakeDowns": 43,
-        "matchesPlayed": 1648,
-        "secondsPlayed": 1975860,
-        "saviorKills": 11752,
-        "shotsFired": 1340449,
-        "shotsHit": 387269,
-        "humanShotsHit": 183306,
-        "killAssists": 25245,
+        "matchesPlayed": 1650,
+        "secondsPlayed": 1977579,
+        "saviorKills": 11767,
+        "shotsFired": 1342204,
+        "shotsHit": 387583,
+        "humanShotsHit": 183612,
+        "killAssists": 25278,
         "vehiclesDestroyed": 62,
         "enemiesSpotted": 3416,
+        "id": 1004183168216,
+        "userId": 1008484368216,
         "platformId": 1,
         "dividedKills": {
-          "confirmed": 48640,
-          "fullConfirmed": 36591,
-          "ads": 56529,
+          "confirmed": 48692,
+          "fullConfirmed": 36643,
+          "ads": 56587,
           "grenades": 67,
-          "hipfire": 6701,
+          "hipfire": 6706,
           "longDistance": 543,
           "melee": 56,
-          "multiKills": 12311,
+          "multiKills": 12324,
           "passenger": 256,
           "vehicle": 377,
           "roadkills": 5,
           "parachute": 33,
-          "human": 63785,
+          "human": 63848,
           "weapons": {
             "SMG": 6535,
             "LMG": 0,
             "DMR": 106,
-            "AR": 21105,
-            "MG": 13043,
-            "Pistols": 2590,
+            "AR": 21137,
+            "MG": 13064,
+            "Pistols": 2595,
             "Snipers": 652,
             "Shotguns": 462
           }
         },
         "objective": {
           "armed": 39,
-          "captured": 2308,
-          "neutralized": 2575,
+          "captured": 2310,
+          "neutralized": 2577,
           "defused": 8,
           "destroyed": 55,
           "time": {
-            "total": 176965,
+            "total": 177055,
             "attacked": 72067,
-            "defended": 57046
+            "defended": 57111
           }
         },
         "dividedSecondsPlayed": {
@@ -18876,7 +20094,7 @@
           "driving": 6144
         },
         "devidedDamage": {
-          "human": 3495621,
+          "human": 3502745,
           "explosive": 218081,
           "passenger": 34498,
           "vehicleDriver": 74610,
@@ -18884,10 +20102,10 @@
           "withVehicle": 93704
         },
         "devidedAssists": {
-          "human": 14266,
+          "human": 14298,
           "driver": 68,
           "passenger": 283,
-          "spot": 3193,
+          "spot": 3195,
           "pilot": 60
         },
         "weapons": {
@@ -19008,11 +20226,11 @@
             "spawns": 562
           },
           "wp_mg_drsiar": {
-            "kills": 10387,
-            "headshots": 15.64,
-            "damage": 1114365,
-            "multiKills": 1967,
-            "spawns": 1579
+            "kills": 10408,
+            "headshots": 15.68,
+            "damage": 1116937,
+            "multiKills": 1971,
+            "spawns": 1581
           },
           "wp_ar_kord6p67": {
             "kills": 588,
@@ -19074,11 +20292,11 @@
             "spawns": 260
           },
           "wp_pst_m44": {
-            "kills": 2439,
-            "headshots": 34.03,
-            "damage": 206161,
+            "kills": 2444,
+            "headshots": 33.96,
+            "damage": 206440,
             "multiKills": 701,
-            "spawns": 9704
+            "spawns": 9711
           },
           "wp_mg_xm250": {
             "kills": 20,
@@ -19122,11 +20340,11 @@
             "spawns": 360
           },
           "wp_ar_nvo228e": {
-            "kills": 6321,
-            "headshots": 15.57,
-            "damage": 691720,
-            "multiKills": 1183,
-            "spawns": 1219
+            "kills": 6353,
+            "headshots": 15.61,
+            "damage": 695503,
+            "multiKills": 1191,
+            "spawns": 1224
           },
           "wp_mg_m60": {
             "kills": 3,
@@ -19149,10 +20367,10 @@
             "spawns": 211
           },
           "wp_crb_sg553r": {
-            "kills": 8306,
-            "headshots": 14.57,
-            "damage": 871916,
-            "multiKills": 1672,
+            "kills": 8311,
+            "headshots": 14.56,
+            "damage": 872517,
+            "multiKills": 1673,
             "spawns": 1476
           },
           "wp_crb_grtbc": {
@@ -19392,9 +20610,9 @@
             "assists": 5
           },
           "gad_sup_pouch": {
-            "uses": 30666,
+            "uses": 30725,
             "secondsPlayed": 10359,
-            "spawns": 7172
+            "spawns": 7179
           },
           "gad_gren_mfrag": {
             "uses": 3,
@@ -19423,8 +20641,8 @@
             "secondsPlayed": 20
           },
           "gad_sup_bag": {
-            "uses": 19623,
-            "secondsPlayed": 15819
+            "uses": 19645,
+            "secondsPlayed": 15868
           },
           "gad_deplocover": {
             "uses": 941,
@@ -19438,9 +20656,9 @@
           },
           "gad_gren_smoke": {
             "kills": 6,
-            "uses": 43637,
+            "uses": 43689,
             "damage": 1507,
-            "secondsPlayed": 20321,
+            "secondsPlayed": 20356,
             "assists": 40
           },
           "gad_gren_flash": {
@@ -19466,9 +20684,9 @@
             "assists": 6
           },
           "gad_deployable": {
-            "uses": 52203,
-            "secondsPlayed": 31776,
-            "spawns": 8870,
+            "uses": 52284,
+            "secondsPlayed": 31825,
+            "spawns": 8877,
             "assists": 543
           },
           "gad_decoy": {
@@ -19612,7 +20830,7 @@
           },
           "melee_light_serratedblade": {
             "kills": 12,
-            "uses": 1822,
+            "uses": 1828,
             "damage": 882
           },
           "melee_light_icecaxe": {
@@ -19635,10 +20853,10 @@
         },
         "classes": {
           "kit": {
-            "kills": 63975,
-            "secondsPlayed": 1490000,
-            "spawns": 11274,
-            "assists": 24910
+            "kills": 64038,
+            "secondsPlayed": 1491431,
+            "spawns": 11281,
+            "assists": 24942
           },
           "kit_assault": {
             "kills": 2117,
@@ -19653,10 +20871,10 @@
             "assists": 702
           },
           "kit_support": {
-            "kills": 59256,
-            "secondsPlayed": 1367937,
-            "spawns": 10130,
-            "assists": 22485
+            "kills": 59319,
+            "secondsPlayed": 1369368,
+            "spawns": 10137,
+            "assists": 22517
           },
           "kit_recon": {
             "kills": 1195,
@@ -19664,14 +20882,78 @@
             "spawns": 266,
             "assists": 1042
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 434,
+                "wins": 323,
+                "losses": 111
+              },
+              "ModBuilderCustom0": {
+                "matches": 2,
+                "losses": 2
+              },
+              "Rush0": {
+                "matches": 12,
+                "wins": 10,
+                "losses": 2
+              },
+              "Conquest0": {
+                "matches": 19,
+                "wins": 15,
+                "losses": 4
+              },
+              "MP_Escalation0": {
+                "matches": 82,
+                "wins": 62,
+                "losses": 20
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 317,
+                "wins": 313,
+                "losses": 4
+              },
+              "Conquest0": {
+                "matches": 14,
+                "wins": 11,
+                "losses": 3
+              },
+              "MP_Escalation0": {
+                "matches": 16,
+                "wins": 15,
+                "losses": 1
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 270,
+                "wins": 266,
+                "losses": 4
+              },
+              "Conquest0": {
+                "matches": 58,
+                "wins": 58
+              },
+              "MP_Escalation0": {
+                "matches": 1,
+                "wins": 1
+              }
+            }
+          }
         }
       }
     },
     "429450913560789003": {
       "name": "Tz DiRekt X",
       "stats": {
-        "userId": 1001416315121,
-        "id": 1296798904,
         "humanPrecentage": 97.18,
         "score": 4070330,
         "kills": 13302,
@@ -19707,6 +20989,8 @@
         "killAssists": 11279,
         "vehiclesDestroyed": 469,
         "enemiesSpotted": 1859,
+        "id": 1296798904,
+        "userId": 1001416315121,
         "platformId": 1,
         "dividedKills": {
           "confirmed": 9878,
@@ -20456,54 +21740,128 @@
             "spawns": 151,
             "assists": 307
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 75,
+                "wins": 56,
+                "losses": 19
+              },
+              "Rush0": {
+                "matches": 46,
+                "wins": 22,
+                "losses": 24
+              },
+              "Conquest0": {
+                "matches": 74,
+                "wins": 59,
+                "losses": 15
+              },
+              "MP_Escalation0": {
+                "matches": 38,
+                "wins": 18,
+                "losses": 20
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 71,
+                "wins": 41,
+                "losses": 30
+              },
+              "Rush0": {
+                "matches": 89,
+                "wins": 57,
+                "losses": 32
+              },
+              "Conquest0": {
+                "matches": 87,
+                "wins": 53,
+                "losses": 34
+              },
+              "MP_Escalation0": {
+                "matches": 23,
+                "wins": 15,
+                "losses": 8
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 30,
+                "wins": 20,
+                "losses": 10
+              },
+              "Rush0": {
+                "matches": 65,
+                "wins": 44,
+                "losses": 21
+              },
+              "Conquest0": {
+                "matches": 56,
+                "wins": 34,
+                "losses": 22
+              },
+              "MP_Escalation0": {
+                "matches": 7,
+                "wins": 4,
+                "losses": 3
+              }
+            }
+          }
         }
       }
     },
     "452965698743042058": {
       "name": "[KDM] Raymdl",
       "stats": {
-        "userId": 2346436782,
-        "id": 347891802,
         "humanPrecentage": 96.89,
-        "score": 16868960,
-        "kills": 42566,
-        "deaths": 14121,
+        "score": 16870052,
+        "kills": 42571,
+        "deaths": 14122,
         "wins": 1556,
-        "loses": 953,
-        "assists": 38797,
+        "loses": 954,
+        "assists": 38801,
         "killsPerMinute": 0.85,
-        "damagePerMinute": 120.07,
-        "killsPerMatch": 16.95,
-        "damagePerMatch": 2388.4,
-        "headShots": 9941,
-        "winPercent": 62.02,
-        "headshots": 23.35,
+        "damagePerMinute": 119.98,
+        "killsPerMatch": 16.94,
+        "damagePerMatch": 2387.65,
+        "headShots": 9943,
+        "winPercent": 61.99,
+        "headshots": 23.36,
         "killDeath": 3.01,
         "infantryKillDeath": 2.92,
-        "damage": 5999652,
+        "damage": 6000161,
         "accuracy": 17.82,
-        "revives": 18875,
+        "revives": 18880,
         "heals": 247302,
-        "resupplies": 55559,
+        "resupplies": 55562,
         "repairs": 17702,
         "squadmateRevive": 5530,
-        "thrownThrowables": 6117,
+        "thrownThrowables": 6119,
         "gadgetsDestoyed": 4337,
         "playerTakeDowns": 61,
-        "matchesPlayed": 2512,
-        "secondsPlayed": 2998119,
-        "saviorKills": 10482,
-        "shotsFired": 1495097,
-        "shotsHit": 266474,
-        "humanShotsHit": 143876,
-        "killAssists": 40843,
+        "matchesPlayed": 2513,
+        "secondsPlayed": 3000612,
+        "saviorKills": 10484,
+        "shotsFired": 1495362,
+        "shotsHit": 266498,
+        "humanShotsHit": 143900,
+        "killAssists": 40847,
         "vehiclesDestroyed": 175,
-        "enemiesSpotted": 24764,
+        "enemiesSpotted": 24766,
+        "id": 347891802,
+        "userId": 2346436782,
         "platformId": 1,
         "dividedKills": {
-          "confirmed": 30933,
-          "fullConfirmed": 23533,
-          "ads": 34379,
+          "confirmed": 30936,
+          "fullConfirmed": 23536,
+          "ads": 34384,
           "grenades": 925,
           "hipfire": 1881,
           "longDistance": 881,
@@ -20513,13 +21871,13 @@
           "vehicle": 4640,
           "roadkills": 5,
           "parachute": 60,
-          "human": 41244,
+          "human": 41249,
           "weapons": {
             "SMG": 5874,
             "LMG": 0,
             "DMR": 465,
             "AR": 9089,
-            "MG": 6109,
+            "MG": 6114,
             "Pistols": 627,
             "Snipers": 6644,
             "Shotguns": 245
@@ -20542,7 +21900,7 @@
           "driving": 16895
         },
         "devidedDamage": {
-          "human": 2848580,
+          "human": 2849089,
           "explosive": 559050,
           "passenger": 723989,
           "vehicleDriver": 179851,
@@ -20550,10 +21908,10 @@
           "withVehicle": 862160
         },
         "devidedAssists": {
-          "human": 21009,
+          "human": 21013,
           "driver": 158,
-          "passenger": 3568,
-          "spot": 15570,
+          "passenger": 3569,
+          "spot": 15572,
           "pilot": 124
         },
         "weapons": {
@@ -20672,11 +22030,11 @@
             "spawns": 512
           },
           "wp_mg_drsiar": {
-            "kills": 3370,
-            "headshots": 15.82,
-            "damage": 399558,
+            "kills": 3375,
+            "headshots": 15.85,
+            "damage": 400067,
             "multiKills": 381,
-            "spawns": 1431
+            "spawns": 1433
           },
           "wp_ar_kord6p67": {
             "kills": 471,
@@ -20743,7 +22101,7 @@
             "headshots": 17.22,
             "damage": 49669,
             "multiKills": 63,
-            "spawns": 11973
+            "spawns": 11975
           },
           "wp_mg_xm250": {
             "kills": 1,
@@ -21156,13 +22514,13 @@
             "assists": 12
           },
           "gad_sup_bag": {
-            "uses": 17949,
+            "uses": 17951,
             "secondsPlayed": 15623
           },
           "gad_deplocover": {
             "uses": 3683,
             "secondsPlayed": 5477,
-            "spawns": 9553
+            "spawns": 9555
           },
           "gad_gren_stun": {
             "uses": 187,
@@ -21172,9 +22530,9 @@
           },
           "gad_gren_smoke": {
             "kills": 1,
-            "uses": 2447,
+            "uses": 2449,
             "damage": 25,
-            "secondsPlayed": 1221,
+            "secondsPlayed": 1226,
             "assists": 6
           },
           "gad_gren_flash": {
@@ -21207,9 +22565,9 @@
             "assists": 1
           },
           "gad_deployable": {
-            "uses": 24973,
+            "uses": 24975,
             "secondsPlayed": 37705,
-            "spawns": 13188,
+            "spawns": 13190,
             "assists": 2477
           },
           "gad_decoy": {
@@ -21290,8 +22648,8 @@
             "damage": 235619,
             "multiKills": 188,
             "vehiclesDestroyedWith": 15,
-            "spawns": 682,
-            "assists": 1096
+            "spawns": 683,
+            "assists": 1097
           },
           "veh_air_f39e": {
             "spawns": 1
@@ -21379,10 +22737,10 @@
         "battlePickups": {},
         "classes": {
           "kit": {
-            "kills": 42561,
-            "secondsPlayed": 2380213,
-            "spawns": 15454,
-            "assists": 38513
+            "kills": 42566,
+            "secondsPlayed": 2380398,
+            "spawns": 15456,
+            "assists": 38517
           },
           "kit_assault": {
             "kills": 1912,
@@ -21397,10 +22755,10 @@
             "assists": 2083
           },
           "kit_support": {
-            "kills": 30478,
-            "secondsPlayed": 1705849,
-            "spawns": 11672,
-            "assists": 25488
+            "kills": 30483,
+            "secondsPlayed": 1706034,
+            "spawns": 11674,
+            "assists": 25492
           },
           "kit_recon": {
             "kills": 8240,
@@ -21408,14 +22766,84 @@
             "spawns": 1444,
             "assists": 9673
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 570,
+                "wins": 295,
+                "losses": 275
+              },
+              "ModBuilderCustom0": {
+                "matches": 2,
+                "losses": 2
+              },
+              "Rush0": {
+                "matches": 8,
+                "wins": 5,
+                "losses": 3
+              },
+              "Conquest0": {
+                "matches": 14,
+                "wins": 4,
+                "losses": 10
+              },
+              "MP_Escalation0": {
+                "matches": 162,
+                "wins": 89,
+                "losses": 73
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 185,
+                "wins": 106,
+                "losses": 79
+              },
+              "Rush0": {
+                "matches": 1,
+                "wins": 1
+              },
+              "Conquest0": {
+                "matches": 6,
+                "wins": 3,
+                "losses": 3
+              },
+              "MP_Escalation0": {
+                "matches": 156,
+                "wins": 67,
+                "losses": 89
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 854,
+                "wins": 735,
+                "losses": 119
+              },
+              "Conquest0": {
+                "matches": 9,
+                "wins": 5,
+                "losses": 4
+              },
+              "MP_Escalation0": {
+                "matches": 8,
+                "wins": 4,
+                "losses": 4
+              }
+            }
+          }
         }
       }
     },
     "483392280913248267": {
       "name": "Nas",
       "stats": {
-        "userId": 1002913947627,
-        "id": 1684201317,
         "humanPrecentage": 91.59,
         "score": 3116285,
         "kills": 10502,
@@ -21451,6 +22879,8 @@
         "killAssists": 5031,
         "vehiclesDestroyed": 156,
         "enemiesSpotted": 1506,
+        "id": 1684201317,
+        "userId": 1002913947627,
         "platformId": 4,
         "dividedKills": {
           "confirmed": 8027,
@@ -22242,14 +23672,72 @@
             "spawns": 106,
             "assists": 299
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 13,
+                "wins": 9,
+                "losses": 4
+              },
+              "Rush0": {
+                "matches": 1,
+                "wins": 1
+              },
+              "Conquest0": {
+                "matches": 16,
+                "wins": 8,
+                "losses": 8
+              },
+              "MP_Escalation0": {
+                "matches": 9,
+                "wins": 6,
+                "losses": 3
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 16,
+                "wins": 14,
+                "losses": 2
+              },
+              "Conquest0": {
+                "matches": 5,
+                "wins": 5
+              },
+              "MP_Escalation0": {
+                "matches": 2,
+                "wins": 2
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 32,
+                "wins": 30,
+                "losses": 2
+              },
+              "Conquest0": {
+                "matches": 30,
+                "wins": 24,
+                "losses": 6
+              },
+              "MP_Escalation0": {
+                "matches": 4,
+                "wins": 4
+              }
+            }
+          }
         }
       }
     },
     "532179643927756803": {
       "name": "[KDM] Faber",
       "stats": {
-        "userId": 1011589756627,
-        "id": 1005869156627,
         "humanPrecentage": 98.96,
         "score": 10432735,
         "kills": 45635,
@@ -22285,6 +23773,8 @@
         "killAssists": 17502,
         "vehiclesDestroyed": 77,
         "enemiesSpotted": 2281,
+        "id": 1005869156627,
+        "userId": 1011589756627,
         "platformId": 1,
         "dividedKills": {
           "confirmed": 33914,
@@ -23085,70 +24575,112 @@
             "spawns": 269,
             "assists": 751
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 372,
+                "wins": 277,
+                "losses": 95
+              },
+              "Conquest0": {
+                "matches": 4,
+                "wins": 3,
+                "losses": 1
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 256,
+                "wins": 199,
+                "losses": 57
+              },
+              "Conquest0": {
+                "matches": 1,
+                "wins": 1
+              },
+              "MP_Escalation0": {
+                "matches": 1,
+                "wins": 1
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 284,
+                "wins": 254,
+                "losses": 30
+              }
+            }
+          }
         }
       }
     },
     "647037738792648715": {
       "name": "[KDM] SorathBF",
       "stats": {
-        "userId": 1006176732947,
-        "id": 1008648132947,
-        "humanPrecentage": 52.93,
-        "score": 6051735,
-        "kills": 25705,
-        "deaths": 4276,
+        "humanPrecentage": 53.11,
+        "score": 6078355,
+        "kills": 25804,
+        "deaths": 4320,
         "wins": 579,
-        "loses": 184,
-        "assists": 12417,
+        "loses": 186,
+        "assists": 12476,
         "killsPerMinute": 1.57,
-        "damagePerMinute": 306.04,
-        "killsPerMatch": 33.65,
-        "damagePerMatch": 6572.37,
-        "headShots": 2634,
-        "winPercent": 75.88,
-        "headshots": 10.25,
-        "killDeath": 6.01,
-        "infantryKillDeath": 3.18,
-        "damage": 5021288,
-        "accuracy": 22.57,
-        "revives": 3462,
-        "heals": 21815,
-        "resupplies": 5191,
-        "repairs": 16723,
-        "squadmateRevive": 1516,
-        "thrownThrowables": 1972,
-        "gadgetsDestoyed": 1475,
+        "damagePerMinute": 305.46,
+        "killsPerMatch": 33.69,
+        "damagePerMatch": 6570.74,
+        "headShots": 2649,
+        "winPercent": 75.69,
+        "headshots": 10.27,
+        "killDeath": 5.97,
+        "infantryKillDeath": 3.17,
+        "damage": 5033185,
+        "accuracy": 22.65,
+        "revives": 3495,
+        "heals": 22097,
+        "resupplies": 5211,
+        "repairs": 16903,
+        "squadmateRevive": 1534,
+        "thrownThrowables": 2019,
+        "gadgetsDestoyed": 1485,
         "playerTakeDowns": 8,
-        "matchesPlayed": 764,
-        "secondsPlayed": 984453,
-        "saviorKills": 4156,
-        "shotsFired": 420213,
-        "shotsHit": 94854,
-        "humanShotsHit": 35296,
-        "killAssists": 12431,
+        "matchesPlayed": 766,
+        "secondsPlayed": 988639,
+        "saviorKills": 4177,
+        "shotsFired": 423160,
+        "shotsHit": 95826,
+        "humanShotsHit": 36267,
+        "killAssists": 12490,
         "vehiclesDestroyed": 348,
         "enemiesSpotted": 9700,
-        "platformId": 1,
+        "id": 1008648132947,
+        "userId": 1006176732947,
+        "platformId": 4,
         "dividedKills": {
-          "confirmed": 11094,
-          "fullConfirmed": 7244,
-          "ads": 11733,
+          "confirmed": 11173,
+          "fullConfirmed": 7323,
+          "ads": 11826,
           "grenades": 74,
-          "hipfire": 4180,
+          "hipfire": 4186,
           "longDistance": 887,
           "melee": 8,
-          "multiKills": 1669,
+          "multiKills": 1682,
           "passenger": 8399,
           "vehicle": 8837,
           "roadkills": 2,
           "parachute": 32,
-          "human": 13606,
+          "human": 13705,
           "weapons": {
-            "SMG": 3694,
+            "SMG": 3749,
             "LMG": 0,
             "DMR": 422,
-            "AR": 3995,
-            "MG": 3293,
+            "AR": 4001,
+            "MG": 3315,
             "Pistols": 337,
             "Snipers": 859,
             "Shotguns": 159
@@ -23156,14 +24688,14 @@
         },
         "objective": {
           "armed": 6,
-          "captured": 1161,
-          "neutralized": 949,
+          "captured": 1165,
+          "neutralized": 956,
           "defused": 0,
           "destroyed": 7,
           "time": {
-            "total": 70105,
-            "attacked": 15762,
-            "defended": 36271
+            "total": 70350,
+            "attacked": 15832,
+            "defended": 36361
           }
         },
         "dividedSecondsPlayed": {
@@ -23171,18 +24703,18 @@
           "driving": 3189
         },
         "devidedDamage": {
-          "human": 1021999,
-          "explosive": 698105,
-          "passenger": 1346723,
+          "human": 1033896,
+          "explosive": 699229,
+          "passenger": 1346804,
           "vehicleDriver": 76752,
-          "toVehicle": 971559,
+          "toVehicle": 972683,
           "withVehicle": 1380960
         },
         "devidedAssists": {
-          "human": 6327,
+          "human": 6386,
           "driver": 23,
-          "passenger": 859,
-          "spot": 4836,
+          "passenger": 860,
+          "spot": 4850,
           "pilot": 21
         },
         "weapons": {
@@ -23229,11 +24761,11 @@
             "spawns": 393
           },
           "wp_crb_x277": {
-            "kills": 373,
-            "headshots": 13.14,
-            "damage": 42880,
-            "multiKills": 32,
-            "spawns": 178
+            "kills": 380,
+            "headshots": 12.89,
+            "damage": 43842,
+            "multiKills": 33,
+            "spawns": 179
           },
           "wp_ar_b36a4": {
             "kills": 138,
@@ -23278,11 +24810,11 @@
             "spawns": 4
           },
           "wp_smg_sgx": {
-            "kills": 70,
-            "headshots": 18.57,
-            "damage": 8763,
+            "kills": 72,
+            "headshots": 18.06,
+            "damage": 8984,
             "multiKills": 4,
-            "spawns": 39
+            "spawns": 41
           },
           "wp_dmr_lmr27": {
             "kills": 39,
@@ -23299,32 +24831,32 @@
             "spawns": 132
           },
           "wp_crb_m417a2": {
-            "kills": 708,
-            "headshots": 17.09,
-            "damage": 78543,
+            "kills": 711,
+            "headshots": 17.02,
+            "damage": 78881,
             "multiKills": 78,
-            "spawns": 220
+            "spawns": 224
           },
           "wp_mg_drsiar": {
-            "kills": 906,
-            "headshots": 16.23,
-            "damage": 103403,
-            "multiKills": 108,
-            "spawns": 402
+            "kills": 917,
+            "headshots": 16.25,
+            "damage": 104632,
+            "multiKills": 110,
+            "spawns": 407
           },
           "wp_ar_kord6p67": {
             "kills": 1424,
             "headshots": 9.34,
-            "damage": 83872,
+            "damage": 83957,
             "multiKills": 76,
-            "spawns": 280
+            "spawns": 281
           },
           "wp_smg_usg90": {
-            "kills": 156,
-            "headshots": 9.62,
-            "damage": 18571,
+            "kills": 157,
+            "headshots": 9.55,
+            "damage": 18836,
             "multiKills": 15,
-            "spawns": 85
+            "spawns": 88
           },
           "wp_crb_m4a1": {
             "kills": 482,
@@ -23334,11 +24866,11 @@
             "spawns": 225
           },
           "wp_mg_kts100mk8": {
-            "kills": 239,
-            "headshots": 19.67,
-            "damage": 36704,
-            "multiKills": 22,
-            "spawns": 89
+            "kills": 246,
+            "headshots": 19.92,
+            "damage": 37272,
+            "multiKills": 23,
+            "spawns": 91
           },
           "wp_pst_m45a1": {
             "kills": 42,
@@ -23355,11 +24887,11 @@
             "spawns": 36
           },
           "wp_ar_sor556mk2": {
-            "kills": 101,
-            "headshots": 14.85,
-            "damage": 14512,
-            "multiKills": 6,
-            "spawns": 73
+            "kills": 103,
+            "headshots": 15.53,
+            "damage": 14653,
+            "multiKills": 7,
+            "spawns": 74
           },
           "wp_smg_pw7a2": {
             "kills": 450,
@@ -23369,11 +24901,11 @@
             "spawns": 211
           },
           "wp_mg_m123k": {
-            "kills": 326,
-            "headshots": 18.71,
-            "damage": 35490,
-            "multiKills": 46,
-            "spawns": 117
+            "kills": 330,
+            "headshots": 18.48,
+            "damage": 36013,
+            "multiKills": 47,
+            "spawns": 119
           },
           "wp_pst_m44": {
             "kills": 139,
@@ -23418,18 +24950,18 @@
             "spawns": 59
           },
           "wp_smg_scw10": {
-            "kills": 1669,
-            "headshots": 6.11,
-            "damage": 64594,
-            "multiKills": 96,
-            "spawns": 153
+            "kills": 1721,
+            "headshots": 6.51,
+            "damage": 69611,
+            "multiKills": 103,
+            "spawns": 171
           },
           "wp_ar_nvo228e": {
-            "kills": 937,
-            "headshots": 14.19,
-            "damage": 64329,
+            "kills": 941,
+            "headshots": 14.13,
+            "damage": 64826,
             "multiKills": 69,
-            "spawns": 233
+            "spawns": 234
           },
           "wp_mg_m60": {
             "kills": 30,
@@ -23466,11 +24998,11 @@
             "spawns": 60
           },
           "wp_crb_sg553r": {
-            "kills": 719,
-            "headshots": 13.07,
-            "damage": 79303,
+            "kills": 725,
+            "headshots": 12.97,
+            "damage": 80149,
             "multiKills": 70,
-            "spawns": 340
+            "spawns": 344
           },
           "wp_crb_grtbc": {
             "kills": 267,
@@ -23511,7 +25043,7 @@
             "headshots": 18.63,
             "damage": 12078,
             "multiKills": 12,
-            "spawns": 1963
+            "spawns": 2007
           },
           "wp_pst_ggh22": {
             "kills": 3,
@@ -23622,11 +25154,11 @@
           },
           "gad_rl_ungui": {
             "kills": 410,
-            "uses": 2476,
-            "damage": 849057,
+            "uses": 2482,
+            "damage": 850181,
             "multiKills": 125,
             "vehiclesDestroyedWith": 236,
-            "secondsPlayed": 28589,
+            "secondsPlayed": 28654,
             "assists": 402
           },
           "gad_rl_aimgui": {
@@ -23764,8 +25296,8 @@
             "spawns": 67
           },
           "gad_sup_pouch": {
-            "uses": 563,
-            "secondsPlayed": 190,
+            "uses": 576,
+            "secondsPlayed": 205,
             "spawns": 129
           },
           "gad_callin_armor": {
@@ -23785,30 +25317,30 @@
           },
           "gad_gren_frag": {
             "kills": 74,
-            "uses": 886,
+            "uses": 890,
             "damage": 11954,
             "multiKills": 14,
             "vehiclesDestroyedWith": 1,
-            "secondsPlayed": 695,
+            "secondsPlayed": 700,
             "assists": 79
           },
           "gad_repair": {
             "kills": 3,
-            "uses": 22848,
+            "uses": 23149,
             "damage": 4028,
             "multiKills": 1,
             "vehiclesDestroyedWith": 3,
-            "secondsPlayed": 11329,
-            "repairs": 16723,
-            "assists": 115
+            "secondsPlayed": 11379,
+            "repairs": 16903,
+            "assists": 117
           },
           "gad_gren_inc": {
             "uses": 12,
             "secondsPlayed": 10
           },
           "gad_sup_bag": {
-            "uses": 2161,
-            "secondsPlayed": 1882
+            "uses": 2185,
+            "secondsPlayed": 1942
           },
           "gad_deplocover": {
             "uses": 315,
@@ -23821,9 +25353,9 @@
             "assists": 7
           },
           "gad_gren_smoke": {
-            "uses": 1671,
+            "uses": 1704,
             "damage": 33,
-            "secondsPlayed": 1038
+            "secondsPlayed": 1063
           },
           "gad_gren_flash": {
             "uses": 13,
@@ -23845,9 +25377,9 @@
             "secondsPlayed": 150
           },
           "gad_vehsupcra": {
-            "uses": 17,
+            "uses": 18,
             "secondsPlayed": 35,
-            "spawns": 211
+            "spawns": 215
           },
           "gad_tknife": {
             "uses": 1,
@@ -23859,9 +25391,9 @@
             "assists": 8
           },
           "gad_deployable": {
-            "uses": 5595,
-            "secondsPlayed": 29845,
-            "spawns": 4761,
+            "uses": 5633,
+            "secondsPlayed": 29920,
+            "spawns": 4765,
             "assists": 2923
           },
           "gad_decoy": {
@@ -23908,7 +25440,7 @@
             "damage": 59655,
             "multiKills": 31,
             "vehiclesDestroyedWith": 6,
-            "spawns": 257,
+            "spawns": 261,
             "assists": 180
           },
           "veh_sur_m1a2sepv3": {
@@ -23938,8 +25470,8 @@
             "damage": 52265,
             "multiKills": 28,
             "vehiclesDestroyedWith": 5,
-            "spawns": 291,
-            "assists": 193
+            "spawns": 294,
+            "assists": 194
           },
           "veh_air_m77efalchion": {
             "kills": 2952,
@@ -23960,7 +25492,7 @@
             "kills": 73,
             "damage": 8608,
             "multiKills": 12,
-            "spawns": 57,
+            "spawns": 58,
             "assists": 113
           },
           "veh_sur_quadbike": {
@@ -23990,9 +25522,9 @@
           },
           "veh_sur_ltv": {
             "kills": 32,
-            "damage": 3179,
+            "damage": 3260,
             "multiKills": 5,
-            "spawns": 16,
+            "spawns": 20,
             "assists": 24
           }
         },
@@ -24021,10 +25553,10 @@
         },
         "classes": {
           "kit": {
-            "kills": 25693,
-            "secondsPlayed": 764827,
-            "spawns": 5261,
-            "assists": 12260
+            "kills": 25792,
+            "secondsPlayed": 768534,
+            "spawns": 5305,
+            "assists": 12314
           },
           "kit_assault": {
             "kills": 713,
@@ -24033,16 +25565,16 @@
             "assists": 401
           },
           "kit_engineer": {
-            "kills": 4622,
-            "secondsPlayed": 273184,
-            "spawns": 2121,
-            "assists": 3035
+            "kills": 4627,
+            "secondsPlayed": 273579,
+            "spawns": 2125,
+            "assists": 3039
           },
           "kit_support": {
-            "kills": 18482,
-            "secondsPlayed": 309645,
-            "spawns": 2138,
-            "assists": 4382
+            "kills": 18576,
+            "secondsPlayed": 312957,
+            "spawns": 2178,
+            "assists": 4432
           },
           "kit_recon": {
             "kills": 1876,
@@ -24050,14 +25582,79 @@
             "spawns": 732,
             "assists": 4442
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 122,
+                "wins": 86,
+                "losses": 36
+              },
+              "Rush0": {
+                "matches": 6,
+                "wins": 2,
+                "losses": 4
+              },
+              "Conquest0": {
+                "matches": 66,
+                "wins": 44,
+                "losses": 22
+              },
+              "MP_Escalation0": {
+                "matches": 55,
+                "wins": 28,
+                "losses": 27
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 157,
+                "wins": 145,
+                "losses": 12
+              },
+              "ModBuilderCustom0": {
+                "matches": 1,
+                "losses": 1
+              },
+              "Conquest0": {
+                "matches": 11,
+                "wins": 5,
+                "losses": 6
+              },
+              "MP_Escalation0": {
+                "matches": 64,
+                "wins": 42,
+                "losses": 22
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 107,
+                "wins": 105,
+                "losses": 2
+              },
+              "Rush0": {
+                "matches": 1,
+                "wins": 1
+              },
+              "Conquest0": {
+                "matches": 23,
+                "wins": 20,
+                "losses": 3
+              }
+            }
+          }
         }
       }
     },
     "683747667247235077": {
       "name": "eMp_SIKKxSHOTZ",
       "stats": {
-        "userId": 2489889997,
-        "id": 451515467,
         "humanPrecentage": 98.67,
         "score": 16433120,
         "kills": 65175,
@@ -24093,6 +25690,8 @@
         "killAssists": 49843,
         "vehiclesDestroyed": 64,
         "enemiesSpotted": 104694,
+        "id": 451515467,
+        "userId": 2489889997,
         "platformId": 1,
         "dividedKills": {
           "confirmed": 47802,
@@ -24809,14 +26408,63 @@
             "spawns": 5985,
             "assists": 46122
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 950,
+                "wins": 487,
+                "losses": 463
+              },
+              "Rush0": {
+                "matches": 1,
+                "losses": 1
+              },
+              "Conquest0": {
+                "matches": 18,
+                "wins": 8,
+                "losses": 10
+              },
+              "MP_Escalation0": {
+                "matches": 1,
+                "wins": 1
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 528,
+                "wins": 377,
+                "losses": 151
+              },
+              "Rush0": {
+                "matches": 5,
+                "wins": 2,
+                "losses": 3
+              },
+              "Conquest0": {
+                "matches": 3,
+                "wins": 3
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 729,
+                "wins": 640,
+                "losses": 88
+              }
+            }
+          }
         }
       }
     },
     "754383753933226016": {
       "name": "[KDM] Rainy",
       "stats": {
-        "userId": 1007979239668,
-        "id": 1004060039668,
         "humanPrecentage": 87.97,
         "score": 4515940,
         "kills": 15140,
@@ -24852,6 +26500,8 @@
         "killAssists": 7809,
         "vehiclesDestroyed": 114,
         "enemiesSpotted": 2484,
+        "id": 1004060039668,
+        "userId": 1007979239668,
         "platformId": 1,
         "dividedKills": {
           "confirmed": 11618,
@@ -25786,14 +27436,79 @@
             "spawns": 674,
             "assists": 1018
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 132,
+                "wins": 105,
+                "losses": 27
+              },
+              "Rush0": {
+                "matches": 14,
+                "wins": 8,
+                "losses": 6
+              },
+              "Conquest0": {
+                "matches": 6,
+                "wins": 2,
+                "losses": 4
+              },
+              "MP_Escalation0": {
+                "matches": 4,
+                "wins": 3,
+                "losses": 1
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 74,
+                "wins": 60,
+                "losses": 14
+              },
+              "Conquest0": {
+                "matches": 4,
+                "wins": 2,
+                "losses": 2
+              },
+              "MP_Escalation0": {
+                "matches": 1,
+                "wins": 1
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 100,
+                "wins": 90,
+                "losses": 10
+              },
+              "Rush0": {
+                "matches": 13,
+                "wins": 9,
+                "losses": 4
+              },
+              "Conquest0": {
+                "matches": 10,
+                "wins": 7,
+                "losses": 3
+              },
+              "MP_Escalation0": {
+                "matches": 3,
+                "wins": 3
+              }
+            }
+          }
         }
       }
     },
     "779866052279402568": {
       "name": "[KDM] Farquaad(Waltard)",
       "stats": {
-        "userId": 1006234528465,
-        "id": 1006439128465,
         "humanPrecentage": 98.79,
         "score": 14641495,
         "kills": 52575,
@@ -25830,6 +27545,8 @@
         "vehiclesDestroyed": 601,
         "enemiesSpotted": 1020,
         "lastPlacement": 0,
+        "id": 1006439128465,
+        "userId": 1006234528465,
         "platformId": 7,
         "dividedKills": {
           "confirmed": 39677,
@@ -26703,104 +28420,165 @@
             "spawns": 24,
             "assists": 41
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 594,
+                "wins": 382,
+                "losses": 212
+              },
+              "Rush0": {
+                "matches": 2,
+                "wins": 1,
+                "losses": 1
+              },
+              "Conquest0": {
+                "matches": 35,
+                "wins": 21,
+                "losses": 14
+              },
+              "MP_Escalation0": {
+                "matches": 8,
+                "wins": 6,
+                "losses": 2
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 339,
+                "wins": 274,
+                "losses": 65
+              },
+              "MP_Escalation0": {
+                "matches": 1,
+                "wins": 1
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 492,
+                "wins": 446,
+                "losses": 46
+              },
+              "Rush0": {
+                "matches": 2,
+                "wins": 2
+              },
+              "Conquest0": {
+                "matches": 34,
+                "wins": 31,
+                "losses": 3
+              },
+              "MP_Escalation0": {
+                "matches": 1,
+                "wins": 1
+              }
+            }
+          }
         }
       }
     },
     "812603193501810729": {
       "name": "[KDM] LatinaSlayz",
       "stats": {
-        "userId": 1013632376689,
-        "id": 1006700776689,
         "humanPrecentage": 99.18,
-        "score": 22054796,
-        "kills": 43175,
-        "deaths": 11235,
-        "wins": 2181,
+        "score": 22068364,
+        "kills": 43202,
+        "deaths": 11247,
+        "wins": 2186,
         "loses": 638,
-        "assists": 55061,
+        "assists": 55095,
         "killsPerMinute": 0.67,
-        "damagePerMinute": 162.83,
-        "killsPerMatch": 15.31,
-        "damagePerMatch": 3707.09,
-        "headShots": 3907,
-        "winPercent": 77.37,
+        "damagePerMinute": 162.67,
+        "killsPerMatch": 15.29,
+        "damagePerMatch": 3702.44,
+        "headShots": 3911,
+        "winPercent": 77.41,
         "headshots": 9.05,
         "killDeath": 3.84,
         "infantryKillDeath": 3.81,
-        "damage": 10454005,
-        "accuracy": 31.2,
-        "revives": 3899,
+        "damage": 10459398,
+        "accuracy": 31.19,
+        "revives": 3900,
         "heals": 17889,
         "resupplies": 2926,
         "repairs": 269636,
-        "squadmateRevive": 2221,
-        "thrownThrowables": 4900,
-        "gadgetsDestoyed": 12114,
+        "squadmateRevive": 2222,
+        "thrownThrowables": 4902,
+        "gadgetsDestoyed": 12115,
         "playerTakeDowns": 26,
-        "matchesPlayed": 2820,
-        "secondsPlayed": 3852047,
-        "saviorKills": 9295,
-        "shotsFired": 1009558,
-        "shotsHit": 314951,
-        "humanShotsHit": 167069,
-        "killAssists": 55113,
-        "vehiclesDestroyed": 1305,
+        "matchesPlayed": 2825,
+        "secondsPlayed": 3857976,
+        "saviorKills": 9305,
+        "shotsFired": 1009851,
+        "shotsHit": 315023,
+        "humanShotsHit": 167140,
+        "killAssists": 55147,
+        "vehiclesDestroyed": 1306,
         "enemiesSpotted": 3420,
+        "id": 1006700776689,
+        "userId": 1013632376689,
         "platformId": 3,
         "dividedKills": {
-          "confirmed": 32094,
-          "fullConfirmed": 24408,
-          "ads": 19036,
+          "confirmed": 32117,
+          "fullConfirmed": 24431,
+          "ads": 19050,
           "grenades": 193,
           "hipfire": 807,
           "longDistance": 2633,
           "melee": 29,
-          "multiKills": 5955,
-          "passenger": 3270,
-          "vehicle": 21119,
+          "multiKills": 5960,
+          "passenger": 3276,
+          "vehicle": 21129,
           "roadkills": 107,
           "parachute": 0,
-          "human": 42822,
+          "human": 42848,
           "weapons": {
             "SMG": 2898,
             "LMG": 0,
             "DMR": 65,
-            "AR": 13757,
+            "AR": 13770,
             "MG": 38,
-            "Pistols": 178,
+            "Pistols": 179,
             "Snipers": 2,
             "Shotguns": 2
           }
         },
         "objective": {
           "armed": 16,
-          "captured": 9400,
-          "neutralized": 6471,
+          "captured": 9414,
+          "neutralized": 6474,
           "defused": 1,
           "destroyed": 7,
           "time": {
-            "total": 529056,
-            "attacked": 100608,
-            "defended": 293649
+            "total": 529424,
+            "attacked": 100673,
+            "defended": 293789
           }
         },
         "dividedSecondsPlayed": {
           "flying": 25,
-          "driving": 772062
+          "driving": 772271
         },
         "devidedDamage": {
-          "human": 4234648,
-          "explosive": 4880727,
-          "passenger": 461710,
-          "vehicleDriver": 5532876,
-          "toVehicle": 4670206,
-          "withVehicle": 5814128
+          "human": 4239941,
+          "explosive": 4884215,
+          "passenger": 462318,
+          "vehicleDriver": 5534149,
+          "toVehicle": 4672368,
+          "withVehicle": 5816009
         },
         "devidedAssists": {
-          "human": 30197,
-          "driver": 16496,
-          "passenger": 4667,
-          "spot": 7334,
+          "human": 30230,
+          "driver": 16500,
+          "passenger": 4674,
+          "spot": 7344,
           "pilot": 7243
         },
         "weapons": {
@@ -26962,11 +28740,11 @@
             "spawns": 82
           },
           "wp_ar_nvo228e": {
-            "kills": 6407,
-            "headshots": 11.19,
-            "damage": 665856,
-            "multiKills": 859,
-            "spawns": 2988
+            "kills": 6420,
+            "headshots": 11.21,
+            "damage": 667180,
+            "multiKills": 862,
+            "spawns": 3003
           },
           "wp_mg_m60": {
             "kills": 1,
@@ -27005,11 +28783,11 @@
             "damage": 410
           },
           "wp_pst_vz61": {
-            "kills": 54,
-            "headshots": 16.67,
-            "damage": 5137,
+            "kills": 55,
+            "headshots": 16.36,
+            "damage": 5199,
             "multiKills": 15,
-            "spawns": 1828
+            "spawns": 1843
           },
           "wp_smg_cz3a1": {
             "kills": 9,
@@ -27058,13 +28836,13 @@
             "assists": 4
           },
           "gad_rl_ungui": {
-            "kills": 1149,
-            "uses": 9980,
-            "damage": 1601431,
-            "multiKills": 313,
-            "vehiclesDestroyedWith": 442,
-            "secondsPlayed": 116622,
-            "assists": 1568
+            "kills": 1152,
+            "uses": 9989,
+            "damage": 1603557,
+            "multiKills": 314,
+            "vehiclesDestroyedWith": 443,
+            "secondsPlayed": 116707,
+            "assists": 1575
           },
           "gad_rl_aimgui": {
             "kills": 5,
@@ -27173,7 +28951,7 @@
           },
           "gad_gren_mfrag": {
             "kills": 156,
-            "uses": 5881,
+            "uses": 5883,
             "damage": 39337,
             "multiKills": 20,
             "secondsPlayed": 4266,
@@ -27193,7 +28971,7 @@
             "damage": 1604,
             "multiKills": 1,
             "vehiclesDestroyedWith": 3,
-            "secondsPlayed": 389877,
+            "secondsPlayed": 389962,
             "repairs": 269320,
             "assists": 2761
           },
@@ -27232,7 +29010,7 @@
           "gad_vehsupcra": {
             "uses": 221,
             "secondsPlayed": 917,
-            "spawns": 1095
+            "spawns": 1110
           },
           "gad_msensor": {
             "uses": 16,
@@ -27242,7 +29020,7 @@
           "gad_deployable": {
             "uses": 6563,
             "secondsPlayed": 31429,
-            "spawns": 13216,
+            "spawns": 13231,
             "assists": 1439
           },
           "gad_gasmask": {
@@ -27263,12 +29041,12 @@
             "assists": 764
           },
           "veh_sur_strf09a4": {
-            "kills": 8632,
-            "damage": 1956350,
-            "multiKills": 1437,
+            "kills": 8641,
+            "damage": 1958142,
+            "multiKills": 1438,
             "vehiclesDestroyedWith": 195,
-            "spawns": 1664,
-            "assists": 8038
+            "spawns": 1669,
+            "assists": 8044
           },
           "veh_sur_m1a2sepv3": {
             "kills": 3196,
@@ -27290,12 +29068,12 @@
             "assists": 6
           },
           "veh_sur_bradley": {
-            "kills": 8183,
-            "damage": 2177723,
+            "kills": 8184,
+            "damage": 2177812,
             "multiKills": 1344,
             "vehiclesDestroyedWith": 265,
-            "spawns": 1454,
-            "assists": 7674
+            "spawns": 1455,
+            "assists": 7679
           },
           "veh_air_m77efalchion": {
             "kills": 5,
@@ -27376,10 +29154,10 @@
         },
         "classes": {
           "kit": {
-            "kills": 43155,
-            "secondsPlayed": 2627214,
-            "spawns": 13351,
-            "assists": 54615
+            "kills": 43182,
+            "secondsPlayed": 2629237,
+            "spawns": 13366,
+            "assists": 54647
           },
           "kit_assault": {
             "kills": 659,
@@ -27388,10 +29166,10 @@
             "assists": 473
           },
           "kit_engineer": {
-            "kills": 40741,
-            "secondsPlayed": 2441864,
-            "spawns": 12266,
-            "assists": 51240
+            "kills": 40768,
+            "secondsPlayed": 2443887,
+            "spawns": 12281,
+            "assists": 51272
           },
           "kit_support": {
             "kills": 1563,
@@ -27405,104 +29183,176 @@
             "spawns": 95,
             "assists": 1500
           }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 906,
+                "wins": 589,
+                "losses": 317
+              },
+              "Rush0": {
+                "matches": 3,
+                "wins": 2,
+                "losses": 1
+              },
+              "Conquest0": {
+                "matches": 265,
+                "wins": 185,
+                "losses": 80
+              },
+              "MP_Escalation0": {
+                "matches": 18,
+                "wins": 15,
+                "losses": 3
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 636,
+                "wins": 538,
+                "losses": 98
+              },
+              "Rush0": {
+                "matches": 2,
+                "wins": 1,
+                "losses": 1
+              },
+              "Conquest0": {
+                "matches": 44,
+                "wins": 33,
+                "losses": 11
+              },
+              "MP_Escalation0": {
+                "matches": 18,
+                "wins": 17,
+                "losses": 1
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 499,
+                "wins": 483,
+                "losses": 16
+              },
+              "Rush0": {
+                "matches": 1,
+                "wins": 1
+              },
+              "Conquest0": {
+                "matches": 94,
+                "wins": 92,
+                "losses": 2
+              },
+              "MP_Escalation0": {
+                "matches": 2,
+                "wins": 2
+              }
+            }
+          }
         }
       }
     },
     "365653146200047616": {
       "name": "elvis",
       "stats": {
-        "userId": 2533101494,
-        "id": 1799611919,
         "humanPrecentage": 93.5,
-        "score": 23589568,
-        "kills": 92994,
-        "deaths": 9049,
-        "wins": 1426,
+        "score": 23616250,
+        "kills": 93096,
+        "deaths": 9059,
+        "wins": 1427,
         "loses": 302,
-        "assists": 48219,
+        "assists": 48276,
         "killsPerMinute": 0.88,
-        "damagePerMinute": 115.77,
-        "killsPerMatch": 53.78,
-        "damagePerMatch": 7043.79,
-        "headShots": 14306,
-        "winPercent": 82.52,
-        "headshots": 15.38,
+        "damagePerMinute": 115.79,
+        "killsPerMatch": 53.81,
+        "damagePerMatch": 7047.76,
+        "headShots": 14325,
+        "winPercent": 82.53,
+        "headshots": 15.39,
         "killDeath": 10.28,
         "infantryKillDeath": 9.61,
-        "damage": 12178717,
-        "accuracy": 30.98,
-        "revives": 11225,
-        "heals": 255519,
-        "resupplies": 52433,
+        "damage": 12192617,
+        "accuracy": 30.97,
+        "revives": 11231,
+        "heals": 255647,
+        "resupplies": 52445,
         "repairs": 11375,
-        "squadmateRevive": 2874,
-        "thrownThrowables": 17696,
-        "gadgetsDestoyed": 8991,
+        "squadmateRevive": 2877,
+        "thrownThrowables": 17723,
+        "gadgetsDestoyed": 9007,
         "playerTakeDowns": 2,
-        "matchesPlayed": 1729,
-        "secondsPlayed": 6311839,
-        "saviorKills": 16018,
-        "shotsFired": 1662941,
-        "shotsHit": 515194,
-        "humanShotsHit": 296179,
-        "killAssists": 49095,
+        "matchesPlayed": 1730,
+        "secondsPlayed": 6318235,
+        "saviorKills": 16045,
+        "shotsFired": 1664476,
+        "shotsHit": 515536,
+        "humanShotsHit": 296521,
+        "killAssists": 49152,
         "vehiclesDestroyed": 451,
-        "enemiesSpotted": 10784,
+        "enemiesSpotted": 10795,
+        "id": 1799611919,
+        "userId": 2533101494,
         "platformId": 1,
         "dividedKills": {
-          "confirmed": 70179,
-          "fullConfirmed": 56877,
-          "ads": 70146,
+          "confirmed": 70268,
+          "fullConfirmed": 56966,
+          "ads": 70218,
           "grenades": 45,
-          "hipfire": 5710,
+          "hipfire": 5711,
           "longDistance": 1822,
           "melee": 4,
-          "multiKills": 15217,
+          "multiKills": 15234,
           "passenger": 802,
-          "vehicle": 16438,
+          "vehicle": 16467,
           "roadkills": 49,
           "parachute": 16,
-          "human": 86945,
+          "human": 87047,
           "weapons": {
             "SMG": 10756,
             "LMG": 0,
             "DMR": 4172,
-            "AR": 24461,
-            "MG": 17728,
-            "Pistols": 1171,
+            "AR": 24462,
+            "MG": 17797,
+            "Pistols": 1173,
             "Snipers": 4046,
             "Shotguns": 300
           }
         },
         "objective": {
           "armed": 2,
-          "captured": 5330,
-          "neutralized": 3943,
+          "captured": 5333,
+          "neutralized": 3948,
           "defused": 0,
           "destroyed": 2,
           "time": {
-            "total": 254562,
-            "attacked": 85900,
-            "defended": 92467
+            "total": 254732,
+            "attacked": 85980,
+            "defended": 92492
           }
         },
         "dividedSecondsPlayed": {
           "flying": 3170,
-          "driving": 357761
+          "driving": 358609
         },
         "devidedDamage": {
-          "human": 7367518,
-          "explosive": 2402460,
+          "human": 7381395,
+          "explosive": 2406550,
           "passenger": 123238,
-          "vehicleDriver": 3521957,
-          "toVehicle": 1675953,
-          "withVehicle": 3600354
+          "vehicleDriver": 3527224,
+          "toVehicle": 1677586,
+          "withVehicle": 3605621
         },
         "devidedAssists": {
-          "human": 30790,
-          "driver": 8526,
+          "human": 30847,
+          "driver": 8536,
           "passenger": 924,
-          "spot": 13909,
+          "spot": 13934,
           "pilot": 1421
         },
         "weapons": {
@@ -27560,7 +29410,7 @@
             "headshots": 14,
             "damage": 433550,
             "multiKills": 618,
-            "spawns": 617
+            "spawns": 618
           },
           "wp_ar_l85a3": {
             "kills": 1474,
@@ -27622,11 +29472,11 @@
             "spawns": 355
           },
           "wp_mg_drsiar": {
-            "kills": 6965,
+            "kills": 7007,
             "headshots": 14.44,
-            "damage": 762040,
-            "multiKills": 1110,
-            "spawns": 1067
+            "damage": 766485,
+            "multiKills": 1118,
+            "spawns": 1073
           },
           "wp_ar_kord6p67": {
             "kills": 3736,
@@ -27650,11 +29500,11 @@
             "spawns": 450
           },
           "wp_mg_kts100mk8": {
-            "kills": 2851,
-            "headshots": 15.29,
-            "damage": 333863,
-            "multiKills": 504,
-            "spawns": 371
+            "kills": 2878,
+            "headshots": 15.5,
+            "damage": 337172,
+            "multiKills": 508,
+            "spawns": 372
           },
           "wp_pst_m45a1": {
             "kills": 53,
@@ -27669,11 +29519,11 @@
             "multiKills": 2
           },
           "wp_ar_sor556mk2": {
-            "kills": 2344,
-            "headshots": 14.38,
-            "damage": 255750,
+            "kills": 2345,
+            "headshots": 14.41,
+            "damage": 255989,
             "multiKills": 405,
-            "spawns": 242
+            "spawns": 243
           },
           "wp_smg_pw7a2": {
             "kills": 822,
@@ -27690,11 +29540,11 @@
             "spawns": 215
           },
           "wp_pst_m44": {
-            "kills": 733,
-            "headshots": 25.92,
-            "damage": 58895,
+            "kills": 735,
+            "headshots": 25.85,
+            "damage": 59112,
             "multiKills": 167,
-            "spawns": 8104
+            "spawns": 8117
           },
           "wp_mg_xm250": {
             "kills": 868,
@@ -27777,11 +29627,11 @@
             "spawns": 207
           },
           "wp_crb_sg553r": {
-            "kills": 3884,
+            "kills": 3885,
             "headshots": 11.87,
-            "damage": 425372,
+            "damage": 425795,
             "multiKills": 645,
-            "spawns": 800
+            "spawns": 804
           },
           "wp_crb_grtbc": {
             "kills": 632,
@@ -27929,7 +29779,7 @@
             "damage": 2912,
             "multiKills": 9,
             "secondsPlayed": 60,
-            "spawns": 193,
+            "spawns": 196,
             "assists": 6
           },
           "gad_mine_tws": {
@@ -27990,7 +29840,7 @@
             "secondsPlayed": 75
           },
           "gad_tugs": {
-            "uses": 407,
+            "uses": 408,
             "secondsPlayed": 867,
             "assists": 490
           },
@@ -28001,16 +29851,16 @@
             "assists": 13
           },
           "gad_sup_pouch": {
-            "uses": 24451,
-            "secondsPlayed": 11870,
-            "spawns": 8122
+            "uses": 24472,
+            "secondsPlayed": 11880,
+            "spawns": 8131
           },
           "gad_gren_mfrag": {
             "damage": 66
           },
           "gad_gren_frag": {
             "kills": 45,
-            "uses": 418,
+            "uses": 420,
             "damage": 6670,
             "multiKills": 16,
             "secondsPlayed": 718,
@@ -28029,12 +29879,12 @@
             "assists": 14
           },
           "gad_sup_bag": {
-            "uses": 19990,
-            "secondsPlayed": 17543
+            "uses": 20005,
+            "secondsPlayed": 17578
           },
           "gad_deplocover": {
-            "uses": 1878,
-            "secondsPlayed": 3438,
+            "uses": 1881,
+            "secondsPlayed": 3448,
             "spawns": 659
           },
           "gad_gren_stun": {
@@ -28044,9 +29894,9 @@
             "assists": 7
           },
           "gad_gren_smoke": {
-            "uses": 20133,
+            "uses": 20152,
             "damage": 163,
-            "secondsPlayed": 9757,
+            "secondsPlayed": 9762,
             "assists": 7
           },
           "gad_gren_flash": {
@@ -28069,7 +29919,7 @@
           "gad_vehsupcra": {
             "uses": 78,
             "secondsPlayed": 135,
-            "spawns": 221
+            "spawns": 222
           },
           "gad_msensor": {
             "uses": 13,
@@ -28077,9 +29927,9 @@
             "assists": 5
           },
           "gad_deployable": {
-            "uses": 47288,
-            "secondsPlayed": 36730,
-            "spawns": 10072,
+            "uses": 47328,
+            "secondsPlayed": 36785,
+            "spawns": 10085,
             "assists": 798
           },
           "gad_decoy": {
@@ -28113,12 +29963,12 @@
             "assists": 31
           },
           "veh_sur_leoa4": {
-            "kills": 173,
-            "damage": 66882,
-            "multiKills": 27,
+            "kills": 178,
+            "damage": 69151,
+            "multiKills": 28,
             "vehiclesDestroyedWith": 7,
-            "spawns": 27,
-            "assists": 86
+            "spawns": 28,
+            "assists": 87
           },
           "veh_sur_strf09a4": {
             "kills": 4263,
@@ -28129,12 +29979,12 @@
             "assists": 2356
           },
           "veh_sur_m1a2sepv3": {
-            "kills": 5486,
-            "damage": 1470607,
+            "kills": 5492,
+            "damage": 1471643,
             "multiKills": 944,
             "vehiclesDestroyedWith": 193,
-            "spawns": 389,
-            "assists": 3894
+            "spawns": 390,
+            "assists": 3898
           },
           "veh_sur_cheetah1a2": {
             "kills": 23,
@@ -28149,12 +29999,12 @@
             "assists": 1
           },
           "veh_sur_bradley": {
-            "kills": 6372,
-            "damage": 1281761,
-            "multiKills": 1249,
+            "kills": 6390,
+            "damage": 1283723,
+            "multiKills": 1253,
             "vehiclesDestroyedWith": 124,
-            "spawns": 934,
-            "assists": 2977
+            "spawns": 936,
+            "assists": 2982
           },
           "veh_air_su57": {
             "kills": 3,
@@ -28180,7 +30030,7 @@
           "veh_sur_travmark2": {
             "kills": 2,
             "damage": 573,
-            "spawns": 153,
+            "spawns": 154,
             "assists": 25
           },
           "veh_sur_quadbike": {
@@ -28249,10 +30099,10 @@
         },
         "classes": {
           "kit": {
-            "kills": 92994,
-            "secondsPlayed": 2449210,
-            "spawns": 11983,
-            "assists": 47928
+            "kills": 93096,
+            "secondsPlayed": 2451878,
+            "spawns": 11996,
+            "assists": 47982
           },
           "kit_assault": {
             "kills": 1400,
@@ -28261,22 +30111,75 @@
             "assists": 1123
           },
           "kit_engineer": {
-            "kills": 7183,
-            "secondsPlayed": 175218,
-            "spawns": 396,
-            "assists": 6778
+            "kills": 7207,
+            "secondsPlayed": 175832,
+            "spawns": 397,
+            "assists": 6801
           },
           "kit_support": {
-            "kills": 79067,
-            "secondsPlayed": 2050377,
-            "spawns": 10794,
-            "assists": 35850
+            "kills": 79139,
+            "secondsPlayed": 2052077,
+            "spawns": 10803,
+            "assists": 35876
           },
           "kit_recon": {
-            "kills": 5344,
-            "secondsPlayed": 178250,
-            "spawns": 627,
-            "assists": 4177
+            "kills": 5350,
+            "secondsPlayed": 178604,
+            "spawns": 630,
+            "assists": 4182
+          }
+        },
+        "seasons": {
+          "Season1": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 298,
+                "wins": 240,
+                "losses": 58
+              },
+              "MP_Escalation0": {
+                "matches": 8,
+                "wins": 7,
+                "losses": 1
+              }
+            }
+          },
+          "Season2": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 374,
+                "wins": 319,
+                "losses": 55
+              },
+              "Conquest0": {
+                "matches": 2,
+                "wins": 2
+              },
+              "MP_Escalation0": {
+                "matches": 11,
+                "wins": 9,
+                "losses": 2
+              }
+            }
+          },
+          "Season3": {
+            "modes": {
+              "Breakthrough0": {
+                "matches": 530,
+                "wins": 483,
+                "losses": 47
+              },
+              "Conquest0": {
+                "matches": 34,
+                "wins": 22,
+                "losses": 12
+              },
+              "MP_Escalation0": {
+                "matches": 4,
+                "wins": 2,
+                "losses": 2
+              }
+            }
           }
         }
       }

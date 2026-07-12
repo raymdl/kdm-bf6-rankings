@@ -1144,13 +1144,13 @@ function effectivenessMethodHtml(key, constants) {
     return `<div class="effectiveness-method-grid">
       <div class="formula-card">
         <div class="formula-kicker">The equation</div>
+        <p class="measure-summary">A balanced overall rating of combat, Breakthrough objective play, and teamwork. It rewards complete players while preventing one exceptional specialty from dominating the result.</p>
         <div class="formula">CEI = C<sup>0.40</sup> &times; O<sup>0.30</sup> &times; T<sup>0.30</sup></div>
         <p>A weighted geometric mean of three 2&ndash;98 clan percentiles. The geometric mean is the anti-one-trick device: a missing pillar drags the whole score down, while a strength can still carry its fair share.</p>
-        <p><strong>Weapon-adjusted aim:</strong> Accuracy and Headshot % are scored as residuals above or below a ridge-regression baseline predicted from each player's weapon-kill mix. A 30% AR accuracy therefore earns more credit than the same accuracy from a sniper-heavy mix. Weapon-kill share is the usage proxy because the dump has no per-weapon shot or playtime totals.</p>
       </div>
       <div class="pillar-list">
-        <div><span class="pillar-letter combat">C</span><p><strong>Combat</strong><br>Player K/D (30%), Player Kills/Min (30%), Player Kills per match (10%), assists/hour (10%), weapon-adjusted Accuracy (10%), and weapon-adjusted Headshot % (10%). Bot kills remain excluded.</p></div>
-        <div><span class="pillar-letter objective">O</span><p><strong>Breakthrough Objective</strong><br>Captures and neutralizations (50%), objective-zone presence (30%), and time attacking or defending objectives (20%). Armed, defused and destroyed events are excluded.</p></div>
+        <div><span class="pillar-letter combat">C</span><p><strong>Combat</strong><br>Player K/D (30%), Player Kills/Min (30%), Player Kills per match (10%), assists/hour (10%), weapon-adjusted Accuracy (10%), and weapon-adjusted Headshot % (10%). Aim is part of Combat, not a separate CEI pillar.</p></div>
+        <div><span class="pillar-letter objective">O</span><p><strong>Breakthrough Objective</strong><br>Captures and neutralizations (50%), objective-zone presence (30%), and time attacking or defending objectives (20%).</p></div>
         <div><span class="pillar-letter teamwork">T</span><p><strong>Teamwork</strong><br>70% best + 30% second-best of Medic, Logistics and Intel lanes. Specialists count, but one spammed action cannot own the score.</p></div>
       </div>
     </div>`;
@@ -1159,6 +1159,7 @@ function effectivenessMethodHtml(key, constants) {
     return `<div class="effectiveness-method-grid">
       <div class="formula-card">
         <div class="formula-kicker">The equation</div>
+        <p class="measure-summary">A risk-adjusted rating of how much useful impact a player produces relative to their death exposure. It favors efficient, repeatable contribution over reckless volume.</p>
         <div class="formula formula-small">RAIS<sub>raw</sub> = (0.40C + 0.30O + 0.30T) &divide; (Deaths/hr &divide; ${constants.medianDeathsPerHour.toFixed(1)})<sup>0.35</sup></div>
         <p>The published score is the raw result's 2&ndash;98 clan percentile. Following a downside-risk framework, only deaths are penalized. The mild exponent and capped penalty keep a cautious camper from winning merely by avoiding deaths.</p>
       </div>
@@ -1172,11 +1173,12 @@ function effectivenessMethodHtml(key, constants) {
   return `<div class="effectiveness-method-grid">
     <div class="formula-card">
       <div class="formula-kicker">The equation</div>
-      <div class="formula formula-small">WRR = smoothed Win% &minus; expected Win%(zC, zO, zT)</div>
-      <p>Expected win rate comes from a leave-one-player-out ridge model (&lambda;=${constants.ridgeLambda}) trained on the other KDM members. Positive alpha is the percentage-point win lift not explained by the three visible performance pillars.</p>
+      <p class="measure-summary">The percentage-point gap between a player's stabilized win rate and the rate predicted by their Combat, Objective, and Teamwork profile. A positive residual means they win more often than their visible statistics predict.</p>
+      <div class="formula formula-small">WRR = weighted Breakthrough Win% &minus; expected Win%(zC, zO, zT)</div>
+      <p>Observed win rate blends Breakthrough results from Season 1 (15%), Season 2 (30%), and Season 3 (55%). Each season is stabilized with a ${constants.seasonWinPriorMatches}-match clan prior before weighting; expected win rate comes from a leave-one-player-out ridge model (&lambda;=${constants.ridgeLambda}).</p>
     </div>
     <div class="pillar-list">
-      <div><span class="pillar-letter combat">W</span><p><strong>Observed winning</strong><br>Lifetime wins and losses, stabilized with a ${constants.winPriorMatches}-match prior at the clan's ${constants.clanWinPercent.toFixed(1)}% win rate.</p></div>
+      <div><span class="pillar-letter combat">W</span><p><strong>Observed winning</strong><br>Breakthrough wins and losses by season, with Season 3 weighted most heavily so recent improvement matters more.</p></div>
       <div><span class="pillar-letter objective">E</span><p><strong>Expected winning</strong><br>The model asks what win rate normally accompanies the same combat, objective and teamwork profile.</p></div>
       <div><span class="pillar-letter risk">&epsilon;</span><p><strong>The unexplained gap</strong><br>Potential squad leadership, positioning, comms and timing live here&mdash;along with team-stack effects. Treat the residual as a clue, not proof of causation.</p></div>
     </div>
@@ -1206,21 +1208,78 @@ function effectivenessBarsHtml(key, ranking) {
   </div>`;
 }
 
+function breakdownStatHtml(label, value, context = "") {
+  return `<div class="breakdown-stat"><span>${esc(label)}</span><strong>${value}</strong>${context ? `<small>${context}</small>` : ""}</div>`;
+}
+
+function effectivenessBreakdownHtml(key, row) {
+  const p = row.percentiles;
+  const scoreLine = key === "trident"
+    ? `CEI = ${row.pillars.combat.toFixed(1)}<sup>0.40</sup> &times; ${row.pillars.objective.toFixed(1)}<sup>0.30</sup> &times; ${row.pillars.teamwork.toFixed(1)}<sup>0.30</sup> = <strong>${row.scores.trident.toFixed(1)}</strong>`
+    : key === "sortino"
+      ? `RAIS<sub>raw</sub> = ${row.sortinoUpside.toFixed(1)} &divide; ${row.sortinoDownside.toFixed(3)} = ${row.sortinoRaw.toFixed(1)} &rarr; <strong>${row.scores.sortino.toFixed(1)} percentile</strong>`
+      : `WRR = ${row.smoothedWinPercent.toFixed(1)}% &minus; ${row.expectedWinPercent.toFixed(1)}% = <strong>${effectivenessScoreText("alpha", row.scores.alpha)}</strong>`;
+  const seasonHtml = key === "alpha"
+    ? `<div class="breakdown-season-grid">${Object.entries({ Season1: "Season 1 · 15%", Season2: "Season 2 · 30%", Season3: "Season 3 · 55%" }).map(([seasonId, label]) => {
+        const season = row.seasonWinRates[seasonId];
+        return season
+          ? breakdownStatHtml(label, `${(season.rawRate * 100).toFixed(1)}%`, `${season.wins}-${season.losses} · stabilized ${(season.smoothedRate * 100).toFixed(1)}%`)
+          : breakdownStatHtml(label, "No record");
+      }).join("")}</div>`
+    : "";
+  return `<div class="score-breakdown">
+    <div class="breakdown-equation"><span>Score calculation</span><div>${scoreLine}</div></div>
+    <div class="breakdown-pillar-grid">
+      ${breakdownStatHtml("Combat pillar", row.pillars.combat.toFixed(1), "40% CEI / RAIS input")}
+      ${breakdownStatHtml("Objective pillar", row.pillars.objective.toFixed(1), "30% CEI / RAIS input")}
+      ${breakdownStatHtml("Teamwork pillar", row.pillars.teamwork.toFixed(1), `30% · ${row.bestSupportLanes.join(" + ")}`)}
+      ${key === "sortino" ? breakdownStatHtml("Deaths / hour", row.adjusted.deathsPerHour.toFixed(1), `clan median ${state.effectiveness.constants.medianDeathsPerHour.toFixed(1)}`) : ""}
+    </div>
+    ${seasonHtml}
+    <div class="breakdown-subhead">Combat inputs</div>
+    <div class="breakdown-input-grid">
+      ${breakdownStatHtml("Player K/D", row.raw.infantryKd.toFixed(2), `${p.infantryKd.toFixed(0)}th percentile · 30% of Combat`)}
+      ${breakdownStatHtml("Player Kills / Min", row.raw.infantryKpm.toFixed(2), `${p.infantryKpm.toFixed(0)}th percentile · 30%`)}
+      ${breakdownStatHtml("Player Kills / match", row.raw.playerKillsPerMatch.toFixed(1), `${p.playerKillsPerMatch.toFixed(0)}th percentile · 10%`)}
+      ${breakdownStatHtml("Assists / hour", row.raw.assistsPerHour.toFixed(1), `${p.assistsPerHour.toFixed(0)}th percentile · 10%`)}
+      ${breakdownStatHtml("Accuracy, weapon-adjusted", `${row.raw.accuracy.toFixed(1)}%`, `expected ${row.expectedAccuracy.toFixed(1)}% · ${p.accuracyResidual.toFixed(0)}th percentile · 10%`)}
+      ${breakdownStatHtml("Headshots, weapon-adjusted", `${row.raw.headshotPercent.toFixed(1)}%`, `expected ${row.expectedHeadshotPercent.toFixed(1)}% · ${p.headshotResidual.toFixed(0)}th percentile · 10%`)}
+    </div>
+    <p class="breakdown-note">Weapon-adjusted aim is included inside the Combat pillar; it is not a separate CEI component.</p>
+  </div>`;
+}
+
 function effectivenessTableHtml(key, ranking) {
   const header = key === "alpha"
     ? `<th class="num">Residual</th><th class="num">Win%</th><th class="num">Expected</th>`
     : key === "sortino"
       ? `<th class="num">Score</th><th class="num">Upside</th><th class="num">Deaths/hr</th>`
       : `<th class="num">Score</th><th>Support lanes</th>`;
+  const columnCount = key === "trident" ? 7 : 8;
   const rows = ranking.map((row, index) => {
     const detail = key === "alpha"
       ? `<td class="num value-cell ${row.scores.alpha >= 0 ? "positive-score" : "negative-score"}">${effectivenessScoreText(key, row.scores.alpha)}</td><td class="num">${row.smoothedWinPercent.toFixed(1)}%</td><td class="num">${row.expectedWinPercent.toFixed(1)}%</td>`
       : key === "sortino"
         ? `<td class="num value-cell">${row.scores.sortino.toFixed(1)}</td><td class="num">${row.sortinoUpside.toFixed(1)}</td><td class="num">${row.adjusted.deathsPerHour.toFixed(1)}</td>`
         : `<td class="num value-cell">${row.scores.trident.toFixed(1)}</td><td>${row.bestSupportLanes.map((lane) => lane[0].toUpperCase() + lane.slice(1)).join(" + ")}</td>`;
-    return `<tr class="r${index + 1}"><td class="rank-cell">${index + 1}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${row.cachedStats ? cachedMarkerHtml() : ""}</td>${detail}<td class="num pillar-score">${row.aimScore.toFixed(1)}</td><td class="num pillar-score">${row.pillars.combat.toFixed(1)}</td><td class="num pillar-score">${row.pillars.objective.toFixed(1)}</td><td class="num pillar-score">${row.pillars.teamwork.toFixed(1)}</td></tr>`;
+    const detailId = `score-detail-${key}-${row.discordId}`;
+    return `<tr class="r${index + 1}"><td class="rank-cell">${index + 1}</td><td><div class="ranking-player-cell"><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${row.cachedStats ? cachedMarkerHtml() : ""}<button class="rank-detail-toggle" type="button" aria-expanded="false" aria-controls="${detailId}" data-detail-id="${detailId}">Breakdown</button></div></td>${detail}<td class="num pillar-score">${row.pillars.combat.toFixed(1)}</td><td class="num pillar-score">${row.pillars.objective.toFixed(1)}</td><td class="num pillar-score">${row.pillars.teamwork.toFixed(1)}</td></tr>
+      <tr class="rank-detail-row" id="${detailId}" hidden><td colspan="${columnCount}">${effectivenessBreakdownHtml(key, row)}</td></tr>`;
   }).join("");
-  return `<div class="table-wrap effectiveness-table"><table><thead><tr><th>#</th><th>Player</th>${header}<th class="num">Aim adj.</th><th class="num">Combat</th><th class="num">Objective</th><th class="num">Teamwork</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  return `<div class="table-wrap effectiveness-table"><table><thead><tr><th>#</th><th>Player</th>${header}<th class="num">Combat</th><th class="num">Objective</th><th class="num">Teamwork</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function wireEffectivenessBreakdowns() {
+  for (const button of app.querySelectorAll(".rank-detail-toggle")) {
+    button.addEventListener("click", () => {
+      const detail = document.getElementById(button.dataset.detailId);
+      if (!detail) return;
+      const expanded = button.getAttribute("aria-expanded") === "true";
+      button.setAttribute("aria-expanded", String(!expanded));
+      button.textContent = expanded ? "Breakdown" : "Hide breakdown";
+      detail.hidden = expanded;
+    });
+  }
 }
 
 function renderEffectiveness(requestedKey) {
@@ -1246,6 +1305,7 @@ function renderEffectiveness(requestedKey) {
     ${effectivenessBarsHtml(key, ranking)}
     <div class="ranking-heading"><h2>Full KDM ranking</h2><p>${ranking.length} tracked players &middot; rates and stabilized percentages, never lifetime-volume totals</p></div>
     ${effectivenessTableHtml(key, ranking)}`;
+  wireEffectivenessBreakdowns();
 }
 
 /* ---------- router ---------- */

@@ -1077,6 +1077,13 @@ tr.r3 .rank-cell { color: var(--bronze); }
 .formula-card p + p { margin-top: 0.75rem; }
 .formula-card strong { color: var(--text); }
 
+.formula-card .measure-summary {
+  color: var(--text);
+  margin-top: 0.35rem;
+  margin-bottom: 0.65rem;
+  font-size: 0.92rem;
+}
+
 .pillar-list {
   display: grid;
   gap: 0.65rem;
@@ -1174,6 +1181,108 @@ tr.r3 .rank-cell { color: var(--bronze); }
 .positive-score { color: var(--up); }
 .negative-score { color: var(--down); }
 
+.ranking-player-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.rank-detail-toggle {
+  color: var(--accent);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.rank-detail-toggle:hover { text-decoration: underline; }
+.rank-detail-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.rank-detail-row:hover { background: transparent; }
+
+.rank-detail-row td {
+  padding: 0;
+  white-space: normal;
+  background: var(--bg-raise);
+}
+
+.score-breakdown { padding: 1rem 1.1rem 1.15rem; }
+
+.breakdown-equation {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.breakdown-equation > span,
+.breakdown-subhead {
+  color: var(--text-faint);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.breakdown-equation > div {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  text-align: right;
+}
+
+.breakdown-equation strong { color: var(--accent); }
+
+.breakdown-pillar-grid,
+.breakdown-season-grid,
+.breakdown-input-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 0.55rem;
+}
+
+.breakdown-season-grid { margin-top: 0.55rem; }
+.breakdown-input-grid { grid-template-columns: repeat(3, 1fr); }
+.breakdown-subhead { margin: 0.9rem 0 0.45rem; }
+
+.breakdown-stat {
+  padding-left: 0.65rem;
+  border-left: 2px solid var(--border);
+}
+
+.breakdown-stat > span,
+.breakdown-stat > strong,
+.breakdown-stat > small { display: block; }
+
+.breakdown-stat > span {
+  color: var(--text-faint);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.breakdown-stat > strong {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+}
+
+.breakdown-stat > small {
+  color: var(--text-dim);
+  font-size: 0.72rem;
+}
+
+.breakdown-note {
+  color: var(--text-dim);
+  margin: 0.8rem 0 0;
+  font-size: 0.78rem;
+}
+
 /* ---------- responsive ---------- */
 
 @media (max-width: 700px) {
@@ -1205,6 +1314,10 @@ tr.r3 .rank-cell { color: var(--bronze); }
 
   .effectiveness-bar-row { grid-template-columns: 1.4rem minmax(90px, 1fr) 4.5rem; }
   .effectiveness-bar-track { display: none; }
+
+  .breakdown-equation { align-items: flex-start; flex-direction: column; gap: 0.25rem; }
+  .breakdown-equation > div { text-align: left; }
+  .breakdown-input-grid { grid-template-columns: 1fr; }
 
   .players-toolbar {
     flex-direction: column;
