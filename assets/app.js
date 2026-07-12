@@ -1148,7 +1148,7 @@ function effectivenessMethodHtml(key, constants) {
         <p>A weighted geometric mean of three 2&ndash;98 clan percentiles. The geometric mean is the anti-one-trick device: a missing pillar drags the whole score down, while a strength can still carry its fair share.</p>
       </div>
       <div class="pillar-list">
-        <div><span class="pillar-letter combat">C</span><p><strong>Combat</strong><br>K/D, human KPM, damage/min and assists/hour. Tempo and survival both matter; headshot rate and accuracy stay out because weapon choice distorts them.</p></div>
+        <div><span class="pillar-letter combat">C</span><p><strong>Combat</strong><br>Player K/D, Player Kills/Min, Player Kills per match and assists/hour. Player-only kill counters exclude bots; headshot rate and accuracy stay out because weapon choice distorts them.</p></div>
         <div><span class="pillar-letter objective">O</span><p><strong>Objective</strong><br>Weighted captures/neutralizations, objective-time share, and high-leverage arms, defuses and destroys.</p></div>
         <div><span class="pillar-letter teamwork">T</span><p><strong>Teamwork</strong><br>70% best + 30% second-best of Medic, Logistics and Intel lanes. Specialists count, but one spammed action cannot own the score.</p></div>
       </div>
