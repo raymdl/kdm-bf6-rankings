@@ -563,7 +563,7 @@ function renderPlayers() {
     <div class="player-grid">${sorted
       .map(
         (member) => `<a class="player-card" data-player-search="${esc(playerSearchText(member))}" href="${playerHref(member.discordId)}">
-          <div class="player-card-name"><span>${esc(member.displayName ?? member.discordId)}</span>${platformIconHtml(member.platform)}${
+          <div class="player-card-name"><span title="${esc(member.displayName ?? member.discordId)}">${esc(member.displayName ?? member.discordId)}</span>${platformIconHtml(member.platform)}${
             member.cachedStats ? cachedMarkerHtml() : ""
           }</div>
           <div class="player-card-sub">${esc(member.profileName ?? member.eaName ?? "")}</div>
