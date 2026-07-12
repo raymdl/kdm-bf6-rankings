@@ -6,6 +6,8 @@ const SEASON_WIN_PRIOR_MATCHES = 25;
 const SEASON_WEIGHTS = { Season1: 0.2, Season2: 0.35, Season3: 0.45 };
 const RIDGE_LAMBDA = 4;
 const AIM_RIDGE_LAMBDA = 1;
+const COMBAT_GEOMETRIC_WEIGHT = 0.7;
+const COMBAT_ARITHMETIC_WEIGHT = 0.3;
 const WEAPON_CATEGORIES = ["ar", "smg", "carbine", "mg", "dmr", "sniper", "shotgun", "pistol"];
 
 const finite = (value, fallback = 0) => (Number.isFinite(Number(value)) ? Number(value) : fallback);
@@ -25,6 +27,11 @@ function weightedGeometric(values, weights) {
     values.reduce((total, value, index) => total + weights[index] * Math.log(Math.max(MIN_PERCENTILE, value)), 0) /
       totalWeight
   );
+}
+
+function weightedArithmetic(values, weights) {
+  const totalWeight = sum(weights);
+  return values.reduce((total, value, index) => total + weights[index] * value, 0) / totalWeight;
 }
 
 function shrinkToMedian(rows, key) {
@@ -264,10 +271,19 @@ export function calculateEffectiveness(archive, latest = { members: [] }) {
 
   for (const row of rows) {
     const p = row.percentiles;
-    row.pillars.combat = weightedGeometric(
-      [p.infantryKd, p.infantryKpm, p.playerKillsPerMatch, p.assistsPerHour, p.accuracyResidual, p.headshotResidual],
-      [0.3, 0.3, 0.1, 0.1, 0.1, 0.1]
-    );
+    const combatValues = [
+      p.infantryKd,
+      p.infantryKpm,
+      p.playerKillsPerMatch,
+      p.assistsPerHour,
+      p.accuracyResidual,
+      p.headshotResidual
+    ];
+    const combatWeights = [0.3, 0.3, 0.1, 0.1, 0.1, 0.1];
+    row.combatGeometric = weightedGeometric(combatValues, combatWeights);
+    row.combatArithmetic = weightedArithmetic(combatValues, combatWeights);
+    row.pillars.combat =
+      COMBAT_GEOMETRIC_WEIGHT * row.combatGeometric + COMBAT_ARITHMETIC_WEIGHT * row.combatArithmetic;
     row.aimScore = weightedGeometric([p.accuracyResidual, p.headshotResidual], [0.5, 0.5]);
     row.pillars.objective = weightedGeometric(
       [p.objectiveActionsPerHour, p.objectivePresence, p.breakthroughPressure],
@@ -363,6 +379,10 @@ export function calculateEffectiveness(archive, latest = { members: [] }) {
       seasonClanRates,
       ridgeLambda: RIDGE_LAMBDA,
       aimRidgeLambda: AIM_RIDGE_LAMBDA,
+      combatBlend: {
+        geometric: COMBAT_GEOMETRIC_WEIGHT,
+        arithmetic: COMBAT_ARITHMETIC_WEIGHT
+      },
       clanWinPercent,
       medianDeathsPerHour
     }
