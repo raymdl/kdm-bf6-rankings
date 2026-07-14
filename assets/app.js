@@ -9,6 +9,7 @@ const state = {
   meta: null,
   latest: null,
   history: null,
+  historyProvenance: null,
   audit: null,
   notifications: null,
   effectiveness: null,
@@ -160,6 +161,35 @@ function platformIconHtml(platform) {
 function memberName(discordId) {
   const latest = state.latest.members.find((member) => member.discordId === discordId);
   return latest?.displayName ?? state.history.members?.[discordId]?.name ?? `Member ${discordId}`;
+}
+
+function historyProvenance(discordId, date, statKey = null) {
+  const entry = state.historyProvenance?.members?.[discordId];
+  const dateEntry = entry?.dates?.[date];
+  if (!dateEntry) {
+    return null;
+  }
+  if (statKey) {
+    return dateEntry.fields?.[statKey] ?? null;
+  }
+  return dateEntry;
+}
+
+function estimatedHistoryNoticeHtml(discordId) {
+  const entry = state.historyProvenance?.members?.[discordId];
+  if (!entry) {
+    return "";
+  }
+  return `<div class="estimated-history-notice" role="note">
+    <strong>Estimated from Tracker session history</strong>
+    <span>${esc(entry.coverageStart ?? "Historical coverage")} through ${esc(entry.coverageEnd ?? "the first authoritative KDM snapshot")}. Grouped sessions may be assigned to a refresh/display date, so individual match dates are approximate.</span>
+  </div>`;
+}
+
+function estimatedDateNoticeHtml(date) {
+  return state.historyProvenance?.members && Object.values(state.historyProvenance.members).some((member) => member.dates?.[date])
+    ? `<div class="estimated-history-notice" role="note"><strong>Estimated history</strong><span>Some values on this date are reconstructed from Tracker session history; grouped-session dates are approximate.</span></div>`
+    : "";
 }
 
 function playerHref(discordId) {
@@ -439,6 +469,9 @@ function lineChart(canvas, labels, datasets, stat) {
         borderWidth: 2,
         pointRadius: labels.length > 45 ? 0 : 2.5,
         pointHoverRadius: 4,
+        pointBackgroundColor: dataset.estimated?.map((estimated, pointIndex) =>
+          estimated ? "#facc15" : CHART_COLORS[index % CHART_COLORS.length]
+        ),
         spanGaps: true,
         tension: 0.25
       }))
@@ -454,7 +487,7 @@ function lineChart(canvas, labels, datasets, stat) {
           // on top of them (it flips to the other side near the chart edge).
           caretPadding: 24,
           callbacks: {
-            label: (ctx) => `${ctx.dataset.label}: ${fmtStat(stat, ctx.parsed.y)}`
+            label: (ctx) => `${ctx.dataset.label}${ctx.dataset.estimated?.[ctx.dataIndex] ? " (estimated)" : ""}: ${fmtStat(stat, ctx.parsed.y)}`
           }
         }
       },
@@ -636,18 +669,30 @@ function renderPlayer(discordId, statKey) {
         .join("")}</div></div>`
     : "";
 
+  // Only a canonical Tracker.gg BF6 profile URL is ever rendered; anything
+  // else in the data is ignored rather than linked.
+  const trackerUrl =
+    typeof member?.trackerUrl === "string" && /^https:\/\/tracker\.gg\/bf6\/profile\/\d+\/overview$/.test(member.trackerUrl)
+      ? member.trackerUrl
+      : null;
+  const profileSubParts = [
+    member?.profileName ? `Profile <strong>${esc(member.profileName)}</strong>` : "",
+    member?.eaName ? `EA <span class="mono">${esc(member.eaName)}</span>` : "",
+    platformLabel(member?.platform) ? `Platform <strong>${esc(platformLabel(member.platform))}</strong>` : "",
+    member?.personaId ? `Persona ID <span class="mono">${esc(member.personaId)}</span>` : "",
+    member?.nucleusId ? `Nucleus ID <span class="mono">${esc(member.nucleusId)}</span>` : "",
+    member?.gameToolsUrl ? `<a href="${esc(member.gameToolsUrl)}" target="_blank" rel="noopener">GameTools profile ↗</a>` : "",
+    trackerUrl ? `<a href="${esc(trackerUrl)}" target="_blank" rel="noopener noreferrer">Tracker.gg profile ↗</a>` : "",
+    !member ? `<span class="badge unlinked">no longer linked</span>` : ""
+  ].filter(Boolean);
+
   app.innerHTML = `
     <div class="profile-head">
       <h1 class="page-title">${esc(name)}</h1>
       ${member?.cachedStats ? cachedMarkerHtml() : ""}
     </div>
-    <p class="profile-sub">
-      ${member?.profileName ? `Profile <strong>${esc(member.profileName)}</strong> · ` : ""}
-      ${member?.eaName ? `EA <span class="mono">${esc(member.eaName)}</span> · ` : ""}
-      ${platformLabel(member?.platform) ? `Platform <strong>${esc(platformLabel(member.platform))}</strong> · ` : ""}
-      ${member?.gameToolsUrl ? `<a href="${esc(member.gameToolsUrl)}" target="_blank" rel="noopener">GameTools profile ↗</a>` : ""}
-      ${!member ? `<span class="badge unlinked">no longer linked</span>` : ""}
-    </p>
+    <p class="profile-sub">${profileSubParts.join(" · ")}</p>
+    ${estimatedHistoryNoticeHtml(discordId)}
     <div class="stat-summary-grid">${summaries}</div>
     <div class="chart-card">
       <h3>${esc(stat.title)} over time</h3>
@@ -666,7 +711,7 @@ function renderPlayer(discordId, statKey) {
     lineChart(
       document.getElementById("player-chart"),
       dates,
-      [{ label: name, data: series(discordId, stat.key) }],
+      [{ label: name, data: series(discordId, stat.key), estimated: dates.map((date) => Boolean(historyProvenance(discordId, date, stat.key))) }],
       stat
     );
   }
@@ -778,7 +823,11 @@ function renderCompare() {
     lineChart(
       document.getElementById("compare-chart"),
       window.labels,
-      compareState.selected.map((id) => ({ label: memberName(id), data: series(id, stat.key).slice(window.start) })),
+      compareState.selected.map((id) => ({
+        label: memberName(id),
+        data: series(id, stat.key).slice(window.start),
+        estimated: window.labels.map((date) => Boolean(historyProvenance(id, date, stat.key)))
+      })),
       stat
     );
   }
@@ -817,6 +866,7 @@ function renderTimeMachine() {
   app.innerHTML = `
     <div class="page-heading-row"><h1 class="page-title">Time Machine</h1>${shareButtonHtml()}</div>
     <p class="page-sub">The ${esc(stat.title)} leaderboard as it stood on any snapshot day</p>
+    ${estimatedDateNoticeHtml(dates[index])}
     ${statTabsHtml(stat.key)}
     <div class="date-control">
       <span class="date-label">${fmtDate(`${dates[index]}T12:00:00`)}</span>
@@ -1373,10 +1423,11 @@ async function fetchJson(path, fallback) {
 }
 
 async function boot() {
-  const [meta, latest, history, audit, notifications, effectivenessHistory] = await Promise.all([
+  const [meta, latest, history, historyProvenanceData, audit, notifications, effectivenessHistory] = await Promise.all([
     fetchJson("data/meta.json", null),
     fetchJson("data/latest.json", { members: [] }),
     fetchJson("data/history.json", { dates: [], members: {} }),
+    fetchJson("data/history-provenance.json", null),
     fetchJson("data/audit.json", { events: [] }),
     fetchJson("data/notifications.json", { events: [] }),
     fetchJson("data/effectiveness-history.json", null)
@@ -1397,6 +1448,7 @@ async function boot() {
     meta,
     latest,
     history,
+    historyProvenance: historyProvenanceData,
     audit,
     notifications,
     effectiveness,

@@ -695,6 +695,7 @@ tr.r3 .rank-cell { color: var(--bronze); }
 .profile-sub {
   color: var(--text-dim);
   margin-bottom: 1.25rem;
+  overflow-wrap: anywhere;
 }
 
 .stat-summary-grid {
@@ -746,6 +747,28 @@ tr.r3 .rank-cell { color: var(--bronze); }
   border-radius: 10px;
   padding: 1rem;
   margin-bottom: 1.5rem;
+}
+
+.estimated-history-notice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.65rem;
+  align-items: baseline;
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  border-left: 3px solid var(--gold);
+  border-radius: 7px;
+  background: rgba(250, 204, 21, 0.08);
+  color: var(--text-dim);
+  font-size: 0.82rem;
+}
+
+.estimated-history-notice strong {
+  color: var(--gold);
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .chart-card h3 {
