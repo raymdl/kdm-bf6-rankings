@@ -23,6 +23,10 @@ The live GameTools comparison established that `/bf6/multiple`, `/bf6/stats`, an
 6. Link confirmation parsing supports `platformid=...`, while confirmation generation omits it. Confirmation-derived recovery therefore loses part of the identity tuple.
 7. Only 10 of the 38 current authoritative link-registry records persist a platform, even though the stats cache has an effective platform for all 38.
 8. There is no user-visible distinction between the stats persona, preferred playing platform, and optional Tracker profile.
+9. An exact username search can return several persona IDs under one nucleus account, several nucleus accounts using the same name, or both; those cases have different meanings and should not be flattened into one candidate list.
+10. Some name-search candidates have no recorded BF6 stats and should not be presented as plausible choices when GameTools definitively confirms that they are empty.
+11. When several playable candidates remain, the bot does not currently show live stat fingerprints or explicitly request the user's selection before saving a link.
+12. The pinned Discord linking instructions do not describe the platform hint or the new multiple-account/persona confirmation flow.
 
 ## Non-goals
 
@@ -105,6 +109,10 @@ Enforce these invariants in one reusable validator:
 6. The same persona+nucleus pair cannot belong to two Discord members.
 7. A Tracker profile ID cannot belong to two Discord members.
 8. A preferred platform is advisory and never changes the batch identity tuple.
+9. Candidates sharing one nucleus ID are platform personas belonging to one EA account and must be grouped together.
+10. Candidates with different nucleus IDs are separate EA accounts even when their names are identical and must be shown as separate account groups.
+11. A candidate may be removed only after a successful GameTools response definitively shows no recorded BF6 play. A timeout, rate limit, gateway error, or missing batch entry is `unknown`, not empty.
+12. Candidate stats are user-facing fingerprints only. They must never automatically establish account ownership or override an explicit platform/persona choice.
 
 ## Enhanced `!bf6-link` command
 
@@ -115,10 +123,10 @@ Retain current inputs and add an optional platform hint:
 ```text
 !bf6-link <name>
 !bf6-link <personaId>
-!bf6-link <name-or-personaId> --platform ea|steam|psn|xbox
+!bf6-link <name-or-personaId> -platform ea|steam|psn|xbox
 ```
 
-Accept friendly aliases (`xbox`, `playstation`, `origin`) and normalize them. Keep the platform flag outside the parsed name so multi-word names continue to work.
+Use `-platform` as the documented syntax. The parser may also accept `--platform` as a convenience alias. Accept friendly values (`xbox`, `playstation`, `origin`) and normalize them. Keep the platform flag outside the parsed name so multi-word names and an optional trailing `@user` continue to work.
 
 The platform hint selects a persona candidate; it does not overwrite a candidate's platform. If the candidate returned by exact persona lookup conflicts with the hint, reject the request with a clear explanation.
 
@@ -136,39 +144,114 @@ This remains the safest way to resolve a known platform-specific persona.
 
 #### Name without a platform hint
 
-1. Collect every complete exact display-name or username match rather than sorting EA/PC first and immediately choosing one.
-2. Deduplicate candidates by persona+nucleus+platform.
-3. If exactly one candidate remains, verify and save it.
-4. If multiple candidates remain:
-   - If they describe the same persona/platform tuple, collapse them.
-   - Otherwise return `ambiguous_platform` and show a compact numbered list containing platform, profile name, and persona ID.
-   - Instruct the member to rerun with the numeric persona ID or `--platform`.
-5. Never silently pick EA solely because it sorts first.
+1. Collect every complete exact display-name or username match from GameTools and Choriper's all-platform global search rather than sorting EA/PC first and immediately choosing one.
+2. Do not make Choriper's BF6-specific `/bf6/player` endpoint the preferred or blocking discovery step. It may be retained only as optional enrichment/fallback; the known PSN members are found by the global search, and the BF6-specific endpoint can expose only the EA persona of a cross-platform account.
+3. Deduplicate candidates by persona+nucleus+platform.
+4. Group the remaining personas by nucleus ID:
+   - one nucleus with several persona IDs means one cross-platform EA account
+   - several nucleus IDs mean several distinct EA accounts matching the name
+5. Verify candidate identities using the existing exact GameTools rules.
+6. Check every verified candidate for recorded BF6 play before asking the user to choose.
+7. If exactly one playable candidate remains and every discarded candidate was definitively empty, save the playable candidate normally.
+8. If several playable or unknown candidates remain, return `confirmation_required` with a reason such as `multiple_personas`, `multiple_nuclei`, or `stats_inconclusive`.
+9. Never silently pick EA solely because it sorts first, and never choose a candidate based on the closest-looking stats.
 
 #### Name with a platform hint
 
 1. Filter exact-name candidates to the requested normalized platform.
-2. If exactly one remains, run the existing verification waterfall.
-3. If none remain, report the platforms that were found without linking.
-4. If multiple same-platform personas remain, require a numeric persona ID.
+2. Run identity and recorded-play verification for every matching candidate.
+3. If exactly one playable candidate remains, link it.
+4. If none remain, distinguish confirmed-empty profiles from temporarily unavailable verification and report the platforms that were found.
+5. If multiple same-platform personas or nucleus accounts remain, request explicit persona selection rather than guessing.
 
-### Ambiguity response example
+### Recorded-BF6-play filtering
+
+Use one bounded `/bf6/multiple` request containing all candidate tuples whenever possible. Normalize each returned row and reuse the existing recorded-play rule: positive `timePlayedHours` or positive player kills means the candidate has recorded BF6 play.
+
+Classify every candidate independently:
+
+- `playable`: a valid response has positive playtime or player kills; keep it
+- `empty`: a successful authoritative response has `hasResults=false` or a valid all-zero BF6 profile; suppress it from the normal choice list
+- `unknown`: timeout, 429, 5xx, malformed response, or missing batch entry; do not discard it
+
+If the batch fails globally, fall back only for unresolved candidates using the exact persona+nucleus+platform stats route. Rank availability must not decide whether a candidate is playable.
+
+Outcomes:
+
+- one `playable`, all others `empty`: link the playable candidate
+- several `playable`: request user confirmation with live fingerprints
+- `playable` plus `unknown`: request confirmation and label unavailable fingerprints
+- all `empty`: report that no exact-name account has recorded BF6 stats yet
+- only `unknown`: return `unreachable` and retry later
+
+### Candidate fingerprints and user confirmation
+
+For every candidate that survives filtering, show:
+
+- account group (`Account A`, `Account B`, and so on), derived from nucleus ID without exposing the nucleus ID
+- platform and exact profile/display name
+- persona ID
+- Player Rank when available
+- Player K/D (`infantryKillDeath`)
+- player kills
+- time played when available
+
+Fetch K/D, kills, and playtime in the candidate batch. Rank requires the separate profile endpoint and must use a short, bounded, best-effort lookup. A rank timeout must not delay or suppress the confirmation prompt; display `Rank unavailable` or omit the field.
+
+When several personas share one nucleus, state that they belong to the same EA account and cross-progression may make their stats identical. In that case, platform and persona ID—not the stat fingerprint—are the deciding information.
+
+Nothing is saved while `confirmation_required` is outstanding. The required cross-path confirmation mechanism is a generated explicit command for each choice, because it works with both the always-on bot and the delayed GitHub Actions poll:
 
 ```text
-I found more than one exact BF6 persona for Terrae:
+Reply with one of these exact commands:
+1. !b6-link 363127164 -platform ea
+2. !b6-link 290377828 -platform xbox
+```
 
-1. EA - eMp_Terrae - persona 363127164
-2. Xbox - Terrae - persona 290377828
+When linking another member, preserve the target mention in each generated command. Discord buttons may be added as a convenience, but the explicit command must remain available. Any button/token implementation must expire, be restricted to the initiating user or authorized moderator, and reverify the chosen tuple before saving.
 
-Nothing was linked. Run `!bf6-link 290377828` or
-`!bf6-link Terrae --platform xbox`.
+### Multiple-persona response example
+
+```text
+I found two playable BF6 personas for Terrae under the same EA account:
+
+1. EA - eMp_Terrae
+   Rank 342 · Player K/D 5.08 · 52,408 kills
+   Persona 363127164
+
+2. Xbox - Terrae
+   Rank 342 · Player K/D 5.08 · 52,408 kills
+   Persona 290377828
+
+These personas share one EA account, so their cross-progression stats may be identical.
+Nothing was linked. Reply with one of these exact commands:
+`!b6-link 363127164 -platform ea`
+`!b6-link 290377828 -platform xbox`
+```
+
+### Multiple-nucleus response example
+
+```text
+I found two different BF6 accounts matching ExamplePlayer:
+
+Account A - Steam
+Rank 286 · Player K/D 3.42 · 24,810 kills · 312 hours
+Persona 1001234567890
+
+Account B - EA
+Rank 41 · Player K/D 1.18 · 2,104 kills · 27 hours
+Persona 3456789012
+
+Nothing was linked. Reply with the command for your account:
+`!b6-link 1001234567890 -platform steam`
+`!b6-link 3456789012 -platform ea`
 ```
 
 Do not include nucleus IDs or other internal identifiers in the public response unless they are already considered safe for the current link-confirmation channel.
 
 ### Preferred platform capture
 
-When a member supplies `--platform` and the selected persona matches it, save that value as both the persona platform and `bf6PreferredPlatform` with `user-selected` provenance.
+When a member supplies `-platform` and the selected persona matches it, save that value as both the persona platform and `bf6PreferredPlatform` with `user-selected` provenance.
 
 When a numeric persona is used without a hint, save only the persona platform. Do not assume it is the preferred platform.
 
@@ -321,6 +404,73 @@ Moderators should also have a dry-run audit summary showing:
 
 Avoid publishing internal confidence details or raw API payloads in general Discord channels.
 
+## Update the pinned instructions and post one announcement
+
+Keep the existing `src/bf6-setup-discord.js` create/update/pin control flow. Update only its canonical `INSTRUCTIONS` content, then run the existing `npm run setup:bf6-discord` command so it patches the current bot-authored pinned instruction message in place. Do not replace, unpin, or delete the existing instruction message.
+
+The updated pinned message should retain the existing recognizable header, stay below Discord's message-length limit, and include at least:
+
+```text
+**BF6 / GameTools Bot Setup**
+
+Link your BF6 account:
+`!b6-link YourBF6Name`
+`!b6-link 347891802`
+
+Optional platform hint:
+`!b6-link YourBF6Name -platform ea`
+`!b6-link YourBF6Name -platform steam`
+`!b6-link YourBF6Name -platform psn`
+`!b6-link YourBF6Name -platform xbox`
+
+`!bf6-link` also works. Add `@user` at the end when linking someone else.
+
+If an exact name matches multiple BF6 accounts or platform personas, the bot
+will remove profiles with no recorded BF6 play, show live Rank, Player K/D,
+kills, and playtime for the remaining choices, and ask you to confirm one.
+Nothing is linked until you send the exact selection command shown by the bot.
+
+Unlink: `!b6-unlink`
+Manual refresh: `!bf6-refresh`
+```
+
+Final wording may retain the existing Choriper help URL and tracked-stat description, but it must explain that `-platform` is optional and that the bot may request confirmation. Validate the final rendered length and formatting in a test before posting.
+
+### Pinned-message update requirements
+
+1. Record the existing pinned instruction message ID before the rollout.
+2. Run `npm run setup:bf6-discord` after the new linking behavior is deployed.
+3. Verify the command patched the same message ID and that it remains pinned.
+4. Do not call the delete-message or unpin routes.
+5. Repeated BAU runs must continue patching that same pinned message rather than creating additional instruction posts.
+6. The existing initial/disaster-recovery behavior may create and pin a message only when no recognized bot-authored instruction message exists.
+
+### One-time unpinned announcement
+
+After the pinned message has been updated and verified, have the bot post one brief, unpinned announcement in `DISCORD_BF6_LINK_CHANNEL_ID`:
+
+```text
+**BF6 linking commands updated**
+
+You can now optionally include your platform when linking:
+`!b6-link YourBF6Name -platform ea|steam|psn|xbox`
+
+If your name matches multiple BF6 accounts or platform personas, the bot will
+ignore profiles with no recorded BF6 play, show live stat fingerprints for the
+remaining choices, and ask you to confirm the correct persona.
+
+The pinned linking instructions have been updated with the full details.
+```
+
+The announcement must disable mentions and must not be pinned. Implement it as a separate explicit one-time action, not as part of bot startup or normal `setup:bf6-discord` BAU behavior. Suggested command:
+
+```text
+npm run actions:bf6-announce-linking-update -- --dry-run
+npm run actions:bf6-announce-linking-update -- --post
+```
+
+Use a stable announcement marker such as `**BF6 linking commands updated**`. Before posting, inspect recent messages in the configured link channel for the same bot-authored marker and skip if it already exists. Default to dry-run unless `--post` is supplied. Log the posted or existing message ID. If the pinned instruction update was not verified, do not post the announcement.
+
 ## Implementation phases
 
 ### Phase A: Semantics and lossless metadata
@@ -334,10 +484,14 @@ Avoid publishing internal confidence details or raw API payloads in general Disc
 ### Phase B: Ambiguity-aware resolver
 
 1. Change candidate selection to return all exact candidates.
-2. Add platform-hint parsing.
-3. Introduce the `ambiguous_platform` result.
-4. Update immediate and delayed link handlers so ambiguity produces a terminal instructional response rather than an endless retry.
-5. Preserve the existing Choriper discovery and GameTools verification waterfall for the selected candidate.
+2. Group exact candidates by nucleus and persona IDs.
+3. Add `-platform` hint parsing and accept `--platform` as an optional alias.
+4. Filter only definitively empty BF6 profiles using a bounded candidate batch and exact per-candidate fallback.
+5. Add live K/D, kills, playtime, and best-effort rank fingerprints.
+6. Introduce `confirmation_required` with explicit `multiple_personas`, `multiple_nuclei`, and `stats_inconclusive` reasons.
+7. Update immediate and delayed link handlers so confirmation produces a terminal instructional response rather than an endless retry.
+8. Make the all-platform candidate search authoritative for discovery; retain the BF6-specific Choriper endpoint only as optional enrichment/fallback.
+9. Reverify the exact persona+nucleus+platform tuple supplied by the user's generated selection command before saving.
 
 ### Phase C: Audit and registry completion
 
@@ -354,11 +508,22 @@ Avoid publishing internal confidence details or raw API payloads in general Disc
 3. Add Tracker commands only if internal endpoint stability and throttling are acceptable.
 4. Consider alternate-persona storage after the flat-field release is stable.
 
+### Phase E: Discord instructions and one-time announcement
+
+1. Update only the canonical instruction text with `-platform` examples and the multiple-candidate confirmation behavior; preserve the setup script's existing edit-in-place flow.
+2. Test that setup patches the existing pinned instruction message ID and never posts or deletes when that message exists.
+3. Add the separate dry-run-by-default one-time announcement action with duplicate-marker detection.
+4. After the new link behavior is deployed, run `npm run setup:bf6-discord` and verify the existing pin was edited in place.
+5. Preview the announcement, then post it once and verify it is unpinned.
+6. Run the announcement action again in dry-run/post mode and confirm it detects the existing marker and skips rather than posting a duplicate.
+
 ## Required tests
 
 ### Parser and command tests
 
-- multi-word names still parse with and without `--platform`
+- multi-word names still parse with and without `-platform`
+- `--platform` is accepted as an optional alias when retained
+- the platform option parses correctly before an optional trailing `@user`
 - friendly platform aliases normalize correctly
 - an invalid platform flag is rejected without linking
 - numeric persona plus matching hint succeeds
@@ -368,16 +533,35 @@ Avoid publishing internal confidence details or raw API payloads in general Disc
 ### Resolver tests
 
 - one exact candidate links normally
-- exact same name on EA and Xbox returns `ambiguous_platform`
+- several persona IDs under one nucleus are grouped as one cross-platform account
+- the same exact name under several nucleus IDs is grouped as distinct accounts
+- exact same name on EA and Xbox returns `confirmation_required`, not an automatic EA selection
 - a platform hint selects the matching exact candidate
-- two same-platform exact candidates require a numeric persona ID
+- two same-platform exact candidates request persona confirmation
+- confirmed all-zero/no-results candidates are removed before confirmation
+- a timeout, 429, 5xx, malformed response, or missing batch row leaves the candidate `unknown` rather than discarding it
+- one playable candidate plus only definitively empty candidates links normally
+- several playable candidates produce fingerprints and exact selection commands
+- all confirmed-empty candidates produce the no-recorded-BF6-stats response
+- rank failure does not block candidate confirmation
+- stat similarity never automatically selects a candidate
 - no candidate is selected merely because it is EA/PC
 - exact numeric persona behavior remains unchanged
 - Choriper candidates still require GameTools verification
 - persona/nucleus mismatches remain rejected
 - a temporary upstream outage remains `unreachable`
 
-Use Terrae as a regression fixture: an EA persona and Xbox persona share one nucleus, and selecting one must never rewrite the other's platform.
+Use Terrae as the multiple-persona regression fixture: an EA persona and Xbox persona share one nucleus, may return identical cross-progression stats, and selecting one must never rewrite the other's platform. Add a separate fixture with the same exact username under two nucleus IDs to verify Account A/B grouping and stat-fingerprint confirmation.
+
+### Confirmation-response tests
+
+- the response shows account group, platform, profile name, persona ID, Player K/D, kills, playtime, and best-effort rank
+- nucleus IDs are used for grouping but are not exposed publicly
+- same-nucleus candidates include the cross-progression/identical-stats warning
+- every displayed candidate has an exact generated `!b6-link <personaId> -platform <platform>` command
+- a target `@user` is preserved when linking on someone else's behalf
+- nothing is persisted before the explicit selection command is reprocessed and reverified
+- optional buttons are restricted to the initiating user or authorized moderator and cannot bypass tuple reverification
 
 ### Metadata and migration tests
 
@@ -403,6 +587,19 @@ Use Terrae as a regression fixture: an EA persona and Xbox persona share one nuc
 - preferred/Tracker fields never enter the batch body
 - incomplete tuples are re-resolved or safely excluded from the preferred batch
 - existing exact-ID response matching and individual fallback behavior remain intact
+- candidate filtering batches all candidate tuples when possible and falls back only for unresolved rows
+- a global candidate batch failure cannot convert every candidate into confirmed empty
+
+### Discord instruction and announcement tests
+
+- the updated pinned instruction content includes optional `-platform` examples and multiple-candidate confirmation behavior
+- the final pinned message stays within Discord's message-length limit
+- existing setup behavior patches the recognized pinned message ID in place
+- BAU setup does not create, delete, or unpin when the recognized instruction message exists
+- the one-time announcement is posted with mentions disabled and is not pinned
+- announcement dry-run performs no mutation
+- a pre-existing bot-authored announcement marker prevents a duplicate post
+- unrelated bot/user messages containing similar words do not trigger the duplicate check
 
 ## Validation and rollout
 
@@ -415,7 +612,9 @@ Use Terrae as a regression fixture: an EA persona and Xbox persona share one nuc
 7. Deploy Phase B and observe ambiguity/error rates before any registry migration.
 8. Run the reviewed Phase C one-time registry completion.
 9. Add Phase D data only after the primary identity registry is clean.
-10. Monitor link failures, ambiguity responses, batch missing-member rates, and fallback usage for at least several refresh cycles.
+10. Update and verify the existing pinned instruction message in place.
+11. Preview and post the one-time unpinned linking-update announcement, then verify a rerun skips it.
+12. Monitor link failures, confirmation responses, batch missing-member rates, and fallback usage for at least several refresh cycles.
 
 Do not merge a migration that depends on Tracker availability. GameTools linking and stat refresh must remain fully functional when Tracker is unavailable or throttled.
 
@@ -424,6 +623,10 @@ Do not merge a migration that depends on Tracker availability. GameTools linking
 The enhancement is complete when:
 
 - no name-based link silently chooses among multiple platform personas
+- confirmed no-play candidates are removed without treating unavailable requests as empty
+- multiple persona IDs are grouped by nucleus and multiple nucleus IDs are presented as separate account groups
+- every remaining ambiguous choice receives live stat fingerprints when available and an exact user-confirmation command
+- no ambiguous identity is saved before explicit user confirmation and exact tuple reverification
 - every saved GameTools platform belongs to its stored persona ID
 - PSN null platform IDs are treated as valid where appropriate
 - confirmation metadata losslessly recovers the GameTools identity tuple
@@ -432,6 +635,8 @@ The enhancement is complete when:
 - preferred and Tracker platforms are stored and displayed separately
 - batch requests never use Tracker/preferred platform fields
 - immediate and scheduled link flows behave consistently
+- the existing pinned instruction message is updated in place and remains the sole pinned linking guide
+- exactly one unpinned linking-update announcement is posted, with duplicate prevention for reruns
 - all focused and full-suite tests pass
 - rollback artifacts and the pre-migration state hash are retained
 
@@ -449,12 +654,16 @@ The enhancement is complete when:
 - `src/bf6-links.js`
 - `src/index.js`
 - `src/bf6-actions-check-links.js`
+- `src/bf6-setup-discord.js` (instruction content only; retain edit-in-place behavior)
+- a new one-time BF6 linking-update announcement action
 - `src/bf6-platform-migration.js`
 - a new read-only identity-audit module/action
 - `test/bf6-resolve.test.js`
 - `test/bf6-links.test.js`
 - `test/bf6-platform-migration.test.js`
 - `test/bf6-multiple.test.js`
+- Discord setup/announcement tests
 - audit/cache tests as needed
+- `package.json`
 - `README.md`
 - `BF6_PROFILE_MATCHING_WATERFALL.md`
