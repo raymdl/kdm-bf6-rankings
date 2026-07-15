@@ -517,6 +517,9 @@ tr.r3 .rank-cell { color: var(--bronze); }
 .badge.linked { color: var(--up); border-color: rgba(74, 222, 128, 0.4); }
 .badge.relinked { color: var(--gold); border-color: rgba(251, 191, 36, 0.4); }
 .badge.unlinked { color: var(--down); border-color: rgba(248, 113, 113, 0.4); }
+.badge.tracker_linked { color: var(--up); border-color: rgba(74, 222, 128, 0.4); }
+.badge.tracker_updated { color: var(--gold); border-color: rgba(251, 191, 36, 0.4); }
+.badge.tracker_unlinked { color: var(--down); border-color: rgba(248, 113, 113, 0.4); }
 .badge.success { color: var(--up); border-color: rgba(74, 222, 128, 0.4); }
 .badge.failed { color: var(--down); border-color: rgba(248, 113, 113, 0.4); }
 .badge.link_attempt, .badge.relink_attempt { color: var(--gold); border-color: rgba(251, 191, 36, 0.4); }
