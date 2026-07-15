@@ -820,13 +820,22 @@ tr.r3 .rank-cell { color: var(--bronze); }
 }
 
 .tracker-history-toggle {
-  min-height: 2.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 7.4rem;
+  min-height: 2rem;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.42rem 0.7rem;
+  border-radius: 7px;
+  padding: 0.32rem 0.55rem;
   color: var(--text);
   background: var(--bg-card);
-  font: inherit;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .tracker-history-toggle {
