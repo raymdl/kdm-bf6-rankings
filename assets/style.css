@@ -713,6 +713,32 @@ tr.r3 .rank-cell { color: var(--bronze); }
   cursor: pointer;
 }
 
+.stat-summary-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.backfill-badge {
+  flex: 0 0 auto;
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  border-radius: 999px;
+  padding: 0.12rem 0.38rem;
+  color: var(--gold);
+  background: rgba(250, 204, 21, 0.08);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.backfill-badge.active {
+  color: #181400;
+  background: var(--gold);
+}
+
 .stat-summary:hover {
   background: var(--bg-hover);
 }
@@ -769,6 +795,51 @@ tr.r3 .rank-cell { color: var(--bronze); }
   font-family: var(--font-display);
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.player-history-controls {
+  display: flex;
+  align-items: end;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  margin: 0 0 1rem;
+}
+
+.snapshot-date-select {
+  display: grid;
+  gap: 0.25rem;
+  color: var(--text-faint);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.snapshot-date-select select,
+.tracker-history-toggle {
+  min-height: 2.35rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.42rem 0.7rem;
+  color: var(--text);
+  background: var(--bg-card);
+  font: inherit;
+}
+
+.tracker-history-toggle {
+  cursor: pointer;
+}
+
+.tracker-history-toggle:hover,
+.tracker-history-toggle.active {
+  border-color: var(--gold);
+  background: rgba(250, 204, 21, 0.08);
+}
+
+.tracker-history-toggle:focus-visible,
+.snapshot-date-select select:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 
 .chart-card h3 {
