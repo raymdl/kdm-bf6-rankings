@@ -182,8 +182,29 @@ function estimatedHistoryNoticeHtml(discordId) {
   }
   return `<div class="estimated-history-notice" role="note">
     <strong>Estimated from Tracker session history</strong>
-    <span>${esc(entry.coverageStart ?? "Historical coverage")} through ${esc(entry.coverageEnd ?? "the first authoritative KDM snapshot")}. Grouped sessions may be assigned to a refresh/display date, so individual match dates are approximate.</span>
+    <span>${entry.coverageStart ? fmtDate(`${entry.coverageStart}T12:00:00`) : "Historical coverage"} through ${entry.coverageEnd ? fmtDate(`${entry.coverageEnd}T12:00:00`) : "the first authoritative KDM snapshot"}. Grouped sessions may be assigned to a refresh/display date, so individual match dates are approximate.</span>
   </div>`;
+}
+
+function memberBackfillFields(discordId) {
+  const entry = state.historyProvenance?.members?.[discordId];
+  if (!entry) {
+    return new Set();
+  }
+  const fields = new Set();
+  for (const date of Object.values(entry.dates ?? {})) {
+    for (const field of Object.keys(date.fields ?? {})) {
+      fields.add(field);
+    }
+  }
+  return fields;
+}
+
+function playerHistoryHref(discordId, statKey, date, showEstimated) {
+  return hashRoute(`player/${encodeURIComponent(discordId)}/${statKey}`, {
+    date,
+    estimated: showEstimated ? 1 : null
+  });
 }
 
 function estimatedDateNoticeHtml(date) {
@@ -629,7 +650,7 @@ function renderPlayers() {
   });
 }
 
-function renderPlayer(discordId, statKey) {
+function renderPlayer(discordId, statKey, params) {
   const member = state.latest.members.find((candidate) => candidate.discordId === discordId);
   const historyEntry = state.history.members?.[discordId];
   if (!member && !historyEntry) {
@@ -641,20 +662,49 @@ function renderPlayer(discordId, statKey) {
   const stat = statByKey(statKey) ?? state.meta.stats[0];
   const dates = state.history.dates;
   const lastIndex = dates.length - 1;
-  const weekAgoIndex = lastIndex >= 0 ? indexOnOrBefore(shiftDateString(dates[lastIndex], -7)) : -1;
+  const requestedDate = params?.get("date");
+  const selectedIndex = requestedDate && dates.includes(requestedDate) ? dates.indexOf(requestedDate) : lastIndex;
+  const selectedDate = dates[selectedIndex] ?? null;
+  const showEstimated = params?.get("estimated") === "1";
+  const backfillFields = memberBackfillFields(discordId);
+  const weekAgoIndex = selectedIndex >= 0 ? indexOnOrBefore(shiftDateString(dates[selectedIndex], -7)) : -1;
+
+  const visibleValueAt = (statKeyToRead, index) => {
+    const values = series(discordId, statKeyToRead);
+    for (let i = Math.min(index, values.length - 1); i >= 0; i -= 1) {
+      if (Number.isFinite(values[i]) && (showEstimated || !historyProvenance(discordId, dates[i], statKeyToRead))) {
+        return values[i];
+      }
+    }
+    return null;
+  };
+  const visibleRankingAt = (statKeyToRead, index) => Object.keys(state.history.members ?? {})
+    .map((candidateId) => {
+      const values = series(candidateId, statKeyToRead);
+      for (let i = Math.min(index, values.length - 1); i >= 0; i -= 1) {
+        if (Number.isFinite(values[i]) && (showEstimated || !historyProvenance(candidateId, dates[i], statKeyToRead))) {
+          return { discordId: candidateId, value: values[i] };
+        }
+      }
+      return { discordId: candidateId, value: null };
+    })
+    .filter((row) => Number.isFinite(row.value))
+    .sort((a, b) => b.value - a.value);
 
   const summaries = state.meta.stats
     .map((candidate) => {
-      const current = member ? member.stats[candidate.key] : valueAt(discordId, candidate.key, lastIndex);
-      const ranking = latestRanking(candidate.key);
+      const current = visibleValueAt(candidate.key, selectedIndex);
+      const ranking = visibleRankingAt(candidate.key, selectedIndex);
       const rankIndex = ranking.findIndex((row) => row.discordId === discordId);
-      const weekAgo = weekAgoIndex >= 0 ? valueAt(discordId, candidate.key, weekAgoIndex) : null;
+      const weekAgo = weekAgoIndex >= 0 ? visibleValueAt(candidate.key, weekAgoIndex) : null;
       const delta = Number.isFinite(current) && Number.isFinite(weekAgo) ? fmtDelta(candidate, current - weekAgo) : null;
       const deltaClass = delta ? (current > weekAgo ? "up" : "down") : "flat";
+      const hasBackfill = backfillFields.has(candidate.key);
+      const isEstimated = showEstimated && Boolean(historyProvenance(discordId, selectedDate, candidate.key));
       return `<div class="stat-summary ${candidate.key === stat.key ? "active" : ""}" data-stat="${candidate.key}">
-        <div class="k">${esc(candidate.title)}</div>
+        <div class="stat-summary-head"><div class="k">${esc(candidate.title)}</div>${hasBackfill ? `<span class="backfill-badge ${isEstimated ? "active" : ""}" title="Tracker-backfilled history is available for this stat">${isEstimated ? "Estimated" : "Backfill"}</span>` : ""}</div>
         <div class="v">${fmtStat(candidate, current)}</div>
-        <div class="m">${rankIndex >= 0 ? `Rank #${rankIndex + 1} of ${ranking.length}` : "Unranked"}${
+        <div class="m">${selectedDate ? fmtDate(`${selectedDate}T12:00:00`) : "No snapshot"} · ${rankIndex >= 0 ? `Rank #${rankIndex + 1} of ${ranking.length}` : "Unranked"}${
           delta ? ` · <span class="delta ${deltaClass}">${delta}</span> 7d` : ""
         }</div>
       </div>`;
@@ -693,6 +743,14 @@ function renderPlayer(discordId, statKey) {
     </div>
     <p class="profile-sub">${profileSubParts.join(" · ")}</p>
     ${estimatedHistoryNoticeHtml(discordId)}
+    <div class="player-history-controls">
+      <label class="snapshot-date-select">Snapshot
+        <select id="player-date-select" aria-label="Player snapshot date">${dates
+          .map((date, index) => `<option value="${date}" ${index === selectedIndex ? "selected" : ""}>${fmtDate(`${date}T12:00:00`)}${index === lastIndex ? " (latest)" : ""}</option>`)
+          .join("")}</select>
+      </label>
+      ${backfillFields.size > 0 ? `<button class="tracker-history-toggle ${showEstimated ? "active" : ""}" id="tracker-history-toggle" type="button" aria-pressed="${showEstimated}">${showEstimated ? "Hide Tracker estimates" : "Show Tracker estimates"}</button>` : ""}
+    </div>
     <div class="stat-summary-grid">${summaries}</div>
     <div class="chart-card">
       <h3>${esc(stat.title)} over time</h3>
@@ -703,15 +761,26 @@ function renderPlayer(discordId, statKey) {
 
   for (const card of app.querySelectorAll(".stat-summary")) {
     card.addEventListener("click", () => {
-      location.hash = `/player/${encodeURIComponent(discordId)}/${card.dataset.stat}`;
+      location.hash = playerHistoryHref(discordId, card.dataset.stat, selectedDate, showEstimated);
     });
   }
 
-  if (dates.length > 0) {
+  document.getElementById("player-date-select")?.addEventListener("change", (event) => {
+    replaceHashAndRender(playerHistoryHref(discordId, stat.key, event.target.value, showEstimated));
+  });
+  document.getElementById("tracker-history-toggle")?.addEventListener("click", () => {
+    replaceHashAndRender(playerHistoryHref(discordId, stat.key, selectedDate, !showEstimated));
+  });
+
+  if (selectedIndex >= 0) {
+    const chartDates = dates.slice(0, selectedIndex + 1);
+    const chartData = series(discordId, stat.key)
+      .slice(0, selectedIndex + 1)
+      .map((value, index) => (showEstimated || !historyProvenance(discordId, chartDates[index], stat.key) ? value : null));
     lineChart(
       document.getElementById("player-chart"),
-      dates,
-      [{ label: name, data: series(discordId, stat.key), estimated: dates.map((date) => Boolean(historyProvenance(discordId, date, stat.key))) }],
+      chartDates,
+      [{ label: name, data: chartData, estimated: chartDates.map((date) => showEstimated && Boolean(historyProvenance(discordId, date, stat.key))) }],
       stat
     );
   }
@@ -1379,7 +1448,7 @@ function render() {
     renderPlayers();
   } else if (route === "player") {
     nav = "players";
-    renderPlayer(decodeURIComponent(parts[1] ?? ""), parts[2]);
+    renderPlayer(decodeURIComponent(parts[1] ?? ""), parts[2], params);
   } else if (route === "compare") {
     nav = "compare";
     loadCompareState(params);
