@@ -215,12 +215,6 @@ function playerRangeSelectHtml(range) {
   </label>`;
 }
 
-function estimatedDateNoticeHtml(date) {
-  return state.historyProvenance?.members && Object.values(state.historyProvenance.members).some((member) => member.dates?.[date])
-    ? `<div class="estimated-history-notice" role="note"><strong>Estimated history</strong><span>Some values on this date are reconstructed from Tracker session history; grouped-session dates are approximate.</span></div>`
-    : "";
-}
-
 function playerHref(discordId) {
   return `#/player/${encodeURIComponent(discordId)}`;
 }
@@ -318,32 +312,53 @@ function valueAt(discordId, statKey, dateIndex) {
   return null;
 }
 
-// Earliest finite value at or after the window start, stopping before the
-// current column. A newly promoted stat can have leading null history cells;
-// those cells should not make every member look NEW in the delta baseline.
-function baselineValueAt(discordId, statKey, fromIndex, lastIndex) {
+function authoritativeValueAt(discordId, statKey, dateIndex, fromIndex = 0) {
   const values = series(discordId, statKey);
-  const end = Math.min(lastIndex - 1, values.length - 1);
-  for (let i = Math.max(0, fromIndex); i <= end; i += 1) {
-    if (Number.isFinite(values[i])) {
-      return values[i];
+  for (let index = Math.min(dateIndex, values.length - 1); index >= fromIndex; index -= 1) {
+    if (Number.isFinite(values[index]) && !historyProvenance(discordId, state.history.dates[index], statKey)) {
+      return values[index];
     }
   }
   return null;
 }
 
-function rankingAt(statKey, dateIndex, memberIds) {
+function authoritativeBaselineValueAt(discordId, statKey, fromIndex, lastIndex) {
+  const values = series(discordId, statKey);
+  const end = Math.min(lastIndex - 1, values.length - 1);
+  for (let index = Math.max(0, fromIndex); index <= end; index += 1) {
+    if (Number.isFinite(values[index]) && !historyProvenance(discordId, state.history.dates[index], statKey)) {
+      return values[index];
+    }
+  }
+  return null;
+}
+
+function authoritativeHistoryIndexes(statKey = null, memberIds = Object.keys(state.history.members ?? {})) {
+  return state.history.dates
+    .map((date, index) =>
+      memberIds.some((discordId) => {
+        const values = state.history.members?.[discordId]?.values ?? {};
+        const statKeys = statKey ? [statKey] : Object.keys(values);
+        return statKeys.some((key) => Number.isFinite(values[key]?.[index]) && !historyProvenance(discordId, date, key));
+      })
+        ? index
+        : -1
+    )
+    .filter((index) => index >= 0);
+}
+
+function authoritativeRankingAt(statKey, dateIndex, memberIds) {
   return memberIds
-    .map((discordId) => ({ discordId, value: valueAt(discordId, statKey, dateIndex) }))
+    .map((discordId) => ({ discordId, value: authoritativeValueAt(discordId, statKey, dateIndex, dateIndex) }))
     .filter((row) => Number.isFinite(row.value))
     .sort((a, b) => b.value - a.value);
 }
 
-function baselineRankingAt(statKey, fromIndex, lastIndex, memberIds) {
+function authoritativeBaselineRankingAt(statKey, fromIndex, lastIndex, memberIds) {
   return memberIds
     .map((discordId) => ({
       discordId,
-      value: baselineValueAt(discordId, statKey, fromIndex, lastIndex)
+      value: authoritativeBaselineValueAt(discordId, statKey, fromIndex, lastIndex)
     }))
     .filter((row) => Number.isFinite(row.value))
     .sort((a, b) => b.value - a.value);
@@ -547,18 +562,20 @@ function renderLeaderboard(statKey) {
   const stat = statByKey(statKey) ?? state.meta.stats[0];
   const ranking = latestRanking(stat.key);
   const memberIds = Object.keys(state.history.members ?? {});
-  const lastIndex = state.history.dates.length - 1;
+  const authoritativeIndexes = authoritativeHistoryIndexes(stat.key, memberIds);
+  const lastIndex = authoritativeIndexes.at(-1) ?? -1;
   // A one-day view means yesterday-to-today, so it needs two snapshot points.
   const sparkPointCount = leaderboardSparklineRange === 1 ? 2 : leaderboardSparklineRange;
-  const sparkStart =
-    sparkPointCount === "all" ? 0 : Math.max(0, lastIndex - sparkPointCount + 1);
+  const sparkIndexes =
+    sparkPointCount === "all" ? authoritativeIndexes : authoritativeIndexes.slice(-sparkPointCount);
+  const sparkStart = sparkIndexes[0] ?? lastIndex;
   // Movement and deltas compare the current standings against the start of the
   // same window the sparkline covers, so the selected range drives both.
   const windowText = rangeWindowText(leaderboardSparklineRange);
   const baselineIndex = sparkStart;
   const prevRanking =
     baselineIndex >= 0 && baselineIndex < lastIndex
-      ? baselineRankingAt(stat.key, baselineIndex, lastIndex, memberIds)
+      ? authoritativeBaselineRankingAt(stat.key, baselineIndex, lastIndex, memberIds)
       : [];
   const prevRankById = new Map(prevRanking.map((row, index) => [row.discordId, index + 1]));
   const prevValueById = new Map(prevRanking.map((row) => [row.discordId, row.value]));
@@ -585,7 +602,10 @@ function renderLeaderboard(statKey) {
       const prevValue = prevValueById.get(row.discordId);
       const delta = fmtDelta(stat, row.value - (prevValue ?? NaN));
       const deltaClass = delta ? (row.value > prevValue ? "up" : "down") : "flat";
-      const spark = series(row.discordId, stat.key).slice(sparkStart, lastIndex + 1);
+      const values = series(row.discordId, stat.key);
+      const spark = sparkIndexes.map((historyIndex) =>
+        historyProvenance(row.discordId, state.history.dates[historyIndex], stat.key) ? null : values[historyIndex]
+      );
       const cached = row.member?.cachedStats ? cachedMarkerHtml() : "";
       return `<tr class="r${rank}">
         <td class="rank-cell">${rank}</td>
@@ -840,12 +860,29 @@ function compareRangeSelectHtml() {
   </label>`;
 }
 
-function compareHistoryWindow() {
+function compareHistoryWindow(statKey) {
+  const dates = state.history.dates;
+  const hasDataAt = (index) =>
+    compareState.selected.some(
+      (id) => Number.isFinite(series(id, statKey)[index]) && !historyProvenance(id, dates[index], statKey)
+    );
+  const firstDataIndex = dates.findIndex((_, index) => hasDataAt(index));
+  if (firstDataIndex < 0) {
+    return { labels: [], start: 0, end: 0 };
+  }
+
+  let lastDataIndex = dates.length - 1;
+  while (lastDataIndex > firstDataIndex && !hasDataAt(lastDataIndex)) {
+    lastDataIndex -= 1;
+  }
+
   const pointCount = compareState.range === 1 ? 2 : compareState.range;
-  const start = pointCount === "all" ? 0 : Math.max(0, state.history.dates.length - pointCount);
+  const start = pointCount === "all" ? firstDataIndex : Math.max(firstDataIndex, lastDataIndex - pointCount + 1);
+  const end = lastDataIndex + 1;
   return {
-    labels: state.history.dates.slice(start),
-    start
+    labels: dates.slice(start, end),
+    start,
+    end
   };
 }
 
@@ -906,14 +943,15 @@ function renderCompare() {
   }
 
   if (state.history.dates.length > 0 && compareState.selected.length > 0) {
-    const window = compareHistoryWindow();
+    const window = compareHistoryWindow(stat.key);
     lineChart(
       document.getElementById("compare-chart"),
       window.labels,
       compareState.selected.map((id) => ({
         label: memberName(id),
-        data: series(id, stat.key).slice(window.start),
-        estimated: window.labels.map((date) => Boolean(historyProvenance(id, date, stat.key)))
+        data: series(id, stat.key)
+          .slice(window.start, window.end)
+          .map((value, index) => (historyProvenance(id, window.labels[index], stat.key) ? null : value))
       })),
       stat
     );
@@ -924,41 +962,47 @@ function renderCompare() {
 const timeMachineState = { index: null, statKey: null };
 
 function timeMachineHref(statKey = timeMachineState.statKey, index = timeMachineState.index) {
-  return hashRoute("history", { stat: statKey, date: state.history.dates[index] });
+  const snapshotIndexes = authoritativeHistoryIndexes();
+  return hashRoute("history", { stat: statKey, date: state.history.dates[snapshotIndexes[index]] });
 }
 
 function loadTimeMachineState(params) {
   const dates = state.history.dates;
+  const snapshotIndexes = authoritativeHistoryIndexes();
   const requestedDate = params.get("date");
   timeMachineState.statKey = (statByKey(params.get("stat")) ?? state.meta.stats[0]).key;
-  timeMachineState.index = requestedDate && dates.includes(requestedDate) ? dates.indexOf(requestedDate) : dates.length - 1;
+  const requestedHistoryIndex = requestedDate ? dates.indexOf(requestedDate) : -1;
+  const requestedSnapshotIndex = snapshotIndexes.indexOf(requestedHistoryIndex);
+  timeMachineState.index = requestedSnapshotIndex >= 0 ? requestedSnapshotIndex : snapshotIndexes.length - 1;
 }
 
 function renderTimeMachine() {
   const dates = state.history.dates;
-  if (dates.length === 0) {
+  const snapshotIndexes = authoritativeHistoryIndexes();
+  if (snapshotIndexes.length === 0) {
     app.innerHTML = `<div class="empty">No snapshots yet — check back after the first daily update.</div>`;
     return;
   }
 
   const stat = statByKey(timeMachineState.statKey) ?? state.meta.stats[0];
   timeMachineState.statKey = stat.key;
-  const index = timeMachineState.index ?? dates.length - 1;
+  const index = timeMachineState.index ?? snapshotIndexes.length - 1;
   timeMachineState.index = index;
+  const historyIndex = snapshotIndexes[index];
+  const date = dates[historyIndex];
   history.replaceState(null, "", timeMachineHref(stat.key, index));
 
   const memberIds = Object.keys(state.history.members ?? {});
-  const ranking = rankingAt(stat.key, index, memberIds);
+  const ranking = authoritativeRankingAt(stat.key, historyIndex, memberIds);
 
   app.innerHTML = `
     <div class="page-heading-row"><h1 class="page-title">Time Machine</h1>${shareButtonHtml()}</div>
     <p class="page-sub">The ${esc(stat.title)} leaderboard as it stood on any snapshot day</p>
-    ${estimatedDateNoticeHtml(dates[index])}
     ${statTabsHtml(stat.key)}
     <div class="date-control">
-      <span class="date-label">${fmtDate(`${dates[index]}T12:00:00`)}</span>
-      <input type="range" min="0" max="${dates.length - 1}" value="${index}" id="date-slider" />
-      <span class="mono">${index + 1}/${dates.length} snapshots</span>
+      <span class="date-label">${fmtDate(`${date}T12:00:00`)}</span>
+      <input type="range" min="0" max="${snapshotIndexes.length - 1}" value="${index}" id="date-slider" />
+      <span class="mono">${index + 1}/${snapshotIndexes.length} snapshots</span>
     </div>
     <div class="table-wrap">
       <table>
