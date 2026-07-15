@@ -1,0 +1,2694 @@
+{
+  "version": 1,
+  "source": "best-effort-tracker-backfill",
+  "timezone": "America/New_York",
+  "notice": "Estimated from Tracker session history. Grouped sessions may be assigned to a refresh/display date rather than the exact match date.",
+  "generatedAt": "2026-07-15T01:45:00.000Z",
+  "members": {
+    "452965698743042058": {
+      "displayName": "[KDM] Raymdl",
+      "trackerProfileId": "3199533316",
+      "trackerUrl": "https://tracker.gg/bf6/profile/3199533316/overview",
+      "trackerDisplayName": "KDM-Raymdl",
+      "trackerPlatform": "ea",
+      "anchorDate": "2026-07-09",
+      "coverageStart": "2026-05-11",
+      "coverageEnd": "2026-07-09",
+      "fields": {
+        "infantryKillDeath": {
+          "source": "best-effort-tracker-backfill",
+          "confidence": "estimated",
+          "supported": true
+        },
+        "killDeath": {
+          "source": null,
+          "confidence": null,
+          "supported": false
+        },
+        "playerKillsPerMinute": {
+          "source": "best-effort-tracker-backfill",
+          "confidence": "estimated",
+          "supported": true
+        },
+        "scorePerMinute": {
+          "source": "best-effort-tracker-backfill",
+          "confidence": "estimated",
+          "supported": true
+        },
+        "kills": {
+          "source": "best-effort-tracker-backfill",
+          "confidence": "estimated",
+          "supported": true
+        },
+        "assists": {
+          "source": null,
+          "confidence": null,
+          "supported": false
+        },
+        "vehicleKills": {
+          "source": null,
+          "confidence": null,
+          "supported": false
+        },
+        "revives": {
+          "source": null,
+          "confidence": null,
+          "supported": false
+        },
+        "headshotPercent": {
+          "source": null,
+          "confidence": null,
+          "supported": false
+        },
+        "playerRank": {
+          "source": null,
+          "confidence": null,
+          "supported": false
+        },
+        "timePlayedHours": {
+          "source": "best-effort-tracker-backfill",
+          "confidence": "estimated",
+          "supported": true
+        },
+        "objectiveCaptures": {
+          "source": null,
+          "confidence": null,
+          "supported": false
+        },
+        "multiKills": {
+          "source": null,
+          "confidence": null,
+          "supported": false
+        },
+        "defibKills": {
+          "source": null,
+          "confidence": null,
+          "supported": false
+        },
+        "meleeKills": {
+          "source": null,
+          "confidence": null,
+          "supported": false
+        }
+      },
+      "dates": {
+        "2026-05-11": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 3,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 3,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 3,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 3,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 3,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-12": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 10,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 10,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 10,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 10,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 10,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-13": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-14": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 20,
+              "groupedMatches": 25,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 20,
+              "groupedMatches": 25,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 20,
+              "groupedMatches": 25,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 20,
+              "groupedMatches": 25,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 20,
+              "groupedMatches": 25,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-15": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-16": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 19,
+              "groupedMatches": 22,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 19,
+              "groupedMatches": 22,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 19,
+              "groupedMatches": 22,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 19,
+              "groupedMatches": 22,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 19,
+              "groupedMatches": 22,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-17": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 9,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 9,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 9,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 9,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 9,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-18": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-19": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 3,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 3,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 3,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 3,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 3,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-20": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-21": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-22": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 17,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 17,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 17,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 17,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 17,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-23": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-24": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 23,
+              "groupedMatches": 30,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 23,
+              "groupedMatches": 30,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 23,
+              "groupedMatches": 30,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 23,
+              "groupedMatches": 30,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 23,
+              "groupedMatches": 30,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-25": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 18,
+              "groupedMatches": 33,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 18,
+              "groupedMatches": 33,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 18,
+              "groupedMatches": 33,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 18,
+              "groupedMatches": 33,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 18,
+              "groupedMatches": 33,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-26": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 16,
+              "groupedMatches": 26,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 16,
+              "groupedMatches": 26,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 16,
+              "groupedMatches": 26,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 16,
+              "groupedMatches": 26,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 16,
+              "groupedMatches": 26,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-27": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-28": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 14,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 14,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 14,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 14,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 14,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-29": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 8,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 8,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 8,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 8,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 8,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-30": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 24,
+              "groupedMatches": 31,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 24,
+              "groupedMatches": 31,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 24,
+              "groupedMatches": 31,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 24,
+              "groupedMatches": 31,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 24,
+              "groupedMatches": 31,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-05-31": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 21,
+              "groupedMatches": 24,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 21,
+              "groupedMatches": 24,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 21,
+              "groupedMatches": 24,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 21,
+              "groupedMatches": 24,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 21,
+              "groupedMatches": 24,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-01": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-02": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 9,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-03": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 3,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 3,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 3,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 3,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 3,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-04": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 7,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 7,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 7,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 7,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 7,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-05": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 16,
+              "groupedMatches": 19,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 16,
+              "groupedMatches": 19,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 16,
+              "groupedMatches": 19,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 16,
+              "groupedMatches": 19,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 16,
+              "groupedMatches": 19,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-06": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 22,
+              "groupedMatches": 27,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 22,
+              "groupedMatches": 27,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 22,
+              "groupedMatches": 27,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 22,
+              "groupedMatches": 27,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 22,
+              "groupedMatches": 27,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-07": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 29,
+              "groupedMatches": 40,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 29,
+              "groupedMatches": 40,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 29,
+              "groupedMatches": 40,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 29,
+              "groupedMatches": 40,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 29,
+              "groupedMatches": 40,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-08": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 9,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 9,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 9,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 9,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 9,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-09": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 10,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 10,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 10,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 10,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 4,
+              "groupedMatches": 10,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-10": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 5,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 5,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 5,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 5,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 5,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-11": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 7,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 7,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 7,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 7,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 7,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-12": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 15,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 15,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 15,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 15,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 15,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-13": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 30,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 30,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 30,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 30,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 11,
+              "groupedMatches": 30,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-14": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 10,
+              "groupedMatches": 44,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 10,
+              "groupedMatches": 44,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 10,
+              "groupedMatches": 44,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 10,
+              "groupedMatches": 44,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 10,
+              "groupedMatches": 44,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-15": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 2,
+              "groupedMatches": 8,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 2,
+              "groupedMatches": 8,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 2,
+              "groupedMatches": 8,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 2,
+              "groupedMatches": 8,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 2,
+              "groupedMatches": 8,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-16": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 1,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 1,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 1,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 1,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 1,
+              "groupedMatches": 5,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-17": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-18": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 3,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-19": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 19,
+              "groupedMatches": 27,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 19,
+              "groupedMatches": 27,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 19,
+              "groupedMatches": 27,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 19,
+              "groupedMatches": 27,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 19,
+              "groupedMatches": 27,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-20": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 16,
+              "groupedMatches": 29,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 16,
+              "groupedMatches": 29,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 16,
+              "groupedMatches": 29,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 16,
+              "groupedMatches": 29,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 16,
+              "groupedMatches": 29,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-21": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 26,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 26,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 26,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 26,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 26,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-22": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 8,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 8,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 8,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 8,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 8,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-23": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 5,
+              "groupedMatches": 7,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 5,
+              "groupedMatches": 7,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 5,
+              "groupedMatches": 7,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 5,
+              "groupedMatches": 7,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 5,
+              "groupedMatches": 7,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-24": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 14,
+              "groupedMatches": 14,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 14,
+              "groupedMatches": 14,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 14,
+              "groupedMatches": 14,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 14,
+              "groupedMatches": 14,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 14,
+              "groupedMatches": 14,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-25": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 17,
+              "groupedMatches": 23,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 17,
+              "groupedMatches": 23,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 17,
+              "groupedMatches": 23,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 17,
+              "groupedMatches": 23,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 17,
+              "groupedMatches": 23,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-26": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-27": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 20,
+              "groupedMatches": 34,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 20,
+              "groupedMatches": 34,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 20,
+              "groupedMatches": 34,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 20,
+              "groupedMatches": 34,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 20,
+              "groupedMatches": 34,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-28": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 17,
+              "groupedMatches": 25,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 17,
+              "groupedMatches": 25,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 17,
+              "groupedMatches": 25,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 17,
+              "groupedMatches": 25,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 17,
+              "groupedMatches": 25,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-29": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 0,
+              "groupedMatches": 0,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 0,
+              "groupedMatches": 0,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 0,
+              "groupedMatches": 0,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 0,
+              "groupedMatches": 0,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 0,
+              "groupedMatches": 0,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-06-30": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 8,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 8,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 8,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 8,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 8,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-07-01": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 12,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-07-02": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 12,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 12,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 12,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 12,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 12,
+              "groupedMatches": 13,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-07-03": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 22,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 22,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 22,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 22,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 13,
+              "groupedMatches": 22,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-07-04": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 18,
+              "groupedMatches": 39,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 18,
+              "groupedMatches": 39,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 18,
+              "groupedMatches": 39,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 18,
+              "groupedMatches": 39,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 18,
+              "groupedMatches": 39,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-07-05": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 14,
+              "groupedMatches": 28,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 14,
+              "groupedMatches": 28,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 14,
+              "groupedMatches": 28,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 14,
+              "groupedMatches": 28,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 14,
+              "groupedMatches": 28,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-07-06": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 6,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-07-07": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 7,
+              "groupedMatches": 11,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        },
+        "2026-07-08": {
+          "fields": {
+            "kills": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 10,
+              "groupedMatches": 19,
+              "notice": "Estimated from Tracker session history."
+            },
+            "infantryKillDeath": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 10,
+              "groupedMatches": 19,
+              "notice": "Estimated from Tracker session history."
+            },
+            "timePlayedHours": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 10,
+              "groupedMatches": 19,
+              "notice": "Estimated from Tracker session history."
+            },
+            "playerKillsPerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 10,
+              "groupedMatches": 19,
+              "notice": "Estimated from Tracker session history."
+            },
+            "scorePerMinute": {
+              "source": "best-effort-tracker-backfill",
+              "confidence": "estimated",
+              "approximateDailyPlacement": true,
+              "groupedSessions": 10,
+              "groupedMatches": 19,
+              "notice": "Estimated from Tracker session history."
+            }
+          }
+        }
+      }
+    }
+  }
+}

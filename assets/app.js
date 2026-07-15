@@ -200,11 +200,19 @@ function memberBackfillFields(discordId) {
   return fields;
 }
 
-function playerHistoryHref(discordId, statKey, date, showEstimated) {
+function playerHistoryHref(discordId, statKey, showEstimated, range = 14) {
   return hashRoute(`player/${encodeURIComponent(discordId)}/${statKey}`, {
-    date,
-    estimated: showEstimated ? 1 : null
+    estimated: showEstimated ? 1 : null,
+    range
   });
+}
+
+function playerRangeSelectHtml(range) {
+  return `<label class="sparkline-range-select">
+    <select id="player-range-select" aria-label="Player history date range">${SPARKLINE_RANGES.map(
+      (option) => `<option value="${option.value}" ${option.value === range ? "selected" : ""}>${option.label}</option>`
+    ).join("")}</select>
+  </label>`;
 }
 
 function estimatedDateNoticeHtml(date) {
@@ -445,6 +453,10 @@ function cachedMarkerHtml() {
   return `<span class="cached-marker" role="img" aria-label="Cached stats" title="Cached stats">◷</span>`;
 }
 
+function backfillMarkerHtml() {
+  return `<span class="cached-marker" role="img" aria-label="Tracker-backfilled history displayed" title="Tracker-backfilled history displayed">◷</span>`;
+}
+
 function cachedFootnoteHtml(hasCachedStats) {
   return hasCachedStats
     ? `<p class="cached-footnote">${cachedMarkerHtml()} Cached stats are from the last successful GameTools refresh.</p>`
@@ -483,19 +495,26 @@ function lineChart(canvas, labels, datasets, stat) {
     type: "line",
     data: {
       labels,
-      datasets: datasets.map((dataset, index) => ({
-        ...dataset,
-        borderColor: CHART_COLORS[index % CHART_COLORS.length],
-        backgroundColor: CHART_COLORS[index % CHART_COLORS.length],
-        borderWidth: 2,
-        pointRadius: labels.length > 45 ? 0 : 2.5,
-        pointHoverRadius: 4,
-        pointBackgroundColor: dataset.estimated?.map((estimated, pointIndex) =>
-          estimated ? "#facc15" : CHART_COLORS[index % CHART_COLORS.length]
-        ),
-        spanGaps: true,
-        tension: 0.25
-      }))
+      datasets: datasets.map((dataset, index) => {
+        const color = CHART_COLORS[index % CHART_COLORS.length];
+        return {
+          ...dataset,
+          borderColor: color,
+          backgroundColor: color,
+          borderWidth: 2,
+          pointRadius: labels.length > 45 ? 0 : 2.5,
+          pointHoverRadius: 4,
+          pointBackgroundColor: dataset.estimated?.map((estimated) => estimated ? "#facc15" : color),
+          pointBorderColor: dataset.estimated?.map((estimated) => estimated ? "#facc15" : color),
+          segment: {
+            borderColor: (ctx) => dataset.estimated?.[ctx.p0DataIndex] || dataset.estimated?.[ctx.p1DataIndex]
+              ? "#facc15"
+              : color
+          },
+          spanGaps: true,
+          tension: 0.25
+        };
+      })
     },
     options: {
       responsive: true,
@@ -662,50 +681,38 @@ function renderPlayer(discordId, statKey, params) {
   const stat = statByKey(statKey) ?? state.meta.stats[0];
   const dates = state.history.dates;
   const lastIndex = dates.length - 1;
-  const requestedDate = params?.get("date");
-  const selectedIndex = requestedDate && dates.includes(requestedDate) ? dates.indexOf(requestedDate) : lastIndex;
-  const selectedDate = dates[selectedIndex] ?? null;
   const showEstimated = params?.get("estimated") === "1";
+  const historyRange = normalizedRange(params?.get("range"), 14);
   const backfillFields = memberBackfillFields(discordId);
-  const weekAgoIndex = selectedIndex >= 0 ? indexOnOrBefore(shiftDateString(dates[selectedIndex], -7)) : -1;
+  const pointCount = historyRange === 1 ? 2 : historyRange;
+  const rangeStart = pointCount === "all" ? 0 : Math.max(0, dates.length - pointCount);
+  const deltaRangeLabel = historyRange === "all" ? "all" : `${historyRange}d`;
 
-  const visibleValueAt = (statKeyToRead, index) => {
+  const baselineForRange = (statKeyToRead) => {
     const values = series(discordId, statKeyToRead);
-    for (let i = Math.min(index, values.length - 1); i >= 0; i -= 1) {
-      if (Number.isFinite(values[i]) && (showEstimated || !historyProvenance(discordId, dates[i], statKeyToRead))) {
-        return values[i];
+    for (let index = rangeStart; index < lastIndex; index += 1) {
+      const estimated = Boolean(historyProvenance(discordId, dates[index], statKeyToRead));
+      if (Number.isFinite(values[index]) && (showEstimated || !estimated)) {
+        return values[index];
       }
     }
     return null;
   };
-  const visibleRankingAt = (statKeyToRead, index) => Object.keys(state.history.members ?? {})
-    .map((candidateId) => {
-      const values = series(candidateId, statKeyToRead);
-      for (let i = Math.min(index, values.length - 1); i >= 0; i -= 1) {
-        if (Number.isFinite(values[i]) && (showEstimated || !historyProvenance(candidateId, dates[i], statKeyToRead))) {
-          return { discordId: candidateId, value: values[i] };
-        }
-      }
-      return { discordId: candidateId, value: null };
-    })
-    .filter((row) => Number.isFinite(row.value))
-    .sort((a, b) => b.value - a.value);
 
   const summaries = state.meta.stats
     .map((candidate) => {
-      const current = visibleValueAt(candidate.key, selectedIndex);
-      const ranking = visibleRankingAt(candidate.key, selectedIndex);
+      const current = member ? member.stats[candidate.key] : valueAt(discordId, candidate.key, lastIndex);
+      const ranking = latestRanking(candidate.key);
       const rankIndex = ranking.findIndex((row) => row.discordId === discordId);
-      const weekAgo = weekAgoIndex >= 0 ? visibleValueAt(candidate.key, weekAgoIndex) : null;
-      const delta = Number.isFinite(current) && Number.isFinite(weekAgo) ? fmtDelta(candidate, current - weekAgo) : null;
-      const deltaClass = delta ? (current > weekAgo ? "up" : "down") : "flat";
+      const baseline = baselineForRange(candidate.key);
+      const delta = Number.isFinite(current) && Number.isFinite(baseline) ? fmtDelta(candidate, current - baseline) : null;
+      const deltaClass = delta ? (current > baseline ? "up" : "down") : "flat";
       const hasBackfill = backfillFields.has(candidate.key);
-      const isEstimated = showEstimated && Boolean(historyProvenance(discordId, selectedDate, candidate.key));
       return `<div class="stat-summary ${candidate.key === stat.key ? "active" : ""}" data-stat="${candidate.key}">
-        <div class="stat-summary-head"><div class="k">${esc(candidate.title)}</div>${hasBackfill ? `<span class="backfill-badge ${isEstimated ? "active" : ""}" title="Tracker-backfilled history is available for this stat">${isEstimated ? "Estimated" : "Backfill"}</span>` : ""}</div>
+        <div class="stat-summary-head"><div class="k">${esc(candidate.title)}</div>${showEstimated && hasBackfill ? backfillMarkerHtml() : ""}</div>
         <div class="v">${fmtStat(candidate, current)}</div>
-        <div class="m">${selectedDate ? fmtDate(`${selectedDate}T12:00:00`) : "No snapshot"} · ${rankIndex >= 0 ? `Rank #${rankIndex + 1} of ${ranking.length}` : "Unranked"}${
-          delta ? ` · <span class="delta ${deltaClass}">${delta}</span> 7d` : ""
+        <div class="m">${rankIndex >= 0 ? `Rank #${rankIndex + 1} of ${ranking.length}` : "Unranked"}${
+          delta ? ` · <span class="delta ${deltaClass}">${delta}</span> ${deltaRangeLabel}` : ""
         }</div>
       </div>`;
     })
@@ -737,20 +744,21 @@ function renderPlayer(discordId, statKey, params) {
   ].filter(Boolean);
 
   app.innerHTML = `
-    <div class="profile-head">
-      <h1 class="page-title">${esc(name)}</h1>
-      ${member?.cachedStats ? cachedMarkerHtml() : ""}
+    <div class="player-profile-top">
+      <div class="player-profile-identity">
+        <div class="profile-head">
+          <h1 class="page-title">${esc(name)}</h1>
+          ${member?.cachedStats ? cachedMarkerHtml() : ""}
+        </div>
+        <p class="profile-sub">${profileSubParts.join(" · ")}</p>
+      </div>
+      <div class="player-history-controls">
+        <span class="player-history-controls-label">Chart range</span>
+        ${playerRangeSelectHtml(historyRange)}
+        ${backfillFields.size > 0 ? `<button class="tracker-history-toggle ${showEstimated ? "active" : ""}" id="tracker-history-toggle" type="button" aria-pressed="${showEstimated}">${showEstimated ? "Hide Backfill" : "Show Backfill"}</button>` : ""}
+      </div>
     </div>
-    <p class="profile-sub">${profileSubParts.join(" · ")}</p>
-    ${estimatedHistoryNoticeHtml(discordId)}
-    <div class="player-history-controls">
-      <label class="snapshot-date-select">Snapshot
-        <select id="player-date-select" aria-label="Player snapshot date">${dates
-          .map((date, index) => `<option value="${date}" ${index === selectedIndex ? "selected" : ""}>${fmtDate(`${date}T12:00:00`)}${index === lastIndex ? " (latest)" : ""}</option>`)
-          .join("")}</select>
-      </label>
-      ${backfillFields.size > 0 ? `<button class="tracker-history-toggle ${showEstimated ? "active" : ""}" id="tracker-history-toggle" type="button" aria-pressed="${showEstimated}">${showEstimated ? "Hide Tracker estimates" : "Show Tracker estimates"}</button>` : ""}
-    </div>
+    ${showEstimated ? estimatedHistoryNoticeHtml(discordId) : ""}
     <div class="stat-summary-grid">${summaries}</div>
     <div class="chart-card">
       <h3>${esc(stat.title)} over time</h3>
@@ -761,21 +769,31 @@ function renderPlayer(discordId, statKey, params) {
 
   for (const card of app.querySelectorAll(".stat-summary")) {
     card.addEventListener("click", () => {
-      location.hash = playerHistoryHref(discordId, card.dataset.stat, selectedDate, showEstimated);
+      location.hash = playerHistoryHref(discordId, card.dataset.stat, showEstimated, historyRange);
     });
   }
 
-  document.getElementById("player-date-select")?.addEventListener("change", (event) => {
-    replaceHashAndRender(playerHistoryHref(discordId, stat.key, event.target.value, showEstimated));
+  document.getElementById("player-range-select")?.addEventListener("change", (event) => {
+    replaceHashAndRender(playerHistoryHref(discordId, stat.key, showEstimated, normalizedRange(event.target.value, 14)));
   });
   document.getElementById("tracker-history-toggle")?.addEventListener("click", () => {
-    replaceHashAndRender(playerHistoryHref(discordId, stat.key, selectedDate, !showEstimated));
+    replaceHashAndRender(playerHistoryHref(discordId, stat.key, !showEstimated, historyRange));
   });
 
-  if (selectedIndex >= 0) {
-    const chartDates = dates.slice(0, selectedIndex + 1);
-    const chartData = series(discordId, stat.key)
-      .slice(0, selectedIndex + 1)
+  if (dates.length > 0) {
+    const fullSeries = series(discordId, stat.key);
+    let firstVisible = rangeStart;
+    while (firstVisible < dates.length) {
+      const value = fullSeries[firstVisible];
+      const estimated = Boolean(historyProvenance(discordId, dates[firstVisible], stat.key));
+      if (Number.isFinite(value) && (showEstimated || !estimated)) {
+        break;
+      }
+      firstVisible += 1;
+    }
+    const chartDates = dates.slice(firstVisible);
+    const chartData = fullSeries
+      .slice(firstVisible)
       .map((value, index) => (showEstimated || !historyProvenance(discordId, chartDates[index], stat.key) ? value : null));
     lineChart(
       document.getElementById("player-chart"),
