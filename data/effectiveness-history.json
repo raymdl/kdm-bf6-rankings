@@ -1,7 +1,7 @@
 {
   "version": 1,
   "modelVersion": 1,
-  "updatedAt": "2026-07-15T00:03:29.676Z",
+  "updatedAt": "2026-07-15T00:06:04.000Z",
   "dates": [
     "2026-07-10",
     "2026-07-11",
@@ -314,7 +314,7 @@
           -3.55,
           -1.39,
           -1.26,
-          -1.28
+          -1.27
         ],
         "combat": [
           15,
@@ -408,7 +408,7 @@
           -0.8,
           2.34,
           2.27,
-          2.31
+          2.32
         ],
         "combat": [
           40,
@@ -441,7 +441,7 @@
           72.88,
           72.88,
           72.88,
-          72.88
+          73.17
         ],
         "rais": [
           84.76,
@@ -455,7 +455,7 @@
           -7.41,
           -4.7,
           -4.38,
-          -4.67
+          -4.62
         ],
         "combat": [
           74.36,
@@ -476,7 +476,7 @@
           60.93,
           59.73,
           59.73,
-          59.73
+          60.53
         ]
       }
     },
@@ -549,7 +549,7 @@
           -6.99,
           -8.35,
           -8.39,
-          -8.4
+          -8.39
         ],
         "combat": [
           17.19,
@@ -643,7 +643,7 @@
           9.24,
           7.66,
           7.54,
-          7.62
+          7.63
         ],
         "combat": [
           16.65,
@@ -690,7 +690,7 @@
           -12.41,
           -15.48,
           -15.63,
-          -15.66
+          -15.65
         ],
         "combat": [
           10.03,
@@ -737,7 +737,7 @@
           3.55,
           2.58,
           2.69,
-          2.71
+          2.72
         ],
         "combat": [
           51.28,
@@ -784,7 +784,7 @@
           0.28,
           -0.72,
           -0.69,
-          -0.63
+          -0.64
         ],
         "combat": [
           65.81,
@@ -878,7 +878,7 @@
           -6.75,
           -10.66,
           -10.66,
-          -10.49
+          -10.5
         ],
         "combat": [
           56.71,
@@ -1019,7 +1019,7 @@
           9.42,
           5.34,
           5.26,
-          5.23
+          5.24
         ],
         "combat": [
           27.67,
@@ -1113,7 +1113,7 @@
           -9.24,
           2.1,
           2.09,
-          2.04
+          2.03
         ],
         "combat": [
           16.88,
@@ -1160,7 +1160,7 @@
           2.89,
           -0.66,
           -0.65,
-          -0.64
+          -0.62
         ],
         "combat": [
           72.61,
@@ -1240,7 +1240,7 @@
           40.19,
           40.72,
           40.72,
-          40.72
+          40.66
         ],
         "rais": [
           15.24,
@@ -1254,7 +1254,7 @@
           -5.12,
           4.11,
           4.07,
-          4.03
+          4.02
         ],
         "combat": [
           22.71,
@@ -1275,7 +1275,7 @@
           43.45,
           43.75,
           43.75,
-          43.75
+          43.53
         ]
       }
     },
@@ -1301,7 +1301,7 @@
           9.54,
           13.78,
           13.73,
-          13.92
+          13.93
         ],
         "combat": [
           17.6,
@@ -1348,7 +1348,7 @@
           4.56,
           -0.08,
           -0.08,
-          -0.08
+          -0.1
         ],
         "combat": [
           42.61,
@@ -1395,7 +1395,7 @@
           11.02,
           7.13,
           7.08,
-          7.04
+          7.02
         ],
         "combat": [
           23.43,
@@ -1489,7 +1489,7 @@
           null,
           6.21,
           6.35,
-          6.32
+          6.31
         ],
         "combat": [
           null,
@@ -1583,7 +1583,7 @@
           null,
           -0.55,
           -0.64,
-          -0.77
+          -0.76
         ],
         "combat": [
           null,
@@ -1724,7 +1724,7 @@
           null,
           -4.52,
           -4.53,
-          -4.52
+          -4.53
         ],
         "combat": [
           null,
@@ -1852,25 +1852,25 @@
           "spotsPerHour": 5.142594822695741,
           "spotAssistsPerHour": 3.5146103088268954,
           "deathsPerHour": 21.41796132448222,
-          "accuracyResidual": -3.3386672333476533,
-          "headshotResidual": 1.996094157581961
+          "accuracyResidual": -3.343262067622316,
+          "headshotResidual": 1.9955897474952593
         },
         "adjusted": {
           "infantryKd": 2.05615365066149,
           "infantryKpm": 0.9604393820745417,
           "playerKillsPerMatch": 15.593235849903827,
           "assistsPerHour": 33.7832317475394,
-          "accuracyResidual": -3.2546193241706978,
-          "headshotResidual": 1.9466897286545675,
+          "accuracyResidual": -3.2591073504121693,
+          "headshotResidual": 1.946175715876552,
           "objectiveActionsPerHour": 8.203100176770567,
-          "objectivePresence": 0.21337129581967196,
+          "objectivePresence": 0.21337144664453836,
           "breakthroughPressure": 0.18655583882591537,
           "revivesPerHour": 23.32939916335053,
           "squadRevivesPerHour": 6.878192989460055,
-          "healsPerHour": 665.0424669242508,
+          "healsPerHour": 665.0553034096283,
           "resuppliesPerHour": 95.87949673945394,
-          "repairsPerHour": 18.38960608264823,
-          "spotsPerHour": 5.4542039582735855,
+          "repairsPerHour": 18.389442056120718,
+          "spotsPerHour": 5.453937375959513,
           "spotAssistsPerHour": 3.715570512593978,
           "deathsPerHour": 21.431932746767345,
           "sortinoRaw": 46.531729955835296
@@ -1908,28 +1908,28 @@
         "model": {
           "combat": -1.73554450130414,
           "objective": 0.5918699101998893,
-          "teamwork": 0.7887942320899373
+          "teamwork": 0.7878051803933068
         },
         "scores": {
           "trident": 31.68525266811681,
           "sortino": 30.54054054054054,
-          "alpha": -15.655851384782743,
+          "alpha": -15.648193722318126,
           "cei": 31.68525266811681,
           "rais": 30.54054054054054,
-          "wrr": -15.655851384782743
+          "wrr": -15.648193722318126
         },
         "weaponModel": [
-          -0.28467532629113323,
-          -0.3202537184993697,
-          -0.4895160613982322,
-          2.291405200059328,
-          -0.13986869413550124,
-          -0.4154601342360467,
-          -0.5952934179633449,
-          0.8135806682120351
+          -0.28483138362216404,
+          -0.3201294099424641,
+          -0.48943077738906426,
+          2.2914219646981437,
+          -0.13985382045254113,
+          -0.41549999309858393,
+          -0.5952365280666106,
+          0.8132914298534508
         ],
-        "expectedAccuracy": 27.108667233347653,
-        "expectedHeadshotPercent": 16.96390584241804,
+        "expectedAccuracy": 27.113262067622315,
+        "expectedHeadshotPercent": 16.96441025250474,
         "combatGeometric": 7.152830043786672,
         "combatArithmetic": 15.232432432432436,
         "aimScore": 41.404452744668234,
@@ -1962,13 +1962,13 @@
             "losses": 60,
             "matches": 182,
             "rawRate": 0.6703296703296703,
-            "smoothedRate": 0.6970199759924502,
+            "smoothedRate": 0.6970236066844401,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 63.454764857890034,
+        "smoothedWinPercent": 63.45492823902957,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 79.11061624267278
+        "expectedWinPercent": 79.1031219613477
       },
       {
         "discordId": "1087330539800895498",
@@ -2023,25 +2023,25 @@
           "spotsPerHour": 0.11359759841713857,
           "spotAssistsPerHour": 4.1294262127311185,
           "deathsPerHour": 30.207750562870984,
-          "accuracyResidual": -4.623027028953604,
-          "headshotResidual": 0.3232279939232967
+          "accuracyResidual": -4.619812115567278,
+          "headshotResidual": 0.3220873047613253
         },
         "adjusted": {
           "infantryKd": 2.5301739323279686,
           "infantryKpm": 1.6632308394626538,
           "playerKillsPerMatch": 25.994274714149306,
           "assistsPerHour": 32.84002320586672,
-          "accuracyResidual": -4.311443492264341,
-          "headshotResidual": 0.313139977793376,
+          "accuracyResidual": -4.308505673465577,
+          "headshotResidual": 0.3120195060364161,
           "objectiveActionsPerHour": 17.651289208174973,
-          "objectivePresence": 0.13497771409367648,
+          "objectivePresence": 0.13497810893907092,
           "breakthroughPressure": 0.09329560421770082,
           "revivesPerHour": 40.23937333374463,
           "squadRevivesPerHour": 9.851606001389795,
-          "healsPerHour": 368.96664269097454,
+          "healsPerHour": 369.00024740917013,
           "resuppliesPerHour": 98.52763346774373,
-          "repairsPerHour": 17.510219679982104,
-          "spotsPerHour": 1.2878469078215578,
+          "repairsPerHour": 17.509790273873545,
+          "spotsPerHour": 1.2871490202552318,
           "spotAssistsPerHour": 4.611694853898764,
           "deathsPerHour": 29.61775738048982,
           "sortinoRaw": 54.943159898355084
@@ -2079,28 +2079,28 @@
         "model": {
           "combat": -0.9904514680896923,
           "objective": 1.4117193775211658,
-          "teamwork": 1.1165516177369252
+          "teamwork": 1.1154836018431236
         },
         "scores": {
           "trident": 52.31291384013717,
           "sortino": 59.08108108108108,
-          "alpha": 5.2340721808418635,
+          "alpha": 5.238911373144106,
           "cei": 52.31291384013717,
           "rais": 59.08108108108108,
-          "wrr": 5.2340721808418635
+          "wrr": 5.238911373144106
         },
         "weaponModel": [
-          1.04422486572903,
-          -0.4877144872247441,
-          1.254539238647188,
-          -0.9528343955050487,
-          -0.6268835984978779,
-          -0.474699134734393,
-          -0.8428275258039275,
-          -1.9435067544596818
+          1.044180085505806,
+          -0.4876166091493885,
+          1.2547624140067246,
+          -0.953052400318351,
+          -0.6268668417726728,
+          -0.4747377421175973,
+          -0.8427782918517134,
+          -1.9430846308179657
         ],
-        "expectedAccuracy": 24.233027028953604,
-        "expectedHeadshotPercent": 11.746772006076704,
+        "expectedAccuracy": 24.229812115567277,
+        "expectedHeadshotPercent": 11.747912695238675,
         "combatGeometric": 23.802676006163214,
         "combatArithmetic": 28.98378378378378,
         "aimScore": 22.96228686279572,
@@ -2133,13 +2133,13 @@
             "losses": 25,
             "matches": 299,
             "rawRate": 0.9163879598662207,
-            "smoothedRate": 0.9144541204643123,
+            "smoothedRate": 0.9144564400730838,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 83.77886370742402,
+        "smoothedWinPercent": 83.77896808981873,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 78.54479152658216
+        "expectedWinPercent": 78.54005671667463
       },
       {
         "discordId": "110501250566492160",
@@ -2194,25 +2194,25 @@
           "spotsPerHour": 18.82170901994932,
           "spotAssistsPerHour": 10.945345315245616,
           "deathsPerHour": 31.360744724502673,
-          "accuracyResidual": 0.7379896022688399,
-          "headshotResidual": -0.7277818821152486
+          "accuracyResidual": 0.7371193019024886,
+          "headshotResidual": -0.7280245469888644
         },
         "adjusted": {
           "infantryKd": 4.521631549187905,
           "infantryKpm": 2.7762656124626313,
           "playerKillsPerMatch": 44.397915492796095,
           "assistsPerHour": 48.270402940433954,
-          "accuracyResidual": 0.6935636796920237,
-          "headshotResidual": -0.6869681402770951,
+          "accuracyResidual": 0.6927022649977955,
+          "headshotResidual": -0.6872383768336874,
           "objectiveActionsPerHour": 7.435856477897576,
-          "objectivePresence": 0.08740301318544012,
+          "objectivePresence": 0.08740326175316816,
           "breakthroughPressure": 0.0691920028386672,
           "revivesPerHour": 24.631908787423633,
           "squadRevivesPerHour": 8.397202804369616,
-          "healsPerHour": 356.896959341866,
+          "healsPerHour": 356.91811458027144,
           "resuppliesPerHour": 54.07256494267145,
-          "repairsPerHour": 3.9490848708926345,
-          "spotsPerHour": 18.721402660780605,
+          "repairsPerHour": 3.948814546096383,
+          "spotsPerHour": 18.720963318371606,
           "spotAssistsPerHour": 10.943081789240491,
           "deathsPerHour": 30.93758420781052,
           "sortinoRaw": 53.524030381147725
@@ -2250,28 +2250,28 @@
         "model": {
           "combat": 0.9483858569598465,
           "objective": -0.38302110309268733,
-          "teamwork": 0.6928738274866043
+          "teamwork": 0.6919078851936777
         },
         "scores": {
           "trident": 58.34513439905751,
           "sortino": 48.70270270270271,
-          "alpha": 2.4692630581500055,
+          "alpha": 2.4678932978868033,
           "cei": 58.34513439905751,
           "rais": 48.70270270270271,
-          "wrr": 2.4692630581500055
+          "wrr": 2.4678932978868033
         },
         "weaponModel": [
-          0.5573873107466126,
-          -0.28577175607611416,
-          0.2380176209799069,
-          0.2386424978939512,
-          -0.6250308521455955,
-          -0.3873119629855206,
-          -0.17625993107915458,
-          0.233056314846855
+          0.5573017645761675,
+          -0.28564200520051763,
+          0.23816042644604873,
+          0.23851071432579277,
+          -0.6250141025840308,
+          -0.38735241650452207,
+          -0.17619008095986502,
+          0.23291685881357432
         ],
-        "expectedAccuracy": 26.87201039773116,
-        "expectedHeadshotPercent": 14.407781882115248,
+        "expectedAccuracy": 26.87288069809751,
+        "expectedHeadshotPercent": 14.408024546988864,
         "combatGeometric": 65.56155042161971,
         "combatArithmetic": 68.42162162162164,
         "aimScore": 44.24544728615022,
@@ -2304,13 +2304,13 @@
             "losses": 32,
             "matches": 353,
             "rawRate": 0.9093484419263456,
-            "smoothedRate": 0.9081564418794634,
+            "smoothedRate": 0.9081584301155533,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 84.87639182055338,
+        "smoothedWinPercent": 84.87648129117741,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 82.40712876240337
+        "expectedWinPercent": 82.40858799329061
       },
       {
         "discordId": "1198566495475732564",
@@ -2365,25 +2365,25 @@
           "spotsPerHour": 2.64387624238538,
           "spotAssistsPerHour": 4.9144357165758255,
           "deathsPerHour": 23.134818852196215,
-          "accuracyResidual": -3.5152243016914113,
-          "headshotResidual": 1.6148490496036185
+          "accuracyResidual": -3.518668355848586,
+          "headshotResidual": 1.6127588416862437
         },
         "adjusted": {
           "infantryKd": 2.073556198949266,
           "infantryKpm": 1.0798452425740577,
           "playerKillsPerMatch": 17.766282420678085,
           "assistsPerHour": 33.91154067703296,
-          "accuracyResidual": -3.3744437936628806,
-          "headshotResidual": 1.5530212796069636,
+          "accuracyResidual": -3.3777682699657956,
+          "headshotResidual": 1.5509842710486301,
           "objectiveActionsPerHour": 17.323029730544825,
-          "objectivePresence": 0.14478154250206704,
+          "objectivePresence": 0.144781781465522,
           "breakthroughPressure": 0.10308475767012135,
           "revivesPerHour": 11.738612185188392,
           "squadRevivesPerHour": 3.4997524989045425,
-          "healsPerHour": 75.75244679023506,
+          "healsPerHour": 75.77278462290609,
           "resuppliesPerHour": 15.461445388193859,
-          "repairsPerHour": 68.61051067950598,
-          "spotsPerHour": 3.245380983212787,
+          "repairsPerHour": 68.6102507996423,
+          "spotsPerHour": 3.2449586163158375,
           "spotAssistsPerHour": 5.172441929065088,
           "deathsPerHour": 23.082887102768353,
           "sortinoRaw": 43.597570402692554
@@ -2421,28 +2421,28 @@
         "model": {
           "combat": -1.4953230459971496,
           "objective": 1.6280909999197848,
-          "teamwork": -1.3797614835759735
+          "teamwork": -1.3802280809554541
         },
         "scores": {
           "trident": 33.14800803917559,
           "sortino": 14.972972972972974,
-          "alpha": 2.0351168564479565,
+          "alpha": 2.025008052134581,
           "cei": 33.14800803917559,
           "rais": 14.972972972972974,
-          "wrr": 2.0351168564479565
+          "wrr": 2.025008052134581
         },
         "weaponModel": [
-          0.14354905382643407,
-          -1.11298099302147,
-          0.16635890523607716,
-          2.4346660578170716,
-          -0.44349339560702705,
-          -0.4775956728966963,
-          -0.10613479342184937,
-          -1.3003147063577831
+          0.14342885439564143,
+          -1.1129818013129038,
+          0.16649604510372606,
+          2.434693189530234,
+          -0.44347734795970906,
+          -0.4776342190878207,
+          -0.10606277441291447,
+          -1.300058534066812
         ],
-        "expectedAccuracy": 27.225224301691412,
-        "expectedHeadshotPercent": 15.83515095039638,
+        "expectedAccuracy": 27.228668355848587,
+        "expectedHeadshotPercent": 15.837241158313756,
         "combatGeometric": 13.308919857995965,
         "combatArithmetic": 17.827027027027032,
         "aimScore": 34.00824890266857,
@@ -2475,31 +2475,31 @@
             "losses": 19,
             "matches": 300,
             "rawRate": 0.9366666666666666,
-            "smoothedRate": 0.9331788770167297,
+            "smoothedRate": 0.9331811894882435,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 81.07182656526075,
+        "smoothedWinPercent": 81.07193062647886,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 79.0367097088128
+        "expectedWinPercent": 79.04692257434428
       },
       {
         "discordId": "123261494958751744",
         "name": "RaCiNE",
-        "hours": 603.8613888888889,
-        "matches": 1752,
-        "wins": 1411,
+        "hours": 604.1858333333333,
+        "matches": 1753,
+        "wins": 1412,
         "losses": 340,
         "cachedStats": false,
         "weaponMix": {
-          "ar": 0.20223713646532437,
-          "smg": 0.15954224746171056,
-          "carbine": 0.19220443985544658,
-          "mg": 0.2189296162450525,
-          "dmr": 0.020598864223025298,
-          "sniper": 0.1268628463259336,
-          "shotgun": 0.0415935295129926,
-          "pistol": 0.03803131991051454
+          "ar": 0.20213973648904332,
+          "smg": 0.159465409886821,
+          "carbine": 0.1921118717534143,
+          "mg": 0.2188241769582717,
+          "dmr": 0.02058894354810967,
+          "sniper": 0.1271801575561595,
+          "shotgun": 0.04157349754033506,
+          "pistol": 0.03811620626784547
         },
         "breakthroughSeasons": {
           "Season1": {
@@ -2513,51 +2513,51 @@
             "matches": 263
           },
           "Season3": {
-            "wins": 241,
+            "wins": 242,
             "losses": 36,
-            "matches": 277
+            "matches": 278
           }
         },
         "raw": {
           "infantryKd": 6.64,
-          "infantryKpm": 2.335608872055672,
-          "playerKillsPerMatch": 39.28082191780822,
-          "assistsPerHour": 59.64282642125838,
-          "accuracy": 33.17,
-          "headshotPercent": 19.86,
-          "objectiveActionsPerHour": 9.018625963187835,
-          "objectivePresence": 0.09923312975153882,
-          "breakthroughPressure": 0.07660882441288724,
-          "revivesPerHour": 17.88986710986379,
-          "squadRevivesPerHour": 6.842629908169691,
-          "healsPerHour": 267.6856029782405,
-          "resuppliesPerHour": 68.2855383018822,
-          "repairsPerHour": 22.435612293292106,
-          "spotsPerHour": 38.364764540795555,
-          "spotAssistsPerHour": 17.6530577979402,
-          "deathsPerHour": 17.15294302730437,
-          "accuracyResidual": 3.7328137412577647,
-          "headshotResidual": -1.2530122531159193
+          "infantryKpm": 2.3354951693620367,
+          "playerKillsPerMatch": 39.28066172276098,
+          "assistsPerHour": 59.69189942939741,
+          "accuracy": 33.18,
+          "headshotPercent": 19.88,
+          "objectiveActionsPerHour": 9.020403490647883,
+          "objectivePresence": 0.09924420788489928,
+          "breakthroughPressure": 0.07661825900695564,
+          "revivesPerHour": 17.88522571008092,
+          "squadRevivesPerHour": 6.843920813546605,
+          "healsPerHour": 267.56337385158815,
+          "resuppliesPerHour": 68.25217958602693,
+          "repairsPerHour": 22.42356449381606,
+          "spotsPerHour": 38.40209207156187,
+          "spotAssistsPerHour": 17.67668060185677,
+          "deathsPerHour": 17.155317831296387,
+          "accuracyResidual": 3.7389457557607635,
+          "headshotResidual": -1.253078081396648
         },
         "adjusted": {
-          "infantryKd": 6.523320869596329,
-          "infantryKpm": 2.3165603915663593,
-          "playerKillsPerMatch": 38.89661040131458,
-          "assistsPerHour": 59.13761233322442,
-          "accuracyResidual": 3.574400118384403,
-          "headshotResidual": -1.1959757941062115,
-          "objectiveActionsPerHour": 9.009144703179775,
-          "objectivePresence": 0.09921744047381585,
-          "breakthroughPressure": 0.07653042163111387,
-          "revivesPerHour": 17.766069804400733,
-          "squadRevivesPerHour": 6.783796496893946,
-          "healsPerHour": 264.4791112314173,
-          "resuppliesPerHour": 66.83465792498635,
-          "repairsPerHour": 22.4358322025381,
-          "spotsPerHour": 37.49898250495017,
-          "spotAssistsPerHour": 17.384391567801956,
-          "deathsPerHour": 17.342894304261197,
-          "sortinoRaw": 73.5584242372072
+          "infantryKd": 6.523381036074397,
+          "infantryKpm": 2.3164610292162804,
+          "playerKillsPerMatch": 38.896654693020515,
+          "assistsPerHour": 59.18499599738422,
+          "accuracyResidual": 3.58034345848876,
+          "headshotResidual": -1.1961024727966025,
+          "objectiveActionsPerHour": 9.010856491644802,
+          "objectivePresence": 0.0992283066088112,
+          "breakthroughPressure": 0.07653952178105847,
+          "revivesPerHour": 17.76167666250018,
+          "squadRevivesPerHour": 6.785066447474537,
+          "healsPerHour": 264.3821236213651,
+          "resuppliesPerHour": 66.80337283810537,
+          "repairsPerHour": 22.424023642627127,
+          "spotsPerHour": 37.53488430904906,
+          "spotAssistsPerHour": 17.40721428563034,
+          "deathsPerHour": 17.34507679823936,
+          "sortinoRaw": 73.55518460991124
         },
         "percentiles": {
           "infantryKd": 77.24324324324324,
@@ -2592,28 +2592,28 @@
         "model": {
           "combat": 1.1578765297227211,
           "objective": 0.23611414923023832,
-          "teamwork": 0.788579125304682
+          "teamwork": 0.7875901254321609
         },
         "scores": {
           "trident": 67.22871882831434,
           "sortino": 92.8108108108108,
-          "alpha": -0.6402510346817962,
+          "alpha": -0.6238116337121227,
           "cei": 67.22871882831434,
           "rais": 92.8108108108108,
-          "wrr": -0.6402510346817962
+          "wrr": -0.6238116337121227
         },
         "weaponModel": [
-          -0.6701275396319045,
-          -0.12584145460610785,
-          -0.18520340902833657,
-          0.6098219481059173,
-          -0.22410122837648905,
-          0.3468030776811134,
-          1.4126184870518976,
-          1.0846061627685162
+          -0.6709933733625296,
+          -0.126235262592284,
+          -0.18586768011929772,
+          0.6085927327717279,
+          -0.22428001336920228,
+          0.3488357483411345,
+          1.411577300181947,
+          1.091156837785793
         ],
-        "expectedAccuracy": 29.437186258742237,
-        "expectedHeadshotPercent": 21.11301225311592,
+        "expectedAccuracy": 29.441054244239236,
+        "expectedHeadshotPercent": 21.133078081396647,
         "combatGeometric": 70.00948171731795,
         "combatArithmetic": 72.83243243243246,
         "aimScore": 47.99637799823647,
@@ -2622,8 +2622,8 @@
           "medic"
         ],
         "sortinoUpside": 67.75931559757747,
-        "sortinoDownside": 0.9211632290962476,
-        "sortinoRaw": 73.5584242372072,
+        "sortinoDownside": 0.9212038003429496,
+        "sortinoRaw": 73.55518460991124,
         "seasonWinRates": {
           "Season1": {
             "wins": 739,
@@ -2642,17 +2642,17 @@
             "weight": 0.35
           },
           "Season3": {
-            "wins": 241,
+            "wins": 242,
             "losses": 36,
-            "matches": 277,
-            "rawRate": 0.8700361010830325,
-            "smoothedRate": 0.871798460365686,
+            "matches": 278,
+            "rawRate": 0.8705035971223022,
+            "smoothedRate": 0.8722240481309542,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 82.8851389535124,
+        "smoothedWinPercent": 82.90429040294947,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 83.52538998819419
+        "expectedWinPercent": 83.5281020366616
       },
       {
         "discordId": "124870403742105600",
@@ -2707,25 +2707,25 @@
           "spotsPerHour": 18.28114243913043,
           "spotAssistsPerHour": 10.844464790052683,
           "deathsPerHour": 24.842064340557876,
-          "accuracyResidual": -2.765714684049847,
-          "headshotResidual": 0.2685422240949009
+          "accuracyResidual": -2.764493378522886,
+          "headshotResidual": 0.26742020304855885
         },
         "adjusted": {
           "infantryKd": 3.5481198966996037,
           "infantryKpm": 1.8134536111533177,
           "playerKillsPerMatch": 30.10720963839971,
           "assistsPerHour": 43.174939592233045,
-          "accuracyResidual": -2.6420107649879614,
-          "headshotResidual": 0.2642690224549349,
+          "accuracyResidual": -2.640882646258064,
+          "headshotResidual": 0.2631600400251072,
           "objectiveActionsPerHour": 12.353075911286654,
-          "objectivePresence": 0.10545994031526644,
+          "objectivePresence": 0.1054602129010195,
           "breakthroughPressure": 0.07477538947404413,
           "revivesPerHour": 23.399859909228095,
           "squadRevivesPerHour": 10.147543538839463,
-          "healsPerHour": 218.3232574050542,
+          "healsPerHour": 218.34645678269555,
           "resuppliesPerHour": 42.36073497424571,
-          "repairsPerHour": 22.446403464903838,
-          "spotsPerHour": 18.197745999755682,
+          "repairsPerHour": 22.446107019791103,
+          "spotsPerHour": 18.19726420558892,
           "spotAssistsPerHour": 10.84694703079077,
           "deathsPerHour": 24.698809660496032,
           "sortinoRaw": 55.37614486200177
@@ -2763,28 +2763,28 @@
         "model": {
           "combat": -0.1536963516197385,
           "objective": 0.6517331981704038,
-          "teamwork": 0.37929453936070884
+          "teamwork": 0.3784041454392937
         },
         "scores": {
           "trident": 56.39883395765204,
           "sortino": 66.86486486486487,
-          "alpha": -0.9819186139543632,
+          "alpha": -0.9833039478624528,
           "cei": 56.39883395765204,
           "rais": 66.86486486486487,
-          "wrr": -0.9819186139543632
+          "wrr": -0.9833039478624528
         },
         "weaponModel": [
-          -0.41395680360236664,
-          -0.055760757315079706,
-          0.695602566800176,
-          0.7570410508229575,
-          -0.5903917602329867,
-          -0.33385159473913817,
-          -0.12201417737318443,
-          -0.31741292920006703
+          -0.41412368647844183,
+          -0.05559470359968779,
+          0.6957815505951161,
+          0.7569467811746761,
+          -0.590375144603408,
+          -0.3338931776584575,
+          -0.1219426494952844,
+          -0.317410357490836
         ],
-        "expectedAccuracy": 26.135714684049848,
-        "expectedHeadshotPercent": 15.071457775905099,
+        "expectedAccuracy": 26.134493378522887,
+        "expectedHeadshotPercent": 15.072579796951441,
         "combatGeometric": 42.8922281561,
         "combatArithmetic": 43.51351351351352,
         "aimScore": 39.58089422598066,
@@ -2817,13 +2817,13 @@
             "losses": 43,
             "matches": 438,
             "rawRate": 0.9018264840182648,
-            "smoothedRate": 0.9012594709080717,
+            "smoothedRate": 0.9012610941332163,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 79.96408338515567,
+        "smoothedWinPercent": 79.96415643028719,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 80.94600199911004
+        "expectedWinPercent": 80.94746037814964
       },
       {
         "discordId": "1280649502398611489",
@@ -2878,25 +2878,25 @@
           "spotsPerHour": 61.93954740310282,
           "spotAssistsPerHour": 25.473423556697853,
           "deathsPerHour": 24.164431622958578,
-          "accuracyResidual": 0.008216585935908682,
-          "headshotResidual": -4.08267709659162
+          "accuracyResidual": 0.008534512382869508,
+          "headshotResidual": -4.082318161160039
         },
         "adjusted": {
           "infantryKd": 3.8829988272510034,
           "infantryKpm": 1.9123009344282405,
           "playerKillsPerMatch": 29.11930069978561,
           "assistsPerHour": 57.21942840104529,
-          "accuracyResidual": -0.0016308958316751318,
-          "headshotResidual": -3.9212949210722825,
+          "accuracyResidual": -0.0013504434111744797,
+          "headshotResidual": -3.9209820043813686,
           "objectiveActionsPerHour": 3.916877242603207,
-          "objectivePresence": 0.061713955505386775,
+          "objectivePresence": 0.06171416512680676,
           "breakthroughPressure": 0.0508408337245021,
           "revivesPerHour": 9.328431193295282,
           "squadRevivesPerHour": 4.338558916073263,
-          "healsPerHour": 130.32732454531975,
+          "healsPerHour": 130.3451651199983,
           "resuppliesPerHour": 31.54196473975379,
-          "repairsPerHour": 29.21574795406314,
-          "spotsPerHour": 60.223198224830234,
+          "repairsPerHour": 29.215519984535096,
+          "spotsPerHour": 60.22282771985615,
           "spotAssistsPerHour": 24.9217115217179,
           "deathsPerHour": 24.0799116625709,
           "sortinoRaw": 45.15731821619322
@@ -2934,28 +2934,28 @@
         "model": {
           "combat": 0.055076419808913035,
           "objective": -1.4428791751549686,
-          "teamwork": 1.1386178338263724
+          "teamwork": 1.1375445016800179
         },
         "scores": {
           "trident": 34.89962887171983,
           "sortino": 20.16216216216216,
-          "alpha": -0.7717621784676538,
+          "alpha": -0.7610333780918808,
           "cei": 34.89962887171983,
           "rais": 20.16216216216216,
-          "wrr": -0.7717621784676538
+          "wrr": -0.7610333780918808
         },
         "weaponModel": [
-          -0.11073553671624863,
-          -0.07161607959725866,
-          -0.17735254067719988,
-          -0.634884406108592,
-          0.04269356322356096,
-          0.6609489551061153,
-          -0.14385427265960754,
-          0.5380032655093411
+          -0.11087702898300095,
+          -0.07145252834143527,
+          -0.17724257588560097,
+          -0.6350794024656404,
+          0.042707731029883865,
+          0.660886356094052,
+          -0.14378342027067056,
+          0.5377851294635859
         ],
-        "expectedAccuracy": 27.201783414064092,
-        "expectedHeadshotPercent": 22.66267709659162,
+        "expectedAccuracy": 27.20146548761713,
+        "expectedHeadshotPercent": 22.662318161160037,
         "combatGeometric": 45.65048520441654,
         "combatArithmetic": 51.81621621621622,
         "aimScore": 19.68347038949539,
@@ -2988,13 +2988,13 @@
             "losses": 57,
             "matches": 393,
             "rawRate": 0.8549618320610687,
-            "smoothedRate": 0.857136686675687,
+            "smoothedRate": 0.8571384846499501,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 78.70036956458077,
+        "smoothedWinPercent": 78.70045047342262,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 79.47213174304842
+        "expectedWinPercent": 79.4614838515145
       },
       {
         "discordId": "1302676035929636979",
@@ -3049,25 +3049,25 @@
           "spotsPerHour": 10.782292064622107,
           "spotAssistsPerHour": 8.262886954392465,
           "deathsPerHour": 33.61065985877093,
-          "accuracyResidual": 0.7363408561365006,
-          "headshotResidual": 0.736363983529202
+          "accuracyResidual": 0.7450809935195828,
+          "headshotResidual": 0.7355030978174018
         },
         "adjusted": {
           "infantryKd": 3.4874003988540894,
           "infantryKpm": 2.5067440312558027,
           "playerKillsPerMatch": 36.399731644498424,
           "assistsPerHour": 44.32656176694449,
-          "accuracyResidual": 0.7038338460124942,
-          "headshotResidual": 0.7181210082584025,
+          "accuracyResidual": 0.7122644023450635,
+          "headshotResidual": 0.717260248034108,
           "objectiveActionsPerHour": 10.715124004252907,
-          "objectivePresence": 0.10855177765112882,
+          "objectivePresence": 0.10855195983469644,
           "breakthroughPressure": 0.08075143396381089,
           "revivesPerHour": 23.112130184254443,
           "squadRevivesPerHour": 8.546398554095346,
-          "healsPerHour": 315.3000137760405,
+          "healsPerHour": 315.3155191549445,
           "resuppliesPerHour": 62.495856292306804,
-          "repairsPerHour": 0.7381040723237166,
-          "spotsPerHour": 10.973195935130548,
+          "repairsPerHour": 0.7379059422760792,
+          "spotsPerHour": 10.972873926444585,
           "spotAssistsPerHour": 8.34945577091816,
           "deathsPerHour": 33.22651022344498,
           "sortinoRaw": 53.60248179426963
@@ -3105,28 +3105,28 @@
         "model": {
           "combat": 0.41183413117150514,
           "objective": 0.6853921802966069,
-          "teamwork": 0.23761578736879788
+          "teamwork": 0.2367595270760886
         },
         "scores": {
           "trident": 61.72147986431493,
           "sortino": 51.29729729729729,
-          "alpha": -3.608453211205614,
+          "alpha": -3.6137446357642773,
           "cei": 61.72147986431493,
           "rais": 51.29729729729729,
-          "wrr": -3.608453211205614
+          "wrr": -3.6137446357642773
         },
         "weaponModel": [
-          -1.0889352791535498,
-          -0.6000304983543095,
-          3.747861112401244,
-          -1.2011303455701368,
-          -0.6243658667459954,
-          -0.27167305211346293,
-          -0.8823629956222931,
-          -0.5547157123905349
+          -1.0891586821904635,
+          -0.5999503472145372,
+          3.7482814188494946,
+          -1.201366318323982,
+          -0.6243491197555956,
+          -0.271715948612694,
+          -0.8823149844565714,
+          -0.5546519136846046
         ],
-        "expectedAccuracy": 21.7136591438635,
-        "expectedHeadshotPercent": 13.913636016470798,
+        "expectedAccuracy": 21.704919006480416,
+        "expectedHeadshotPercent": 13.914496902182599,
         "combatGeometric": 53.77569972389717,
         "combatArithmetic": 58.04324324324325,
         "aimScore": 60.36443982449481,
@@ -3159,13 +3159,13 @@
             "losses": 48,
             "matches": 402,
             "rawRate": 0.8805970149253731,
-            "smoothedRate": 0.8812251405865039,
+            "smoothedRate": 0.8812269006643539,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 78.89712362971201,
+        "smoothedWinPercent": 78.89720283321526,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 82.50557684091763
+        "expectedWinPercent": 82.51094746897954
       },
       {
         "discordId": "132955607509630977",
@@ -3220,25 +3220,25 @@
           "spotsPerHour": 50.13779962217552,
           "spotAssistsPerHour": 20.213754177404326,
           "deathsPerHour": 26.48465923878036,
-          "accuracyResidual": 2.004527269212371,
-          "headshotResidual": 5.228975674127437
+          "accuracyResidual": 2.0045346330563163,
+          "headshotResidual": 5.228838449108192
         },
         "adjusted": {
           "infantryKd": 4.6970488527225225,
           "infantryKpm": 3.211742744549328,
           "playerKillsPerMatch": 57.374583883012605,
           "assistsPerHour": 51.27140454115545,
-          "accuracyResidual": 1.9108845569350095,
-          "headshotResidual": 5.019520696353045,
+          "accuracyResidual": 1.9108637159231199,
+          "headshotResidual": 5.019353598690536,
           "objectiveActionsPerHour": 9.064149925866458,
-          "objectivePresence": 0.10288884515413409,
+          "objectivePresence": 0.10288907501816187,
           "breakthroughPressure": 0.07943555232736213,
           "revivesPerHour": 8.673883072476832,
           "squadRevivesPerHour": 3.232030569373458,
-          "healsPerHour": 173.51383930503374,
+          "healsPerHour": 173.53340269867005,
           "resuppliesPerHour": 27.931501755180076,
-          "repairsPerHour": 30.77547821902282,
-          "spotsPerHour": 48.74546407386177,
+          "repairsPerHour": 30.775228235056797,
+          "spotsPerHour": 48.74505779016391,
           "spotAssistsPerHour": 19.827034118260404,
           "deathsPerHour": 26.29569098704237,
           "sortinoRaw": 68.61012151381914
@@ -3276,28 +3276,28 @@
         "model": {
           "combat": 1.5962620129646714,
           "objective": 0.3506648777059989,
-          "teamwork": 0.91247501193749
+          "teamwork": 0.9114561627323552
         },
         "scores": {
           "trident": 72.44871472588673,
           "sortino": 85.02702702702703,
-          "alpha": 9.0148501956471,
+          "alpha": 9.007803248861123,
           "cei": 72.44871472588673,
           "rais": 85.02702702702703,
-          "wrr": 9.0148501956471
+          "wrr": 9.007803248861123
         },
         "weaponModel": [
-          -0.833585932363707,
-          0.18448180356610944,
-          0.1553550413525462,
-          0.825619125679973,
-          -0.3547213165539871,
-          -0.12291040599814271,
-          0.9245242962302805,
-          1.5340586466291464
+          -0.8337879534059744,
+          0.18468577497781447,
+          0.15549131121472562,
+          0.8255298186852156,
+          -0.35470561214375185,
+          -0.12295644524751409,
+          0.9246281923363893,
+          1.5335835162122673
         ],
-        "expectedAccuracy": 28.19547273078763,
-        "expectedHeadshotPercent": 17.471024325872563,
+        "expectedAccuracy": 28.195465366943683,
+        "expectedHeadshotPercent": 17.471161550891807,
         "combatGeometric": 79.60362623341608,
         "combatArithmetic": 81.3945945945946,
         "aimScore": 84.03152561567181,
@@ -3330,31 +3330,31 @@
             "losses": 6,
             "matches": 364,
             "rawRate": 0.9835164835164835,
-            "smoothedRate": 0.9775916067620493,
+            "smoothedRate": 0.9775935387755248,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 92.62015522290466,
+        "smoothedWinPercent": 92.62024216351105,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 83.60530502725756
+        "expectedWinPercent": 83.61243891464993
       },
       {
         "discordId": "168790441779658752",
         "name": "AryanDemon",
-        "hours": 708.5411111111111,
-        "matches": 2435,
-        "wins": 1925,
+        "hours": 708.8919444444444,
+        "matches": 2436,
+        "wins": 1926,
         "losses": 510,
         "cachedStats": false,
         "weaponMix": {
-          "ar": 0.18254944228237438,
-          "smg": 0.17362306679590864,
-          "carbine": 0.22966970963961747,
-          "mg": 0.18173926881844882,
-          "dmr": 0.06600020254336599,
-          "sniper": 0.07460829559757527,
-          "shotgun": 0.049420581299460364,
-          "pistol": 0.04238943302324909
+          "ar": 0.1825849198541751,
+          "smg": 0.17361553150859324,
+          "carbine": 0.22965974191308372,
+          "mg": 0.1817313812858052,
+          "dmr": 0.06599733811700711,
+          "sniper": 0.07460505757768647,
+          "shotgun": 0.04941843643307679,
+          "pistol": 0.042387593310572305
         },
         "breakthroughSeasons": {
           "Season1": {
@@ -3368,51 +3368,51 @@
             "matches": 387
           },
           "Season3": {
-            "wins": 453,
+            "wins": 454,
             "losses": 52,
-            "matches": 505
+            "matches": 506
           }
         },
         "raw": {
           "infantryKd": 3.51,
-          "infantryKpm": 2.0056666914015064,
-          "playerKillsPerMatch": 30.340451745379877,
-          "assistsPerHour": 54.88601774851926,
+          "infantryKpm": 2.005711834682564,
+          "playerKillsPerMatch": 30.329228243021348,
+          "assistsPerHour": 54.860265100738204,
           "accuracy": 31,
           "headshotPercent": 17.49,
-          "objectiveActionsPerHour": 16.27428503325299,
-          "objectivePresence": 0.16472383787030315,
-          "breakthroughPressure": 0.12332500113692141,
-          "revivesPerHour": 27.60743123193667,
-          "squadRevivesPerHour": 9.029821840495416,
-          "healsPerHour": 431.93541659152527,
-          "resuppliesPerHour": 93.12938792856056,
-          "repairsPerHour": 54.03779597200507,
-          "spotsPerHour": 38.573626246105064,
-          "spotAssistsPerHour": 18.251587377506517,
-          "deathsPerHour": 29.69764163296413,
-          "accuracyResidual": 2.750837883240237,
-          "headshotResidual": -0.7986326439499578
+          "objectiveActionsPerHour": 16.267641479601775,
+          "objectivePresence": 0.16464819313082898,
+          "breakthroughPressure": 0.12326788560080658,
+          "revivesPerHour": 27.595178860906163,
+          "squadRevivesPerHour": 9.0267635993732,
+          "healsPerHour": 431.72165010260534,
+          "resuppliesPerHour": 93.08329783844975,
+          "repairsPerHour": 54.01105246019708,
+          "spotsPerHour": 38.554536011012495,
+          "spotAssistsPerHour": 18.242554597139275,
+          "deathsPerHour": 29.68294415658867,
+          "accuracyResidual": 2.752140749636016,
+          "headshotResidual": -0.7983358273966417
         },
         "adjusted": {
-          "infantryKd": 3.5166458442835133,
-          "infantryKpm": 2.0005813603629674,
-          "playerKillsPerMatch": 30.315768011497312,
-          "assistsPerHour": 54.61501805503558,
-          "accuracyResidual": 2.6484975872274976,
-          "headshotResidual": -0.7652213787464625,
-          "objectiveActionsPerHour": 16.018874842534537,
-          "objectivePresence": 0.1624783821501,
-          "breakthroughPressure": 0.1216656409703237,
-          "revivesPerHour": 27.170113617903947,
-          "squadRevivesPerHour": 8.904841989131375,
-          "healsPerHour": 423.58866669440505,
-          "resuppliesPerHour": 91.03884539949837,
-          "repairsPerHour": 52.960942490218,
-          "spotsPerHour": 37.82427705784088,
-          "spotAssistsPerHour": 18.00086242789483,
-          "deathsPerHour": 29.432946937122065,
-          "sortinoRaw": 67.38834543723831
+          "infantryKd": 3.5166426672712565,
+          "infantryKpm": 2.000627396856735,
+          "playerKillsPerMatch": 30.304938637235963,
+          "assistsPerHour": 54.59027222021373,
+          "accuracyResidual": 2.6497820931700238,
+          "headshotResidual": -0.7649798413935192,
+          "objectiveActionsPerHour": 16.0125796988254,
+          "objectivePresence": 0.16240657636251832,
+          "breakthroughPressure": 0.12161126432142044,
+          "revivesPerHour": 27.1584876808812,
+          "squadRevivesPerHour": 8.901947672857796,
+          "healsPerHour": 423.4022312431408,
+          "resuppliesPerHour": 90.99532473976622,
+          "repairsPerHour": 52.93541957553613,
+          "spotsPerHour": 37.80586184804434,
+          "spotAssistsPerHour": 17.992257206627233,
+          "deathsPerHour": 29.4188766656578,
+          "sortinoRaw": 67.39962420709652
         },
         "percentiles": {
           "infantryKd": 35.72972972972973,
@@ -3447,28 +3447,28 @@
         "model": {
           "combat": 0.18438858429277302,
           "objective": 1.647598323439856,
-          "teamwork": 1.4305089367048947
+          "teamwork": 1.429365281363367
         },
         "scores": {
           "trident": 71.7317878992395,
           "sortino": 79.83783783783784,
-          "alpha": 2.7140134244623084,
+          "alpha": 2.723183023306987,
           "cei": 71.7317878992395,
           "rais": 79.83783783783784,
-          "wrr": 2.7140134244623084
+          "wrr": 2.723183023306987
         },
         "weaponModel": [
-          -0.8070608128748532,
-          -0.025287194367233798,
-          0.1278786228017121,
-          0.21329241687654202,
-          0.6636593033381143,
-          0.0028414500287194007,
-          1.8659189045387292,
-          1.4394528356152074
+          -0.8070138359698171,
+          -0.025170150636845485,
+          0.1279294174534203,
+          0.21307469460806608,
+          0.6636150604926234,
+          0.0027714405829696903,
+          1.8659276940166498,
+          1.4388523600447474
         ],
-        "expectedAccuracy": 28.249162116759763,
-        "expectedHeadshotPercent": 18.288632643949956,
+        "expectedAccuracy": 28.247859250363984,
+        "expectedHeadshotPercent": 18.28833582739664,
         "combatGeometric": 49.45171331012452,
         "combatArithmetic": 52.07567567567568,
         "aimScore": 48.5700566373265,
@@ -3477,8 +3477,8 @@
           "intel"
         ],
         "sortinoUpside": 74.70000768423846,
-        "sortinoDownside": 1.108500397206069,
-        "sortinoRaw": 67.38834543723831,
+        "sortinoDownside": 1.1083148988295586,
+        "sortinoRaw": 67.39962420709652,
         "seasonWinRates": {
           "Season1": {
             "wins": 902,
@@ -3497,17 +3497,17 @@
             "weight": 0.35
           },
           "Season3": {
-            "wins": 453,
+            "wins": 454,
             "losses": 52,
-            "matches": 505,
-            "rawRate": 0.897029702970297,
-            "smoothedRate": 0.8967606321329004,
+            "matches": 506,
+            "rawRate": 0.8972332015810277,
+            "smoothedRate": 0.8969564719090003,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 84.35129099548631,
+        "smoothedWinPercent": 84.36010378541079,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 81.637277571024
+        "expectedWinPercent": 81.6369207621038
       },
       {
         "discordId": "199335576220991489",
@@ -3562,25 +3562,25 @@
           "spotsPerHour": 9.263490426718082,
           "spotAssistsPerHour": 10.409372279869983,
           "deathsPerHour": 21.892016077642634,
-          "accuracyResidual": -2.8216892458119816,
-          "headshotResidual": 4.488716097787101
+          "accuracyResidual": -2.8222632653674573,
+          "headshotResidual": 4.487834061850979
         },
         "adjusted": {
           "infantryKd": 5.324077439197426,
           "infantryKpm": 2.2136136462564293,
           "playerKillsPerMatch": 35.69270131919772,
           "assistsPerHour": 49.828445356228244,
-          "accuracyResidual": -2.750814198204015,
-          "headshotResidual": 4.369924023560572,
+          "accuracyResidual": -2.7513909282410234,
+          "headshotResidual": 4.369042676201315,
           "objectiveActionsPerHour": 5.694401125883714,
-          "objectivePresence": 0.07544399859584904,
+          "objectivePresence": 0.07544415136949853,
           "breakthroughPressure": 0.061290850871686,
           "revivesPerHour": 15.496611260160615,
           "squadRevivesPerHour": 6.5621741744863336,
-          "healsPerHour": 404.3686419841968,
+          "healsPerHour": 404.381644327674,
           "resuppliesPerHour": 70.30618378188439,
-          "repairsPerHour": 1.5390579145727612,
-          "spotsPerHour": 9.46546690601127,
+          "repairsPerHour": 1.5388917686856813,
+          "spotsPerHour": 9.46519687923131,
           "spotAssistsPerHour": 10.422763816374243,
           "deathsPerHour": 21.893093062463635,
           "sortinoRaw": 50.644588379475785
@@ -3618,28 +3618,28 @@
         "model": {
           "combat": 0.9109606402965256,
           "objective": -0.9569853637176315,
-          "teamwork": -0.14478910386065194
+          "teamwork": -0.14555323413111707
         },
         "scores": {
           "trident": 46.243044815741186,
           "sortino": 40.91891891891892,
-          "alpha": -0.6348271657641789,
+          "alpha": -0.6391023976076724,
           "cei": 46.243044815741186,
           "rais": 40.91891891891892,
-          "wrr": -0.6348271657641789
+          "wrr": -0.6391023976076724
         },
         "weaponModel": [
-          0.3418299652334763,
-          -0.012932580546933222,
-          -0.5270327808114663,
-          0.39805485131640617,
-          0.0516379755275253,
-          -0.10030287605142696,
-          0.019240752272644508,
-          -0.7601974090756138
+          0.34172636910102555,
+          -0.012759767222442972,
+          -0.5269504630104807,
+          0.397934603625846,
+          0.05165210875029424,
+          -0.100349392906029,
+          0.01931664900263523,
+          -0.7600805935993131
         ],
-        "expectedAccuracy": 27.00168924581198,
-        "expectedHeadshotPercent": 16.731283902212898,
+        "expectedAccuracy": 27.002263265367457,
+        "expectedHeadshotPercent": 16.73216593814902,
         "combatGeometric": 64.87401339671288,
         "combatArithmetic": 67.3837837837838,
         "aimScore": 51.63520409963073,
@@ -3672,13 +3672,13 @@
             "losses": 82,
             "matches": 762,
             "rawRate": 0.8923884514435696,
-            "smoothedRate": 0.8923546823766673,
+            "smoothedRate": 0.892355637336314,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 81.80052718624171,
+        "smoothedWinPercent": 81.80057015942582,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 82.43535435200589
+        "expectedWinPercent": 82.43967255703349
       },
       {
         "discordId": "199574297541476352",
@@ -3733,25 +3733,25 @@
           "spotsPerHour": 24.580137238968305,
           "spotAssistsPerHour": 16.295388040754222,
           "deathsPerHour": 23.90431343101359,
-          "accuracyResidual": -9.98066527143921,
-          "headshotResidual": 2.0813396777840687
+          "accuracyResidual": -9.97837980366047,
+          "headshotResidual": 2.080952852369304
         },
         "adjusted": {
           "infantryKd": 2.728459741050374,
           "infantryKpm": 1.3903838414497889,
           "playerKillsPerMatch": 20.27840096568415,
           "assistsPerHour": 52.97874576144986,
-          "accuracyResidual": -9.612032610212019,
-          "headshotResidual": 2.0093600611552884,
+          "accuracyResidual": -9.609859216029177,
+          "headshotResidual": 2.0089554175128472,
           "objectiveActionsPerHour": 13.755330243365071,
-          "objectivePresence": 0.12784062666689913,
+          "objectivePresence": 0.12784083654972692,
           "breakthroughPressure": 0.09687067719924686,
           "revivesPerHour": 16.62884821443342,
           "squadRevivesPerHour": 4.86535456139042,
-          "healsPerHour": 179.6728477579115,
+          "healsPerHour": 179.69071058062704,
           "resuppliesPerHour": 43.888416191670764,
-          "repairsPerHour": 41.848788574639556,
-          "spotsPerHour": 24.277246944351127,
+          "repairsPerHour": 41.84856032082277,
+          "spotsPerHour": 24.276875977339888,
           "spotAssistsPerHour": 16.090756339010902,
           "deathsPerHour": 23.829544305036993,
           "sortinoRaw": 52.574773867049814
@@ -3789,28 +3789,28 @@
         "model": {
           "combat": -1.0017190632248412,
           "objective": 1.2231930095610246,
-          "teamwork": 0.18590860636388565
+          "teamwork": 0.18506480350528723
         },
         "scores": {
           "trident": 47.60493026793241,
           "sortino": 46.10810810810811,
-          "alpha": 2.621639054045218,
+          "alpha": 2.621152689773126,
           "cei": 47.60493026793241,
           "rais": 46.10810810810811,
-          "wrr": 2.621639054045218
+          "wrr": 2.621152689773126
         },
         "weaponModel": [
-          0.1655214107592848,
-          0.22364065878120004,
-          0.5559144279859162,
-          -0.41327565059884835,
-          -0.34769610487643215,
-          -0.3939245296145052,
-          -0.21442202105651167,
-          -0.1261201494056491
+          0.1654030512110852,
+          0.22385081066973053,
+          0.5560823675289389,
+          -0.4134546102346304,
+          -0.3476804276291651,
+          -0.39396484343684723,
+          -0.21435335124665983,
+          -0.12616693355411007
         ],
-        "expectedAccuracy": 25.57066527143921,
-        "expectedHeadshotPercent": 13.408660322215932,
+        "expectedAccuracy": 25.56837980366047,
+        "expectedHeadshotPercent": 13.409047147630696,
         "combatGeometric": 22.12740453266114,
         "combatArithmetic": 32.0972972972973,
         "aimScore": 13.237947093233272,
@@ -3843,13 +3843,13 @@
             "losses": 71,
             "matches": 639,
             "rawRate": 0.8888888888888888,
-            "smoothedRate": 0.8889806250458391,
+            "smoothedRate": 0.8889817569031312,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 81.87145057289844,
+        "smoothedWinPercent": 81.87150150647659,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 79.24981151885322
+        "expectedWinPercent": 79.25034881670346
       },
       {
         "discordId": "206528087578378240",
@@ -3899,25 +3899,25 @@
           "spotsPerHour": 3.5449312288399475,
           "spotAssistsPerHour": 3.6416628996108606,
           "deathsPerHour": 19.596698478530943,
-          "accuracyResidual": -2.8155980445722406,
-          "headshotResidual": 2.1348871232107456
+          "accuracyResidual": -2.8156005715050654,
+          "headshotResidual": 2.1347096014996048
         },
         "adjusted": {
           "infantryKd": 2.9827428536637344,
           "infantryKpm": 1.2281119663022624,
           "playerKillsPerMatch": 21.03505837266997,
           "assistsPerHour": 35.031507391672484,
-          "accuracyResidual": -2.4963351065997643,
-          "headshotResidual": 1.8916445625117024,
+          "accuracyResidual": -2.4964210440055083,
+          "headshotResidual": 1.8913824119842655,
           "objectiveActionsPerHour": 12.042724010795123,
-          "objectivePresence": 0.1098144162491624,
+          "objectivePresence": 0.1098151060667592,
           "breakthroughPressure": 0.07915323015381726,
           "revivesPerHour": 18.40850724147217,
           "squadRevivesPerHour": 8.937097397616506,
-          "healsPerHour": 207.1081787406241,
+          "healsPerHour": 207.16688811465377,
           "resuppliesPerHour": 32.014602507665245,
-          "repairsPerHour": 2.7947480885791545,
-          "spotsPerHour": 5.169084975520477,
+          "repairsPerHour": 2.793997891428526,
+          "spotsPerHour": 5.16786572583287,
           "spotAssistsPerHour": 4.544958411268121,
           "deathsPerHour": 19.88741287033952,
           "sortinoRaw": 48.93878017998473
@@ -3955,28 +3955,28 @@
         "model": {
           "combat": -0.9559041065430106,
           "objective": 0.7570178177778858,
-          "teamwork": -0.41534658519953144
+          "teamwork": -0.41604553202871275
         },
         "scores": {
           "trident": 43.36729637171329,
           "sortino": 35.72972972972973,
-          "alpha": -0.11544611996363585,
+          "alpha": -0.11785956313750034,
           "cei": 43.36729637171329,
           "rais": 35.72972972972973,
-          "wrr": -0.11544611996363585
+          "wrr": -0.11785956313750034
         },
         "weaponModel": [
-          2.415250508415393,
-          -1.0135314699133717,
-          0.20393801363594527,
-          -1.524813054565083,
-          0.23695573421002178,
-          -0.488262012395388,
-          -0.301790057576751,
-          -1.5837615663875133
+          2.4153205327268985,
+          -1.0135165819984302,
+          0.20407812464447644,
+          -1.525072450623531,
+          0.23696915090201268,
+          -0.4883003332501069,
+          -0.30172408995952327,
+          -1.5834322613682612
         ],
-        "expectedAccuracy": 25.49559804457224,
-        "expectedHeadshotPercent": 11.775112876789255,
+        "expectedAccuracy": 25.495600571505065,
+        "expectedHeadshotPercent": 11.775290398500395,
         "combatGeometric": 25.070323089321725,
         "combatArithmetic": 28.464864864864868,
         "aimScore": 52.26289111947927,
@@ -4001,13 +4001,13 @@
             "losses": 16,
             "matches": 126,
             "rawRate": 0.873015873015873,
-            "smoothedRate": 0.8760472518572,
+            "smoothedRate": 0.8760522290309875,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 79.36686725632238,
+        "smoothedWinPercent": 79.36721182989226,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 79.48231337628602
+        "expectedWinPercent": 79.48507139302976
       },
       {
         "discordId": "208693345768308736",
@@ -4062,25 +4062,25 @@
           "spotsPerHour": 36.361783547388754,
           "spotAssistsPerHour": 15.967835109941484,
           "deathsPerHour": 23.68613822141551,
-          "accuracyResidual": 0.9474999269150324,
-          "headshotResidual": 2.744697412070636
+          "accuracyResidual": 0.9464923154324509,
+          "headshotResidual": 2.7459080585855205
         },
         "adjusted": {
           "infantryKd": 4.1155497863182475,
           "infantryKpm": 2.856562296999959,
           "playerKillsPerMatch": 51.170423424321314,
           "assistsPerHour": 38.64901152988333,
-          "accuracyResidual": 0.8800794675846491,
-          "headshotResidual": 2.600638518420476,
+          "accuracyResidual": 0.8790907034982165,
+          "headshotResidual": 2.6017329439678534,
           "objectiveActionsPerHour": 4.245913381088835,
-          "objectivePresence": 0.060867269192863276,
+          "objectivePresence": 0.060867580529332076,
           "breakthroughPressure": 0.049447074225040855,
           "revivesPerHour": 13.872872126477002,
           "squadRevivesPerHour": 3.8447375040764102,
-          "healsPerHour": 166.30799549836078,
+          "healsPerHour": 166.3344928931515,
           "resuppliesPerHour": 27.28022374976627,
-          "repairsPerHour": 6.659515604206439,
-          "spotsPerHour": 35.25026588713631,
+          "repairsPerHour": 6.659177016537952,
+          "spotsPerHour": 35.24971560124321,
           "spotAssistsPerHour": 15.682698963060144,
           "deathsPerHour": 23.587490083025322,
           "sortinoRaw": 48.98858501188227
@@ -4118,28 +4118,28 @@
         "model": {
           "combat": 1.0995767152858262,
           "objective": -1.4261753919220297,
-          "teamwork": 0.18714225217881714
+          "teamwork": 0.18629815210692732
         },
         "scores": {
           "trident": 38.292156177554276,
           "sortino": 38.32432432432432,
-          "alpha": 5.23734933341386,
+          "alpha": 5.236023623762719,
           "cei": 38.292156177554276,
           "rais": 38.32432432432432,
-          "wrr": 5.23734933341386
+          "wrr": 5.236023623762719
         },
         "weaponModel": [
-          0.21454812231533915,
-          -0.4179287119444449,
-          0.10226961672410856,
-          -0.9848074628974185,
-          -0.5759193231811128,
-          0.855376061257056,
-          -0.5913069942499524,
-          1.426346053539688
+          0.21443386807971307,
+          -0.41781981951832503,
+          0.10240168945969068,
+          -0.9850277814422728,
+          -0.5759027635091858,
+          0.8553093547903925,
+          -0.5912499810577294,
+          1.4258987142784492
         ],
-        "expectedAccuracy": 27.65250007308497,
-        "expectedHeadshotPercent": 24.255302587929364,
+        "expectedAccuracy": 27.65350768456755,
+        "expectedHeadshotPercent": 24.25409194141448,
         "combatGeometric": 68.35677920424769,
         "combatArithmetic": 72.57297297297299,
         "aimScore": 76.14604782244027,
@@ -4172,13 +4172,13 @@
             "losses": 14,
             "matches": 195,
             "rawRate": 0.9282051282051282,
-            "smoothedRate": 0.9240142501383509,
+            "smoothedRate": 0.9240176662894505,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 87.0829970275675,
+        "smoothedWinPercent": 87.08315075436698,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 81.84564769415364
+        "expectedWinPercent": 81.84712713060426
       },
       {
         "discordId": "210550539887312896",
@@ -4233,25 +4233,25 @@
           "spotsPerHour": 33.33617355787599,
           "spotAssistsPerHour": 15.203630356686393,
           "deathsPerHour": 28.793142781752564,
-          "accuracyResidual": -1.1584775932695273,
-          "headshotResidual": 0.9576803683429134
+          "accuracyResidual": -1.1563142349366657,
+          "headshotResidual": 0.9573591722697508
         },
         "adjusted": {
           "infantryKd": 3.5643491765559054,
           "infantryKpm": 2.0386790486065567,
           "playerKillsPerMatch": 33.000692278521626,
           "assistsPerHour": 47.18629929360011,
-          "accuracyResidual": -1.131288254160789,
-          "headshotResidual": 0.9344056285793892,
+          "accuracyResidual": -1.1292099492536987,
+          "headshotResidual": 0.9340683593190429,
           "objectiveActionsPerHour": 6.400192131180963,
-          "objectivePresence": 0.11715164019149447,
+          "objectivePresence": 0.11715180633203894,
           "breakthroughPressure": 0.09844179437396532,
           "revivesPerHour": 40.22885773501971,
           "squadRevivesPerHour": 10.751245655194184,
-          "healsPerHour": 308.9591452004809,
+          "healsPerHour": 308.97328518097964,
           "resuppliesPerHour": 51.166395466136585,
-          "repairsPerHour": 22.189833044662944,
-          "spotsPerHour": 32.83377813531944,
+          "repairsPerHour": 22.18965236188008,
+          "spotsPerHour": 32.83348448260911,
           "spotAssistsPerHour": 15.07439306649222,
           "deathsPerHour": 28.587319386966477,
           "sortinoRaw": 55.225425782606195
@@ -4289,28 +4289,28 @@
         "model": {
           "combat": 0.35016541832498893,
           "objective": -0.06593532636515755,
-          "teamwork": 1.1682005193633656
+          "teamwork": 1.1671200600762786
         },
         "scores": {
           "trident": 58.943201045200034,
           "sortino": 64.27027027027027,
-          "alpha": -9.731564537602708,
+          "alpha": -9.727482516061727,
           "cei": 58.943201045200034,
           "rais": 64.27027027027027,
-          "wrr": -9.731564537602708
+          "wrr": -9.727482516061727
         },
         "weaponModel": [
-          -0.5126753680810779,
-          -0.11431269697192648,
-          0.36275750071064766,
-          -0.09031082142242373,
-          0.43271921854412815,
-          -0.0870843098970788,
-          2.025170917643647,
-          0.88831119691097
+          -0.5128505172787385,
+          -0.11415588456106573,
+          0.36291016856501795,
+          -0.0904664097029881,
+          0.4327318783169617,
+          -0.08713110600626336,
+          2.025308855480583,
+          0.8880026771694518
         ],
-        "expectedAccuracy": 28.238477593269526,
-        "expectedHeadshotPercent": 16.862319631657087,
+        "expectedAccuracy": 28.236314234936664,
+        "expectedHeadshotPercent": 16.86264082773025,
         "combatGeometric": 53.57782571922574,
         "combatArithmetic": 54.151351351351366,
         "aimScore": 52.88312844303533,
@@ -4343,31 +4343,31 @@
             "losses": 89,
             "matches": 579,
             "rawRate": 0.846286701208981,
-            "smoothedRate": 0.8481508858119821,
+            "smoothedRate": 0.8481521301054289,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 71.99825824290559,
+        "smoothedWinPercent": 71.9983142361107,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 81.7298227805083
+        "expectedWinPercent": 81.72579675217243
       },
       {
         "discordId": "211731212480282624",
         "name": "Terrae",
-        "hours": 527.6333333333333,
-        "matches": 1502,
-        "wins": 1206,
+        "hours": 527.9577777777778,
+        "matches": 1503,
+        "wins": 1207,
         "losses": 294,
         "cachedStats": false,
         "weaponMix": {
-          "ar": 0.1737431834830028,
-          "smg": 0.3517458422637619,
-          "carbine": 0.27550937355869665,
-          "mg": 0.14655850674190835,
-          "dmr": 0.008546081011421906,
-          "sniper": 0.021405898152418678,
-          "shotgun": 0.008763124338696112,
-          "pistol": 0.0137279904500936
+          "ar": 0.17347491602557158,
+          "smg": 0.35125690757395167,
+          "carbine": 0.27546321378264166,
+          "mg": 0.14744284321161555,
+          "dmr": 0.00853288546971503,
+          "sniper": 0.021372846462238596,
+          "shotgun": 0.00874959367212049,
+          "pistol": 0.013706793802145411
         },
         "breakthroughSeasons": {
           "Season1": {
@@ -4381,51 +4381,51 @@
             "matches": 5
           },
           "Season3": {
-            "wins": 566,
+            "wins": 567,
             "losses": 66,
-            "matches": 632
+            "matches": 633
           }
         },
         "raw": {
           "infantryKd": 5.09,
-          "infantryKpm": 2.3850724997195445,
-          "playerKillsPerMatch": 33.5,
-          "assistsPerHour": 58.72259776359846,
+          "infantryKpm": 2.385752263800659,
+          "playerKillsPerMatch": 33.51630073186959,
+          "assistsPerHour": 58.72439294388019,
           "accuracy": 34.22,
-          "headshotPercent": 14.45,
-          "objectiveActionsPerHour": 5.926464084907448,
-          "objectivePresence": 0.06489407627350643,
-          "breakthroughPressure": 0.04990997536167793,
-          "revivesPerHour": 3.2238296797018133,
-          "squadRevivesPerHour": 1.5162044348979722,
-          "healsPerHour": 56.86524733084844,
-          "resuppliesPerHour": 10.562259144607998,
-          "repairsPerHour": 42.859308863478425,
-          "spotsPerHour": 31.89904605470971,
-          "spotAssistsPerHour": 17.940488975930254,
-          "deathsPerHour": 18.725124770989954,
-          "accuracyResidual": 9.640303097244203,
-          "headshotResidual": 1.2406888095421724
+          "headshotPercent": 14.46,
+          "objectiveActionsPerHour": 5.926610292910628,
+          "objectivePresence": 0.06491470277505355,
+          "breakthroughPressure": 0.049934548638148675,
+          "revivesPerHour": 3.229424911924775,
+          "squadRevivesPerHour": 1.5171667768045425,
+          "healsPerHour": 57.12578026020599,
+          "resuppliesPerHour": 10.58228562048312,
+          "repairsPerHour": 42.83297065000989,
+          "spotsPerHour": 31.902172311758935,
+          "spotAssistsPerHour": 17.950299055900935,
+          "deathsPerHour": 18.730664489163697,
+          "accuracyResidual": 9.642638248864948,
+          "headshotResidual": 1.2400971043757671
         },
         "adjusted": {
-          "infantryKd": 5.027345436998613,
-          "infantryKpm": 2.361158913999666,
-          "playerKillsPerMatch": 33.324304409293525,
-          "assistsPerHour": 58.1893257025952,
-          "accuracyResidual": 9.192795808266476,
-          "headshotResidual": 1.192782724006911,
-          "objectiveActionsPerHour": 6.055558086873654,
-          "objectivePresence": 0.066429651318994,
-          "breakthroughPressure": 0.05102855925221683,
-          "revivesPerHour": 3.746417755520348,
-          "squadRevivesPerHour": 1.6902123535369553,
-          "healsPerHour": 62.753545849124784,
-          "resuppliesPerHour": 11.522532978986721,
-          "repairsPerHour": 41.935632908678755,
-          "spotsPerHour": 31.206337330327116,
-          "spotAssistsPerHour": 17.621761191235105,
-          "deathsPerHour": 18.87015489389751,
-          "sortinoRaw": 58.27739914345895
+          "infantryKd": 5.027382199163287,
+          "infantryKpm": 2.361821976132883,
+          "playerKillsPerMatch": 33.33997125038065,
+          "assistsPerHour": 58.191352614223646,
+          "accuracyResidual": 9.195257561139657,
+          "headshotResidual": 1.1922071298933772,
+          "objectiveActionsPerHour": 6.0556219395259205,
+          "objectivePresence": 0.06644869470750901,
+          "breakthroughPressure": 0.0510513652142922,
+          "revivesPerHour": 3.751453394197578,
+          "squadRevivesPerHour": 1.6910290885755297,
+          "healsPerHour": 63.02015844535134,
+          "resuppliesPerHour": 11.541090595140126,
+          "repairsPerHour": 41.91075509491472,
+          "spotsPerHour": 31.20928605510037,
+          "spotAssistsPerHour": 17.63131475516436,
+          "deathsPerHour": 18.875359058111343,
+          "sortinoRaw": 58.27177491575001
         },
         "percentiles": {
           "infantryKd": 66.86486486486487,
@@ -4460,28 +4460,28 @@
         "model": {
           "combat": 1.3395103884446193,
           "objective": -0.9898353830867811,
-          "teamwork": 0.08731340552282411
+          "teamwork": 0.08649335648708464
         },
         "scores": {
           "trident": 49.18711466310341,
           "sortino": 69.45945945945947,
-          "alpha": -1.374531904973594,
+          "alpha": -1.3717560153827293,
           "cei": 49.18711466310341,
           "rais": 69.45945945945947,
-          "wrr": -1.374531904973594
+          "wrr": -1.3717560153827293
         },
         "weaponModel": [
-          -0.8683107404294361,
-          1.2467271319130981,
-          0.5109420626452825,
-          -0.16181058860180028,
-          -0.45977677514291704,
-          -0.3473593069421855,
-          -0.48874064251206706,
-          -0.8942216865885523
+          -0.8703816986431641,
+          1.2436066160829191,
+          0.5107206775249198,
+          -0.15254172941009508,
+          -0.4600186841508103,
+          -0.34761816015286884,
+          -0.4894641041703531,
+          -0.8957957212774839
         ],
-        "expectedAccuracy": 24.579696902755796,
-        "expectedHeadshotPercent": 13.209311190457827,
+        "expectedAccuracy": 24.57736175113505,
+        "expectedHeadshotPercent": 13.219902895624234,
         "combatGeometric": 74.50416197932793,
         "combatArithmetic": 75.16756756756759,
         "aimScore": 82.91167733274986,
@@ -4490,8 +4490,8 @@
           "logistics"
         ],
         "sortinoUpside": 55.29242221685334,
-        "sortinoDownside": 0.9487798534169718,
-        "sortinoRaw": 58.27739914345895,
+        "sortinoDownside": 0.9488714269780825,
+        "sortinoRaw": 58.27177491575001,
         "seasonWinRates": {
           "Season1": {
             "wins": 167,
@@ -4510,17 +4510,17 @@
             "weight": 0.35
           },
           "Season3": {
-            "wins": 566,
+            "wins": 567,
             "losses": 66,
-            "matches": 632,
-            "rawRate": 0.8955696202531646,
-            "smoothedRate": 0.8954081202898587,
+            "matches": 633,
+            "rawRate": 0.8957345971563981,
+            "smoothedRate": 0.8955682166925214,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 82.00811333171654,
+        "smoothedWinPercent": 82.01531766983635,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 83.38264523669014
+        "expectedWinPercent": 83.38707368521908
       },
       {
         "discordId": "232628344477188096",
@@ -4570,25 +4570,25 @@
           "spotsPerHour": 27.93143960821029,
           "spotAssistsPerHour": 13.63852654953588,
           "deathsPerHour": 22.85804922075789,
-          "accuracyResidual": -3.1015513035958477,
-          "headshotResidual": -2.046022025387135
+          "accuracyResidual": -3.101511471860988,
+          "headshotResidual": -2.045049171445303
         },
         "adjusted": {
           "infantryKd": 1.997832743394378,
           "infantryKpm": 1.2861136648587392,
           "playerKillsPerMatch": 21.0907292623084,
           "assistsPerHour": 38.114831275785846,
-          "accuracyResidual": -2.93225350381937,
-          "headshotResidual": -1.9136681253253818,
+          "accuracyResidual": -2.932255980803575,
+          "headshotResidual": -1.9128039908127663,
           "objectiveActionsPerHour": 4.359658805365956,
-          "objectivePresence": 0.07409958682672178,
+          "objectivePresence": 0.07409991591363968,
           "breakthroughPressure": 0.061569491592610964,
           "revivesPerHour": 4.744391968723304,
           "squadRevivesPerHour": 1.9797680246801996,
-          "healsPerHour": 70.96333514820435,
+          "healsPerHour": 70.9913432579429,
           "resuppliesPerHour": 12.910783611690231,
-          "repairsPerHour": 21.421651414835704,
-          "spotsPerHour": 27.25741361956211,
+          "repairsPerHour": 21.421293523025962,
+          "spotsPerHour": 27.256831959825252,
           "spotAssistsPerHour": 13.475522564497265,
           "deathsPerHour": 22.802975192403206,
           "sortinoRaw": 25.846876359378243
@@ -4626,28 +4626,28 @@
         "model": {
           "combat": -1.5053474991953275,
           "objective": -1.1495429723092492,
-          "teamwork": -0.5625424861837781
+          "teamwork": -0.5632059701777736
         },
         "scores": {
           "trident": 22.36163501087634,
           "sortino": 4.594594594594595,
-          "alpha": -1.2777097358727616,
+          "alpha": -1.2707934258277334,
           "cei": 22.36163501087634,
           "rais": 4.594594594594595,
-          "wrr": -1.2777097358727616
+          "wrr": -1.2707934258277334
         },
         "weaponModel": [
-          -0.16501882073176993,
-          -0.2337087695603525,
-          -0.2034943468266232,
-          -0.5956734391129508,
-          1.0638301991299428,
-          0.3241052958724714,
-          0.7813992911448763,
-          1.5906387582678896
+          -0.16516485847671827,
+          -0.23357080153745025,
+          -0.20338644890122454,
+          -0.5958655979677225,
+          1.063840418713314,
+          0.32404981299799346,
+          0.7814987605596174,
+          1.5901490294958542
         ],
-        "expectedAccuracy": 27.24155130359585,
-        "expectedHeadshotPercent": 20.756022025387136,
+        "expectedAccuracy": 27.24151147186099,
+        "expectedHeadshotPercent": 20.755049171445304,
         "combatGeometric": 13.561607955910345,
         "combatArithmetic": 16.52972972972973,
         "aimScore": 21.420210550193232,
@@ -4672,18 +4672,18 @@
             "losses": 87,
             "matches": 353,
             "rawRate": 0.7535410764872521,
-            "smoothedRate": 0.7626537963768178,
+            "smoothedRate": 0.7626557846129077,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 75.63457926055126,
+        "smoothedWinPercent": 75.63471690766518,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 76.91228899642402
+        "expectedWinPercent": 76.90551033349291
       },
       {
         "discordId": "234364939492524032",
         "name": "my blueberries are no help",
-        "hours": 894.8105555555555,
+        "hours": 894.8119444444444,
         "matches": 2572,
         "wins": 2164,
         "losses": 408,
@@ -4717,44 +4717,44 @@
         },
         "raw": {
           "infantryKd": 7.28,
-          "infantryKpm": 2.470559306904571,
+          "infantryKpm": 2.4705542696920615,
           "playerKillsPerMatch": 39.259720062208395,
-          "assistsPerHour": 55.73805504455009,
+          "assistsPerHour": 55.73796853032124,
           "accuracy": 39.16,
           "headshotPercent": 8.93,
-          "objectiveActionsPerHour": 8.176032294855709,
-          "objectivePresence": 0.08222566042843334,
-          "breakthroughPressure": 0.06259363403426796,
-          "revivesPerHour": 15.245685151233129,
-          "squadRevivesPerHour": 6.322008569163305,
-          "healsPerHour": 224.359221908548,
-          "resuppliesPerHour": 48.00345697009733,
-          "repairsPerHour": 80.28291525394265,
-          "spotsPerHour": 11.386767776419466,
-          "spotAssistsPerHour": 10.518427550462265,
-          "deathsPerHour": 15.49266480366111,
-          "accuracyResidual": 12.61059894341017,
-          "headshotResidual": -5.616394785718853
+          "objectiveActionsPerHour": 8.176019604367523,
+          "objectivePresence": 0.08222553280127451,
+          "breakthroughPressure": 0.06259353687910216,
+          "revivesPerHour": 15.245661487531676,
+          "squadRevivesPerHour": 6.321998756411574,
+          "healsPerHour": 224.3588736677446,
+          "resuppliesPerHour": 48.003382461181324,
+          "repairsPerHour": 80.28279064222993,
+          "spotsPerHour": 11.386750102364774,
+          "spotAssistsPerHour": 10.51841122420819,
+          "deathsPerHour": 15.492640756608388,
+          "accuracyResidual": 12.612914727217362,
+          "headshotResidual": -5.617052208355828
         },
         "adjusted": {
-          "infantryKd": 7.182833252499458,
-          "infantryKpm": 2.4538682451688403,
-          "playerKillsPerMatch": 38.997613653401544,
-          "assistsPerHour": 55.49877713309295,
-          "accuracyResidual": 12.260999953693585,
-          "headshotResidual": -5.4588051719992405,
-          "objectiveActionsPerHour": 8.192451375154365,
-          "objectivePresence": 0.08267718857147281,
-          "breakthroughPressure": 0.06292095717206875,
-          "revivesPerHour": 15.232914264426618,
-          "squadRevivesPerHour": 6.295935235792727,
-          "healsPerHour": 223.34457892474137,
-          "resuppliesPerHour": 47.56276772905366,
-          "repairsPerHour": 78.71080426560005,
-          "spotsPerHour": 11.528093644868656,
-          "spotAssistsPerHour": 10.528660024418803,
-          "deathsPerHour": 15.667657337142257,
-          "sortinoRaw": 65.57792328660362
+          "infantryKd": 7.182833399218379,
+          "infantryKpm": 2.4538633700681016,
+          "playerKillsPerMatch": 38.99761404917449,
+          "assistsPerHour": 55.49869333157746,
+          "accuracyResidual": 12.263235051054483,
+          "headshotResidual": -5.4594682589125325,
+          "objectiveActionsPerHour": 8.19243900479458,
+          "objectivePresence": 0.08267721428024793,
+          "breakthroughPressure": 0.06292086216328047,
+          "revivesPerHour": 15.232891263175661,
+          "squadRevivesPerHour": 6.295925729116338,
+          "healsPerHour": 223.35705467842365,
+          "resuppliesPerHour": 47.56269591067815,
+          "repairsPerHour": 78.710521688214,
+          "spotsPerHour": 11.527810143261,
+          "spotAssistsPerHour": 10.528644126452908,
+          "deathsPerHour": 15.667633679442092,
+          "sortinoRaw": 65.57795794389399
         },
         "percentiles": {
           "infantryKd": 82.43243243243244,
@@ -4789,28 +4789,28 @@
         "model": {
           "combat": 0.9171024171528217,
           "objective": -0.4213403925092288,
-          "teamwork": 0.4282654311025612
+          "teamwork": 0.42736323898125644
         },
         "scores": {
           "trident": 56.439628119423965,
           "sortino": 77.24324324324324,
-          "alpha": 6.141852885411481,
+          "alpha": 6.139107092312258,
           "cei": 56.439628119423965,
           "rais": 77.24324324324324,
-          "wrr": 6.141852885411481
+          "wrr": 6.139107092312258
         },
         "weaponModel": [
-          -0.5503633721380958,
-          0.8204483904311843,
-          0.10675505996632484,
-          0.1925924467022769,
-          -0.5273128593327064,
-          -0.2937524067755495,
-          0.1373490045424662,
-          0.21369144153817443
+          -0.5505416771875771,
+          0.8207527370129575,
+          0.10688748733735096,
+          0.19245733072140056,
+          -0.5272964875975839,
+          -0.29379483682774715,
+          0.13742855422450717,
+          0.21355698187711586
         ],
-        "expectedAccuracy": 26.549401056589826,
-        "expectedHeadshotPercent": 14.546394785718853,
+        "expectedAccuracy": 26.547085272782635,
+        "expectedHeadshotPercent": 14.547052208355828,
         "combatGeometric": 61.83512649074668,
         "combatArithmetic": 74.90810810810811,
         "aimScore": 21.219572810739393,
@@ -4819,8 +4819,8 @@
           "medic"
         ],
         "sortinoUpside": 58.29792852705022,
-        "sortinoDownside": 0.8889871103765103,
-        "sortinoRaw": 65.57792328660362,
+        "sortinoDownside": 0.888986640555775,
+        "sortinoRaw": 65.57795794389399,
         "seasonWinRates": {
           "Season1": {
             "wins": 594,
@@ -4843,13 +4843,13 @@
             "losses": 16,
             "matches": 470,
             "rawRate": 0.9659574468085106,
-            "smoothedRate": 0.9621881515766407,
+            "smoothedRate": 0.9621896698660185,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 88.4068216469256,
+        "smoothedWinPercent": 88.40688996994758,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 82.26496876151411
+        "expectedWinPercent": 82.26778287763533
       },
       {
         "discordId": "234840069305925633",
@@ -4904,25 +4904,25 @@
           "spotsPerHour": 29.18298861415099,
           "spotAssistsPerHour": 12.327394261749578,
           "deathsPerHour": 43.43759687956951,
-          "accuracyResidual": -1.8346847079025927,
-          "headshotResidual": 1.0937410383536488
+          "accuracyResidual": -1.831000120401825,
+          "headshotResidual": 1.0933624174554062
         },
         "adjusted": {
           "infantryKd": 3.3181994025403267,
           "infantryKpm": 2.9044024765134533,
           "playerKillsPerMatch": 44.858776158464856,
           "assistsPerHour": 45.325699253399634,
-          "accuracyResidual": -1.763563689021746,
-          "headshotResidual": 1.052757232255064,
+          "accuracyResidual": -1.7600748857568365,
+          "headshotResidual": 1.0523571113681236,
           "objectiveActionsPerHour": 8.997251217499285,
-          "objectivePresence": 0.12160269715950126,
+          "objectivePresence": 0.12160294606741288,
           "breakthroughPressure": 0.09367040161068474,
           "revivesPerHour": 4.420693892166978,
           "squadRevivesPerHour": 2.430303614523523,
-          "healsPerHour": 32.12747490450519,
+          "healsPerHour": 32.14865909544315,
           "resuppliesPerHour": 6.094752186566844,
-          "repairsPerHour": 35.86320987489007,
-          "spotsPerHour": 28.61694226667152,
+          "repairsPerHour": 35.862939180134035,
+          "spotsPerHour": 28.616502322989437,
           "spotAssistsPerHour": 12.263022785820953,
           "deathsPerHour": 42.47116218953603,
           "sortinoRaw": 45.17183179768137
@@ -4960,28 +4960,28 @@
         "model": {
           "combat": 0.5118645829649329,
           "objective": 0.5616636512214049,
-          "teamwork": -0.6268748686259337
+          "teamwork": -0.6275228534880891
         },
         "scores": {
           "trident": 56.613007223450346,
           "sortino": 22.756756756756758,
-          "alpha": -10.49147224147427,
+          "alpha": -10.504040971484741,
           "cei": 56.613007223450346,
           "rais": 22.756756756756758,
-          "wrr": -10.49147224147427
+          "wrr": -10.504040971484741
         },
         "weaponModel": [
-          0.4782867182933187,
-          0.5827641307913597,
-          -0.7354628525733181,
-          -1.569858768933261,
-          0.5455899467599045,
-          0.07839091613820202,
-          2.7388610174590218,
-          -0.18142213421097636
+          0.47819454853653737,
+          0.583030963455772,
+          -0.7353970140112945,
+          -1.570121424725576,
+          0.545602170118272,
+          0.07834062420998344,
+          2.739021028907778,
+          -0.18145464977650874
         ],
-        "expectedAccuracy": 29.424684707902593,
-        "expectedHeadshotPercent": 15.73625896164635,
+        "expectedAccuracy": 29.421000120401825,
+        "expectedHeadshotPercent": 15.736637582544592,
         "combatGeometric": 55.134233499031296,
         "combatArithmetic": 61.93513513513515,
         "aimScore": 53.31234369049588,
@@ -5014,13 +5014,13 @@
             "losses": 53,
             "matches": 215,
             "rawRate": 0.7534883720930232,
-            "smoothedRate": 0.767846395960155,
+            "smoothedRate": 0.7678495274319963,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 73.08772607232208,
+        "smoothedWinPercent": 73.08786698855494,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 83.57919831379635
+        "expectedWinPercent": 83.59190796003968
       },
       {
         "discordId": "277535059274104832",
@@ -5075,25 +5075,25 @@
           "spotsPerHour": 39.06463886523599,
           "spotAssistsPerHour": 17.82985007059939,
           "deathsPerHour": 8.299901915345398,
-          "accuracyResidual": 1.6982105189252614,
-          "headshotResidual": -2.478554225549143
+          "accuracyResidual": 1.6965138048406665,
+          "headshotResidual": -2.4801884411607666
         },
         "adjusted": {
           "infantryKd": 7.982525468507458,
           "infantryKpm": 1.357602890953088,
           "playerKillsPerMatch": 22.85432316976131,
           "assistsPerHour": 58.45436213020502,
-          "accuracyResidual": 1.607994707774269,
-          "headshotResidual": -2.35549138741293,
+          "accuracyResidual": 1.6063453830673846,
+          "headshotResidual": -2.357089652559727,
           "objectiveActionsPerHour": 8.897587149415276,
-          "objectivePresence": 0.11437208317799283,
+          "objectivePresence": 0.11437233941328032,
           "breakthroughPressure": 0.09212367674840936,
           "revivesPerHour": 14.655788725111083,
           "squadRevivesPerHour": 5.016521723076729,
-          "healsPerHour": 244.78331177766418,
+          "healsPerHour": 244.8051195909217,
           "resuppliesPerHour": 50.92028378292633,
-          "repairsPerHour": 126.25559122873763,
-          "spotsPerHour": 38.02480750431201,
+          "repairsPerHour": 126.25531256524243,
+          "spotsPerHour": 38.02435460952406,
           "spotAssistsPerHour": 17.509041939378488,
           "deathsPerHour": 8.930474705383197,
           "sortinoRaw": 83.27628524690836
@@ -5131,28 +5131,28 @@
         "model": {
           "combat": -0.04171902390492736,
           "objective": 0.39856413762842313,
-          "teamwork": 1.1209596333738139
+          "teamwork": 1.1198905554889445
         },
         "scores": {
           "trident": 58.9897372003615,
           "sortino": 95.40540540540542,
-          "alpha": -1.749008387883606,
+          "alpha": -1.745297605321639,
           "cei": 58.9897372003615,
           "rais": 95.40540540540542,
-          "wrr": -1.749008387883606
+          "wrr": -1.745297605321639
         },
         "weaponModel": [
-          -0.7850038018061195,
-          -0.2858448078300414,
-          -0.5214234899270602,
-          2.049810975040596,
-          0.2967422341544274,
-          -0.08758627125309525,
-          1.3684040289594852,
-          -0.2002991686714093
+          -0.7852017547633554,
+          -0.2857150684842679,
+          -0.5213407286351517,
+          2.0498102567093133,
+          0.2967554196820246,
+          -0.08763305675787633,
+          1.3685216537538825,
+          -0.20032681373306024
         ],
-        "expectedAccuracy": 28.821789481074738,
-        "expectedHeadshotPercent": 18.80855422554914,
+        "expectedAccuracy": 28.823486195159333,
+        "expectedHeadshotPercent": 18.810188441160765,
         "combatGeometric": 41.943496690866326,
         "combatArithmetic": 53.632432432432445,
         "aimScore": 28.769403843605026,
@@ -5185,13 +5185,13 @@
             "losses": 49,
             "matches": 325,
             "rawRate": 0.8492307692307692,
-            "smoothedRate": 0.8522375286583919,
+            "smoothedRate": 0.8522396759533689,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 78.97263430060084,
+        "smoothedWinPercent": 78.97273092887481,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 80.72164268848445
+        "expectedWinPercent": 80.71802853419645
       },
       {
         "discordId": "307279962795409429",
@@ -5246,25 +5246,25 @@
           "spotsPerHour": 7.881341368746037,
           "spotAssistsPerHour": 7.478385569441729,
           "deathsPerHour": 11.391797479155926,
-          "accuracyResidual": 2.784323808830038,
-          "headshotResidual": -0.5145412889259404
+          "accuracyResidual": 2.7839150914514157,
+          "headshotResidual": -0.51419674005583
         },
         "adjusted": {
           "infantryKd": 7.74043371913003,
           "infantryKpm": 1.9003800311371633,
           "playerKillsPerMatch": 40.41991685238589,
           "assistsPerHour": 35.397789997806306,
-          "accuracyResidual": 2.6969492454114268,
-          "headshotResidual": -0.4945056605046762,
+          "accuracyResidual": 2.6965329432641236,
+          "headshotResidual": -0.4941956900098764,
           "objectiveActionsPerHour": 2.7792363305872243,
-          "objectivePresence": 0.04746951218303895,
+          "objectivePresence": 0.047469671577889117,
           "breakthroughPressure": 0.03870510247340265,
           "revivesPerHour": 12.209740645965704,
           "squadRevivesPerHour": 4.344175567588826,
-          "healsPerHour": 205.42344733165817,
+          "healsPerHour": 205.43701319591023,
           "resuppliesPerHour": 43.11146950973013,
-          "repairsPerHour": 4.565133954252494,
-          "spotsPerHour": 8.13184488323437,
+          "repairsPerHour": 4.5649606076127816,
+          "spotsPerHour": 8.131563153510202,
           "spotAssistsPerHour": 7.5767009793399005,
           "deathsPerHour": 11.695080487278949,
           "sortinoRaw": 46.35829652137713
@@ -5302,28 +5302,28 @@
         "model": {
           "combat": 0.6555276867228104,
           "objective": -1.691000181991236,
-          "teamwork": -1.0700394477043003
+          "teamwork": -1.0705806641556306
         },
         "scores": {
           "trident": 21.838269664054753,
           "sortino": 27.945945945945947,
-          "alpha": -8.836699637726738,
+          "alpha": -8.843038532090418,
           "cei": 21.838269664054753,
           "rais": 27.945945945945947,
-          "wrr": -8.836699637726738
+          "wrr": -8.843038532090418
         },
         "weaponModel": [
-          0.038409661003561094,
-          -0.3098746877589711,
-          -1.406517104548263,
-          0.03806273964788155,
-          4.877322058655819,
-          -0.2664179798062992,
-          -0.07196966597285001,
-          -0.41557805175393353
+          0.038280657595148336,
+          -0.3097487410704447,
+          -1.4065043219741848,
+          0.03791644112219231,
+          4.877317533379827,
+          -0.2664609873238515,
+          -0.07189659027591946,
+          -0.4155501522522773
         ],
-        "expectedAccuracy": 22.375676191169962,
-        "expectedHeadshotPercent": 17.88454128892594,
+        "expectedAccuracy": 22.376084908548584,
+        "expectedHeadshotPercent": 17.88419674005583,
         "combatGeometric": 58.70247729183061,
         "combatArithmetic": 63.75135135135135,
         "aimScore": 53.40959060086434,
@@ -5356,13 +5356,13 @@
             "losses": 81,
             "matches": 464,
             "rawRate": 0.8254310344827587,
-            "smoothedRate": 0.8287998671379083,
+            "smoothedRate": 0.8288014040566035,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 73.89086888331302,
+        "smoothedWinPercent": 73.8909380446543,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 82.72756852103976
+        "expectedWinPercent": 82.73397657674472
       },
       {
         "discordId": "310748119765745665",
@@ -5417,25 +5417,25 @@
           "spotsPerHour": 58.47262719409573,
           "spotAssistsPerHour": 22.84217456904049,
           "deathsPerHour": 23.13671778868392,
-          "accuracyResidual": -4.0566023969169756,
-          "headshotResidual": -0.4566575142371718
+          "accuracyResidual": -4.05682184890097,
+          "headshotResidual": -0.4561991576067612
         },
         "adjusted": {
           "infantryKd": 3.5235076986084235,
           "infantryKpm": 1.622063008233323,
           "playerKillsPerMatch": 25.270752768296145,
           "assistsPerHour": 52.49061341933811,
-          "accuracyResidual": -3.9844650069567256,
-          "headshotResidual": -0.4445537482772592,
+          "accuracyResidual": -3.984693045040952,
+          "headshotResidual": -0.44412033284485153,
           "objectiveActionsPerHour": 8.6615531589456,
-          "objectivePresence": 0.10551125027568872,
+          "objectivePresence": 0.10551135529934541,
           "breakthroughPressure": 0.08369670100653051,
           "revivesPerHour": 9.663345875989817,
           "squadRevivesPerHour": 6.0181245153192044,
-          "healsPerHour": 91.22496512229264,
+          "healsPerHour": 91.23390353321564,
           "resuppliesPerHour": 18.92923737597905,
-          "repairsPerHour": 79.05861858594835,
-          "spotsPerHour": 57.67844368404403,
+          "repairsPerHour": 79.05850436959847,
+          "spotsPerHour": 57.67825805517461,
           "spotAssistsPerHour": 22.615647970893985,
           "deathsPerHour": 23.113857949858918,
           "sortinoRaw": 54.05151847215798
@@ -5473,28 +5473,28 @@
         "model": {
           "combat": -0.3981030681452417,
           "objective": 0.19778729122374325,
-          "teamwork": 0.9284044898843791
+          "teamwork": 0.9273818029062679
         },
         "scores": {
           "trident": 52.58463968914192,
           "sortino": 53.891891891891895,
-          "alpha": 2.3134687248551273,
+          "alpha": 2.3184357431898803,
           "cei": 52.58463968914192,
           "rais": 53.891891891891895,
-          "wrr": 2.3134687248551273
+          "wrr": 2.3184357431898803
         },
         "weaponModel": [
-          -0.6827759898274768,
-          -0.1864845973695272,
-          -0.8143637954313695,
-          -0.35513477391997195,
-          0.6320952246161523,
-          1.0361397236827923,
-          2.567057586584981,
-          1.7081463994431696
+          -0.6829653826119302,
+          -0.18633917591367283,
+          -0.8143041950646347,
+          -0.3553095261902492,
+          0.6321071135020198,
+          1.0360691984145662,
+          2.5672122843517298,
+          1.7076263522742674
         ],
-        "expectedAccuracy": 31.106602396916976,
-        "expectedHeadshotPercent": 26.376657514237174,
+        "expectedAccuracy": 31.10682184890097,
+        "expectedHeadshotPercent": 26.376199157606763,
         "combatGeometric": 37.05429814188936,
         "combatArithmetic": 39.881081081081085,
         "aimScore": 21.780564445903984,
@@ -5527,13 +5527,13 @@
             "losses": 35,
             "matches": 562,
             "rawRate": 0.9377224199288257,
-            "smoothedRate": 0.9357463969854125,
+            "smoothedRate": 0.9357476773146152,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 81.88564263381552,
+        "smoothedWinPercent": 81.88570024862965,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 79.5721739089604
+        "expectedWinPercent": 79.56726450543977
       },
       {
         "discordId": "323926044413394946",
@@ -5583,25 +5583,25 @@
           "spotsPerHour": 1.070777925119905,
           "spotAssistsPerHour": 8.134937847785944,
           "deathsPerHour": 18.72374177397167,
-          "accuracyResidual": -9.286329386193461,
-          "headshotResidual": 1.8985449205544942
+          "accuracyResidual": -9.287943411112803,
+          "headshotResidual": 1.8976982233183382
         },
         "adjusted": {
           "infantryKd": 3.5482713729458215,
           "infantryKpm": 1.4315484454139287,
           "playerKillsPerMatch": 24.04963394797217,
           "assistsPerHour": 43.00005631032016,
-          "accuracyResidual": -6.837756892588305,
-          "headshotResidual": 1.43323144754513,
+          "accuracyResidual": -6.8391156801457935,
+          "headshotResidual": 1.4323819388689576,
           "objectiveActionsPerHour": 10.835800313410838,
-          "objectivePresence": 0.09855078254121061,
+          "objectivePresence": 0.0985522837924678,
           "breakthroughPressure": 0.07250132672352369,
           "revivesPerHour": 14.867551416589487,
           "squadRevivesPerHour": 6.657221804981227,
-          "healsPerHour": 235.16376031318006,
+          "healsPerHour": 235.29152962782143,
           "resuppliesPerHour": 22.18904290710761,
-          "repairsPerHour": 15.30806421342141,
-          "spotsPerHour": 5.275995482656173,
+          "repairsPerHour": 15.306431558034328,
+          "spotsPerHour": 5.2733420274024425,
           "spotAssistsPerHour": 8.882970770171152,
           "deathsPerHour": 19.593021162329368,
           "sortinoRaw": 48.26675192218911
@@ -5639,28 +5639,28 @@
         "model": {
           "combat": -0.6214931073603279,
           "objective": 0.4219510993509853,
-          "teamwork": -0.5888953047801883
+          "teamwork": -0.5895524397817437
         },
         "scores": {
           "trident": 44.904840334661046,
           "sortino": 33.13513513513514,
-          "alpha": 1.4502811483250895,
+          "alpha": 1.4463851897030082,
           "cei": 44.904840334661046,
           "rais": 33.13513513513514,
-          "wrr": 1.4502811483250895
+          "wrr": 1.4463851897030082
         },
         "weaponModel": [
-          0.24005295108851016,
-          0.8057696215917697,
-          -0.9927153017428123,
-          1.0428757552625916,
-          -0.6268835984978779,
-          -0.488262012395388,
-          -0.8741565131131314,
-          -0.4098621308757969
+          0.23994083253139328,
+          0.8060716514104469,
+          -0.9926698024943418,
+          1.0428021700474357,
+          -0.6268668417726728,
+          -0.4883003332501069,
+          -0.8741082481303687,
+          -0.409835706151065
         ],
-        "expectedAccuracy": 26.64632938619346,
-        "expectedHeadshotPercent": 13.701455079445505,
+        "expectedAccuracy": 26.647943411112802,
+        "expectedHeadshotPercent": 13.702301776681661,
         "combatGeometric": 31.852241592558766,
         "combatArithmetic": 36.24864864864866,
         "aimScore": 23.16599356497465,
@@ -5685,13 +5685,13 @@
             "losses": 13,
             "matches": 125,
             "rawRate": 0.896,
-            "smoothedRate": 0.8952209002029147,
+            "smoothedRate": 0.8952259105578607,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 81.47092007325035,
+        "smoothedWinPercent": 81.47126694397738,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 80.02063892492527
+        "expectedWinPercent": 80.02488175427438
       },
       {
         "discordId": "365653146200047616",
@@ -5746,25 +5746,25 @@
           "spotsPerHour": 6.139374320646535,
           "spotAssistsPerHour": 8.015576133237138,
           "deathsPerHour": 5.158427459496401,
-          "accuracyResidual": 5.480195867050174,
-          "headshotResidual": -2.0413452659382045
+          "accuracyResidual": 5.478928305676494,
+          "headshotResidual": -2.0421456463419467
         },
         "adjusted": {
           "infantryKd": 9.55751428848951,
           "infantryKpm": 2.12386702841848,
           "playerKillsPerMatch": 49.66753668334274,
           "assistsPerHour": 27.89329650502397,
-          "accuracyResidual": 5.400528838069539,
-          "headshotResidual": -2.0104488551526374,
+          "accuracyResidual": 5.399269549849176,
+          "headshotResidual": -2.0112500234445414,
           "objectiveActionsPerHour": 5.363866255425641,
-          "objectivePresence": 0.04119845302516516,
+          "objectivePresence": 0.04119853000812324,
           "breakthroughPressure": 0.02890239693626932,
           "revivesPerHour": 6.486779384463811,
           "squadRevivesPerHour": 1.694504006014315,
-          "healsPerHour": 145.02069430004923,
+          "healsPerHour": 145.0272462078303,
           "resuppliesPerHour": 29.65079101674538,
-          "repairsPerHour": 6.635564021305945,
-          "spotsPerHour": 6.284570221405638,
+          "repairsPerHour": 6.635480300049676,
+          "spotsPerHour": 6.284434154352508,
           "spotAssistsPerHour": 8.05559357124732,
           "deathsPerHour": 5.39153661828368,
           "sortinoRaw": 43.60914930451108
@@ -5802,28 +5802,28 @@
         "model": {
           "combat": 0.31012652123081624,
           "objective": -1.584826654691967,
-          "teamwork": -1.731284584793214
+          "teamwork": -1.7316664922749516
         },
         "scores": {
           "trident": 22.7152762057631,
           "sortino": 17.56756756756757,
-          "alpha": 6.321483488996535,
+          "alpha": 6.3114967590911135,
           "cei": 22.7152762057631,
           "rais": 17.56756756756757,
-          "wrr": 6.321483488996535
+          "wrr": 6.3114967590911135
         },
         "weaponModel": [
-          0.1541052438087699,
-          -0.2563889627893112,
-          -0.33011612857766176,
-          0.7937614926788054,
-          0.44013322196239557,
-          -0.1399154384830853,
-          -0.7659706244971386,
-          -0.7510453533924745
+          0.15398592831365407,
+          -0.256254574401408,
+          -0.33001824183050454,
+          0.7936698803059077,
+          0.44014585306899834,
+          -0.13996111848522882,
+          -0.7659190134495918,
+          -0.7509308992575603
         ],
-        "expectedAccuracy": 25.589804132949826,
-        "expectedHeadshotPercent": 17.341345265938205,
+        "expectedAccuracy": 25.591071694323507,
+        "expectedHeadshotPercent": 17.342145646341947,
         "combatGeometric": 46.91777377170127,
         "combatArithmetic": 66.86486486486487,
         "aimScore": 36.22093555374577,
@@ -5856,31 +5856,31 @@
             "losses": 48,
             "matches": 548,
             "rawRate": 0.9124087591240876,
-            "smoothedRate": 0.9114888918506757,
+            "smoothedRate": 0.9114902034619181,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 86.60507285732848,
+        "smoothedWinPercent": 86.60513187983439,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 80.28358936833195
+        "expectedWinPercent": 80.29363512074328
       },
       {
         "discordId": "379816775526776832",
         "name": "[KDM] Muscle Mommy",
-        "hours": 464.34277777777777,
-        "matches": 1504,
-        "wins": 1099,
+        "hours": 464.85027777777776,
+        "matches": 1505,
+        "wins": 1100,
         "losses": 403,
         "cachedStats": false,
         "weaponMix": {
-          "ar": 0.19871438627690713,
-          "smg": 0.2717757771108888,
-          "carbine": 0.3159942202956541,
-          "mg": 0.18257937831128895,
-          "dmr": 0.001426401393056945,
-          "sniper": 0.0001852469341632396,
-          "shotgun": 0.010429402393390389,
-          "pistol": 0.01889518728465044
+          "ar": 0.19976689545446136,
+          "smg": 0.271418792666457,
+          "carbine": 0.315579153793499,
+          "mg": 0.1823395556213346,
+          "dmr": 0.0014245277782916766,
+          "sniper": 0.00018500360757034762,
+          "shotgun": 0.010415703106210572,
+          "pistol": 0.018870367972175457
         },
         "breakthroughSeasons": {
           "Season1": {
@@ -5894,51 +5894,51 @@
             "matches": 329
           },
           "Season3": {
-            "wins": 173,
+            "wins": 174,
             "losses": 27,
-            "matches": 200
+            "matches": 201
           }
         },
         "raw": {
           "infantryKd": 4.79,
-          "infantryKpm": 2.385000385711149,
-          "playerKillsPerMatch": 40.08510638297872,
-          "assistsPerHour": 58.36851846755929,
-          "accuracy": 33.56,
-          "headshotPercent": 13.79,
-          "objectiveActionsPerHour": 12.764277347792639,
-          "objectivePresence": 0.1414454360224786,
-          "breakthroughPressure": 0.1111858217767765,
-          "revivesPerHour": 18.78138396323597,
-          "squadRevivesPerHour": 7.453545453131487,
-          "healsPerHour": 186.63798415203328,
-          "resuppliesPerHour": 36.11771476292059,
-          "repairsPerHour": 26.58380961382695,
-          "spotsPerHour": 17.935026447176835,
-          "spotAssistsPerHour": 10.08952916726987,
-          "deathsPerHour": 27.113590654413585,
-          "accuracyResidual": 8.65247939419433,
-          "headshotResidual": 0.9610565170942138
+          "infantryKpm": 2.385226241453298,
+          "playerKillsPerMatch": 40.10830564784053,
+          "assistsPerHour": 58.37363404345844,
+          "accuracy": 33.54,
+          "headshotPercent": 13.8,
+          "objectiveActionsPerHour": 12.774005489222635,
+          "objectivePresence": 0.14142546494958652,
+          "breakthroughPressure": 0.11116900842027391,
+          "revivesPerHour": 18.795299083755165,
+          "squadRevivesPerHour": 7.460466661607292,
+          "healsPerHour": 187.5808279965891,
+          "resuppliesPerHour": 36.11700541572227,
+          "repairsPerHour": 26.55478675630923,
+          "spotsPerHour": 17.91544589327149,
+          "spotAssistsPerHour": 10.093572542174572,
+          "deathsPerHour": 27.107652942016575,
+          "accuracyResidual": 8.632004993922493,
+          "headshotResidual": 0.9721220515599729
         },
         "adjusted": {
-          "infantryKd": 4.7345685085551255,
-          "infantryKpm": 2.357997551832359,
-          "playerKillsPerMatch": 39.5502606441551,
-          "assistsPerHour": 57.784363663961464,
-          "accuracyResidual": 8.197559321125283,
-          "headshotResidual": 0.9212404754360854,
-          "objectiveActionsPerHour": 12.560731515555103,
-          "objectivePresence": 0.1392686918543308,
-          "breakthroughPressure": 0.10931856336849785,
-          "revivesPerHour": 18.576743634746276,
-          "squadRevivesPerHour": 7.346726773617393,
-          "healsPerHour": 186.65791214061306,
-          "resuppliesPerHour": 35.89658743588878,
-          "repairsPerHour": 26.37216525064696,
-          "spotsPerHour": 17.866131098706763,
-          "spotAssistsPerHour": 10.130674961279373,
-          "deathsPerHour": 26.848820900545302,
-          "sortinoRaw": 68.66553546133416
+          "infantryKd": 4.734625937290362,
+          "infantryKpm": 2.3582398565692424,
+          "playerKillsPerMatch": 39.57283002796327,
+          "assistsPerHour": 57.78982336371436,
+          "accuracyResidual": 8.178566852498241,
+          "headshotResidual": 0.9317387784566836,
+          "objectiveActionsPerHour": 12.57017405129651,
+          "objectivePresence": 0.1392522778910979,
+          "breakthroughPressure": 0.10930454263581693,
+          "revivesPerHour": 18.590160596833513,
+          "squadRevivesPerHour": 7.353405418727548,
+          "healsPerHour": 187.57667584875526,
+          "resuppliesPerHour": 35.89614338566858,
+          "repairsPerHour": 26.34453543808555,
+          "spotsPerHour": 17.847121579106908,
+          "spotAssistsPerHour": 10.13446935018037,
+          "deathsPerHour": 26.843460534886354,
+          "sortinoRaw": 68.89354992303097
         },
         "percentiles": {
           "infantryKd": 64.27027027027027,
@@ -5952,7 +5952,7 @@
           "breakthroughPressure": 92.8108108108108,
           "revivesPerHour": 69.45945945945947,
           "squadRevivesPerHour": 74.64864864864865,
-          "healsPerHour": 48.70270270270271,
+          "healsPerHour": 51.29729729729729,
           "resuppliesPerHour": 53.891891891891895,
           "repairsPerHour": 53.891891891891895,
           "spotsPerHour": 51.29729729729729,
@@ -5961,40 +5961,40 @@
           "sortinoRaw": 87.62162162162161
         },
         "lanes": {
-          "medic": 62.23391059244141,
+          "medic": 63.3747981508134,
           "logistics": 53.891891891891895,
           "intel": 46.335924677871276
         },
         "pillars": {
           "combat": 73.4071925062823,
           "objective": 88.08127508248026,
-          "teamwork": 59.731304982276555
+          "teamwork": 60.529926273136944
         },
         "model": {
           "combat": 1.2783180077702583,
           "objective": 1.426978941066741,
-          "teamwork": -0.061746487014093854
+          "teamwork": -0.02025681794416461
         },
         "scores": {
-          "trident": 72.88214143319466,
+          "trident": 73.17311899864858,
           "sortino": 87.62162162162161,
-          "alpha": -4.6693524594926,
-          "cei": 72.88214143319466,
+          "alpha": -4.62254687917148,
+          "cei": 73.17311899864858,
           "rais": 87.62162162162161,
-          "wrr": -4.6693524594926
+          "wrr": -4.62254687917148
         },
         "weaponModel": [
-          -0.6946292263014863,
-          0.6756431238133894,
-          0.8492574717629285,
-          0.22224980088686044,
-          -0.598992287228506,
-          -0.48704263846327567,
-          -0.3922388486759836,
-          -0.4734977271005068
+          -0.6874985107536872,
+          0.6733749080372516,
+          0.8459797877827765,
+          0.21955961750722164,
+          -0.5990122741551059,
+          -0.4870825867234658,
+          -0.39296909153858745,
+          -0.47547520248289155
         ],
-        "expectedAccuracy": 24.907520605805672,
-        "expectedHeadshotPercent": 12.828943482905785,
+        "expectedAccuracy": 24.907995006077506,
+        "expectedHeadshotPercent": 12.827877948440028,
         "combatGeometric": 73.2087306074303,
         "combatArithmetic": 73.8702702702703,
         "aimScore": 75.65824123493789,
@@ -6002,9 +6002,9 @@
           "medic",
           "logistics"
         ],
-        "sortinoUpside": 73.70665102193996,
-        "sortinoDownside": 1.0734155137178603,
-        "sortinoRaw": 68.66553546133416,
+        "sortinoUpside": 73.94623740919809,
+        "sortinoDownside": 1.073340501277871,
+        "sortinoRaw": 68.89354992303097,
         "seasonWinRates": {
           "Season1": {
             "wins": 437,
@@ -6023,17 +6023,17 @@
             "weight": 0.35
           },
           "Season3": {
-            "wins": 173,
+            "wins": 174,
             "losses": 27,
-            "matches": 200,
-            "rawRate": 0.865,
-            "smoothedRate": 0.8679250445797209,
+            "matches": 201,
+            "rawRate": 0.8656716417910447,
+            "smoothedRate": 0.8685127724941554,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 81.18249002660146,
+        "smoothedWinPercent": 81.20893778275101,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 85.85184248609406
+        "expectedWinPercent": 85.83148466192249
       },
       {
         "discordId": "391072156353822722",
@@ -6088,25 +6088,25 @@
           "spotsPerHour": 15.237951151471766,
           "spotAssistsPerHour": 11.915823188844321,
           "deathsPerHour": 14.019136460751067,
-          "accuracyResidual": -0.14080426667112178,
-          "headshotResidual": -1.7863012138674677
+          "accuracyResidual": -0.14584629431506713,
+          "headshotResidual": -1.7866264936729355
         },
         "adjusted": {
           "infantryKd": 6.035502924585549,
           "infantryKpm": 2.145088105821782,
           "playerKillsPerMatch": 34.864723260847825,
           "assistsPerHour": 60.4030445428679,
-          "accuracyResidual": -0.14379861215014084,
-          "headshotResidual": -1.7333029292843554,
+          "accuracyResidual": -0.14872296333144847,
+          "headshotResidual": -1.7336425301500749,
           "objectiveActionsPerHour": 7.411646547850037,
-          "objectivePresence": 0.08438643030189963,
+          "objectivePresence": 0.08438657946833028,
           "breakthroughPressure": 0.06680774876364906,
           "revivesPerHour": 9.012242683824182,
           "squadRevivesPerHour": 3.4514070186207295,
-          "healsPerHour": 144.1478140700622,
+          "healsPerHour": 144.16050940838088,
           "resuppliesPerHour": 25.769461303859618,
-          "repairsPerHour": 78.66330311176566,
-          "spotsPerHour": 15.27426711571927,
+          "repairsPerHour": 78.66314088883635,
+          "spotsPerHour": 15.274003464683386,
           "spotAssistsPerHour": 11.888329980484338,
           "deathsPerHour": 14.2322037617792,
           "sortinoRaw": 60.42742089357819
@@ -6144,28 +6144,28 @@
         "model": {
           "combat": 0.8152139221112035,
           "objective": -0.4784887430713362,
-          "teamwork": -0.4585057135412042
+          "teamwork": -0.459194262356277
         },
         "scores": {
           "trident": 50.58795196842174,
           "sortino": 72.05405405405405,
-          "alpha": -1.05706104082401,
+          "alpha": -1.064609389993322,
           "cei": 50.58795196842174,
           "rais": 72.05405405405405,
-          "wrr": -1.05706104082401
+          "wrr": -1.064609389993322
         },
         "weaponModel": [
-          1.7503688279892957,
-          -1.1649981249968924,
-          -0.6498144518566168,
-          0.7462458896275594,
-          0.39006294858435586,
-          -0.4874581293128955,
-          -0.9487641210304225,
-          -0.8357823334502591
+          1.7503831776076413,
+          -1.1650071431983693,
+          -0.6497418416207642,
+          0.7461508387872593,
+          0.39007577328757986,
+          -0.48749646715039696,
+          -0.9487181635749415,
+          -0.8356460161465757
         ],
-        "expectedAccuracy": 26.190804266671122,
-        "expectedHeadshotPercent": 14.806301213867467,
+        "expectedAccuracy": 26.195846294315068,
+        "expectedHeadshotPercent": 14.806626493672935,
         "combatGeometric": 62.53311770163991,
         "combatArithmetic": 66.0864864864865,
         "aimScore": 34.166652116846784,
@@ -6198,13 +6198,13 @@
             "losses": 67,
             "matches": 634,
             "rawRate": 0.8943217665615142,
-            "smoothedRate": 0.8942080956455799,
+            "smoothedRate": 0.89420923609056,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 81.70129628527793,
+        "smoothedWinPercent": 81.70134760530205,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 82.75835732610194
+        "expectedWinPercent": 82.76595699529537
       },
       {
         "discordId": "399026036685144066",
@@ -6259,25 +6259,25 @@
           "spotsPerHour": 6.206367468320783,
           "spotAssistsPerHour": 5.821420158992519,
           "deathsPerHour": 16.70889217188059,
-          "accuracyResidual": 2.573920063894615,
-          "headshotResidual": 0.6926965633466384
+          "accuracyResidual": 2.572236010609714,
+          "headshotResidual": 0.6931277658861301
         },
         "adjusted": {
           "infantryKd": 6.818656408420498,
           "infantryKpm": 2.5382771659848222,
           "playerKillsPerMatch": 38.23041816758835,
           "assistsPerHour": 45.94098534687396,
-          "accuracyResidual": 2.451208868356072,
-          "headshotResidual": 0.6705076715232924,
+          "accuracyResidual": 2.449568749290283,
+          "headshotResidual": 0.6708829327027589,
           "objectiveActionsPerHour": 8.895750092117423,
-          "objectivePresence": 0.08997715570380722,
+          "objectivePresence": 0.08997739622963782,
           "breakthroughPressure": 0.06576604562708178,
           "revivesPerHour": 25.080380909400965,
           "squadRevivesPerHour": 6.218367127188342,
-          "healsPerHour": 467.4589970399225,
+          "healsPerHour": 467.4794678441142,
           "resuppliesPerHour": 101.588022106936,
-          "repairsPerHour": 8.867134591791412,
-          "spotsPerHour": 6.657108982899904,
+          "repairsPerHour": 8.866873012797775,
+          "spotsPerHour": 6.656683854510642,
           "spotAssistsPerHour": 6.041728784704893,
           "deathsPerHour": 16.935657308402707,
           "sortinoRaw": 71.88215743703854
@@ -6315,28 +6315,28 @@
         "model": {
           "combat": 1.3164044761713156,
           "objective": -0.11352425551558135,
-          "teamwork": 0.6872145755656064
+          "teamwork": 0.6862499967149823
         },
         "scores": {
           "trident": 64.2311218900793,
           "sortino": 90.21621621621622,
-          "alpha": 9.903527884631501,
+          "alpha": 9.89880543211737,
           "cei": 64.2311218900793,
           "rais": 90.21621621621622,
-          "wrr": 9.903527884631501
+          "wrr": 9.89880543211737
         },
         "weaponModel": [
-          0.24836480228885272,
-          -0.5265140589604964,
-          0.6754948371529257,
-          0.4802378697231462,
-          -0.59423725418095,
-          -0.4206638350271113,
-          -0.5748175325498921,
-          1.3326717549775673
+          0.24825337973491776,
+          -0.5264223046559362,
+          0.6756722311576833,
+          0.48012356920807553,
+          -0.594220623682776,
+          -0.4207035839565987,
+          -0.574760009357633,
+          1.3322485848216872
         ],
-        "expectedAccuracy": 26.306079936105384,
-        "expectedHeadshotPercent": 15.09730343665336,
+        "expectedAccuracy": 26.307763989390285,
+        "expectedHeadshotPercent": 15.096872234113869,
         "combatGeometric": 73.80507732957894,
         "combatArithmetic": 75.16756756756759,
         "aimScore": 64.93565956488294,
@@ -6369,13 +6369,13 @@
             "losses": 4,
             "matches": 279,
             "rawRate": 0.985663082437276,
-            "smoothedRate": 0.9779050494422276,
+            "smoothedRate": 0.9779075216568393,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 92.82686721502711,
+        "smoothedWinPercent": 92.82697846468464,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 82.9233393303956
+        "expectedWinPercent": 82.92817303256727
       },
       {
         "discordId": "429450913560789003",
@@ -6430,25 +6430,25 @@
           "spotsPerHour": 6.006311647859231,
           "spotAssistsPerHour": 5.63437525615454,
           "deathsPerHour": 20.044605043853657,
-          "accuracyResidual": -2.276893073889344,
-          "headshotResidual": 0.03279026297564336
+          "accuracyResidual": -2.2669562149311453,
+          "headshotResidual": 0.03224494049087667
         },
         "adjusted": {
           "infantryKd": 2.158818428631237,
           "infantryKpm": 1.0983049361001143,
           "playerKillsPerMatch": 18.768723502457416,
           "assistsPerHour": 33.729764550638045,
-          "accuracyResidual": -2.132391426109974,
-          "headshotResidual": 0.043417451534420684,
+          "accuracyResidual": -2.1232116618797896,
+          "headshotResidual": 0.04284988196276547,
           "objectiveActionsPerHour": 4.400216071668006,
-          "objectivePresence": 0.0771415566412343,
+          "objectivePresence": 0.07714195192243492,
           "breakthroughPressure": 0.06498919894978333,
           "revivesPerHour": 4.345672579904201,
           "squadRevivesPerHour": 3.065922758200891,
-          "healsPerHour": 17.836897539357764,
+          "healsPerHour": 17.870539348383215,
           "resuppliesPerHour": 3.3218801230561668,
-          "repairsPerHour": 209.6628704178652,
-          "spotsPerHour": 6.761338689166857,
+          "repairsPerHour": 209.66244053780449,
+          "spotsPerHour": 6.760640031314976,
           "spotAssistsPerHour": 6.009779390801561,
           "deathsPerHour": 20.179227318098164,
           "sortinoRaw": 19.32768963519551
@@ -6486,28 +6486,28 @@
         "model": {
           "combat": -1.4262316975116975,
           "objective": -0.9731482643534907,
-          "teamwork": -2.2468142066240264
+          "teamwork": -2.247071911312818
         },
         "scores": {
           "trident": 18.58720590607043,
           "sortino": 2,
-          "alpha": -7.390151872907381,
+          "alpha": -7.393548976303535,
           "cei": 18.58720590607043,
           "rais": 2,
-          "wrr": -7.390151872907381
+          "wrr": -7.393548976303535
         },
         "weaponModel": [
-          -1.7793908244530048,
-          5.089830546095632,
-          -1.7384824706187623,
-          -1.490995507143896,
-          -0.6248545832105543,
-          -0.41244494235320467,
-          -0.791926679881481,
-          -0.060286497286317874
+          -1.7796720436424118,
+          5.0908087330470275,
+          -1.7384959344329736,
+          -1.4912524559949643,
+          -0.6248378343305331,
+          -0.4124848649144926,
+          -0.7918758716247969,
+          -0.060350267315630354
         ],
-        "expectedAccuracy": 24.426893073889342,
-        "expectedHeadshotPercent": 9.547209737024357,
+        "expectedAccuracy": 24.416956214931144,
+        "expectedHeadshotPercent": 9.547755059509123,
         "combatGeometric": 15.510521189729166,
         "combatArithmetic": 17.56756756756757,
         "aimScore": 38.236395146583796,
@@ -6540,13 +6540,13 @@
             "losses": 10,
             "matches": 34,
             "rawRate": 0.7058823529411765,
-            "smoothedRate": 0.784459915770122,
+            "smoothedRate": 0.784472653960663,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 71.88186457290013,
+        "smoothedWinPercent": 71.88243779147447,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 79.27201644580751
+        "expectedWinPercent": 79.27598676777801
       },
       {
         "discordId": "452965698743042058",
@@ -6601,25 +6601,25 @@
           "spotsPerHour": 29.65184475446956,
           "spotAssistsPerHour": 18.777954894066795,
           "deathsPerHour": 16.865892195120825,
-          "accuracyResidual": -9.204034991141825,
-          "headshotResidual": 0.08414036947077008
+          "accuracyResidual": -9.203864438961912,
+          "headshotResidual": 0.08345228463031873
         },
         "adjusted": {
           "infantryKd": 2.9620982381429393,
           "infantryKpm": 1.0634859661951024,
           "playerKillsPerMatch": 16.738516784182377,
           "assistsPerHour": 46.682295282788154,
-          "accuracyResidual": -8.945441110964238,
-          "headshotResidual": 0.0869587888917143,
+          "accuracyResidual": -8.94529490569357,
+          "headshotResidual": 0.08626582263484919,
           "objectiveActionsPerHour": 9.938722469133365,
-          "objectivePresence": 0.12111871414448114,
+          "objectivePresence": 0.12111887414920608,
           "breakthroughPressure": 0.09701986660851915,
           "revivesPerHour": 22.496174355661477,
           "squadRevivesPerHour": 6.594308018022245,
-          "healsPerHour": 292.96625257079916,
+          "healsPerHour": 292.9798703406087,
           "resuppliesPerHour": 65.35732832173575,
-          "repairsPerHour": 21.102261710271463,
-          "spotsPerHour": 29.274431228562282,
+          "repairsPerHour": 21.102087700374785,
+          "spotsPerHour": 29.27414842088701,
           "spotAssistsPerHour": 18.550240498395805,
           "deathsPerHour": 17.0122077145515,
           "sortinoRaw": 55.142981609501994
@@ -6657,28 +6657,28 @@
         "model": {
           "combat": -1.4413594060263217,
           "objective": 0.8277405549006792,
-          "teamwork": 0.7662572314808375
+          "teamwork": 0.7652736094594416
         },
         "scores": {
           "trident": 39.757807702650524,
           "sortino": 61.67567567567568,
-          "alpha": -8.400586288865924,
+          "alpha": -8.393952849736579,
           "cei": 39.757807702650524,
           "rais": 61.67567567567568,
-          "wrr": -8.400586288865924
+          "wrr": -8.393952849736579
         },
         "weaponModel": [
-          -0.33744927741455044,
-          -0.12037416344538747,
-          -0.12790436327086066,
-          0.1003069306796501,
-          -0.3787412086001863,
-          0.7142582831136569,
-          -0.609018110929442,
-          -0.5987294693761392
+          -0.33760975383791325,
+          -0.12021830772115256,
+          -0.12779048892664857,
+          0.1001651364558768,
+          -0.37872541131708193,
+          0.7141945578921421,
+          -0.608961645521635,
+          -0.5986543145869914
         ],
-        "expectedAccuracy": 26.974034991141824,
-        "expectedHeadshotPercent": 23.30585963052923,
+        "expectedAccuracy": 26.97386443896191,
+        "expectedHeadshotPercent": 23.306547715369682,
         "combatGeometric": 14.163247079031379,
         "combatArithmetic": 19.643243243243248,
         "aimScore": 14.55500134938148,
@@ -6711,13 +6711,13 @@
             "losses": 119,
             "matches": 887,
             "rawRate": 0.8658399098083427,
-            "smoothedRate": 0.8665385252526723,
+            "smoothedRate": 0.8665393493242095,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 70.36310657611853,
+        "smoothedWinPercent": 70.36314365933771,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 78.76369286498445
+        "expectedWinPercent": 78.75709650907429
       },
       {
         "discordId": "463527125509603357",
@@ -6772,25 +6772,25 @@
           "spotsPerHour": 12.619691650292685,
           "spotAssistsPerHour": 15.924315294825051,
           "deathsPerHour": 5.626185797910238,
-          "accuracyResidual": 8.805736371102437,
-          "headshotResidual": 0.09487541608518768
+          "accuracyResidual": 8.799781281355646,
+          "headshotResidual": 0.09428329629361798
         },
         "adjusted": {
           "infantryKd": 9.727847745467752,
           "infantryKpm": 1.4487711003482138,
           "playerKillsPerMatch": 24.419991853632087,
           "assistsPerHour": 50.11822155762816,
-          "accuracyResidual": 8.134375040691104,
-          "headshotResidual": 0.10131153007591037,
+          "accuracyResidual": 8.128811513209452,
+          "headshotResidual": 0.10069977207644921,
           "objectiveActionsPerHour": 8.501602811524048,
-          "objectivePresence": 0.07691991035246831,
+          "objectivePresence": 0.0769203209094995,
           "breakthroughPressure": 0.055012298247632756,
           "revivesPerHour": 8.237414748326835,
           "squadRevivesPerHour": 3.1903364261640386,
-          "healsPerHour": 100.58622894751443,
+          "healsPerHour": 100.62117086029878,
           "resuppliesPerHour": 18.79314841513149,
-          "repairsPerHour": 71.51130618760676,
-          "spotsPerHour": 12.91371166392492,
+          "repairsPerHour": 71.51085969462602,
+          "spotsPerHour": 12.912986006107053,
           "spotAssistsPerHour": 15.551534128455692,
           "deathsPerHour": 6.834707515967747,
           "sortinoRaw": 67.45145611847825
@@ -6828,28 +6828,28 @@
         "model": {
           "combat": 0.5095325710297014,
           "objective": -0.5050329605167653,
-          "teamwork": -0.5592254159392326
+          "teamwork": -0.5598896990907767
         },
         "scores": {
           "trident": 47.6348671862789,
           "sortino": 82.43243243243244,
-          "alpha": -4.524974568189279,
+          "alpha": -4.5315306374920965,
           "cei": 47.6348671862789,
           "rais": 82.43243243243244,
-          "wrr": -4.524974568189279
+          "wrr": -4.5315306374920965
         },
         "weaponModel": [
-          2.1341130403165627,
-          -0.9973830646343458,
-          -1.1990270208445262,
-          0.6770280887423968,
-          -0.6055962411838047,
-          -0.2509857986082771,
-          -0.316718499560481,
-          -1.0270784353815396
+          2.134159523233061,
+          -0.9973656280022867,
+          -1.198997833350358,
+          0.676928028954788,
+          -0.6055795667661281,
+          -0.25102913214510164,
+          -0.3166529936627496,
+          -1.0268927613630128
         ],
-        "expectedAccuracy": 28.764263628897563,
-        "expectedHeadshotPercent": 15.855124583914812,
+        "expectedAccuracy": 28.770218718644355,
+        "expectedHeadshotPercent": 15.855716703706381,
         "combatGeometric": 55.17487384757582,
         "combatArithmetic": 61.675675675675684,
         "aimScore": 66.2855456139657,
@@ -6882,13 +6882,13 @@
             "losses": 34,
             "matches": 341,
             "rawRate": 0.9002932551319648,
-            "smoothedRate": 0.8996806968044732,
+            "smoothedRate": 0.8996827502286315,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 77.6919787764556,
+        "smoothedWinPercent": 77.69207118054273,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 82.21695334464488
+        "expectedWinPercent": 82.22360181803482
       },
       {
         "discordId": "483392280913248267",
@@ -6943,28 +6943,28 @@
           "spotsPerHour": 9.640730914496661,
           "spotAssistsPerHour": 4.50028806964884,
           "deathsPerHour": 21.970111884829045,
-          "accuracyResidual": -0.36318512273839687,
-          "headshotResidual": -3.5472992219480393
+          "accuracyResidual": -0.35948768037672707,
+          "headshotResidual": -3.5481095120929336
         },
         "adjusted": {
           "infantryKd": 2.9248536093346655,
           "infantryKpm": 1.5555493005040486,
           "playerKillsPerMatch": 24.919925766572323,
           "assistsPerHour": 29.536423988446767,
-          "accuracyResidual": -0.34784531471246755,
-          "headshotResidual": -3.032846058095608,
+          "accuracyResidual": -0.3447507200711696,
+          "headshotResidual": -3.0336628020372562,
           "objectiveActionsPerHour": 10.266985460070446,
-          "objectivePresence": 0.130587314300164,
+          "objectivePresence": 0.13058807846863624,
           "breakthroughPressure": 0.09971932550094785,
           "revivesPerHour": 9.863547338989616,
           "squadRevivesPerHour": 4.40404999833636,
-          "healsPerHour": 187.36430029234717,
+          "healsPerHour": 187.42933756142548,
           "resuppliesPerHour": 24.15806039424999,
-          "repairsPerHour": 40.84177385502298,
-          "spotsPerHour": 10.598966208955718,
+          "repairsPerHour": 40.84094279908423,
+          "spotsPerHour": 10.59761554440994,
           "spotAssistsPerHour": 5.382488081406122,
           "deathsPerHour": 21.964724844275935,
-          "sortinoRaw": 45.78382462276136
+          "sortinoRaw": 45.716355978548904
         },
         "percentiles": {
           "infantryKd": 20.16216216216216,
@@ -6978,7 +6978,7 @@
           "breakthroughPressure": 82.43243243243244,
           "revivesPerHour": 35.72972972972973,
           "squadRevivesPerHour": 40.91891891891892,
-          "healsPerHour": 51.29729729729729,
+          "healsPerHour": 48.70270270270271,
           "resuppliesPerHour": 33.13513513513514,
           "repairsPerHour": 64.27027027027027,
           "spotsPerHour": 38.32432432432432,
@@ -6987,40 +6987,40 @@
           "sortinoRaw": 25.351351351351354
         },
         "lanes": {
-          "medic": 41.66594906516918,
+          "medic": 40.915869155122124,
           "logistics": 44.64402751848172,
           "intel": 23.046748788595387
         },
         "pillars": {
           "combat": 23.91044791058591,
           "objective": 77.06874166803064,
-          "teamwork": 43.75060398248796
+          "teamwork": 43.52558000947384
         },
         "model": {
           "combat": -1.0587532280704104,
           "objective": 1.0232530550291246,
-          "teamwork": -0.9078644941411304
+          "teamwork": -0.9203560847785502
         },
         "scores": {
-          "trident": 40.71868845909014,
+          "trident": 40.65574608014587,
           "sortino": 25.351351351351354,
-          "alpha": 4.031586089867744,
-          "cei": 40.71868845909014,
+          "alpha": 4.02165201608554,
+          "cei": 40.65574608014587,
           "rais": 25.351351351351354,
-          "wrr": 4.031586089867744
+          "wrr": 4.02165201608554
         },
         "weaponModel": [
-          0.04449364101691196,
-          -0.5751254886138238,
-          1.913785227006515,
-          -0.48919721647742304,
-          -0.5048579860082792,
-          -0.38026652465169103,
-          -0.8796663332836049,
-          -0.8318342965359972
+          0.0443651470581207,
+          -0.5750414066942906,
+          1.9140605247497613,
+          -0.4893816701785786,
+          -0.5048417010948837,
+          -0.3803071270121718,
+          -0.8796182387132265,
+          -0.83169899787373
         ],
-        "expectedAccuracy": 23.723185122738396,
-        "expectedHeadshotPercent": 13.647299221948039,
+        "expectedAccuracy": 23.719487680376727,
+        "expectedHeadshotPercent": 13.648109512092933,
         "combatGeometric": 22.514539486165194,
         "combatArithmetic": 27.16756756756757,
         "aimScore": 21.82880466102406,
@@ -7028,9 +7028,9 @@
           "logistics",
           "medic"
         ],
-        "sortinoUpside": 45.80998285938995,
+        "sortinoUpside": 45.74247566748571,
         "sortinoDownside": 1.0005713423210953,
-        "sortinoRaw": 45.78382462276136,
+        "sortinoRaw": 45.716355978548904,
         "seasonWinRates": {
           "Season1": {
             "wins": 9,
@@ -7053,13 +7053,13 @@
             "losses": 2,
             "matches": 32,
             "rawRate": 0.9375,
-            "smoothedRate": 0.9172479829901262,
+            "smoothedRate": 0.9172611681347214,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 83.38008166801818,
+        "smoothedWinPercent": 83.38067499952496,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 79.34849557815043
+        "expectedWinPercent": 79.35902298343942
       },
       {
         "discordId": "532179643927756803",
@@ -7114,25 +7114,25 @@
           "spotsPerHour": 6.403236874219322,
           "spotAssistsPerHour": 9.034256364009142,
           "deathsPerHour": 22.81578702481296,
-          "accuracyResidual": -0.4949915538851144,
-          "headshotResidual": 1.034263448685584
+          "accuracyResidual": -0.49289766047902006,
+          "headshotResidual": 1.0338743788105216
         },
         "adjusted": {
           "infantryKd": 5.310669082548207,
           "infantryKpm": 2.4754543877901365,
           "playerKillsPerMatch": 40.468167219470004,
           "assistsPerHour": 47.93567481563845,
-          "accuracyResidual": -0.4795005512308332,
-          "headshotResidual": 0.9799132564277865,
+          "accuracyResidual": -0.47758300164887074,
+          "headshotResidual": 0.9794943516087988,
           "objectiveActionsPerHour": 5.973365120408081,
-          "objectivePresence": 0.06481121394938703,
+          "objectivePresence": 0.06481156706381384,
           "breakthroughPressure": 0.0486186465782294,
           "revivesPerHour": 23.77203579073674,
           "squadRevivesPerHour": 11.755636845060843,
-          "healsPerHour": 290.723853828719,
+          "healsPerHour": 290.75390688485277,
           "resuppliesPerHour": 60.63559187872414,
-          "repairsPerHour": 15.901824561354022,
-          "spotsPerHour": 7.052417209854577,
+          "repairsPerHour": 15.901440538913791,
+          "spotsPerHour": 7.051793081597235,
           "spotAssistsPerHour": 9.15287235711963,
           "deathsPerHour": 22.759386102337725,
           "sortinoRaw": 54.21490234172733
@@ -7170,28 +7170,28 @@
         "model": {
           "combat": 1.1135912064154114,
           "objective": -1.1461472025401107,
-          "teamwork": 0.585970353480765
+          "teamwork": 0.5850301666623735
         },
         "scores": {
           "trident": 46.85770678560452,
           "sortino": 56.486486486486484,
-          "alpha": -0.17512341435408985,
+          "alpha": -0.1750420524544154,
           "cei": 46.85770678560452,
           "rais": 56.486486486486484,
-          "wrr": -0.17512341435408985
+          "wrr": -0.1750420524544154
         },
         "weaponModel": [
-          -0.16917841705117415,
-          0.2686304743264949,
-          0.796176055797947,
-          -0.020824690168486728,
-          -0.5802391357922402,
-          -0.4481995477789613,
-          -0.6205283549661836,
-          0.15176941141961195
+          -0.16932480310508566,
+          0.26884772699748777,
+          0.7963629912984374,
+          -0.020975250084010914,
+          -0.5802225594177656,
+          -0.4482387149907435,
+          -0.6204722455569521,
+          0.15165092839347816
         ],
-        "expectedAccuracy": 25.134991553885115,
-        "expectedHeadshotPercent": 13.435736551314417,
+        "expectedAccuracy": 25.13289766047902,
+        "expectedHeadshotPercent": 13.436125621189479,
         "combatGeometric": 69.55917527588358,
         "combatArithmetic": 70.75675675675677,
         "aimScore": 55.52488106987019,
@@ -7224,13 +7224,13 @@
             "losses": 31,
             "matches": 292,
             "rawRate": 0.8938356164383562,
-            "smoothedRate": 0.8936376499382875,
+            "smoothedRate": 0.8936400207687039,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 82.21395241011184,
+        "smoothedWinPercent": 82.21405909748057,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 82.38907582446593
+        "expectedWinPercent": 82.38910114993499
       },
       {
         "discordId": "647037738792648715",
@@ -7285,25 +7285,25 @@
           "spotsPerHour": 34.61809447082012,
           "spotAssistsPerHour": 17.65151807930935,
           "deathsPerHour": 15.871383171957822,
-          "accuracyResidual": -3.553938367145008,
-          "headshotResidual": -5.997303642155117
+          "accuracyResidual": -3.55296162618054,
+          "headshotResidual": -5.998107178793163
         },
         "adjusted": {
           "infantryKd": 3.2413506232617046,
           "infantryKpm": 1.1453749630690055,
           "playerKillsPerMatch": 18.948837459739853,
           "assistsPerHour": 45.78655772556022,
-          "accuracyResidual": -3.2835672209461064,
-          "headshotResidual": -5.4913511343220955,
+          "accuracyResidual": -3.28272550684772,
+          "headshotResidual": -5.492159054435796,
           "objectiveActionsPerHour": 7.944243258732439,
-          "objectivePresence": 0.07387383256692495,
+          "objectivePresence": 0.07387428611912202,
           "breakthroughPressure": 0.05484966665765991,
           "revivesPerHour": 13.305550805998362,
           "squadRevivesPerHour": 5.6959629901592805,
-          "healsPerHour": 93.4792700053922,
+          "healsPerHour": 93.51787117431383,
           "resuppliesPerHour": 20.309250722188864,
-          "repairsPerHour": 57.199878594896006,
-          "spotsPerHour": 33.14162292047232,
+          "repairsPerHour": 57.199385343393764,
+          "spotsPerHour": 33.140821268880444,
           "spotAssistsPerHour": 17.098270238139943,
           "deathsPerHour": 16.367564514988786,
           "sortinoRaw": 39.26267159239541
@@ -7341,28 +7341,28 @@
         "model": {
           "combat": -1.34314618066837,
           "objective": -0.7830591929849672,
-          "teamwork": 0.29624852409696295
+          "teamwork": 0.29537813784649813
         },
         "scores": {
           "trident": 30.272760107680327,
           "sortino": 9.783783783783784,
-          "alpha": 13.919344097655042,
+          "alpha": 13.932317849033709,
           "cei": 30.272760107680327,
           "rais": 9.783783783783784,
-          "wrr": 13.919344097655042
+          "wrr": 13.932317849033709
         },
         "weaponModel": [
-          -0.3596405968595456,
-          0.41990750059151905,
-          -0.09259895224221872,
-          0.46371328654219635,
-          -0.12660302515594277,
-          -0.14545235279052424,
-          -0.39582932467857235,
-          -0.3335845207616729
+          -0.3598029315005993,
+          0.42014862944964565,
+          -0.09248228652390172,
+          0.4635977902253898,
+          -0.12658820276466776,
+          -0.14549791582017046,
+          -0.39576626558743794,
+          -0.33357777658564713
         ],
-        "expectedAccuracy": 25.983938367145008,
-        "expectedHeadshotPercent": 16.387303642155118,
+        "expectedAccuracy": 25.98296162618054,
+        "expectedHeadshotPercent": 16.388107178793163,
         "combatGeometric": 16.689965490267785,
         "combatArithmetic": 20.681081081081086,
         "aimScore": 5.927489783638192,
@@ -7395,13 +7395,13 @@
             "losses": 2,
             "matches": 129,
             "rawRate": 0.9844961240310077,
-            "smoothedRate": 0.9693710066911506,
+            "smoothedRate": 0.9693758869070072,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 89.22996903763844,
+        "smoothedWinPercent": 89.230188647352,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 75.3106249399834
+        "expectedWinPercent": 75.29787079831829
       },
       {
         "discordId": "683747667247235077",
@@ -7456,25 +7456,25 @@
           "spotsPerHour": 107.30549392458403,
           "spotAssistsPerHour": 42.793496852372854,
           "deathsPerHour": 5.722403938282618,
-          "accuracyResidual": 1.81122793625196,
-          "headshotResidual": 1.6155118227351082
+          "accuracyResidual": 1.8089619946630293,
+          "headshotResidual": 1.6158802419796672
         },
         "adjusted": {
           "infantryKd": 11.345810083004725,
           "infantryKpm": 1.389680636768246,
           "playerKillsPerMatch": 25.70561446495487,
           "assistsPerHour": 50.93933494842919,
-          "accuracyResidual": 1.7600911102853671,
-          "headshotResidual": 1.5799751174292729,
+          "accuracyResidual": 1.7578646671721085,
+          "headshotResidual": 1.5803131629998004,
           "objectiveActionsPerHour": 3.8302661165165386,
-          "objectivePresence": 0.04915084430028213,
+          "objectivePresence": 0.04915098158565531,
           "breakthroughPressure": 0.04011751858280338,
           "revivesPerHour": 5.803039457400799,
           "squadRevivesPerHour": 3.1646068113706374,
-          "healsPerHour": 52.89173320619127,
+          "healsPerHour": 52.9034173649605,
           "resuppliesPerHour": 10.929891673622834,
-          "repairsPerHour": 8.304962289499041,
-          "spotsPerHour": 105.057029843516,
+          "repairsPerHour": 8.304812987573053,
+          "spotsPerHour": 105.05678719219898,
           "spotAssistsPerHour": 42.00289252641823,
           "deathsPerHour": 6.124134423074667,
           "sortinoRaw": 64.36516836775633
@@ -7512,28 +7512,28 @@
         "model": {
           "combat": 0.47688836805235574,
           "objective": -1.591432668560732,
-          "teamwork": 0.6664131344054591
+          "teamwork": 0.6654535670943859
         },
         "scores": {
           "trident": 30.783121367361236,
           "sortino": 74.64864864864865,
-          "alpha": -6.261398792021737,
+          "alpha": -6.2560624761620005,
           "cei": 30.783121367361236,
           "rais": 74.64864864864865,
-          "wrr": -6.261398792021737
+          "wrr": -6.2560624761620005
         },
         "weaponModel": [
-          -1.9896247253726986,
-          -1.1861591201534982,
-          -1.7244000178413408,
-          -1.54766289312121,
-          -0.41945807133881674,
-          5.591721161748936,
-          -0.9543858120675995,
-          -0.6428136780945447
+          -1.9899235487588673,
+          -1.186171478213596,
+          -1.7244123682456562,
+          -1.547923942708604,
+          -0.41944211662403647,
+          5.591554395558829,
+          -0.9543400284845398,
+          -0.6427271490447777
         ],
-        "expectedAccuracy": 32.64877206374804,
-        "expectedHeadshotPercent": 63.12448817726489,
+        "expectedAccuracy": 32.65103800533697,
+        "expectedHeadshotPercent": 63.12411975802033,
         "combatGeometric": 53.96480808499551,
         "combatArithmetic": 62.194594594594605,
         "aimScore": 74.4680673888358,
@@ -7566,13 +7566,13 @@
             "losses": 92,
             "matches": 743,
             "rawRate": 0.876010781671159,
-            "smoothedRate": 0.8765099544073496,
+            "smoothedRate": 0.8765109342681605,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 74.86303559831921,
+        "smoothedWinPercent": 74.86307969205572,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 81.12443439034095
+        "expectedWinPercent": 81.11914216821772
       },
       {
         "discordId": "754383753933226016",
@@ -7627,25 +7627,25 @@
           "spotsPerHour": 9.774611472382874,
           "spotAssistsPerHour": 6.9454284649207905,
           "deathsPerHour": 28.78232643513785,
-          "accuracyResidual": 0.256387055860575,
-          "headshotResidual": 0.06851429735977987
+          "accuracyResidual": 0.2536896062255245,
+          "headshotResidual": 0.06996235554812458
         },
         "adjusted": {
           "infantryKd": 1.9883974596947902,
           "infantryKpm": 1.5002433667790356,
           "playerKillsPerMatch": 26.149008344950065,
           "assistsPerHour": 30.671961648060808,
-          "accuracyResidual": 0.2109705066030722,
-          "headshotResidual": 0.07862658917895267,
+          "accuracyResidual": 0.20845397542598354,
+          "headshotResidual": 0.07986871749900071,
           "objectiveActionsPerHour": 5.719271759327517,
-          "objectivePresence": 0.0756289346898888,
+          "objectivePresence": 0.0756294295253042,
           "breakthroughPressure": 0.06068889406702978,
           "revivesPerHour": 18.472425296894322,
           "squadRevivesPerHour": 4.9672969186339015,
-          "healsPerHour": 180.1207859897252,
+          "healsPerHour": 180.1629007134154,
           "resuppliesPerHour": 27.25353710206931,
-          "repairsPerHour": 20.397188669831994,
-          "spotsPerHour": 10.383154091804345,
+          "repairsPerHour": 20.396650521602105,
+          "spotsPerHour": 10.382279472298489,
           "spotAssistsPerHour": 7.298257019030872,
           "deathsPerHour": 28.170265324825174,
           "sortinoRaw": 26.922373521685248
@@ -7683,28 +7683,28 @@
         "model": {
           "combat": -1.3526059601651785,
           "objective": -0.8954594546639546,
-          "teamwork": -0.59556327023944
+          "teamwork": -0.5962187987766949
         },
         "scores": {
           "trident": 26.65691149143845,
           "sortino": 7.1891891891891895,
-          "alpha": 7.6214263628649945,
+          "alpha": 7.626219206511763,
           "cei": 26.65691149143845,
           "rais": 7.1891891891891895,
-          "wrr": 7.6214263628649945
+          "wrr": 7.626219206511763
         },
         "weaponModel": [
-          1.0547515424720018,
-          0.16393531298792285,
-          -1.014896839089752,
-          -0.6167048838120345,
-          -0.11974188960006969,
-          -0.19976754524219184,
-          0.8541223140140816,
-          2.150324608265202
+          1.054707643713127,
+          0.1641360415288094,
+          -1.0148530935942375,
+          -0.6168985646076506,
+          -0.11972709373736286,
+          -0.19981196081255878,
+          0.8542240326680619,
+          2.1496904737545166
         ],
-        "expectedAccuracy": 29.193612944139424,
-        "expectedHeadshotPercent": 15.68148570264022,
+        "expectedAccuracy": 29.196310393774475,
+        "expectedHeadshotPercent": 15.680037644451875,
         "combatGeometric": 13.957421561972101,
         "combatArithmetic": 26.389189189189196,
         "aimScore": 49.57746961131264,
@@ -7737,13 +7737,13 @@
             "losses": 10,
             "matches": 103,
             "rawRate": 0.9029126213592233,
-            "smoothedRate": 0.9006494924252906,
+            "smoothedRate": 0.9006553639349931,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 84.10242419536759,
+        "smoothedWinPercent": 84.1026884133042,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 76.4809978325026
+        "expectedWinPercent": 76.47646920679243
       },
       {
         "discordId": "779866052279402568",
@@ -7798,25 +7798,25 @@
           "spotsPerHour": 1.591118549067497,
           "spotAssistsPerHour": 5.700599071977379,
           "deathsPerHour": 22.65123223378655,
-          "accuracyResidual": -2.9109314670736772,
-          "headshotResidual": -1.6056813287412162
+          "accuracyResidual": -2.9089319926238453,
+          "headshotResidual": -1.6058006344811968
         },
         "adjusted": {
           "infantryKd": 3.584687357426212,
           "infantryKpm": 2.004857379779152,
           "playerKillsPerMatch": 30.26372563998906,
           "assistsPerHour": 44.57168581905596,
-          "accuracyResidual": -2.811224370867352,
-          "headshotResidual": -1.5386562368399224,
+          "accuracyResidual": -2.80932508463604,
+          "headshotResidual": -1.5388032079138774,
           "objectiveActionsPerHour": 9.147476640366104,
-          "objectivePresence": 0.09788013227352343,
+          "objectivePresence": 0.09788033998220613,
           "breakthroughPressure": 0.07449619159963065,
           "revivesPerHour": 7.4868652729532075,
           "squadRevivesPerHour": 4.220973142531374,
-          "healsPerHour": 43.72322191696535,
+          "healsPerHour": 43.740899701351495,
           "resuppliesPerHour": 10.28629083825138,
-          "repairsPerHour": 50.869495619157505,
-          "spotsPerHour": 2.1534278298781695,
+          "repairsPerHour": 50.86926972978813,
+          "spotsPerHour": 2.1530607056591395,
           "spotAssistsPerHour": 5.895379621677518,
           "deathsPerHour": 22.624226745732827,
           "sortinoRaw": 40.76743121323267
@@ -7854,28 +7854,28 @@
         "model": {
           "combat": -0.050887761396197155,
           "objective": 0.21552923130552168,
-          "teamwork": -2.0591239545708815
+          "teamwork": -2.059426878103609
         },
         "scores": {
           "trident": 38.657289976919564,
           "sortino": 12.378378378378379,
-          "alpha": -0.08189509691814578,
+          "alpha": -0.09914288607207311,
           "cei": 38.657289976919564,
           "rais": 12.378378378378379,
-          "wrr": -0.08189509691814578
+          "wrr": -0.09914288607207311
         },
         "weaponModel": [
-          -0.3733820034927393,
-          0.1675679031884003,
-          1.0544465709591442,
-          0.08070257041859762,
-          -0.6071868161952524,
-          -0.4863213438207738,
-          -0.4640914260694823,
-          0.7666339558158659
+          -0.3735454887875415,
+          0.1677692050642178,
+          1.0546539262651848,
+          0.080559357524969,
+          -0.6071701356276203,
+          -0.4863597056739328,
+          -0.4640304782464298,
+          0.7663568302785737
         ],
-        "expectedAccuracy": 25.250931467073677,
-        "expectedHeadshotPercent": 13.495681328741217,
+        "expectedAccuracy": 25.248931992623845,
+        "expectedHeadshotPercent": 13.495800634481197,
         "combatGeometric": 44.668407079487125,
         "combatArithmetic": 46.62702702702703,
         "aimScore": 25.35135135135135,
@@ -7908,13 +7908,13 @@
             "losses": 46,
             "matches": 498,
             "rawRate": 0.9076305220883534,
-            "smoothedRate": 0.9068511186050424,
+            "smoothedRate": 0.9068525556093291,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 81.90100094201152,
+        "smoothedWinPercent": 81.90106560720443,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 81.98289603892967
+        "expectedWinPercent": 82.0002084932765
       },
       {
         "discordId": "812603193501810729",
@@ -7969,25 +7969,25 @@
           "spotsPerHour": 3.16578158318392,
           "spotAssistsPerHour": 6.948983141801662,
           "deathsPerHour": 10.455410228673209,
-          "accuracyResidual": 5.169282794407579,
-          "headshotResidual": -1.9714291267077773
+          "accuracyResidual": 5.168210431683164,
+          "headshotResidual": -1.9711845149759917
         },
         "adjusted": {
           "infantryKd": 3.827172718264265,
           "infantryKpm": 0.9995688866440823,
           "playerKillsPerMatch": 15.45080178105471,
           "assistsPerHour": 51.455044762479204,
-          "accuracyResidual": 5.046662963773036,
-          "headshotResidual": -1.9227289059757844,
+          "accuracyResidual": 5.045599649935337,
+          "headshotResidual": -1.9225092123705856,
           "objectiveActionsPerHour": 14.789174426865609,
-          "objectivePresence": 0.13644598942071692,
+          "objectivePresence": 0.1364461147047334,
           "breakthroughPressure": 0.10156533346998955,
           "revivesPerHour": 3.8861736866403316,
           "squadRevivesPerHour": 2.146985897296214,
-          "healsPerHour": 20.414965643102732,
+          "healsPerHour": 20.425628383828183,
           "resuppliesPerHour": 3.368976076932848,
-          "repairsPerHour": 245.78897193229457,
-          "spotsPerHour": 3.4693345463266287,
+          "repairsPerHour": 245.78883568220093,
+          "spotsPerHour": 3.4691131073569,
           "spotAssistsPerHour": 7.038233005395062,
           "deathsPerHour": 10.714969478755108,
           "sortinoRaw": 52.40864137098807
@@ -8025,28 +8025,28 @@
         "model": {
           "combat": -1.1247709499114926,
           "objective": 1.4573404934174068,
-          "teamwork": -2.322209438936309
+          "teamwork": -2.3224489792015044
         },
         "scores": {
           "trident": 31.266245317060225,
           "sortino": 43.513513513513516,
-          "alpha": 7.038432603795741,
+          "alpha": 7.020773396547796,
           "cei": 31.266245317060225,
           "rais": 43.513513513513516,
-          "wrr": 7.038432603795741
+          "wrr": 7.020773396547796
         },
         "weaponModel": [
-          2.7668292521482565,
-          -0.2313870898380057,
-          -0.5795694555456155,
-          -1.7100609589158455,
-          -0.5633946469490505,
-          -0.48760439469616934,
-          -0.9904673474418705,
-          -1.2758128024159252
+          2.766928716342459,
+          -0.23124875538233514,
+          -0.5794912914850661,
+          -1.7103337604419628,
+          -0.5633781357037614,
+          -0.4876427294436777,
+          -0.9904226798190937,
+          -1.2755629519133949
         ],
-        "expectedAccuracy": 26.10071720559242,
-        "expectedHeadshotPercent": 11.011429126707776,
+        "expectedAccuracy": 26.101789568316835,
+        "expectedHeadshotPercent": 11.01118451497599,
         "combatGeometric": 17.514813069226275,
         "combatArithmetic": 34.17297297297298,
         "aimScore": 38.64864864864867,
@@ -8079,13 +8079,13 @@
             "losses": 16,
             "matches": 536,
             "rawRate": 0.9701492537313433,
-            "smoothedRate": 0.9666366043323301,
+            "smoothedRate": 0.9666379439994279,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 86.02546761445018,
+        "smoothedWinPercent": 86.02552789946958,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 78.98703501065444
+        "expectedWinPercent": 79.00475450292178
       },
       {
         "discordId": "97465129314045952",
@@ -8140,25 +8140,25 @@
           "spotsPerHour": 28.185569494435324,
           "spotAssistsPerHour": 13.722308398969895,
           "deathsPerHour": 12.422252676917516,
-          "accuracyResidual": -2.157881675849165,
-          "headshotResidual": 3.53143628668985
+          "accuracyResidual": -2.1556262050254276,
+          "headshotResidual": 3.5313498650841098
         },
         "adjusted": {
           "infantryKd": 7.65836670279454,
           "infantryKpm": 1.7198302692506868,
           "playerKillsPerMatch": 27.668373621082523,
           "assistsPerHour": 52.30574546045923,
-          "accuracyResidual": -2.1055420822929256,
-          "headshotResidual": 3.4394458508137786,
+          "accuracyResidual": -2.1033670139019125,
+          "headshotResidual": 3.4393382655996727,
           "objectiveActionsPerHour": 9.187163041269198,
-          "objectivePresence": 0.12475908527707154,
+          "objectivePresence": 0.12475923739128482,
           "breakthroughPressure": 0.10115142279775603,
           "revivesPerHour": 27.854658297526647,
           "squadRevivesPerHour": 8.697859811986978,
-          "healsPerHour": 455.88424324186536,
+          "healsPerHour": 455.897189461683,
           "resuppliesPerHour": 97.8492469630112,
-          "repairsPerHour": 1.1644230034340417,
-          "spotsPerHour": 27.867034777941488,
+          "repairsPerHour": 1.164257574703466,
+          "spotsPerHour": 27.866765916712268,
           "spotAssistsPerHour": 13.644662062418963,
           "deathsPerHour": 12.683384278001306,
           "sortinoRaw": 86.57683825887179
@@ -8196,28 +8196,28 @@
         "model": {
           "combat": 0.7384499622400578,
           "objective": 0.883632388080991,
-          "teamwork": 1.1369777770942378
+          "teamwork": 1.1359048400747935
         },
         "scores": {
           "trident": 70.97018965989875,
           "sortino": 98,
-          "alpha": 0.6874144494419454,
+          "alpha": 0.6851974122771907,
           "cei": 70.97018965989875,
           "rais": 98,
-          "wrr": 0.6874144494419454
+          "wrr": 0.6851974122771907
         },
         "weaponModel": [
-          -0.3155665228586732,
-          0.06885873631093814,
-          -0.0074585697145043315,
-          -0.2961511376502624,
-          2.2169068900638136,
-          -0.22800877056657884,
-          -0.5791105764053315,
-          -0.3534139605863402
+          -0.31572516690240926,
+          0.06904445883146049,
+          -0.007335172488122578,
+          -0.29632162156872316,
+          2.216912651278249,
+          -0.22805258951462715,
+          -0.5790531859919685,
+          -0.3534021001742958
         ],
-        "expectedAccuracy": 22.977881675849165,
-        "expectedHeadshotPercent": 16.37856371331015,
+        "expectedAccuracy": 22.975626205025428,
+        "expectedHeadshotPercent": 16.37865013491589,
         "combatGeometric": 60.98895173010881,
         "combatArithmetic": 64.27027027027029,
         "aimScore": 59.63984921440548,
@@ -8250,13 +8250,13 @@
             "losses": 13,
             "matches": 241,
             "rawRate": 0.946058091286307,
-            "smoothedRate": 0.940914041467809,
+            "smoothedRate": 0.9409168668559365,
             "weight": 0.45
           }
         },
-        "smoothedWinPercent": 83.46764093981949,
+        "smoothedWinPercent": 83.46776808228522,
         "winDataSource": "season-breakthrough",
-        "expectedWinPercent": 82.78022649037754
+        "expectedWinPercent": 82.78257067000803
       }
     ],
     "archiveDate": "2026-07-14",
@@ -8272,7 +8272,7 @@
       "seasonClanRates": {
         "Season1": 0.6802694523088939,
         "Season2": 0.771500372300819,
-        "Season3": 0.8913254012174876
+        "Season3": 0.8913554633471646
       },
       "ridgeLambda": 4,
       "aimRidgeLambda": 1,
@@ -8280,7 +8280,7 @@
         "geometric": 0.7,
         "arithmetic": 0.3
       },
-      "clanWinPercent": 80.93457010279886,
+      "clanWinPercent": 80.93631661385045,
       "medianDeathsPerHour": 21.928908953369785
     }
   }
