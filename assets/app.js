@@ -1049,6 +1049,9 @@ function auditActionLabel(action) {
       linked: "linked",
       relinked: "relinked",
       unlinked: "unlinked",
+      tracker_linked: "Tracker linked",
+      tracker_updated: "Tracker updated",
+      tracker_unlinked: "Tracker unlinked",
       link_attempt: "link attempt",
       relink_attempt: "relink attempt",
       unlink_attempt: "unlink attempt"
@@ -1076,6 +1079,13 @@ function auditMemberHtml(event) {
 
 function auditText(event) {
   const who = auditMemberHtml(event);
+
+  if (event.action === "tracker_linked" || event.action === "tracker_updated") {
+    return `<span class="feed-text"><span class="badge ${esc(event.action)}">${esc(auditActionLabel(event.action))}</span> ${who} set Tracker profile <span class="mono">${esc(event.trackerProfileId ?? "unknown")}</span></span>`;
+  }
+  if (event.action === "tracker_unlinked") {
+    return `<span class="feed-text"><span class="badge tracker_unlinked">Tracker unlinked</span> ${who} removed their Tracker profile mapping</span>`;
+  }
 
   if (auditOutcome(event) === "failed") {
     return `<span class="feed-text"><span class="badge failed">failed</span> ${auditMemberHtml(event)} could not ${
@@ -1223,6 +1233,9 @@ function renderAudit() {
       event.profileName,
       event.playerId,
       event.nucleusId,
+      event.trackerProfileId,
+      event.previousTrackerProfileId,
+      event.requesterUsername,
       event.failureReason
     ]
       .filter(Boolean)
@@ -1231,11 +1244,11 @@ function renderAudit() {
 
   app.innerHTML = `
     <h1 class="page-title">Audit Log</h1>
-    <p class="page-sub">Completed profile changes and failed link attempts pulled from the Discord link channel</p>
+    <p class="page-sub">Completed profile changes, imported Tracker mappings, and failed link attempts</p>
     <div class="filter-row">
-      <input type="search" id="audit-search" placeholder="Filter by name, EA account, player or nucleus ID…" value="${esc(auditFilterState.text)}" />
+      <input type="search" id="audit-search" placeholder="Filter by name, EA account, player, nucleus, or Tracker ID…" value="${esc(auditFilterState.text)}" />
       <select id="audit-action">
-        ${["all", "linked", "relinked", "unlinked", "link_attempt", "relink_attempt"]
+        ${["all", "linked", "relinked", "unlinked", "tracker_linked", "tracker_updated", "tracker_unlinked", "link_attempt", "relink_attempt"]
           .map(
             (action) =>
               `<option value="${action}" ${auditFilterState.action === action ? "selected" : ""}>${
@@ -1257,7 +1270,7 @@ function renderAudit() {
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>When</th><th>Action</th><th>Result</th><th>Discord member</th><th>EA account</th><th>Persona / Player ID</th><th>User / Nucleus ID</th><th>Platform</th><th>Profile</th></tr></thead>
+        <thead><tr><th>When</th><th>Action</th><th>Result</th><th>Discord member</th><th>EA account</th><th>Persona / Player ID</th><th>User / Nucleus ID</th><th>Platform</th><th>Tracker ID</th></tr></thead>
         <tbody>${filtered
           .map(
             (event) => `<tr>
@@ -1275,7 +1288,7 @@ function renderAudit() {
               <td class="mono">${esc(event.playerId ?? "—")}</td>
               <td class="mono">${esc(event.nucleusId ?? "—")}</td>
               <td class="mono">${esc(event.platform ?? "—")}</td>
-              <td>${esc(event.profileName ?? "—")}</td>
+              <td class="mono">${esc(event.trackerProfileId ?? "—")}</td>
             </tr>`
           )
           .join("") || `<tr><td colspan="9" class="empty">No matching events.</td></tr>`}</tbody>
