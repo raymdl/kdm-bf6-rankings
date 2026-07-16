@@ -316,12 +316,9 @@ If season-mode data is temporarily unavailable, the implementation falls back to
 Every row in the Full KDM Ranking table has a **Breakdown** control. Expanding it displays:
 
 - The exact selected-measure equation with that player's values.
-- Combat, Objective, and Teamwork pillar scores.
-- Player-only K/D, KPM, kills/match, and assists/hour.
-- Actual versus weapon-mix-expected Accuracy and Headshot %.
-- Clan percentiles and component weights.
-- RAIS upside, death multiplier, and raw score when viewing RAIS.
-- Season 1/2/3 Breakthrough records, stabilized rates, weights, expected win rate, and final residual when viewing WRR.
+- CEI's three weighted pillars, Combat construction, and the player-level Combat inputs and percentiles when viewing CEI.
+- RAIS upside composition, player and median death exposure, downside multiplier, raw score, and final clan percentile when viewing RAIS.
+- Season 1/2/3 Breakthrough records, stabilized rates and weights, expected-win pillar inputs, expected win rate, and final residual when viewing WRR.
 
 ## Implementation reference
 

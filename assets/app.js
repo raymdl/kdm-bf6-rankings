@@ -1408,40 +1408,75 @@ function breakdownStatHtml(label, value, context = "") {
 
 function effectivenessBreakdownHtml(key, row) {
   const p = row.percentiles;
-  const scoreLine = key === "trident"
-    ? `CEI = ${row.pillars.combat.toFixed(1)}<sup>0.40</sup> &times; ${row.pillars.objective.toFixed(1)}<sup>0.30</sup> &times; ${row.pillars.teamwork.toFixed(1)}<sup>0.30</sup> = <strong>${row.scores.trident.toFixed(1)}</strong>`
-    : key === "sortino"
-      ? `RAIS<sub>raw</sub> = ${row.sortinoUpside.toFixed(1)} &divide; ${row.sortinoDownside.toFixed(3)} = ${row.sortinoRaw.toFixed(1)} &rarr; <strong>${row.scores.sortino.toFixed(1)} percentile</strong>`
-      : `WRR = ${row.smoothedWinPercent.toFixed(1)}% &minus; ${row.expectedWinPercent.toFixed(1)}% = <strong>${effectivenessScoreText("alpha", row.scores.alpha)}</strong>`;
-  const seasonHtml = key === "alpha"
-    ? `<div class="breakdown-season-grid">${Object.entries({ Season1: "Season 1 · 20%", Season2: "Season 2 · 35%", Season3: "Season 3 · 45%" }).map(([seasonId, label]) => {
-        const season = row.seasonWinRates[seasonId];
-        return season
-          ? breakdownStatHtml(label, `${(season.rawRate * 100).toFixed(1)}%`, `${season.wins}-${season.losses} · stabilized ${(season.smoothedRate * 100).toFixed(1)}%`)
-          : breakdownStatHtml(label, "No record");
-      }).join("")}</div>`
-    : "";
+  if (key === "trident") {
+    return `<div class="score-breakdown">
+      <div class="breakdown-equation"><span>CEI calculation</span><div>CEI = ${row.pillars.combat.toFixed(1)}<sup>0.40</sup> &times; ${row.pillars.objective.toFixed(1)}<sup>0.30</sup> &times; ${row.pillars.teamwork.toFixed(1)}<sup>0.30</sup> = <strong>${row.scores.trident.toFixed(1)}</strong></div></div>
+      <div class="breakdown-pillar-grid">
+        ${breakdownStatHtml("Combat pillar", row.pillars.combat.toFixed(1), "40% of CEI")}
+        ${breakdownStatHtml("Balanced Combat", row.combatGeometric.toFixed(1), "70% of Combat · geometric mean")}
+        ${breakdownStatHtml("Additive Combat", row.combatArithmetic.toFixed(1), "30% of Combat · arithmetic mean")}
+        ${breakdownStatHtml("Objective pillar", row.pillars.objective.toFixed(1), "30% of CEI")}
+        ${breakdownStatHtml("Teamwork pillar", row.pillars.teamwork.toFixed(1), `30% of CEI · ${row.bestSupportLanes.join(" + ")}`)}
+      </div>
+      <div class="breakdown-subhead">Combat inputs</div>
+      <div class="breakdown-input-grid">
+        ${breakdownStatHtml("Player K/D", row.raw.infantryKd.toFixed(2), `${p.infantryKd.toFixed(0)}th percentile · 30% of Combat`)}
+        ${breakdownStatHtml("Player Kills / Min", row.raw.infantryKpm.toFixed(2), `${p.infantryKpm.toFixed(0)}th percentile · 30%`)}
+        ${breakdownStatHtml("Player Kills / match", row.raw.playerKillsPerMatch.toFixed(1), `${p.playerKillsPerMatch.toFixed(0)}th percentile · 10%`)}
+        ${breakdownStatHtml("Assists / hour", row.raw.assistsPerHour.toFixed(1), `${p.assistsPerHour.toFixed(0)}th percentile · 10%`)}
+        ${breakdownStatHtml("Accuracy, weapon-adjusted", `${row.raw.accuracy.toFixed(1)}%`, `expected ${row.expectedAccuracy.toFixed(1)}% · ${p.accuracyResidual.toFixed(0)}th percentile · 10%`)}
+        ${breakdownStatHtml("Headshots, weapon-adjusted", `${row.raw.headshotPercent.toFixed(1)}%`, `expected ${row.expectedHeadshotPercent.toFixed(1)}% · ${p.headshotResidual.toFixed(0)}th percentile · 10%`)}
+      </div>
+      <p class="breakdown-note">CEI rewards balance: because the three pillars use a geometric mean, a weak pillar pulls the overall score down.</p>
+    </div>`;
+  }
+
+  if (key === "sortino") {
+    const medianDeaths = state.effectiveness.constants.medianDeathsPerHour;
+    const deathRatio = row.adjusted.deathsPerHour / medianDeaths;
+    return `<div class="score-breakdown">
+      <div class="breakdown-equation"><span>RAIS calculation</span><div>RAIS<sub>raw</sub> = ${row.sortinoUpside.toFixed(1)} &divide; ${row.sortinoDownside.toFixed(3)} = ${row.sortinoRaw.toFixed(1)} &rarr; <strong>${row.scores.sortino.toFixed(1)} percentile</strong></div></div>
+      <div class="breakdown-subhead">Upside production</div>
+      <div class="breakdown-pillar-grid">
+        ${breakdownStatHtml("Weighted upside", row.sortinoUpside.toFixed(1), "0.40C + 0.30O + 0.30T")}
+        ${breakdownStatHtml("Combat pillar", row.pillars.combat.toFixed(1), "40% of upside")}
+        ${breakdownStatHtml("Objective pillar", row.pillars.objective.toFixed(1), "30% of upside")}
+        ${breakdownStatHtml("Teamwork pillar", row.pillars.teamwork.toFixed(1), "30% of upside")}
+      </div>
+      <div class="breakdown-subhead">Death-risk adjustment</div>
+      <div class="breakdown-input-grid">
+        ${breakdownStatHtml("Deaths / hour", row.adjusted.deathsPerHour.toFixed(1), "player death exposure")}
+        ${breakdownStatHtml("Clan median", medianDeaths.toFixed(1), `player is ${deathRatio.toFixed(2)}&times; median`)}
+        ${breakdownStatHtml("Downside multiplier", row.sortinoDownside.toFixed(3), `(${deathRatio.toFixed(2)})<sup>0.35</sup> · capped 0.72–1.40`)}
+        ${breakdownStatHtml("Raw RAIS", row.sortinoRaw.toFixed(1), "upside &divide; downside")}
+        ${breakdownStatHtml("Clan percentile", row.scores.sortino.toFixed(1), "published RAIS score")}
+      </div>
+      <p class="breakdown-note">A multiplier above 1 reduces the upside score; below 1 increases it. The soft exponent keeps low-death passive play from dominating RAIS.</p>
+    </div>`;
+  }
+
+  const seasonHtml = Object.entries({ Season1: "Season 1", Season2: "Season 2", Season3: "Season 3" }).map(([seasonId, label]) => {
+    const season = row.seasonWinRates[seasonId];
+    return season
+      ? breakdownStatHtml(`${label} · ${(season.weight * 100).toFixed(0)}%`, `${(season.rawRate * 100).toFixed(1)}%`, `${season.wins}-${season.losses} · stabilized ${(season.smoothedRate * 100).toFixed(1)}%`)
+      : breakdownStatHtml(label, "No record");
+  }).join("");
   return `<div class="score-breakdown">
-    <div class="breakdown-equation"><span>Score calculation</span><div>${scoreLine}</div></div>
+    <div class="breakdown-equation"><span>WRR calculation</span><div>WRR = ${row.smoothedWinPercent.toFixed(1)}% &minus; ${row.expectedWinPercent.toFixed(1)}% = <strong>${effectivenessScoreText("alpha", row.scores.alpha)}</strong></div></div>
     <div class="breakdown-pillar-grid">
-      ${breakdownStatHtml("Combat pillar", row.pillars.combat.toFixed(1), "40% CEI / RAIS input")}
-      ${breakdownStatHtml("Balanced Combat", row.combatGeometric.toFixed(1), "70% of Combat · geometric mean")}
-      ${breakdownStatHtml("Additive Combat", row.combatArithmetic.toFixed(1), "30% of Combat · arithmetic mean")}
-      ${breakdownStatHtml("Objective pillar", row.pillars.objective.toFixed(1), "30% CEI / RAIS input")}
-      ${breakdownStatHtml("Teamwork pillar", row.pillars.teamwork.toFixed(1), `30% · ${row.bestSupportLanes.join(" + ")}`)}
-      ${key === "sortino" ? breakdownStatHtml("Deaths / hour", row.adjusted.deathsPerHour.toFixed(1), `clan median ${state.effectiveness.constants.medianDeathsPerHour.toFixed(1)}`) : ""}
+      ${breakdownStatHtml("Stabilized Win%", `${row.smoothedWinPercent.toFixed(1)}%`, "weighted observed Breakthrough winning")}
+      ${breakdownStatHtml("Expected Win%", `${row.expectedWinPercent.toFixed(1)}%`, "predicted from the visible pillar profile")}
+      ${breakdownStatHtml("Win Rate Residual", effectivenessScoreText("alpha", row.scores.alpha), row.scores.alpha >= 0 ? "winning above expectation" : "winning below expectation")}
     </div>
-    ${seasonHtml}
-    <div class="breakdown-subhead">Combat inputs</div>
+    <div class="breakdown-subhead">Observed Breakthrough winning</div>
+    <div class="breakdown-season-grid">${seasonHtml}</div>
+    <div class="breakdown-subhead">Expected-win model inputs</div>
     <div class="breakdown-input-grid">
-      ${breakdownStatHtml("Player K/D", row.raw.infantryKd.toFixed(2), `${p.infantryKd.toFixed(0)}th percentile · 30% of Combat`)}
-      ${breakdownStatHtml("Player Kills / Min", row.raw.infantryKpm.toFixed(2), `${p.infantryKpm.toFixed(0)}th percentile · 30%`)}
-      ${breakdownStatHtml("Player Kills / match", row.raw.playerKillsPerMatch.toFixed(1), `${p.playerKillsPerMatch.toFixed(0)}th percentile · 10%`)}
-      ${breakdownStatHtml("Assists / hour", row.raw.assistsPerHour.toFixed(1), `${p.assistsPerHour.toFixed(0)}th percentile · 10%`)}
-      ${breakdownStatHtml("Accuracy, weapon-adjusted", `${row.raw.accuracy.toFixed(1)}%`, `expected ${row.expectedAccuracy.toFixed(1)}% · ${p.accuracyResidual.toFixed(0)}th percentile · 10%`)}
-      ${breakdownStatHtml("Headshots, weapon-adjusted", `${row.raw.headshotPercent.toFixed(1)}%`, `expected ${row.expectedHeadshotPercent.toFixed(1)}% · ${p.headshotResidual.toFixed(0)}th percentile · 10%`)}
+      ${breakdownStatHtml("Combat profile", row.pillars.combat.toFixed(1), `z-score ${row.model.combat >= 0 ? "+" : ""}${row.model.combat.toFixed(2)}`)}
+      ${breakdownStatHtml("Objective profile", row.pillars.objective.toFixed(1), `z-score ${row.model.objective >= 0 ? "+" : ""}${row.model.objective.toFixed(2)}`)}
+      ${breakdownStatHtml("Teamwork profile", row.pillars.teamwork.toFixed(1), `z-score ${row.model.teamwork >= 0 ? "+" : ""}${row.model.teamwork.toFixed(2)}`)}
     </div>
-    <p class="breakdown-note">Weapon-adjusted aim is included inside the Combat pillar; it is not a separate CEI component.</p>
+    <p class="breakdown-note">WRR is the unexplained percentage-point gap after comparing this player with the rest of the clan. It can suggest positioning, coordination, or team effects, but does not prove individual causation.</p>
   </div>`;
 }
 
