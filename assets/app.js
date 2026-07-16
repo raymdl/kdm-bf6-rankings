@@ -28,6 +28,7 @@ const SPARKLINE_RANGES = [
   { value: 90, label: "90 Days" },
   { value: "all", label: "All Time" }
 ];
+const PLAYER_HISTORY_DEFAULT_RANGE = "all";
 
 /* ---------- utilities ---------- */
 
@@ -200,7 +201,7 @@ function memberBackfillFields(discordId) {
   return fields;
 }
 
-function playerHistoryHref(discordId, statKey, showEstimated, range = 14) {
+function playerHistoryHref(discordId, statKey, showEstimated, range = PLAYER_HISTORY_DEFAULT_RANGE) {
   return hashRoute(`player/${encodeURIComponent(discordId)}/${statKey}`, {
     estimated: showEstimated ? 1 : null,
     range
@@ -702,7 +703,7 @@ function renderPlayer(discordId, statKey, params) {
   const dates = state.history.dates;
   const lastIndex = dates.length - 1;
   const showEstimated = params?.get("estimated") === "1";
-  const historyRange = normalizedRange(params?.get("range"), 14);
+  const historyRange = normalizedRange(params?.get("range"), PLAYER_HISTORY_DEFAULT_RANGE);
   const backfillFields = memberBackfillFields(discordId);
   const pointCount = historyRange === 1 ? 2 : historyRange;
   const rangeStart = pointCount === "all" ? 0 : Math.max(0, dates.length - pointCount);
@@ -794,7 +795,7 @@ function renderPlayer(discordId, statKey, params) {
   }
 
   document.getElementById("player-range-select")?.addEventListener("change", (event) => {
-    replaceHashAndRender(playerHistoryHref(discordId, stat.key, showEstimated, normalizedRange(event.target.value, 14)));
+    replaceHashAndRender(playerHistoryHref(discordId, stat.key, showEstimated, normalizedRange(event.target.value, PLAYER_HISTORY_DEFAULT_RANGE)));
   });
   document.getElementById("tracker-history-toggle")?.addEventListener("click", () => {
     replaceHashAndRender(playerHistoryHref(discordId, stat.key, !showEstimated, historyRange));
