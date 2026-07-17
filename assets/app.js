@@ -660,7 +660,7 @@ function renderLeaderboard(statKey) {
           const delta = fmtDelta(stat, row.value - (prevValueById.get(row.discordId) ?? NaN));
           return `<div class="podium-card p${index + 1}">
             <div class="podium-rank">#${index + 1}${index === 0 ? " · TOP DOG" : ""}</div>
-            <div class="podium-name"><a class="player-link" href="${playerHref(row.discordId)}">${esc(memberName(row.discordId))}</a></div>
+            <div class="podium-name"><a class="player-link" href="${playerHistoryHref(row.discordId, stat.key, false, "all")}">${esc(memberName(row.discordId))}</a></div>
             <div class="podium-value">${fmtStat(stat, row.value)} <span class="podium-stat-label">${esc(stat.title)}</span></div>
             <div class="podium-delta">${delta ? `${delta} vs ${windowText}` : "&nbsp;"}</div>
           </div>`;
@@ -701,7 +701,7 @@ function renderLeaderboard(statKey) {
       return `<tr class="r${rank}">
         <td class="rank-cell">${rank}</td>
         <td>${movementHtml(prevRank, rank, windowText)}</td>
-        <td><a class="player-link" href="${playerHref(row.discordId)}">${esc(memberName(row.discordId))}</a>${cached}</td>
+        <td><a class="player-link" href="${playerHistoryHref(row.discordId, stat.key, false, "all")}">${esc(memberName(row.discordId))}</a>${cached}</td>
         <td class="num value-cell">${fmtStat(stat, row.value)}</td>
         <td class="num"><span class="delta ${deltaClass}">${delta ?? "–"}</span></td>
         <td>${sparklineSvg(spark)}</td>
