@@ -559,9 +559,81 @@ function lineChart(canvas, labels, datasets, stat) {
 
 /* ---------- views ---------- */
 
+const leaderboardSortState = { context: null, key: "rank", direction: "asc", defaultKey: "rank", defaultDirection: "asc" };
+const effectivenessSortState = { context: null, key: "rank", direction: "asc", defaultKey: "rank", defaultDirection: "asc" };
+
+function resetSortState(sortState) {
+  sortState.key = sortState.defaultKey;
+  sortState.direction = sortState.defaultDirection;
+}
+
+function prepareSortState(sortState, context) {
+  if (sortState.context !== context) {
+    sortState.context = context;
+    resetSortState(sortState);
+  }
+}
+
+function advanceSortState(sortState, key) {
+  if (sortState.key !== key) {
+    sortState.key = key;
+    sortState.direction = "desc";
+  } else if (key === sortState.defaultKey) {
+    sortState.direction = sortState.direction === "desc" ? "asc" : "desc";
+  } else if (sortState.direction === "desc") {
+    sortState.direction = "asc";
+  } else {
+    resetSortState(sortState);
+  }
+}
+
+function sortableHeaderHtml(label, key, sortState, { numeric = false } = {}) {
+  const direction = sortState.key === key ? sortState.direction : null;
+  const nextAction = key === sortState.defaultKey
+    ? direction === "desc" ? "ascending" : "descending"
+    : direction === "desc" ? "ascending" : direction === "asc" ? "unsorted" : "descending";
+  const indicator = direction === "desc" ? "&#9660;" : direction === "asc" ? "&#9650;" : "&#8645;";
+  return `<th class="sortable-column${numeric ? " num" : ""}" aria-sort="${direction === "desc" ? "descending" : direction === "asc" ? "ascending" : "none"}"><button class="sort-button" type="button" data-sort-key="${key}" aria-label="Sort ${esc(label)} ${nextAction}"><span>${esc(label)}</span><span class="sort-indicator" aria-hidden="true">${indicator}</span></button></th>`;
+}
+
+function sortedRows(rows, sortState, valueFor) {
+  if (!sortState.key || !sortState.direction) {
+    return rows;
+  }
+  return [...rows].sort((a, b) => {
+    const aValue = valueFor(a, sortState.key);
+    const bValue = valueFor(b, sortState.key);
+    const aMissing = aValue === null || aValue === undefined || (typeof aValue === "number" && !Number.isFinite(aValue));
+    const bMissing = bValue === null || bValue === undefined || (typeof bValue === "number" && !Number.isFinite(bValue));
+    if (aMissing !== bMissing) {
+      return aMissing ? 1 : -1;
+    }
+    let comparison = 0;
+    if (!aMissing) {
+      comparison = typeof aValue === "string"
+        ? aValue.localeCompare(String(bValue), undefined, { sensitivity: "base", numeric: true })
+        : aValue - bValue;
+    }
+    if (comparison !== 0) {
+      return sortState.direction === "desc" ? -comparison : comparison;
+    }
+    return a.originalRank - b.originalRank;
+  });
+}
+
+function wireSortableHeaders(sortState) {
+  for (const button of app.querySelectorAll(".sort-button[data-sort-key]")) {
+    button.addEventListener("click", () => {
+      advanceSortState(sortState, button.dataset.sortKey);
+      replaceHashAndRender(location.hash);
+    });
+  }
+}
+
 function renderLeaderboard(statKey) {
   const stat = statByKey(statKey) ?? state.meta.stats[0];
   const ranking = latestRanking(stat.key);
+  prepareSortState(leaderboardSortState, stat.key);
   const memberIds = Object.keys(state.history.members ?? {});
   const authoritativeIndexes = authoritativeHistoryIndexes(stat.key, memberIds);
   const lastIndex = authoritativeIndexes.at(-1) ?? -1;
@@ -596,9 +668,27 @@ function renderLeaderboard(statKey) {
         .join("")}</div>`
     : "";
 
-  const rows = ranking
-    .map((row, index) => {
-      const rank = index + 1;
+  const sortableRanking = ranking.map((row, index) => {
+    const rank = index + 1;
+    const prevRank = prevRankById.get(row.discordId) ?? null;
+    const prevValue = prevValueById.get(row.discordId);
+    return {
+      ...row,
+      originalRank: rank,
+      movement: prevRank === null ? null : prevRank - rank,
+      change: Number.isFinite(prevValue) ? row.value - prevValue : null
+    };
+  });
+  const sortedRanking = sortedRows(sortableRanking, leaderboardSortState, (row, key) => ({
+    rank: row.originalRank,
+    movement: row.movement,
+    player: memberName(row.discordId),
+    value: row.value,
+    change: row.change
+  })[key]);
+  const rows = sortedRanking
+    .map((row) => {
+      const rank = row.originalRank;
       const prevRank = prevRankById.get(row.discordId) ?? null;
       const prevValue = prevValueById.get(row.discordId);
       const delta = fmtDelta(stat, row.value - (prevValue ?? NaN));
@@ -626,13 +716,14 @@ function renderLeaderboard(statKey) {
     ${podiumHtml}
     <div class="table-wrap">
       <table>
-        <thead><tr><th>#</th><th>Δ</th><th>Player</th><th class="num">${esc(stat.title)}</th><th class="num">Change</th><th>Trend</th></tr></thead>
+        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Δ", "movement", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th>Trend</th></tr></thead>
         <tbody>${rows || `<tr><td colspan="6" class="empty">No stats yet.</td></tr>`}</tbody>
       </table>
     </div>
     ${cachedFootnoteHtml(ranking.some((row) => row.member?.cachedStats))}`;
   wireStatTabs();
   wireSparklineRange();
+  wireSortableHeaders(leaderboardSortState);
 }
 
 function renderPlayers() {
@@ -835,8 +926,17 @@ function normalizedRange(value, fallback = 14) {
   return SPARKLINE_RANGES.some((range) => range.value === numeric) ? numeric : fallback;
 }
 
-function compareHref(statKey = compareState.statKey, selected = compareState.selected, range = compareState.range) {
-  return hashRoute("compare", { stat: statKey, players: selected, range });
+function compareHref(
+  statKey = compareState.statKey,
+  selected = compareState.selected,
+  range = compareState.range,
+  selectionMode = compareState.selectionMode
+) {
+  return hashRoute("compare", {
+    stat: statKey,
+    players: selectionMode === "manual" ? selected : null,
+    range
+  });
 }
 
 function loadCompareState(params) {
@@ -1031,7 +1131,12 @@ function renderTimeMachine() {
 function overtakeText(event) {
   const stat = statByKey(event.statKey);
   const compare = stat
-    ? `<a class="feed-action" href="${compareHref(stat.key, [event.overtakerId, event.overtakenId], 14)}">Compare</a>`
+    ? `<a class="feed-action" href="${compareHref(
+        stat.key,
+        [event.overtakerId, event.overtakenId],
+        14,
+        "manual"
+      )}">Compare</a>`
     : "";
   return `<span class="feed-text"><span class="badge overtake">overtake</span>
     <a class="who player-link" href="${playerHref(event.overtakerId)}">${esc(memberName(event.overtakerId))}</a>
@@ -1145,6 +1250,21 @@ function wireFloatingTableHeader(wrapper) {
   const cloneTable = table.cloneNode(false);
   cloneTable.append(sourceHead.cloneNode(true));
   overlay.append(cloneTable);
+  if (sourceHead.querySelector(".sort-button")) {
+    overlay.classList.add("sortable");
+    for (const button of cloneTable.querySelectorAll(".sort-button")) {
+      button.tabIndex = -1;
+    }
+    overlay.addEventListener("click", (event) => {
+      const clonedButton = event.target.closest(".sort-button[data-sort-key]");
+      if (!clonedButton) {
+        return;
+      }
+      const sourceButton = [...sourceHead.querySelectorAll(".sort-button[data-sort-key]")]
+        .find((button) => button.dataset.sortKey === clonedButton.dataset.sortKey);
+      sourceButton?.click();
+    });
+  }
   document.body.append(overlay);
 
   const syncWidths = () => {
@@ -1483,22 +1603,35 @@ function effectivenessBreakdownHtml(key, row) {
 
 function effectivenessTableHtml(key, ranking) {
   const header = key === "alpha"
-    ? `<th class="num">Residual</th><th class="num">Win%</th><th class="num">Expected</th>`
+    ? `${sortableHeaderHtml("Residual", "score", effectivenessSortState, { numeric: true })}${sortableHeaderHtml("Win%", "win", effectivenessSortState, { numeric: true })}${sortableHeaderHtml("Expected", "expected", effectivenessSortState, { numeric: true })}`
     : key === "sortino"
-      ? `<th class="num">Score</th><th class="num">Upside</th><th class="num">Deaths/hr</th>`
-      : `<th class="num">Score</th><th>Support lanes</th>`;
+      ? `${sortableHeaderHtml("Score", "score", effectivenessSortState, { numeric: true })}${sortableHeaderHtml("Upside", "upside", effectivenessSortState, { numeric: true })}${sortableHeaderHtml("Deaths/hr", "deaths", effectivenessSortState, { numeric: true })}`
+      : `${sortableHeaderHtml("Score", "score", effectivenessSortState, { numeric: true })}<th>Support lanes</th>`;
   const columnCount = key === "trident" ? 7 : 8;
-  const rows = ranking.map((row, index) => {
+  const sortableRanking = ranking.map((row, index) => ({ ...row, originalRank: index + 1 }));
+  const sortedRanking = sortedRows(sortableRanking, effectivenessSortState, (row, sortKey) => ({
+    rank: row.originalRank,
+    player: row.name,
+    score: row.scores[key],
+    win: row.smoothedWinPercent,
+    expected: row.expectedWinPercent,
+    upside: row.sortinoUpside,
+    deaths: row.adjusted.deathsPerHour,
+    combat: row.pillars.combat,
+    objective: row.pillars.objective,
+    teamwork: row.pillars.teamwork
+  })[sortKey]);
+  const rows = sortedRanking.map((row) => {
     const detail = key === "alpha"
       ? `<td class="num value-cell ${row.scores.alpha >= 0 ? "positive-score" : "negative-score"}">${effectivenessScoreText(key, row.scores.alpha)}</td><td class="num">${row.smoothedWinPercent.toFixed(1)}%</td><td class="num">${row.expectedWinPercent.toFixed(1)}%</td>`
       : key === "sortino"
         ? `<td class="num value-cell">${row.scores.sortino.toFixed(1)}</td><td class="num">${row.sortinoUpside.toFixed(1)}</td><td class="num">${row.adjusted.deathsPerHour.toFixed(1)}</td>`
         : `<td class="num value-cell">${row.scores.trident.toFixed(1)}</td><td>${row.bestSupportLanes.map((lane) => lane[0].toUpperCase() + lane.slice(1)).join(" + ")}</td>`;
     const detailId = `score-detail-${key}-${row.discordId}`;
-    return `<tr class="r${index + 1}"><td class="rank-cell">${index + 1}</td><td><div class="ranking-player-cell"><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${row.cachedStats ? cachedMarkerHtml() : ""}<button class="rank-detail-toggle" type="button" aria-expanded="false" aria-controls="${detailId}" data-detail-id="${detailId}">Breakdown</button></div></td>${detail}<td class="num pillar-score">${row.pillars.combat.toFixed(1)}</td><td class="num pillar-score">${row.pillars.objective.toFixed(1)}</td><td class="num pillar-score">${row.pillars.teamwork.toFixed(1)}</td></tr>
+    return `<tr class="r${row.originalRank}"><td class="rank-cell">${row.originalRank}</td><td><div class="ranking-player-cell"><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${row.cachedStats ? cachedMarkerHtml() : ""}<button class="rank-detail-toggle" type="button" aria-expanded="false" aria-controls="${detailId}" data-detail-id="${detailId}">Breakdown</button></div></td>${detail}<td class="num pillar-score">${row.pillars.combat.toFixed(1)}</td><td class="num pillar-score">${row.pillars.objective.toFixed(1)}</td><td class="num pillar-score">${row.pillars.teamwork.toFixed(1)}</td></tr>
       <tr class="rank-detail-row" id="${detailId}" hidden><td colspan="${columnCount}">${effectivenessBreakdownHtml(key, row)}</td></tr>`;
   }).join("");
-  return `<div class="table-wrap effectiveness-table"><table><thead><tr><th>#</th><th>Player</th>${header}<th class="num">Combat</th><th class="num">Objective</th><th class="num">Teamwork</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  return `<div class="table-wrap effectiveness-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", effectivenessSortState)}${sortableHeaderHtml("Player", "player", effectivenessSortState)}${header}${sortableHeaderHtml("Combat", "combat", effectivenessSortState, { numeric: true })}${sortableHeaderHtml("Objective", "objective", effectivenessSortState, { numeric: true })}${sortableHeaderHtml("Teamwork", "teamwork", effectivenessSortState, { numeric: true })}</tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 function wireEffectivenessBreakdowns() {
@@ -1516,6 +1649,7 @@ function wireEffectivenessBreakdowns() {
 
 function renderEffectiveness(requestedKey) {
   const key = EFFECTIVENESS_KEYS.includes(requestedKey) ? requestedKey : "trident";
+  prepareSortState(effectivenessSortState, key);
   const calculation = state.effectiveness;
   if (!calculation?.rows?.length) {
     app.innerHTML = `<div class="error-box"><strong>Effectiveness data has not been published yet.</strong><br>The next tracker refresh will generate it.</div>`;
@@ -1538,6 +1672,7 @@ function renderEffectiveness(requestedKey) {
     <div class="ranking-heading"><h2>Full KDM ranking</h2><p>${ranking.length} tracked players &middot; rates and stabilized percentages, never lifetime-volume totals</p></div>
     ${effectivenessTableHtml(key, ranking)}`;
   wireEffectivenessBreakdowns();
+  wireSortableHeaders(effectivenessSortState);
 }
 
 /* ---------- router ---------- */
