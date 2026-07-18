@@ -624,9 +624,14 @@ tr.r3 .rank-cell { color: var(--bronze); }
 .players-heading-row,
 .activity-heading-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.players-heading-row .page-title,
+.activity-heading-row .page-title {
+  margin: 0;
 }
 
 .activity-toolbar { margin-bottom: 1.25rem; }
