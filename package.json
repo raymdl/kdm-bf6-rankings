@@ -1,0 +1,9 @@
+{
+  "name": "kdm-bf6-rankings",
+  "private": true,
+  "type": "module",
+  "description": "Static BF6 rankings site. No build step; package.json exists only so `node --test` can run the pure calculation modules.",
+  "scripts": {
+    "test": "node --test"
+  }
+}
