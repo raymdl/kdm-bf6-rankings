@@ -99,13 +99,19 @@ export function resolveRange(counters, rangeKey, customRange = null) {
     return window_(dates, 0, endIndex, { requested: "all", partialEnd });
   }
 
+  // Presets and custom starts that predate the first tracked column clamp to
+  // it rather than becoming unavailable — the user asked for Period, so show
+  // the tracked portion honestly (`clamped: true`; renderers surface it and
+  // per-member `tracked since` annotations cover late joiners). A range is
+  // truly unavailable only when fewer than two columns exist at all.
   const preset = /^(\d+)d$/.exec(rangeKey ?? "");
   if (preset) {
-    const startIndex = indexOnOrBefore(dates, shiftDate(dates[endIndex], -Number(preset[1])));
-    if (startIndex < 0 || startIndex >= endIndex) {
+    if (endIndex === 0) {
       return { unavailable: true, reason: "not_enough_history" };
     }
-    return window_(dates, startIndex, endIndex, { requested: rangeKey, partialEnd });
+    const target = indexOnOrBefore(dates, shiftDate(dates[endIndex], -Number(preset[1])));
+    const startIndex = Math.max(0, target);
+    return window_(dates, startIndex, endIndex, { requested: rangeKey, partialEnd, clamped: target < 0 });
   }
 
   if (rangeKey === "custom") {
@@ -113,14 +119,16 @@ export function resolveRange(counters, rangeKey, customRange = null) {
     if (!match || match[1] >= match[2]) {
       return { unavailable: true, reason: "invalid_custom_range" };
     }
-    const startIndex = indexOnOrBefore(dates, match[1]);
+    const target = indexOnOrBefore(dates, match[1]);
+    const startIndex = Math.max(0, target);
     const customEnd = indexOnOrBefore(dates, match[2]);
-    if (startIndex < 0 || customEnd <= startIndex) {
+    if (customEnd <= startIndex) {
       return { unavailable: true, reason: "not_enough_history" };
     }
     return window_(dates, startIndex, customEnd, {
       requested: customRange,
-      partialEnd: partialEnd && customEnd === endIndex
+      partialEnd: partialEnd && customEnd === endIndex,
+      clamped: target < 0
     });
   }
 

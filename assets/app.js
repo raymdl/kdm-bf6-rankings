@@ -11,7 +11,7 @@ import {
   periodSupported,
   resolveRange,
   validCounters
-} from "./period.js";
+} from "./period.js?v=20260718-career-period-3";
 
 const app = document.getElementById("app");
 
@@ -468,7 +468,8 @@ function periodWindowText(window) {
     return `Today so far · as of ${asOfEasternText(window.asOf)} ET`;
   }
   const label = RANGE_OPTIONS.find((option) => option.key === window.requested)?.label;
-  return `${label ? `${label} · ` : ""}${fmtShortDate(window.startDate)} → ${fmtShortDate(window.endDate)}${window.partialEnd ? " (in progress)" : ""}`;
+  const clampNote = window.clamped ? " · tracking began " + fmtShortDate(window.startDate) : "";
+  return `${label ? `${label} · ` : ""}${fmtShortDate(window.startDate)} → ${fmtShortDate(window.endDate)}${window.partialEnd ? " (in progress)" : ""}${clampNote}`;
 }
 
 function careerRangeWindowText() {
@@ -593,10 +594,10 @@ function wireViewRangeControl(hrefFor) {
 }
 
 function trackedSinceBadgeHtml(window, trackedSince) {
-  if (window?.requested !== "all" || !trackedSince || trackedSince === window.startDate) {
+  if (!window || !trackedSince || trackedSince === window.startDate) {
     return "";
   }
-  return ` <span class="badge tracked-since" title="This member's tracking began after the site-wide start; their All-Time window runs from their own first snapshot">tracked since ${esc(fmtShortDate(trackedSince))}</span>`;
+  return ` <span class="badge tracked-since" title="This member's tracking began after this range's start; their stats cover their own tracked portion of it">tracked since ${esc(fmtShortDate(trackedSince))}</span>`;
 }
 
 /* ---------- shared render pieces ---------- */

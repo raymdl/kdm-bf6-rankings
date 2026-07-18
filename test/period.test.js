@@ -99,18 +99,27 @@ function fixture(settled = true) {
 
 /* ---------- range resolution ---------- */
 
-test("preset ranges resolve by snapping to snapshots at or before the target", () => {
+test("preset ranges snap to snapshots and clamp to tracked history instead of failing", () => {
   const c = fixture();
-  for (const [key, expectedStart] of [["3d", "2026-07-14"], ["7d", "2026-07-10"], ["14d", null], ["30d", null]]) {
+  for (const [key, expectedStart, expectClamped] of [
+    ["3d", "2026-07-14", false],
+    ["7d", "2026-07-10", false],
+    ["14d", "2026-07-10", true],
+    ["30d", "2026-07-10", true]
+  ]) {
     const window = resolveRange(c, key);
-    if (expectedStart == null) {
-      assert.equal(window.unavailable, true, `${key} must be unavailable with 8 days of data`);
-      assert.equal(window.reason, "not_enough_history");
-    } else {
-      assert.equal(window.startDate, expectedStart, key);
-      assert.equal(window.endDate, "2026-07-17");
-    }
+    assert.equal(window.startDate, expectedStart, key);
+    assert.equal(window.endDate, "2026-07-17", key);
+    assert.equal(Boolean(window.clamped), expectClamped, `${key} clamped flag`);
   }
+  // Truly unavailable only with a single snapshot column.
+  const single = counters({ dates: ["2026-07-17"], members: {} });
+  assert.equal(resolveRange(single, "14d").reason, "not_enough_history");
+});
+
+test("custom ranges starting before tracking clamp with the flag set", () => {
+  const window = resolveRange(fixture(), "custom", "2026-06-01..2026-07-16");
+  assert.deepEqual([window.startDate, window.endDate, window.clamped], ["2026-07-10", "2026-07-16", true]);
 });
 
 test("today requires an unsettled current column and uses the prior column as baseline", () => {
