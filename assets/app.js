@@ -2,6 +2,16 @@
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
 import { effectivenessDefinitions } from "./effectiveness.js";
+import {
+  CUSTOM_RANGE_RE,
+  memberDailySeries,
+  memberPeriodDeltas,
+  memberPeriodStat,
+  periodRanking,
+  periodSupported,
+  resolveRange,
+  validCounters
+} from "./period.js";
 
 const app = document.getElementById("app");
 
@@ -13,7 +23,8 @@ const state = {
   audit: null,
   notifications: null,
   effectiveness: null,
-  effectivenessHistory: null
+  effectivenessHistory: null,
+  counters: null
 };
 
 let charts = [];
@@ -21,11 +32,11 @@ let floatingHeaderCleanups = [];
 let leaderboardSparklineRange = 14;
 
 const SPARKLINE_RANGES = [
-  { value: 1, label: "1 Day" },
+  { value: 1, label: "Today" },
+  { value: 3, label: "3 Days" },
   { value: 7, label: "7 Days" },
   { value: 14, label: "14 Days" },
   { value: 30, label: "30 Days" },
-  { value: 90, label: "90 Days" },
   { value: "all", label: "All Time" }
 ];
 const PLAYER_HISTORY_DEFAULT_RANGE = "all";
@@ -201,10 +212,11 @@ function memberBackfillFields(discordId) {
   return fields;
 }
 
-function playerHistoryHref(discordId, statKey, showEstimated, range = PLAYER_HISTORY_DEFAULT_RANGE) {
+function playerHistoryHref(discordId, statKey, showEstimated, range = PLAYER_HISTORY_DEFAULT_RANGE, view = null) {
   return hashRoute(`player/${encodeURIComponent(discordId)}/${statKey}`, {
     estimated: showEstimated ? 1 : null,
-    range
+    range,
+    view: view ?? (typeof viewRangeState !== "undefined" && viewRangeState.view === "period" ? "period" : null)
   });
 }
 
@@ -386,6 +398,221 @@ function shiftDateString(date, days) {
   const d = new Date(`${date}T12:00:00Z`);
   d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().slice(0, 10);
+}
+
+/* ---------- Career/Period view + range state (URL-only) ----------
+
+   Two independent controls (see BF6_CAREER_PERIOD_STATS_IMPLEMENTATION_PLAN.md):
+   - View: Career (lifetime values) vs Period (stats earned between two
+     counter snapshots, computed by assets/period.js).
+   - Range: the same options in both views. In Career view it only drives
+     movement/deltas/chart windows; in Period view it sets the calculation
+     endpoints.
+   State lives exclusively in the URL so shared links reproduce the sender's
+   exact view and a parameterless URL always opens Career. No storage. */
+
+const RANGE_OPTIONS = [
+  { key: "today", label: "Today" },
+  { key: "3d", label: "3 Days" },
+  { key: "7d", label: "7 Days" },
+  { key: "14d", label: "14 Days" },
+  { key: "30d", label: "30 Days" },
+  { key: "all", label: "All Time" }
+];
+const DEFAULT_RANGE = "14d";
+// Career view: how many trailing snapshot points each range covers.
+const CAREER_RANGE_POINTS = { today: 2, "3d": 3, "7d": 7, "14d": 14, "30d": 30, all: "all" };
+
+const viewRangeState = { view: "career", range: DEFAULT_RANGE, custom: null };
+
+function periodDataAvailable() {
+  return validCounters(state.counters) && state.counters.dates.length >= 2;
+}
+
+function loadViewRange(params) {
+  const requestedView = params?.get("view") === "period" ? "period" : "career";
+  viewRangeState.view = requestedView === "period" && periodDataAvailable() ? "period" : "career";
+  const raw = params?.get("range") ?? "";
+  if (CUSTOM_RANGE_RE.test(raw)) {
+    viewRangeState.range = "custom";
+    viewRangeState.custom = raw;
+  } else {
+    viewRangeState.range = RANGE_OPTIONS.some((option) => option.key === raw) ? raw : DEFAULT_RANGE;
+    viewRangeState.custom = null;
+  }
+}
+
+// Params to merge into every in-site navigation so the selection follows the
+// user; defaults are omitted so a clean URL stays clean.
+function viewRangeParams() {
+  const range = viewRangeState.range === "custom" ? viewRangeState.custom : viewRangeState.range;
+  return {
+    view: viewRangeState.view === "period" ? "period" : null,
+    range: viewRangeState.view === "career" && range === DEFAULT_RANGE ? null : range
+  };
+}
+
+function activePeriodWindow() {
+  if (viewRangeState.view !== "period" || !periodDataAvailable()) {
+    return null;
+  }
+  const window = resolveRange(
+    state.counters,
+    viewRangeState.range === "custom" ? "custom" : viewRangeState.range,
+    viewRangeState.custom
+  );
+  return window.unavailable ? null : window;
+}
+
+function fmtShortDate(date) {
+  return fmtDate(`${date}T12:00:00`);
+}
+
+function asOfEasternText(iso) {
+  return new Date(iso).toLocaleString("en-US", {
+    timeZone: "America/New_York",
+    hour: "numeric",
+    minute: "2-digit"
+  });
+}
+
+function periodWindowText(window) {
+  if (!window) {
+    return "";
+  }
+  if (window.requested === "today") {
+    return `Today so far · as of ${asOfEasternText(window.asOf)} ET`;
+  }
+  const label = RANGE_OPTIONS.find((option) => option.key === window.requested)?.label;
+  return `${label ? `${label} · ` : ""}${fmtShortDate(window.startDate)} → ${fmtShortDate(window.endDate)}${window.partialEnd ? " (in progress)" : ""}`;
+}
+
+function careerRangeWindowText() {
+  if (viewRangeState.range === "custom" && viewRangeState.custom) {
+    const [from, to] = viewRangeState.custom.split("..");
+    return `${fmtShortDate(from)} → ${fmtShortDate(to)}`;
+  }
+  return {
+    today: "the previous day",
+    "3d": "the last 3 days",
+    "7d": "the last 7 days",
+    "14d": "the last 14 days",
+    "30d": "the last 30 days",
+    all: "all snapshots"
+  }[viewRangeState.range] ?? "the selected range";
+}
+
+// Career view: the trailing slice of authoritative snapshot indexes the
+// selected range covers (custom ranges filter by date instead).
+function careerRangeIndexes(authoritativeIndexes) {
+  if (viewRangeState.range === "custom" && viewRangeState.custom) {
+    const [from, to] = viewRangeState.custom.split("..");
+    const filtered = authoritativeIndexes.filter(
+      (index) => state.history.dates[index] >= from && state.history.dates[index] <= to
+    );
+    return filtered.length >= 2 ? filtered : authoritativeIndexes.slice(-2);
+  }
+  const points = CAREER_RANGE_POINTS[viewRangeState.range] ?? 14;
+  return points === "all" ? authoritativeIndexes : authoritativeIndexes.slice(-points);
+}
+
+function rangeChipAvailability(key) {
+  if (viewRangeState.view !== "period") {
+    return { enabled: true, title: "" };
+  }
+  const window = resolveRange(state.counters, key);
+  if (!window.unavailable) {
+    return { enabled: true, title: "" };
+  }
+  const reasons = {
+    no_refresh_today: "Available after today's first refresh",
+    not_enough_history: `Needs more tracked history (daily counters start ${fmtShortDate(state.counters.dates[0])})`,
+    no_prior_baseline: "Needs a prior day's snapshot",
+    single_snapshot: "Needs at least two snapshots"
+  };
+  return { enabled: false, title: reasons[window.reason] ?? "Unavailable" };
+}
+
+function viewRangeControlHtml() {
+  if (!periodDataAvailable()) {
+    return "";
+  }
+  const dates = state.counters.dates;
+  const isCustom = viewRangeState.range === "custom";
+  const [customFrom, customTo] = isCustom && viewRangeState.custom
+    ? viewRangeState.custom.split("..")
+    : [dates[0], dates[dates.length - 1]];
+  return `<div class="view-range-bar">
+    <div class="view-range-group" role="group" aria-label="Stat view">
+      <span class="view-range-label">View</span>
+      <div class="view-toggle">
+        <button type="button" class="view-toggle-option ${viewRangeState.view === "career" ? "active" : ""}" data-view="career" title="Lifetime totals and ratios">Career</button>
+        <button type="button" class="view-toggle-option ${viewRangeState.view === "period" ? "active" : ""}" data-view="period" title="Stats earned during the selected range only">Period</button>
+      </div>
+    </div>
+    <div class="view-range-group" role="group" aria-label="Date range">
+      <span class="view-range-label">Range</span>
+      ${RANGE_OPTIONS.map((option) => {
+        const availability = rangeChipAvailability(option.key);
+        return `<button type="button" class="chip range-chip ${viewRangeState.range === option.key ? "active" : ""}" data-range="${option.key}" ${availability.enabled ? "" : "disabled"} title="${esc(availability.title)}">${option.label}</button>`;
+      }).join("")}
+      <button type="button" class="chip range-chip ${isCustom ? "active" : ""}" data-range="custom" title="Pick an exact date range">Custom…</button>
+      ${
+        isCustom
+          ? `<span class="range-picker">
+              <input type="date" id="range-start" min="${dates[0]}" max="${dates[dates.length - 1]}" value="${customFrom}" aria-label="Range start date">
+              <span aria-hidden="true">→</span>
+              <input type="date" id="range-end" min="${dates[0]}" max="${dates[dates.length - 1]}" value="${customTo}" aria-label="Range end date">
+              <button type="button" class="chip range-apply" id="range-apply">Apply</button>
+            </span>`
+          : ""
+      }
+    </div>
+  </div>`;
+}
+
+function wireViewRangeControl(hrefFor) {
+  const navigate = () => replaceHashAndRender(hrefFor(viewRangeParams()));
+  for (const button of app.querySelectorAll(".view-toggle-option[data-view]")) {
+    button.addEventListener("click", () => {
+      viewRangeState.view = button.dataset.view === "period" && periodDataAvailable() ? "period" : "career";
+      navigate();
+    });
+  }
+  for (const chip of app.querySelectorAll(".range-chip[data-range]")) {
+    chip.addEventListener("click", () => {
+      const key = chip.dataset.range;
+      if (key === "custom") {
+        if (viewRangeState.range !== "custom") {
+          const dates = state.counters?.dates ?? state.history.dates;
+          viewRangeState.range = "custom";
+          viewRangeState.custom = viewRangeState.custom ?? `${dates[Math.max(0, dates.length - 8)]}..${dates[dates.length - 1]}`;
+          navigate();
+        }
+        return;
+      }
+      viewRangeState.range = key;
+      viewRangeState.custom = null;
+      navigate();
+    });
+  }
+  document.getElementById("range-apply")?.addEventListener("click", () => {
+    const from = document.getElementById("range-start")?.value;
+    const to = document.getElementById("range-end")?.value;
+    if (!from || !to || from >= to) {
+      return;
+    }
+    viewRangeState.range = "custom";
+    viewRangeState.custom = `${from}..${to}`;
+    navigate();
+  });
+}
+
+function trackedSinceBadgeHtml(window, trackedSince) {
+  if (window?.requested !== "all" || !trackedSince || trackedSince === window.startDate) {
+    return "";
+  }
+  return ` <span class="badge tracked-since" title="This member's tracking began after the site-wide start; their All-Time window runs from their own first snapshot">tracked since ${esc(fmtShortDate(trackedSince))}</span>`;
 }
 
 /* ---------- shared render pieces ---------- */
@@ -630,21 +857,114 @@ function wireSortableHeaders(sortState) {
   }
 }
 
-function renderLeaderboard(statKey) {
+function leaderboardHrefFor(statKey) {
+  return (params) => hashRoute(`board/${statKey}`, params);
+}
+
+function activeTimeText(activeSeconds) {
+  if (!Number.isFinite(activeSeconds)) {
+    return "—";
+  }
+  const minutes = Math.round(activeSeconds / 60);
+  return minutes < 90 ? `${minutes} min` : `${(activeSeconds / 3600).toFixed(1)}h`;
+}
+
+function renderPeriodLeaderboard(stat, window) {
+  prepareSortState(leaderboardSortState, `period:${stat.key}:${window.startDate}:${window.endDate}`);
+  const { ranked, provisional, invalid } = periodRanking(state.counters, stat.key, window);
+
+  const podium = ranked.slice(0, 3);
+  const podiumHtml = podium.length
+    ? `<div class="podium">${podium
+        .map(
+          (row, index) => `<div class="podium-card p${index + 1}">
+            <div class="podium-rank">#${index + 1}${index === 0 ? " · TOP DOG" : ""}</div>
+            <div class="podium-name"><a class="player-link" href="${playerHref(row.discordId)}">${esc(memberName(row.discordId))}</a></div>
+            <div class="podium-value">${fmtStat(stat, row.value)} <span class="podium-stat-label">${esc(stat.title)}</span></div>
+            <div class="podium-delta">${esc(activeTimeText(row.activeSeconds))} played this period</div>
+          </div>`
+        )
+        .join("")}</div>`
+    : "";
+
+  const allRows = [
+    ...ranked.map((row) => ({ ...row, provisionalRow: false, originalRank: row.rank })),
+    ...provisional.map((row, index) => ({ ...row, provisionalRow: true, originalRank: ranked.length + index + 1 }))
+  ];
+  const sortedRanking = sortedRows(allRows, leaderboardSortState, (row, key) => ({
+    rank: row.originalRank,
+    player: memberName(row.discordId),
+    value: row.value,
+    time: row.activeSeconds
+  })[key]);
+  const bodyRows = sortedRanking
+    .map((row) => {
+      const spark = memberDailySeries(state.counters, row.discordId, stat.key, window).map((point) => point.value);
+      const carried = row.provenance?.startCarried || row.provenance?.endCarried;
+      return `<tr class="${row.provisionalRow ? "period-provisional" : `r${row.originalRank}`}">
+        <td class="rank-cell">${row.provisionalRow ? "–" : row.originalRank}</td>
+        <td><a class="player-link" href="${playerHref(row.discordId)}">${esc(memberName(row.discordId))}</a>${
+          row.provisionalRow
+            ? ` <span class="badge provisional" title="Under 15 active minutes in this range — too small a sample to rank">low time</span>`
+            : ""
+        }${trackedSinceBadgeHtml(window, row.trackedSince)}${
+          carried ? ` <span class="cached-marker" role="img" aria-label="Endpoint carried from an earlier snapshot" title="One endpoint was carried from this member's most recent earlier snapshot (they were missing from a refresh)">◷</span>` : ""
+        }</td>
+        <td class="num value-cell">${fmtStat(stat, row.value)}</td>
+        <td class="num">${esc(activeTimeText(row.activeSeconds))}</td>
+        <td>${sparklineSvg(spark)}</td>
+      </tr>`;
+    })
+    .join("");
+
+  const invalidNote = invalid.length
+    ? `<p class="cached-footnote">Not shown (counter reset or upstream correction in this range): ${invalid
+        .map((row) => esc(memberName(row.discordId)))
+        .join(", ")}.</p>`
+    : "";
+
+  app.innerHTML = `
+    <h1 class="page-title">${esc(stat.title)} Leaderboard <span class="period-title-tag">${esc(periodWindowText(window))}</span></h1>
+    ${viewRangeControlHtml()}
+    <p class="page-sub">Stats earned during this range only, from daily snapshot differences · rates need 15+ active minutes to rank · daily trend per player</p>
+    ${statTabsHtml(stat.key, (key) => hashRoute(`board/${key}`, viewRangeParams()))}
+    ${podiumHtml}
+    <div class="table-wrap">
+      <table>
+        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true })}<th>Daily trend</th></tr></thead>
+        <tbody>${bodyRows || `<tr><td colspan="5" class="empty">No gameplay recorded in this range.</td></tr>`}</tbody>
+      </table>
+    </div>
+    ${invalidNote}`;
+  wireViewRangeControl(leaderboardHrefFor(stat.key));
+  wireStatTabs();
+  wireSortableHeaders(leaderboardSortState);
+}
+
+function renderLeaderboard(statKey, params) {
+  loadViewRange(params);
   const stat = statByKey(statKey) ?? state.meta.stats[0];
+  const periodWindow = activePeriodWindow();
+  if (periodWindow && periodSupported(stat.key)) {
+    renderPeriodLeaderboard(stat, periodWindow);
+    return;
+  }
+  const periodNotice =
+    viewRangeState.view === "period" && !periodSupported(stat.key)
+      ? `<div class="period-unsupported-note" role="note">${esc(stat.title)} is a progression stat with no Period form — showing Career values.</div>`
+      : viewRangeState.view === "period" && !periodWindow
+        ? `<div class="period-unsupported-note" role="note">The selected range is not available yet — showing Career values.</div>`
+        : "";
   const ranking = latestRanking(stat.key);
   prepareSortState(leaderboardSortState, stat.key);
   const memberIds = Object.keys(state.history.members ?? {});
   const authoritativeIndexes = authoritativeHistoryIndexes(stat.key, memberIds);
   const lastIndex = authoritativeIndexes.at(-1) ?? -1;
-  // A one-day view means yesterday-to-today, so it needs two snapshot points.
-  const sparkPointCount = leaderboardSparklineRange === 1 ? 2 : leaderboardSparklineRange;
-  const sparkIndexes =
-    sparkPointCount === "all" ? authoritativeIndexes : authoritativeIndexes.slice(-sparkPointCount);
+  // In Career view the range only drives the movement/delta baseline and the
+  // sparkline window; the primary values stay lifetime Career values.
+  const sparkIndexes = careerRangeIndexes(authoritativeIndexes);
   const sparkStart = sparkIndexes[0] ?? lastIndex;
-  // Movement and deltas compare the current standings against the start of the
-  // same window the sparkline covers, so the selected range drives both.
-  const windowText = rangeWindowText(leaderboardSparklineRange);
+  const windowText = careerRangeWindowText();
   const baselineIndex = sparkStart;
   const prevRanking =
     baselineIndex >= 0 && baselineIndex < lastIndex
@@ -711,8 +1031,10 @@ function renderLeaderboard(statKey) {
 
   app.innerHTML = `
     <h1 class="page-title">${esc(stat.title)} Leaderboard</h1>
-    <p class="page-sub">Movement, deltas, and sparkline reflect ${sparklineRangeSelectHtml()} · comparing to ${windowText}</p>
-    ${statTabsHtml(stat.key, (key) => `/board/${key}`)}
+    ${viewRangeControlHtml()}
+    ${periodNotice}
+    <p class="page-sub">Lifetime Career values · movement, deltas, and sparkline compare to ${esc(windowText)}</p>
+    ${statTabsHtml(stat.key, (key) => hashRoute(`board/${key}`, viewRangeParams()))}
     ${podiumHtml}
     <div class="table-wrap">
       <table>
@@ -721,12 +1043,14 @@ function renderLeaderboard(statKey) {
       </table>
     </div>
     ${cachedFootnoteHtml(ranking.some((row) => row.member?.cachedStats))}`;
+  wireViewRangeControl(leaderboardHrefFor(stat.key));
   wireStatTabs();
-  wireSparklineRange();
   wireSortableHeaders(leaderboardSortState);
 }
 
-function renderPlayers() {
+function renderPlayers(params) {
+  loadViewRange(params);
+  const periodWindow = activePeriodWindow();
   const kd = statByKey("infantryKillDeath") ?? state.meta.stats[0];
   const playerKpm = statByKey("playerKillsPerMinute");
   const kills = statByKey("kills");
@@ -741,14 +1065,30 @@ function renderPlayers() {
       .filter(Boolean)
       .join(" ")
       .toLocaleLowerCase();
+  const cardStat = (member, stat) => {
+    if (!periodWindow) {
+      return { value: member.stats[stat.key], title: "" };
+    }
+    const period = memberPeriodStat(state.counters, member.discordId, stat.key, periodWindow);
+    if (period.invalid) {
+      const titles = {
+        no_data: "No snapshot coverage for this member in this range",
+        negative_delta: "Counter reset detected in this range",
+        career_only: "Career-only stat"
+      };
+      return { value: null, title: titles[period.reason] ?? "Unavailable" };
+    }
+    return { value: period.value, title: period.value == null ? "No gameplay recorded in this range" : "" };
+  };
 
   app.innerHTML = `
     <div class="players-toolbar"><div>
-    <h1 class="page-title">Players</h1>
-    <p class="page-sub">${sorted.length} linked member(s) · click a player for full history</p>
+    <h1 class="page-title">Players${periodWindow ? ` <span class="period-title-tag">${esc(periodWindowText(periodWindow))}</span>` : ""}</h1>
+    <p class="page-sub">${sorted.length} linked member(s) · click a player for full history${periodWindow ? " · card stats are for this range only" : ""}</p>
       </div>
       <label class="player-search"><span class="sr-only">Search players</span><input id="player-search" type="search" placeholder="Search players" autocomplete="off"></label>
     </div>
+    ${viewRangeControlHtml()}
     <div class="player-grid">${sorted
       .map(
         (member) => `<a class="player-card" data-player-search="${esc(playerSearchText(member))}" href="${playerHref(member.discordId)}">
@@ -757,15 +1097,20 @@ function renderPlayers() {
           }</div>
           <div class="player-card-sub">${esc(member.profileName ?? member.eaName ?? "")}</div>
           <div class="player-card-stats">
-            <div class="mini-stat"><div class="k">${esc(kd.label)}</div><div class="v">${fmtStat(kd, member.stats[kd.key])}</div></div>
-            ${playerKpm ? `<div class="mini-stat"><div class="k">Player KPM</div><div class="v">${fmtStat(playerKpm, member.stats[playerKpm.key])}</div></div>` : ""}
-            ${kills ? `<div class="mini-stat"><div class="k">${esc(kills.label)}</div><div class="v">${fmtStat(kills, member.stats[kills.key])}</div></div>` : ""}
+            ${[[kd, kd.label], playerKpm ? [playerKpm, "Player KPM"] : null, kills ? [kills, kills.label] : null]
+              .filter(Boolean)
+              .map(([stat, label]) => {
+                const card = cardStat(member, stat);
+                return `<div class="mini-stat"${card.title ? ` title="${esc(card.title)}"` : ""}><div class="k">${esc(label)}</div><div class="v">${fmtStat(stat, card.value)}</div></div>`;
+              })
+              .join("")}
           </div>
         </a>`
       )
       .join("")}</div>
     <p id="player-search-empty" class="empty" hidden>No players match that search.</p>
     ${cachedFootnoteHtml(sorted.some((member) => member.cachedStats))}`;
+  wireViewRangeControl((params) => hashRoute("players", params));
 
   const search = document.getElementById("player-search");
   const empty = document.getElementById("player-search-empty");
@@ -794,6 +1139,8 @@ function renderPlayer(discordId, statKey, params) {
   const dates = state.history.dates;
   const lastIndex = dates.length - 1;
   const showEstimated = params?.get("estimated") === "1";
+  const playerView = params?.get("view") === "period" && periodDataAvailable() ? "period" : "career";
+  viewRangeState.view = playerView;
   const historyRange = normalizedRange(params?.get("range"), PLAYER_HISTORY_DEFAULT_RANGE);
   const backfillFields = memberBackfillFields(discordId);
   const pointCount = historyRange === 1 ? 2 : historyRange;
@@ -871,9 +1218,10 @@ function renderPlayer(discordId, statKey, params) {
       </div>
     </div>
     ${showEstimated ? estimatedHistoryNoticeHtml(discordId) : ""}
+    ${recentFormCardHtml(discordId, member)}
     <div class="stat-summary-grid">${summaries}</div>
     <div class="chart-card">
-      <h3>${esc(stat.title)} over time</h3>
+      <h3>${esc(stat.title)} ${params?.get("view") === "period" && periodSupported(stat.key) ? "· daily Period form (yellow = carried snapshot)" : "over time"}</h3>
       <div class="chart-box"><canvas id="player-chart"></canvas></div>
     </div>
     ${auditHtml}
@@ -892,7 +1240,24 @@ function renderPlayer(discordId, statKey, params) {
     replaceHashAndRender(playerHistoryHref(discordId, stat.key, !showEstimated, historyRange));
   });
 
-  if (dates.length > 0) {
+  const periodChartWindow =
+    playerView === "period" && periodSupported(stat.key)
+      ? (() => {
+          const key = historyRange === "all" ? "all" : historyRange === 1 ? "today" : `${historyRange}d`;
+          let window = resolveRange(state.counters, key);
+          if (window.unavailable && key === "today") window = resolveRange(state.counters, "3d");
+          return window.unavailable ? null : window;
+        })()
+      : null;
+  if (periodChartWindow) {
+    const points = memberDailySeries(state.counters, discordId, stat.key, periodChartWindow);
+    lineChart(
+      document.getElementById("player-chart"),
+      points.map((point) => point.date),
+      [{ label: name, data: points.map((point) => point.value), estimated: points.map((point) => !point.observedEnd) }],
+      stat
+    );
+  } else if (dates.length > 0) {
     const fullSeries = series(discordId, stat.key);
     let firstVisible = rangeStart;
     while (firstVisible < dates.length) {
@@ -916,7 +1281,72 @@ function renderPlayer(discordId, statKey, params) {
   }
 }
 
-const compareState = { selected: [], statKey: null, selectionMode: "default", range: 14 };
+// Career vs recent-window performance, side by side. This is the direct answer
+// to "am I improving?" — career ratios barely move once thousands of hours are
+// banked, while these columns show what the player actually did lately.
+// Career vs recent-window performance, side by side (Task 5). This is the
+// direct answer to "am I improving?" — career ratios barely move once
+// thousands of hours are banked, while these columns show what the player
+// actually did lately. Columns render only for ranges the data supports.
+function recentFormCardHtml(discordId, member) {
+  if (!periodDataAvailable() || !state.counters.members?.[discordId]) {
+    return "";
+  }
+  const columns = ["today", "3d", "7d", "14d", "30d", "all"]
+    .map((key) => ({ key, window: resolveRange(state.counters, key) }))
+    .filter((column) => !column.window.unavailable);
+  if (!columns.length) {
+    return "";
+  }
+  const labels = { today: "Today", "3d": "3 days", "7d": "7 days", "14d": "14 days", "30d": "30 days", all: "All tracked" };
+  const decimal = { format: "decimal", decimals: 2 };
+  const integer = { format: "integer" };
+  const hours = { format: "hours" };
+  const lastIndex = state.counters.dates.length - 1;
+  const careerDeathsSeries = state.counters.members[discordId].values?.deaths ?? [];
+  let careerDeaths = null;
+  for (let i = lastIndex; i >= 0; i -= 1) {
+    if (Number.isFinite(careerDeathsSeries[i])) {
+      careerDeaths = careerDeathsSeries[i];
+      break;
+    }
+  }
+  const rows = [
+    { label: "Player K/D", stat: decimal, career: member?.stats?.infantryKillDeath, statKey: "infantryKillDeath" },
+    { label: "Player KPM", stat: decimal, career: member?.stats?.playerKillsPerMinute, statKey: "playerKillsPerMinute" },
+    { label: "Player Kills", stat: integer, career: member?.stats?.kills, statKey: "kills" },
+    { label: "Deaths", stat: integer, career: careerDeaths, counterKey: "deaths" },
+    { label: "Active Time", stat: hours, career: member?.stats?.timePlayedHours, statKey: "timePlayedHours" }
+  ];
+  const windowValue = (row, window) => {
+    if (row.counterKey) {
+      const resolved = memberPeriodDeltas(state.counters, discordId, window);
+      return resolved.invalid ? null : resolved.deltas[row.counterKey] ?? null;
+    }
+    const stat = memberPeriodStat(state.counters, discordId, row.statKey, window);
+    return stat.invalid ? null : stat.value;
+  };
+  return `<div class="chart-card recent-form-card">
+    <h3>Recent form</h3>
+    <div class="table-wrap"><table class="recent-form-table">
+      <thead><tr><th></th><th class="num">Career</th>${columns
+        .map((column) => `<th class="num">${labels[column.key]}${column.window.partialEnd ? "*" : ""}</th>`)
+        .join("")}</tr></thead>
+      <tbody>${rows
+        .map(
+          (row) => `<tr><td>${esc(row.label)}</td><td class="num">${fmtStat(row.stat, row.career)}</td>${columns
+            .map((column) => `<td class="num value-cell">${fmtStat(row.stat, windowValue(row, column.window))}</td>`)
+            .join("")}</tr>`
+        )
+        .join("")}</tbody>
+    </table></div>
+    <p class="cached-footnote">Range columns are performance during that window only, from daily snapshot differences.${
+      columns.some((column) => column.window.partialEnd) ? " * includes today so far." : ""
+    } “—” means no coverage yet or nothing derivable (e.g. zero deaths).</p>
+  </div>`;
+}
+
+const compareState = { selected: [], statKey: null, selectionMode: "default" };
 
 function normalizedRange(value, fallback = 14) {
   if (value === "all") {
@@ -929,21 +1359,20 @@ function normalizedRange(value, fallback = 14) {
 function compareHref(
   statKey = compareState.statKey,
   selected = compareState.selected,
-  range = compareState.range,
   selectionMode = compareState.selectionMode
 ) {
   return hashRoute("compare", {
     stat: statKey,
     players: selectionMode === "manual" ? selected : null,
-    range
+    ...viewRangeParams()
   });
 }
 
 function loadCompareState(params) {
+  loadViewRange(params);
   const stat = statByKey(params.get("stat")) ?? state.meta.stats[0];
   const candidateIds = new Set(state.latest.members.map((member) => member.discordId));
   compareState.statKey = stat.key;
-  compareState.range = normalizedRange(params.get("range"), 14);
   if (params.has("players")) {
     compareState.selectionMode = "manual";
     compareState.selected = [...new Set((params.get("players") ?? "").split(",").filter((id) => candidateIds.has(id)))];
@@ -953,13 +1382,7 @@ function loadCompareState(params) {
   }
 }
 
-function compareRangeSelectHtml() {
-  return `<label class="sparkline-range-select">
-    <select id="compare-range-select" aria-label="Comparison date range">${SPARKLINE_RANGES.map(
-      (range) => `<option value="${range.value}" ${range.value === compareState.range ? "selected" : ""}>${range.label}</option>`
-    ).join("")}</select>
-  </label>`;
-}
+
 
 function compareHistoryWindow(statKey) {
   const dates = state.history.dates;
@@ -977,8 +1400,13 @@ function compareHistoryWindow(statKey) {
     lastDataIndex -= 1;
   }
 
-  const pointCount = compareState.range === 1 ? 2 : compareState.range;
-  const start = pointCount === "all" ? firstDataIndex : Math.max(firstDataIndex, lastDataIndex - pointCount + 1);
+  const pointCount = CAREER_RANGE_POINTS[viewRangeState.range] ?? 14;
+  const start =
+    viewRangeState.range === "custom" && viewRangeState.custom
+      ? Math.max(firstDataIndex, dates.findIndex((date) => date >= viewRangeState.custom.split("..")[0]))
+      : pointCount === "all"
+        ? firstDataIndex
+        : Math.max(firstDataIndex, lastDataIndex - pointCount + 1);
   const end = lastDataIndex + 1;
   return {
     labels: dates.slice(start, end),
@@ -1001,9 +1429,17 @@ function renderCompare() {
   }
   history.replaceState(null, "", compareHref());
 
+  const periodWindow = activePeriodWindow();
+  const periodMode = Boolean(periodWindow && periodSupported(stat.key));
   app.innerHTML = `
-    <div class="page-heading-row"><h1 class="page-title">Head to Head</h1>${shareButtonHtml()}</div>
-    <p class="page-sub">Pick players and a stat to overlay their daily history · showing ${compareRangeSelectHtml()} · comparing to ${rangeWindowText(compareState.range)}</p>
+    <div class="page-heading-row"><h1 class="page-title">Head to Head${periodMode ? ` <span class="period-title-tag">${esc(periodWindowText(periodWindow))}</span>` : ""}</h1>${shareButtonHtml()}</div>
+    ${viewRangeControlHtml()}
+    ${viewRangeState.view === "period" && !periodSupported(stat.key) ? `<div class="period-unsupported-note" role="note">${esc(stat.title)} is a progression stat with no Period form — showing Career history.</div>` : ""}
+    <p class="page-sub">${
+      periodMode
+        ? "Overlaying each player's day-by-day Period form inside the selected range · gaps are days without gameplay · yellow points are carried (member missing from that refresh)"
+        : `Pick players and a stat to overlay their daily Career history · comparing to ${esc(careerRangeWindowText())}`
+    }</p>
     <div class="group-label">Stat</div>
     ${statTabsHtml(stat.key)}
     <div class="group-label compare-players-label"><span>Players</span><button class="compare-clear" type="button" ${compareState.selected.length === 0 ? "disabled" : ""}>Unselect all</button></div>
@@ -1019,11 +1455,7 @@ function renderCompare() {
     </div>`;
 
   wireStatTabs((key) => replaceHashAndRender(compareHref(key)));
-  const rangeSelect = document.getElementById("compare-range-select");
-  rangeSelect?.addEventListener("change", () => {
-    compareState.range = normalizedRange(rangeSelect.value, 14);
-    replaceHashAndRender(compareHref());
-  });
+  wireViewRangeControl(() => compareHref());
   app.querySelector(".compare-clear")?.addEventListener("click", () => {
     compareState.selectionMode = "manual";
     compareState.selected = [];
@@ -1043,7 +1475,22 @@ function renderCompare() {
     });
   }
 
-  if (state.history.dates.length > 0 && compareState.selected.length > 0) {
+  if (periodMode && compareState.selected.length > 0) {
+    const labels = state.counters.dates.slice(periodWindow.startIndex + 1, periodWindow.endIndex + 1);
+    lineChart(
+      document.getElementById("compare-chart"),
+      labels,
+      compareState.selected.map((id) => {
+        const points = memberDailySeries(state.counters, id, stat.key, periodWindow);
+        return {
+          label: memberName(id),
+          data: points.map((point) => point.value),
+          estimated: points.map((point) => !point.observedEnd)
+        };
+      }),
+      stat
+    );
+  } else if (state.history.dates.length > 0 && compareState.selected.length > 0) {
     const window = compareHistoryWindow(stat.key);
     lineChart(
       document.getElementById("compare-chart"),
@@ -1688,10 +2135,10 @@ function render() {
 
   let nav = "board";
   if (!route || route === "board") {
-    renderLeaderboard(parts[1] ?? state.meta.stats[0].key);
+    renderLeaderboard(parts[1] ?? state.meta.stats[0].key, params);
   } else if (route === "players") {
     nav = "players";
-    renderPlayers();
+    renderPlayers(params);
   } else if (route === "player") {
     nav = "players";
     renderPlayer(decodeURIComponent(parts[1] ?? ""), parts[2], params);
@@ -1713,7 +2160,7 @@ function render() {
     nav = "effectiveness";
     renderEffectiveness(parts[1]);
   } else {
-    renderLeaderboard(state.meta.stats[0].key);
+    renderLeaderboard(state.meta.stats[0].key, params);
   }
 
   for (const link of document.querySelectorAll("#site-nav a")) {
@@ -1738,14 +2185,15 @@ async function fetchJson(path, fallback) {
 }
 
 async function boot() {
-  const [meta, latest, history, historyProvenanceData, audit, notifications, effectivenessHistory] = await Promise.all([
+  const [meta, latest, history, historyProvenanceData, audit, notifications, effectivenessHistory, counters] = await Promise.all([
     fetchJson("data/meta.json", null),
     fetchJson("data/latest.json", { members: [] }),
     fetchJson("data/history.json", { dates: [], members: {} }),
     fetchJson("data/history-provenance.json", null),
     fetchJson("data/audit.json", { events: [] }),
     fetchJson("data/notifications.json", { events: [] }),
-    fetchJson("data/effectiveness-history.json", null)
+    fetchJson("data/effectiveness-history.json", null),
+    fetchJson("data/counters.json", null)
   ]);
 
   if (!meta) {
@@ -1767,7 +2215,8 @@ async function boot() {
     audit,
     notifications,
     effectiveness,
-    effectivenessHistory: compatibleEffectiveness
+    effectivenessHistory: compatibleEffectiveness,
+    counters: counters?.dates && counters?.members ? counters : null
   });
 
   const updated = document.getElementById("footer-updated");

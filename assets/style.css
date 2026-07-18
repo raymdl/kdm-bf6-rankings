@@ -1515,3 +1515,144 @@ tr.r3 .rank-cell { color: var(--bronze); }
     height: 240px;
   }
 }
+
+/* ---------- Career/Period view + range controls ---------- */
+
+.view-range-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1.4rem;
+  margin: 0 0 1rem;
+  padding: 0.6rem 0.8rem;
+  background: var(--bg-raise);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.view-range-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.view-range-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-right: 2px;
+}
+
+.view-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.view-toggle-option {
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font: 600 0.85rem var(--font-body);
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.view-toggle-option.active {
+  background: var(--accent);
+  color: #0d0f12;
+}
+
+.view-toggle-option:focus-visible,
+.range-chip:focus-visible,
+.range-apply:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.range-chip[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.range-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-dim);
+}
+
+.range-picker input[type="date"] {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font: 500 0.8rem var(--font-body);
+  padding: 4px 6px;
+  color-scheme: dark;
+}
+
+.period-title-tag {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.7rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font: 600 0.78rem var(--font-body);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.period-unsupported-note {
+  margin: 0 0 1rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 0;
+  background: var(--bg-raise);
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+tr.period-provisional {
+  opacity: 0.55;
+}
+
+.badge.provisional {
+  background: rgba(251, 191, 36, 0.16);
+  color: var(--gold);
+}
+
+.badge.tracked-since {
+  background: rgba(122, 184, 255, 0.14);
+  color: var(--silver);
+  white-space: nowrap;
+}
+
+.recent-form-card .table-wrap {
+  margin: 0;
+}
+
+.recent-form-table td:first-child {
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.recent-form-table .value-cell {
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  .view-range-bar {
+    gap: 0.5rem 0.9rem;
+    padding: 0.55rem 0.6rem;
+  }
+  .range-picker {
+    width: 100%;
+  }
+}
