@@ -3,7 +3,6 @@
 
 import { effectivenessDefinitions } from "./effectiveness.js";
 import {
-  CUSTOM_RANGE_RE,
   memberDailySeries,
   memberPeriodDeltas,
   memberPeriodStat,
@@ -11,7 +10,19 @@ import {
   periodSupported,
   resolveRange,
   validCounters
-} from "./period.js?v=20260718-career-period-3";
+} from "./period.js?v=20260718-career-period-18";
+import {
+  CUSTOM_RANGE_RE,
+  DEFAULT_RANGE,
+  RANGE_OPTIONS,
+  hashRoute,
+  normalizedViewRange,
+  parseHashRoute,
+  playerProfileRoute,
+  resolveCareerWindow,
+  validateCustomRange,
+  viewRangeParams as serializedViewRangeParams
+} from "./view-state.js?v=20260718-career-period-18";
 
 const app = document.getElementById("app");
 
@@ -164,6 +175,22 @@ function memberName(discordId) {
   return latest?.displayName ?? state.history.members?.[discordId]?.name ?? `Member ${discordId}`;
 }
 
+function memberTrackedSince(discordId) {
+  const counterValues = state.counters?.members?.[discordId]?.values ?? {};
+  const counterSeries = Object.values(counterValues);
+  const counterIndex = (state.counters?.dates ?? []).findIndex((_, index) =>
+    counterSeries.some((values) => Number.isFinite(values?.[index]))
+  );
+  if (counterIndex >= 0) return state.counters.dates[counterIndex];
+
+  const historyValues = state.history.members?.[discordId]?.values ?? {};
+  const historySeries = Object.entries(historyValues);
+  const historyIndex = state.history.dates.findIndex((date, index) =>
+    historySeries.some(([statKey, values]) => Number.isFinite(values?.[index]) && !historyProvenance(discordId, date, statKey))
+  );
+  return historyIndex >= 0 ? state.history.dates[historyIndex] : null;
+}
+
 function historyProvenance(discordId, date, statKey = null) {
   const entry = state.historyProvenance?.members?.[discordId];
   const dateEntry = entry?.dates?.[date];
@@ -201,38 +228,16 @@ function memberBackfillFields(discordId) {
   return fields;
 }
 
-function playerHistoryHref(discordId, statKey, showEstimated, range = "all", view = null) {
-  return hashRoute(`player/${encodeURIComponent(discordId)}/${statKey}`, {
-    estimated: showEstimated ? 1 : null,
-    range: range === "all" ? null : range,
-    view: view ?? (typeof viewRangeState !== "undefined" && viewRangeState.view === "period" ? "period" : null)
-  });
+function playerHistoryHref(discordId, statKey, showEstimated) {
+  return playerProfileRoute(discordId, statKey, viewRangeState, { estimated: showEstimated });
 }
 
-function playerHref(discordId) {
-  return `#/player/${encodeURIComponent(discordId)}`;
-}
-
-function hashRoute(route, params = {}) {
-  const query = new URLSearchParams();
-  for (const [key, value] of Object.entries(params)) {
-    if (value !== null && value !== undefined) {
-      query.set(key, Array.isArray(value) ? value.join(",") : String(value));
-    }
-  }
-  const suffix = query.toString();
-  return `#/${route}${suffix ? `?${suffix}` : ""}`;
+function playerHref(discordId, statKey = state.meta.stats[0].key) {
+  return playerProfileRoute(discordId, statKey, viewRangeState);
 }
 
 function parsedHashRoute() {
-  const raw = location.hash.replace(/^#\/?/, "");
-  const question = raw.indexOf("?");
-  const path = question >= 0 ? raw.slice(0, question) : raw;
-  const query = question >= 0 ? raw.slice(question + 1) : "";
-  return {
-    parts: path.split("/").filter(Boolean),
-    params: new URLSearchParams(query)
-  };
+  return parseHashRoute(location.hash);
 }
 
 function replaceHashAndRender(hash, { preserveScroll = true } = {}) {
@@ -327,13 +332,19 @@ function authoritativeBaselineValueAt(discordId, statKey, fromIndex, lastIndex) 
   return null;
 }
 
-function authoritativeHistoryIndexes(statKey = null, memberIds = Object.keys(state.history.members ?? {})) {
+function authoritativeHistoryIndexes(
+  statKey = null,
+  memberIds = Object.keys(state.history.members ?? {}),
+  { includeEstimated = false } = {}
+) {
   return state.history.dates
     .map((date, index) =>
       memberIds.some((discordId) => {
         const values = state.history.members?.[discordId]?.values ?? {};
         const statKeys = statKey ? [statKey] : Object.keys(values);
-        return statKeys.some((key) => Number.isFinite(values[key]?.[index]) && !historyProvenance(discordId, date, key));
+        return statKeys.some(
+          (key) => Number.isFinite(values[key]?.[index]) && (includeEstimated || !historyProvenance(discordId, date, key))
+        );
       })
         ? index
         : -1
@@ -392,48 +403,32 @@ function shiftDateString(date, days) {
    State lives exclusively in the URL so shared links reproduce the sender's
    exact view and a parameterless URL always opens Career. No storage. */
 
-const RANGE_OPTIONS = [
-  { key: "today", label: "Today" },
-  { key: "3d", label: "3 Days" },
-  { key: "7d", label: "7 Days" },
-  { key: "14d", label: "14 Days" },
-  { key: "30d", label: "30 Days" },
-  { key: "all", label: "All Time" }
-];
-const DEFAULT_RANGE = "14d";
-// Career view: how many trailing snapshot points each range covers.
-const CAREER_RANGE_POINTS = { today: 2, "3d": 3, "7d": 7, "14d": 14, "30d": 30, all: "all" };
-
 const viewRangeState = { view: "career", range: DEFAULT_RANGE, custom: null };
+let lastRenderedRoutePath = null;
+const RECENT_PERFORMANCE_STORAGE_KEY = "kdm-recent-performance-collapsed";
+let recentPerformanceCollapsed = (() => {
+  try {
+    return localStorage.getItem(RECENT_PERFORMANCE_STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+})();
 
 function periodDataAvailable() {
   return validCounters(state.counters) && state.counters.dates.length >= 2;
 }
 
-const LEGACY_RANGE_KEYS = { 1: "today", 3: "3d", 7: "7d", 14: "14d", 30: "30d", 90: "30d" };
-
 function loadViewRange(params, defaultRange = DEFAULT_RANGE) {
-  const requestedView = params?.get("view") === "period" ? "period" : "career";
-  viewRangeState.view = requestedView === "period" && periodDataAvailable() ? "period" : "career";
-  const raw = params?.get("range") ?? "";
-  const normalized = LEGACY_RANGE_KEYS[Number(raw)] ?? raw;
-  if (CUSTOM_RANGE_RE.test(normalized)) {
-    viewRangeState.range = "custom";
-    viewRangeState.custom = normalized;
-  } else {
-    viewRangeState.range = RANGE_OPTIONS.some((option) => option.key === normalized) ? normalized : defaultRange;
-    viewRangeState.custom = null;
-  }
+  Object.assign(viewRangeState, normalizedViewRange(params, {
+    periodAvailable: periodDataAvailable(),
+    defaultRange
+  }));
 }
 
 // Params to merge into every in-site navigation so the selection follows the
 // user; defaults are omitted so a clean URL stays clean.
 function viewRangeParams() {
-  const range = viewRangeState.range === "custom" ? viewRangeState.custom : viewRangeState.range;
-  return {
-    view: viewRangeState.view === "period" ? "period" : null,
-    range: viewRangeState.view === "career" && range === DEFAULT_RANGE ? null : range
-  };
+  return serializedViewRangeParams(viewRangeState);
 }
 
 function activePeriodWindow() {
@@ -465,40 +460,32 @@ function periodWindowText(window) {
     return "";
   }
   if (window.requested === "today") {
-    return `Today so far · as of ${asOfEasternText(window.asOf)} ET`;
+    return `Today's performance · as of ${asOfEasternText(window.asOf)} ET`;
   }
-  const label = RANGE_OPTIONS.find((option) => option.key === window.requested)?.label;
+  const label = RANGE_OPTIONS.find((option) => option.key === window.requested)?.label
+    ?? (window.requested === "custom" ? "Custom" : "Period");
+  // Preset Period values are daily intervals after the baseline snapshot.
+  // Label the dates the chart/table actually shows (e.g. a 3-day window has
+  // points for Jul 15–17 even though Jul 14 is the subtraction baseline).
+  const displayStartDate = /^\d+d$/.test(window.requested ?? "")
+    ? shiftDateString(window.startDate, 1)
+    : window.startDate;
   const clampNote = window.clamped ? " · tracking began " + fmtShortDate(window.startDate) : "";
-  return `${label ? `${label} · ` : ""}${fmtShortDate(window.startDate)} → ${fmtShortDate(window.endDate)}${window.partialEnd ? " (in progress)" : ""}${clampNote}`;
+  return `${label} · performance ${fmtShortDate(displayStartDate)} → ${fmtShortDate(window.endDate)}${window.partialEnd ? " (in progress)" : ""}${clampNote}`;
 }
 
-function careerRangeWindowText() {
-  if (viewRangeState.range === "custom" && viewRangeState.custom) {
-    const [from, to] = viewRangeState.custom.split("..");
-    return `${fmtShortDate(from)} → ${fmtShortDate(to)}`;
+function careerRangeWindowText(window, { includeLabel = false, includeClamp = true } = {}) {
+  if (!window || window.unavailable) return "the selected range";
+  const clampNote = includeClamp && window.clamped ? ` · tracking began ${fmtShortDate(window.startDate)}` : "";
+  const dateRange = `${fmtShortDate(window.startDate)} → ${fmtShortDate(window.endDate)}`;
+  if (!includeLabel) return `${dateRange}${clampNote}`;
+  if (window.requested === "today") {
+    return `Current career · change since ${fmtShortDate(window.startDate)}`;
   }
-  return {
-    today: "the previous day",
-    "3d": "the last 3 days",
-    "7d": "the last 7 days",
-    "14d": "the last 14 days",
-    "30d": "the last 30 days",
-    all: "all snapshots"
-  }[viewRangeState.range] ?? "the selected range";
-}
-
-// Career view: the trailing slice of authoritative snapshot indexes the
-// selected range covers (custom ranges filter by date instead).
-function careerRangeIndexes(authoritativeIndexes) {
-  if (viewRangeState.range === "custom" && viewRangeState.custom) {
-    const [from, to] = viewRangeState.custom.split("..");
-    const filtered = authoritativeIndexes.filter(
-      (index) => state.history.dates[index] >= from && state.history.dates[index] <= to
-    );
-    return filtered.length >= 2 ? filtered : authoritativeIndexes.slice(-2);
+  if (window.requested === "all") {
+    return `Current career · change since tracking began ${fmtShortDate(window.startDate)}`;
   }
-  const points = CAREER_RANGE_POINTS[viewRangeState.range] ?? 14;
-  return points === "all" ? authoritativeIndexes : authoritativeIndexes.slice(-points);
+  return `Current career · change ${dateRange}${clampNote}`;
 }
 
 function rangeChipAvailability(key) {
@@ -518,15 +505,94 @@ function rangeChipAvailability(key) {
   return { enabled: false, title: reasons[window.reason] ?? "Unavailable" };
 }
 
+const customCalendarState = { open: false, from: null, to: null, selecting: "from", month: null };
+
+function monthKey(date) {
+  return String(date ?? "").slice(0, 7);
+}
+
+function shiftMonth(month, amount) {
+  const date = new Date(`${month}-01T12:00:00Z`);
+  date.setUTCMonth(date.getUTCMonth() + amount);
+  return date.toISOString().slice(0, 7);
+}
+
+function calendarDate(year, month, day) {
+  return new Date(Date.UTC(year, month, day, 12)).toISOString().slice(0, 10);
+}
+
+function openCustomCalendar(dates) {
+  Object.assign(customCalendarState, {
+    open: true,
+    from: null,
+    to: null,
+    selecting: "from",
+    month: monthKey(dates.at(-1))
+  });
+}
+
+function rangeCalendarHtml(dates) {
+  if (!customCalendarState.open) return "";
+  const minDate = dates[0];
+  const maxDate = dates.at(-1);
+  const minMonth = monthKey(minDate);
+  const maxMonth = monthKey(maxDate);
+  const month = customCalendarState.month && customCalendarState.month >= minMonth && customCalendarState.month <= maxMonth
+    ? customCalendarState.month
+    : minMonth;
+  customCalendarState.month = month;
+  const [year, monthNumber] = month.split("-").map(Number);
+  const monthIndex = monthNumber - 1;
+  const firstWeekday = new Date(Date.UTC(year, monthIndex, 1, 12)).getUTCDay();
+  const daysInMonth = new Date(Date.UTC(year, monthIndex + 1, 0, 12)).getUTCDate();
+  const validation = validateCustomRange(customCalendarState.from, customCalendarState.to, minDate, maxDate);
+  const availableDates = new Set(dates);
+  const dayCells = [];
+  for (let blank = 0; blank < firstWeekday; blank += 1) dayCells.push('<span class="calendar-day-spacer"></span>');
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const date = calendarDate(year, monthIndex, day);
+    const noData = date < minDate || date > maxDate || !availableDates.has(date);
+    const blockedByEnd = customCalendarState.selecting === "from" && customCalendarState.to && date >= customCalendarState.to;
+    const blockedByStart = customCalendarState.selecting === "to" && customCalendarState.from && date <= customCalendarState.from;
+    const selectionBlocked = !noData && (blockedByEnd || blockedByStart);
+    const disabled = noData || selectionBlocked;
+    const classes = ["calendar-day"];
+    if (noData) classes.push("no-data");
+    if (selectionBlocked) classes.push("selection-blocked");
+    if (date === customCalendarState.from) classes.push("range-start");
+    if (date === customCalendarState.to) classes.push("range-end");
+    if (customCalendarState.from && customCalendarState.to && date > customCalendarState.from && date < customCalendarState.to) classes.push("in-range");
+    dayCells.push(`<button type="button" class="${classes.join(" ")}" data-calendar-date="${date}" ${disabled ? "disabled" : ""} aria-label="${esc(fmtShortDate(date))}">${day}</button>`);
+  }
+  const monthLabel = new Date(Date.UTC(year, monthIndex, 1, 12)).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+  return `<div class="range-calendar-popover" role="dialog" aria-label="Choose custom date range">
+    <div class="range-calendar-fields">
+      <button type="button" class="calendar-field ${customCalendarState.selecting === "from" ? "active" : ""}" data-calendar-field="from"><span>From</span><strong>${customCalendarState.from ? esc(fmtShortDate(customCalendarState.from)) : "Choose date"}</strong></button>
+      <span class="calendar-range-arrow" aria-hidden="true">→</span>
+      <button type="button" class="calendar-field ${customCalendarState.selecting === "to" ? "active" : ""}" data-calendar-field="to"><span>To</span><strong>${customCalendarState.to ? esc(fmtShortDate(customCalendarState.to)) : "Choose date"}</strong></button>
+    </div>
+    <div class="calendar-range-track" aria-hidden="true"><span></span></div>
+    <div class="range-calendar-month-head">
+      <button type="button" class="calendar-month-nav" data-month-shift="-1" ${month <= minMonth ? "disabled" : ""} aria-label="Previous month">‹</button>
+      <strong>${esc(monthLabel)}</strong>
+      <button type="button" class="calendar-month-nav" data-month-shift="1" ${month >= maxMonth ? "disabled" : ""} aria-label="Next month">›</button>
+    </div>
+    <div class="calendar-weekdays" aria-hidden="true">${["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => `<span>${day}</span>`).join("")}</div>
+    <div class="calendar-grid">${dayCells.join("")}</div>
+    <div class="range-calendar-actions">
+      <button type="button" class="chip" id="range-calendar-cancel">Cancel</button>
+      <button type="button" class="chip calendar-reset" id="range-calendar-reset">Reset</button>
+      <button type="button" class="chip range-apply" id="range-apply" ${validation.valid ? "" : "disabled"}>Apply range</button>
+    </div>
+  </div>`;
+}
+
 function viewRangeControlHtml() {
   if (!periodDataAvailable()) {
     return "";
   }
   const dates = state.counters.dates;
   const isCustom = viewRangeState.range === "custom";
-  const [customFrom, customTo] = isCustom && viewRangeState.custom
-    ? viewRangeState.custom.split("..")
-    : [dates[0], dates[dates.length - 1]];
   return `<div class="view-range-bar">
     <div class="view-range-group" role="group" aria-label="Stat view">
       <span class="view-range-label">View</span>
@@ -536,30 +602,22 @@ function viewRangeControlHtml() {
       </div>
     </div>
     <div class="view-range-group" role="group" aria-label="Date range">
-      <span class="view-range-label">Range</span>
+      <span class="view-range-label">${viewRangeState.view === "period" ? "Performance window" : "Change window"}</span>
       ${RANGE_OPTIONS.map((option) => {
         const availability = rangeChipAvailability(option.key);
         return `<button type="button" class="chip range-chip ${viewRangeState.range === option.key ? "active" : ""}" data-range="${option.key}" ${availability.enabled ? "" : "disabled"} title="${esc(availability.title)}">${option.label}</button>`;
       }).join("")}
-      <button type="button" class="chip range-chip ${isCustom ? "active" : ""}" data-range="custom" title="Pick an exact date range">Custom…</button>
-      ${
-        isCustom
-          ? `<span class="range-picker">
-              <input type="date" id="range-start" min="${dates[0]}" max="${dates[dates.length - 1]}" value="${customFrom}" aria-label="Range start date">
-              <span aria-hidden="true">→</span>
-              <input type="date" id="range-end" min="${dates[0]}" max="${dates[dates.length - 1]}" value="${customTo}" aria-label="Range end date">
-              <button type="button" class="chip range-apply" id="range-apply">Apply</button>
-            </span>`
-          : ""
-      }
+      <span class="range-calendar-anchor"><button type="button" class="chip range-chip ${isCustom ? "active" : ""}" data-range="custom" title="Pick an exact date range" aria-expanded="${customCalendarState.open}">Custom…</button>${rangeCalendarHtml(dates)}</span>
     </div>
   </div>`;
 }
 
 function wireViewRangeControl(hrefFor) {
   const navigate = () => replaceHashAndRender(hrefFor(viewRangeParams()));
+  const rerender = () => replaceHashAndRender(location.hash);
   for (const button of app.querySelectorAll(".view-toggle-option[data-view]")) {
     button.addEventListener("click", () => {
+      customCalendarState.open = false;
       viewRangeState.view = button.dataset.view === "period" && periodDataAvailable() ? "period" : "career";
       navigate();
     });
@@ -568,36 +626,90 @@ function wireViewRangeControl(hrefFor) {
     chip.addEventListener("click", () => {
       const key = chip.dataset.range;
       if (key === "custom") {
-        if (viewRangeState.range !== "custom") {
-          const dates = state.counters?.dates ?? state.history.dates;
-          viewRangeState.range = "custom";
-          viewRangeState.custom = viewRangeState.custom ?? `${dates[Math.max(0, dates.length - 8)]}..${dates[dates.length - 1]}`;
-          navigate();
-        }
+        openCustomCalendar(state.counters?.dates ?? state.history.dates);
+        rerender();
         return;
       }
+      customCalendarState.open = false;
       viewRangeState.range = key;
       viewRangeState.custom = null;
       navigate();
     });
   }
+  for (const field of app.querySelectorAll("[data-calendar-field]")) {
+    field.addEventListener("click", () => {
+      customCalendarState.selecting = field.dataset.calendarField;
+      rerender();
+    });
+  }
+  for (const button of app.querySelectorAll("[data-month-shift]")) {
+    button.addEventListener("click", () => {
+      customCalendarState.month = shiftMonth(customCalendarState.month, Number(button.dataset.monthShift));
+      rerender();
+    });
+  }
+  for (const day of app.querySelectorAll("[data-calendar-date]")) {
+    day.addEventListener("click", () => {
+      const date = day.dataset.calendarDate;
+      if (customCalendarState.selecting === "from") {
+        customCalendarState.from = date;
+        customCalendarState.to = null;
+        customCalendarState.selecting = "to";
+      } else if (customCalendarState.selecting === "to") {
+        customCalendarState.to = date;
+        customCalendarState.selecting = "done";
+      } else {
+        customCalendarState.from = date;
+        customCalendarState.to = null;
+        customCalendarState.selecting = "to";
+      }
+      rerender();
+    });
+  }
+  document.getElementById("range-calendar-cancel")?.addEventListener("click", () => {
+    customCalendarState.open = false;
+    rerender();
+  });
+  document.getElementById("range-calendar-reset")?.addEventListener("click", () => {
+    customCalendarState.from = null;
+    customCalendarState.to = null;
+    customCalendarState.selecting = "from";
+    rerender();
+  });
   document.getElementById("range-apply")?.addEventListener("click", () => {
-    const from = document.getElementById("range-start")?.value;
-    const to = document.getElementById("range-end")?.value;
-    if (!from || !to || from >= to) {
-      return;
-    }
+    const dates = state.counters?.dates ?? state.history.dates;
+    const from = customCalendarState.from;
+    const to = customCalendarState.to;
+    if (!validateCustomRange(from, to, dates[0], dates.at(-1)).valid) return;
+    customCalendarState.open = false;
     viewRangeState.range = "custom";
     viewRangeState.custom = `${from}..${to}`;
     navigate();
   });
 }
 
+document.addEventListener("click", (event) => {
+  if (!customCalendarState.open || event.target.closest?.(".range-calendar-anchor")) return;
+  customCalendarState.open = false;
+  replaceHashAndRender(location.hash);
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape" || !customCalendarState.open) return;
+  customCalendarState.open = false;
+  replaceHashAndRender(location.hash);
+});
+
 function trackedSinceBadgeHtml(window, trackedSince) {
   if (!window || !trackedSince || trackedSince === window.startDate) {
     return "";
   }
   return ` <span class="badge tracked-since" title="This member's tracking began after this range's start; their stats cover their own tracked portion of it">tracked since ${esc(fmtShortDate(trackedSince))}</span>`;
+}
+
+function timeMachineTrackedSinceBadgeHtml(trackedSince) {
+  if (!trackedSince) return `<span class="badge tracked-since">not tracked yet</span>`;
+  return `<span class="badge tracked-since" title="This player's first authoritative GameTools snapshot">tracked since ${esc(fmtShortDate(trackedSince))}</span>`;
 }
 
 /* ---------- shared render pieces ---------- */
@@ -632,8 +744,11 @@ function sparklineSvg(values, width = 110, height = 28) {
 // Human-readable description of the selected date range, used consistently for
 // the leaderboard/compare sub-headings, movement tooltips, and podium deltas.
 function movementHtml(prevRank, currentRank, windowText = "the previous day") {
-  if (prevRank == null) {
+  if (prevRank == null && currentRank != null) {
     return `<span class="movement flat" title="New to this leaderboard">NEW</span>`;
+  }
+  if (prevRank == null || currentRank == null) {
+    return `<span class="movement flat" title="No comparable rank at both endpoints">–</span>`;
   }
   const diff = prevRank - currentRank;
   if (diff > 0) {
@@ -712,7 +827,10 @@ function lineChart(canvas, labels, datasets, stat) {
               : color
           },
           spanGaps: true,
-          tension: 0.25
+          // Monotone cubic interpolation softens corners without overshooting
+          // the observed values; equal adjacent points remain truly flat.
+          cubicInterpolationMode: "monotone",
+          tension: 0.22
         };
       })
     },
@@ -836,7 +954,7 @@ function renderPeriodLeaderboard(stat, window) {
         .map(
           (row, index) => `<div class="podium-card p${index + 1}">
             <div class="podium-rank">#${index + 1}${index === 0 ? " · TOP DOG" : ""}</div>
-            <div class="podium-name"><a class="player-link" href="${playerHref(row.discordId)}">${esc(memberName(row.discordId))}</a></div>
+            <div class="podium-name"><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a></div>
             <div class="podium-value">${fmtStat(stat, row.value)} <span class="podium-stat-label">${esc(stat.title)}</span></div>
             <div class="podium-delta">${esc(activeTimeText(row.activeSeconds))} played this period</div>
           </div>`
@@ -860,7 +978,7 @@ function renderPeriodLeaderboard(stat, window) {
       const carried = row.provenance?.startCarried || row.provenance?.endCarried;
       return `<tr class="${row.provisionalRow ? "period-provisional" : `r${row.originalRank}`}">
         <td class="rank-cell">${row.provisionalRow ? "–" : row.originalRank}</td>
-        <td><a class="player-link" href="${playerHref(row.discordId)}">${esc(memberName(row.discordId))}</a>${
+        <td><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${
           row.provisionalRow
             ? ` <span class="badge provisional" title="Under 15 active minutes in this range — too small a sample to rank">low time</span>`
             : ""
@@ -882,8 +1000,8 @@ function renderPeriodLeaderboard(stat, window) {
 
   app.innerHTML = `
     <h1 class="page-title">${esc(stat.title)} Leaderboard <span class="period-title-tag">${esc(periodWindowText(window))}</span></h1>
-    ${viewRangeControlHtml()}
     <p class="page-sub">Stats earned during this range only, from daily snapshot differences · rates need 15+ active minutes to rank · daily trend per player</p>
+    ${viewRangeControlHtml()}
     ${statTabsHtml(stat.key, (key) => hashRoute(`board/${key}`, viewRangeParams()))}
     ${podiumHtml}
     <div class="table-wrap">
@@ -919,27 +1037,42 @@ function renderLeaderboard(statKey, params) {
   const lastIndex = authoritativeIndexes.at(-1) ?? -1;
   // In Career view the range only drives the movement/delta baseline and the
   // sparkline window; the primary values stay lifetime Career values.
-  const sparkIndexes = careerRangeIndexes(authoritativeIndexes);
+  const careerWindow = resolveCareerWindow(
+    state.history.dates,
+    authoritativeIndexes,
+    viewRangeState.range,
+    viewRangeState.custom
+  );
+  const sparkIndexes = careerWindow.unavailable ? authoritativeIndexes.slice(-2) : careerWindow.indexes;
   const sparkStart = sparkIndexes[0] ?? lastIndex;
-  const windowText = careerRangeWindowText();
+  const comparisonEndIndex = sparkIndexes.at(-1) ?? lastIndex;
+  const windowText = careerRangeWindowText(careerWindow);
+  const podiumWindowText = careerRangeWindowText(careerWindow, { includeClamp: false });
   const baselineIndex = sparkStart;
   const prevRanking =
-    baselineIndex >= 0 && baselineIndex < lastIndex
-      ? authoritativeBaselineRankingAt(stat.key, baselineIndex, lastIndex, memberIds)
+    baselineIndex >= 0 && baselineIndex < comparisonEndIndex
+      ? authoritativeBaselineRankingAt(stat.key, baselineIndex, comparisonEndIndex, memberIds)
       : [];
+  const endRanking = comparisonEndIndex === lastIndex
+    ? ranking
+    : authoritativeRankingAt(stat.key, comparisonEndIndex, memberIds);
   const prevRankById = new Map(prevRanking.map((row, index) => [row.discordId, index + 1]));
   const prevValueById = new Map(prevRanking.map((row) => [row.discordId, row.value]));
+  const endRankById = new Map(endRanking.map((row, index) => [row.discordId, index + 1]));
+  const endValueById = new Map(endRanking.map((row) => [row.discordId, row.value]));
 
   const podium = ranking.slice(0, 3);
   const podiumHtml = podium.length
     ? `<div class="podium">${podium
         .map((row, index) => {
-          const delta = fmtDelta(stat, row.value - (prevValueById.get(row.discordId) ?? NaN));
+          const deltaValue = (endValueById.get(row.discordId) ?? NaN) - (prevValueById.get(row.discordId) ?? NaN);
+          const delta = fmtDelta(stat, deltaValue);
+          const deltaClass = Number.isFinite(deltaValue) ? (deltaValue > 0 ? "up" : deltaValue < 0 ? "down" : "flat") : "";
           return `<div class="podium-card p${index + 1}">
             <div class="podium-rank">#${index + 1}${index === 0 ? " · TOP DOG" : ""}</div>
-            <div class="podium-name"><a class="player-link" href="${playerHistoryHref(row.discordId, stat.key, false, "all")}">${esc(memberName(row.discordId))}</a></div>
+            <div class="podium-name"><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a></div>
             <div class="podium-value">${fmtStat(stat, row.value)} <span class="podium-stat-label">${esc(stat.title)}</span></div>
-            <div class="podium-delta">${delta ? `${delta} vs ${windowText}` : "&nbsp;"}</div>
+            <div class="podium-delta">${delta ? `<span class="podium-delta-value ${deltaClass}">${delta}</span> <span class="podium-delta-context">vs ${podiumWindowText}</span>` : "&nbsp;"}</div>
           </div>`;
         })
         .join("")}</div>`
@@ -949,11 +1082,13 @@ function renderLeaderboard(statKey, params) {
     const rank = index + 1;
     const prevRank = prevRankById.get(row.discordId) ?? null;
     const prevValue = prevValueById.get(row.discordId);
+    const endRank = endRankById.get(row.discordId) ?? null;
+    const endValue = endValueById.get(row.discordId);
     return {
       ...row,
       originalRank: rank,
-      movement: prevRank === null ? null : prevRank - rank,
-      change: Number.isFinite(prevValue) ? row.value - prevValue : null
+      movement: prevRank === null || endRank === null ? null : prevRank - endRank,
+      change: Number.isFinite(prevValue) && Number.isFinite(endValue) ? endValue - prevValue : null
     };
   });
   const sortedRanking = sortedRows(sortableRanking, leaderboardSortState, (row, key) => ({
@@ -968,8 +1103,10 @@ function renderLeaderboard(statKey, params) {
       const rank = row.originalRank;
       const prevRank = prevRankById.get(row.discordId) ?? null;
       const prevValue = prevValueById.get(row.discordId);
-      const delta = fmtDelta(stat, row.value - (prevValue ?? NaN));
-      const deltaClass = delta ? (row.value > prevValue ? "up" : "down") : "flat";
+      const endRank = endRankById.get(row.discordId) ?? null;
+      const endValue = endValueById.get(row.discordId);
+      const delta = fmtDelta(stat, (endValue ?? NaN) - (prevValue ?? NaN));
+      const deltaClass = delta ? (endValue > prevValue ? "up" : "down") : "flat";
       const values = series(row.discordId, stat.key);
       const spark = sparkIndexes.map((historyIndex) =>
         historyProvenance(row.discordId, state.history.dates[historyIndex], stat.key) ? null : values[historyIndex]
@@ -977,8 +1114,8 @@ function renderLeaderboard(statKey, params) {
       const cached = row.member?.cachedStats ? cachedMarkerHtml() : "";
       return `<tr class="r${rank}">
         <td class="rank-cell">${rank}</td>
-        <td>${movementHtml(prevRank, rank, windowText)}</td>
-        <td><a class="player-link" href="${playerHistoryHref(row.discordId, stat.key, false, "all")}">${esc(memberName(row.discordId))}</a>${cached}</td>
+        <td>${movementHtml(prevRank, endRank, windowText)}</td>
+        <td><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${cached}</td>
         <td class="num value-cell">${fmtStat(stat, row.value)}</td>
         <td class="num"><span class="delta ${deltaClass}">${delta ?? "–"}</span></td>
         <td>${sparklineSvg(spark)}</td>
@@ -987,10 +1124,10 @@ function renderLeaderboard(statKey, params) {
     .join("");
 
   app.innerHTML = `
-    <h1 class="page-title">${esc(stat.title)} Leaderboard</h1>
-    ${viewRangeControlHtml()}
+    <h1 class="page-title">${esc(stat.title)} Leaderboard <span class="period-title-tag career-title-tag">${esc(careerRangeWindowText(careerWindow, { includeLabel: true }))}</span></h1>
     ${periodNotice}
-    <p class="page-sub">Lifetime Career values · movement, deltas, and sparkline compare to ${esc(windowText)}</p>
+    <p class="page-sub">Current Career values · movement, deltas, and sparkline show change over ${esc(windowText)}</p>
+    ${viewRangeControlHtml()}
     ${statTabsHtml(stat.key, (key) => hashRoute(`board/${key}`, viewRangeParams()))}
     ${podiumHtml}
     <div class="table-wrap">
@@ -1039,16 +1176,17 @@ function renderPlayers(params) {
   };
 
   app.innerHTML = `
-    <div class="players-toolbar"><div>
-    <h1 class="page-title">Players${periodWindow ? ` <span class="period-title-tag">${esc(periodWindowText(periodWindow))}</span>` : ""}</h1>
-    <p class="page-sub">${sorted.length} linked member(s) · click a player for full history${periodWindow ? " · card stats are for this range only" : ""}</p>
-      </div>
+    <div class="players-toolbar">
+      <div class="players-heading-row">
+        <h1 class="page-title">Players${periodWindow ? ` <span class="period-title-tag">${esc(periodWindowText(periodWindow))}</span>` : ""}</h1>
       <label class="player-search"><span class="sr-only">Search players</span><input id="player-search" type="search" placeholder="Search players" autocomplete="off"></label>
+      </div>
+      <p class="page-sub">${sorted.length} linked member(s) · click a player for full history${periodWindow ? " · card stats are for this performance window only" : " · cards show current Career values; the selected change window carries into profiles"}</p>
     </div>
     ${viewRangeControlHtml()}
     <div class="player-grid">${sorted
       .map(
-        (member) => `<a class="player-card" data-player-search="${esc(playerSearchText(member))}" href="${playerHref(member.discordId)}">
+        (member) => `<a class="player-card" data-player-search="${esc(playerSearchText(member))}" href="${playerHref(member.discordId, kd.key)}">
           <div class="player-card-name"><span title="${esc(member.displayName ?? member.discordId)}">${esc(member.displayName ?? member.discordId)}</span>${platformIconHtml(member.platform)}${
             member.cachedStats ? cachedMarkerHtml() : ""
           }</div>
@@ -1099,24 +1237,33 @@ function renderPlayer(discordId, statKey, params) {
   loadViewRange(params, "all");
   const periodWindow = activePeriodWindow();
   const backfillFields = memberBackfillFields(discordId);
-  const careerPoints = CAREER_RANGE_POINTS[viewRangeState.range] ?? "all";
-  const rangeStart =
-    viewRangeState.range === "custom" && viewRangeState.custom
-      ? Math.max(0, dates.findIndex((date) => date >= viewRangeState.custom.split("..")[0]))
-      : careerPoints === "all"
-        ? 0
-        : Math.max(0, dates.length - careerPoints);
-  const deltaRangeLabel =
-    RANGE_OPTIONS.find((option) => option.key === viewRangeState.range)?.label.toLowerCase() ??
-    careerRangeWindowText();
+  const playerHistoryIndexes = authoritativeHistoryIndexes(null, [discordId], { includeEstimated: showEstimated });
+  const careerWindow = resolveCareerWindow(
+    dates,
+    playerHistoryIndexes,
+    viewRangeState.range,
+    viewRangeState.custom
+  );
+  const rangeStart = careerWindow.unavailable ? Math.max(0, lastIndex - 1) : careerWindow.startIndex;
+  const rangeEnd = careerWindow.unavailable ? lastIndex : careerWindow.endIndex;
+  const deltaRangeLabel = careerRangeWindowText(careerWindow);
 
   const baselineForRange = (statKeyToRead) => {
     const values = series(discordId, statKeyToRead);
-    for (let index = rangeStart; index < lastIndex; index += 1) {
+    for (let index = rangeStart; index < rangeEnd; index += 1) {
       const estimated = Boolean(historyProvenance(discordId, dates[index], statKeyToRead));
       if (Number.isFinite(values[index]) && (showEstimated || !estimated)) {
         return values[index];
       }
+    }
+    return null;
+  };
+
+  const endForRange = (statKeyToRead) => {
+    const values = series(discordId, statKeyToRead);
+    for (let index = Math.min(rangeEnd, values.length - 1); index >= rangeStart; index -= 1) {
+      const estimated = Boolean(historyProvenance(discordId, dates[index], statKeyToRead));
+      if (Number.isFinite(values[index]) && (showEstimated || !estimated)) return values[index];
     }
     return null;
   };
@@ -1155,15 +1302,16 @@ function renderPlayer(discordId, statKey, params) {
     const ranking = latestRanking(candidate.key);
     const rankIndex = ranking.findIndex((row) => row.discordId === discordId);
     const baseline = baselineForRange(candidate.key);
-    const delta = Number.isFinite(current) && Number.isFinite(baseline) ? fmtDelta(candidate, current - baseline) : null;
-    const deltaClass = delta ? (current > baseline ? "up" : "down") : "flat";
+    const rangeEndValue = endForRange(candidate.key);
+    const delta = Number.isFinite(rangeEndValue) && Number.isFinite(baseline) ? fmtDelta(candidate, rangeEndValue - baseline) : null;
+    const deltaClass = delta ? (rangeEndValue > baseline ? "up" : "down") : "flat";
     const hasBackfill = backfillFields.has(candidate.key);
     return `<div class="stat-summary ${candidate.key === stat.key ? "active" : ""}" data-stat="${candidate.key}">
       <div class="stat-summary-head"><div class="k">${esc(candidate.title)}</div>${showEstimated && hasBackfill ? backfillMarkerHtml() : ""}</div>
       <div class="v">${fmtStat(candidate, current)}</div>
-      <div class="m">${rankIndex >= 0 ? `Rank #${rankIndex + 1} of ${ranking.length}` : "Unranked"}${
-        delta ? ` · <span class="delta ${deltaClass}">${delta}</span> ${deltaRangeLabel}` : ""
-      }</div>
+      <div class="m"><span>${rankIndex >= 0 ? `Rank #${rankIndex + 1} of ${ranking.length}` : "Unranked"}${
+        delta ? ` · <span class="delta ${deltaClass}">${delta}</span>` : ""
+      }</span>${delta ? `<span class="stat-summary-range">${esc(deltaRangeLabel)}</span>` : ""}</div>
     </div>`;
   };
 
@@ -1185,25 +1333,27 @@ function renderPlayer(discordId, statKey, params) {
     typeof member?.trackerUrl === "string" && /^https:\/\/tracker\.gg\/bf6\/profile\/\d+\/overview$/.test(member.trackerUrl)
       ? member.trackerUrl
       : null;
-  const profileSubParts = [
+  const profileIdentityParts = [
     member?.profileName ? `Profile <strong>${esc(member.profileName)}</strong>` : "",
     member?.eaName ? `EA <span class="mono">${esc(member.eaName)}</span>` : "",
     platformLabel(member?.platform) ? `Platform <strong>${esc(platformLabel(member.platform))}</strong>` : "",
-    member?.personaId ? `Persona ID <span class="mono">${esc(member.personaId)}</span>` : "",
-    member?.nucleusId ? `Nucleus ID <span class="mono">${esc(member.nucleusId)}</span>` : "",
-    member?.gameToolsUrl ? `<a href="${esc(member.gameToolsUrl)}" target="_blank" rel="noopener">GameTools profile ↗</a>` : "",
-    trackerUrl ? `<a href="${esc(trackerUrl)}" target="_blank" rel="noopener noreferrer">Tracker.gg profile ↗</a>` : "",
+    member?.personaId ? `<span class="profile-id-field">Persona ID <span class="mono">${esc(member.personaId)}</span></span>` : "",
+    member?.nucleusId ? `<span class="profile-id-field">Nucleus ID <span class="mono">${esc(member.nucleusId)}</span></span>` : "",
     !member ? `<span class="badge unlinked">no longer linked</span>` : ""
+  ].filter(Boolean);
+  const profileLinkParts = [
+    member?.gameToolsUrl ? `<a href="${esc(member.gameToolsUrl)}" target="_blank" rel="noopener">GameTools profile ↗</a>` : "",
+    trackerUrl ? `<a href="${esc(trackerUrl)}" target="_blank" rel="noopener noreferrer">Tracker.gg profile ↗</a>` : ""
   ].filter(Boolean);
 
   app.innerHTML = `
     <div class="player-profile-top">
       <div class="player-profile-identity">
         <div class="profile-head">
-          <h1 class="page-title">${esc(name)}${periodWindow ? ` <span class="period-title-tag">${esc(periodWindowText(periodWindow))}</span>` : ""}</h1>
+          <h1 class="page-title">${esc(name)} <span class="period-title-tag ${periodWindow ? "" : "career-title-tag"}">${esc(periodWindow ? periodWindowText(periodWindow) : careerRangeWindowText(careerWindow, { includeLabel: true }))}</span></h1>
           ${member?.cachedStats ? cachedMarkerHtml() : ""}
         </div>
-        <p class="profile-sub">${profileSubParts.join(" · ")}</p>
+        <p class="profile-sub"><span class="profile-identity-row">${profileIdentityParts.join(" · ")}</span>${profileLinkParts.length ? `<span class="profile-links-row">${profileLinkParts.join(" · ")}</span>` : ""}</p>
       </div>
       <div class="player-history-controls">
         ${!periodWindow && backfillFields.size > 0 ? `<button class="tracker-history-toggle ${showEstimated ? "active" : ""}" id="tracker-history-toggle" type="button" aria-pressed="${showEstimated}">${showEstimated ? "Hide Backfill" : "Show Backfill"}</button>` : ""}
@@ -1221,10 +1371,9 @@ function renderPlayer(discordId, statKey, params) {
     ${auditHtml}
     ${cachedFootnoteHtml(Boolean(member?.cachedStats))}`;
 
-  const currentRangeKey = viewRangeState.range === "custom" ? viewRangeState.custom : viewRangeState.range;
   for (const card of app.querySelectorAll(".stat-summary")) {
     card.addEventListener("click", () => {
-      location.hash = playerHistoryHref(discordId, card.dataset.stat, showEstimated, currentRangeKey);
+      location.hash = playerHistoryHref(discordId, card.dataset.stat, showEstimated);
     });
   }
 
@@ -1235,7 +1384,22 @@ function renderPlayer(discordId, statKey, params) {
     })
   );
   document.getElementById("tracker-history-toggle")?.addEventListener("click", () => {
-    replaceHashAndRender(playerHistoryHref(discordId, stat.key, !showEstimated, currentRangeKey));
+    if (!showEstimated) {
+      viewRangeState.view = "career";
+      viewRangeState.range = "all";
+      viewRangeState.custom = null;
+    }
+    replaceHashAndRender(playerHistoryHref(discordId, stat.key, !showEstimated));
+  });
+  const recentPerformanceCard = app.querySelector(".recent-form-card");
+  recentPerformanceCard?.addEventListener("toggle", () => {
+    recentPerformanceCollapsed = !recentPerformanceCard.open;
+    try {
+      localStorage.setItem(RECENT_PERFORMANCE_STORAGE_KEY, String(recentPerformanceCollapsed));
+    } catch {
+      // Storage may be unavailable in privacy-restricted browsers; the
+      // in-memory preference still survives normal SPA navigation.
+    }
   });
 
   const periodChartWindow = periodWindow && periodSupported(stat.key) ? periodWindow : null;
@@ -1258,9 +1422,9 @@ function renderPlayer(discordId, statKey, params) {
       }
       firstVisible += 1;
     }
-    const chartDates = dates.slice(firstVisible);
+    const chartDates = dates.slice(firstVisible, rangeEnd + 1);
     const chartData = fullSeries
-      .slice(firstVisible)
+      .slice(firstVisible, rangeEnd + 1)
       .map((value, index) => (showEstimated || !historyProvenance(discordId, chartDates[index], stat.key) ? value : null));
     lineChart(
       document.getElementById("player-chart"),
@@ -1284,7 +1448,7 @@ function recentFormCardHtml(discordId, member) {
   }
   const columns = ["today", "3d", "7d", "14d", "30d", "all"]
     .map((key) => ({ key, window: resolveRange(state.counters, key) }))
-    .filter((column) => !column.window.unavailable);
+    .filter((column) => column.key === "today" || !column.window.unavailable);
   if (!columns.length) {
     return "";
   }
@@ -1309,6 +1473,7 @@ function recentFormCardHtml(discordId, member) {
     { label: "Active Time", stat: hours, career: member?.stats?.timePlayedHours, statKey: "timePlayedHours" }
   ];
   const windowValue = (row, window) => {
+    if (window.unavailable) return null;
     if (row.counterKey) {
       const resolved = memberPeriodDeltas(state.counters, discordId, window);
       return resolved.invalid ? null : resolved.deltas[row.counterKey] ?? null;
@@ -1316,24 +1481,29 @@ function recentFormCardHtml(discordId, member) {
     const stat = memberPeriodStat(state.counters, discordId, row.statKey, window);
     return stat.invalid ? null : stat.value;
   };
-  return `<div class="chart-card recent-form-card">
-    <h3>Recent form</h3>
+  return `<details class="chart-card recent-form-card" ${recentPerformanceCollapsed ? "" : "open"}>
+    <summary class="recent-form-summary">
+      <h3>Recent Performance Snapshot</h3>
+      <span class="recent-form-toggle" aria-hidden="true"><span class="when-open">[–]</span><span class="when-closed">[+]</span></span>
+    </summary>
+    <div class="recent-form-content">
     <div class="table-wrap"><table class="recent-form-table">
-      <thead><tr><th></th><th class="num">Career</th>${columns
-        .map((column) => `<th class="num">${labels[column.key]}${column.window.partialEnd ? "*" : ""}</th>`)
-        .join("")}</tr></thead>
+      <thead><tr><th></th>${columns
+        .map((column) => `<th class="num period-column ${column.key === "today" ? "today-column" : ""}">${labels[column.key]}${column.window.partialEnd ? "*" : ""}<small>Period</small></th>`)
+        .join("")}<th class="num career-column">Lifetime<small>Career</small></th></tr></thead>
       <tbody>${rows
         .map(
-          (row) => `<tr><td>${esc(row.label)}</td><td class="num">${fmtStat(row.stat, row.career)}</td>${columns
-            .map((column) => `<td class="num value-cell">${fmtStat(row.stat, windowValue(row, column.window))}</td>`)
-            .join("")}</tr>`
+          (row) => `<tr><td>${esc(row.label)}</td>${columns
+            .map((column) => `<td class="num value-cell period-column ${column.key === "today" ? "today-column" : ""}"${column.window.unavailable ? ` title="Available after today's first refresh"` : ""}>${fmtStat(row.stat, windowValue(row, column.window))}</td>`)
+            .join("")}<td class="num career-column">${fmtStat(row.stat, row.career)}</td></tr>`
         )
         .join("")}</tbody>
     </table></div>
-    <p class="cached-footnote">Range columns are performance during that window only, from daily snapshot differences.${
+    <p class="cached-footnote">Career is the current lifetime total. Period columns are performance during that window only, from daily snapshot differences.${
       columns.some((column) => column.window.partialEnd) ? " * includes today so far." : ""
-    } “—” means no coverage yet or nothing derivable (e.g. zero deaths).</p>
-  </div>`;
+    } Today needs a prior daily snapshot plus the latest refresh. “—” means no coverage yet or nothing derivable (e.g. zero deaths).</p>
+    </div>
+  </details>`;
 }
 
 const compareState = { selected: [], statKey: null, selectionMode: "default" };
@@ -1372,28 +1542,19 @@ function compareHistoryWindow(statKey) {
     compareState.selected.some(
       (id) => Number.isFinite(series(id, statKey)[index]) && !historyProvenance(id, dates[index], statKey)
     );
-  const firstDataIndex = dates.findIndex((_, index) => hasDataAt(index));
-  if (firstDataIndex < 0) {
+  const indexes = dates.map((_, index) => (hasDataAt(index) ? index : -1)).filter((index) => index >= 0);
+  if (indexes.length < 2) {
     return { labels: [], start: 0, end: 0 };
   }
-
-  let lastDataIndex = dates.length - 1;
-  while (lastDataIndex > firstDataIndex && !hasDataAt(lastDataIndex)) {
-    lastDataIndex -= 1;
-  }
-
-  const pointCount = CAREER_RANGE_POINTS[viewRangeState.range] ?? 14;
-  const start =
-    viewRangeState.range === "custom" && viewRangeState.custom
-      ? Math.max(firstDataIndex, dates.findIndex((date) => date >= viewRangeState.custom.split("..")[0]))
-      : pointCount === "all"
-        ? firstDataIndex
-        : Math.max(firstDataIndex, lastDataIndex - pointCount + 1);
-  const end = lastDataIndex + 1;
+  const window = resolveCareerWindow(dates, indexes, viewRangeState.range, viewRangeState.custom);
+  const selected = window.unavailable ? indexes.slice(-2) : window.indexes;
+  const start = selected[0];
+  const end = selected.at(-1) + 1;
   return {
     labels: dates.slice(start, end),
     start,
-    end
+    end,
+    window
   };
 }
 
@@ -1413,18 +1574,19 @@ function renderCompare() {
 
   const periodWindow = activePeriodWindow();
   const periodMode = Boolean(periodWindow && periodSupported(stat.key));
+  const careerHistoryWindow = periodMode ? null : compareHistoryWindow(stat.key);
   app.innerHTML = `
-    <div class="page-heading-row"><h1 class="page-title">Head to Head${periodMode ? ` <span class="period-title-tag">${esc(periodWindowText(periodWindow))}</span>` : ""}</h1>${shareButtonHtml()}</div>
-    ${viewRangeControlHtml()}
+    <div class="page-heading-row"><h1 class="page-title">Head to Head <span class="period-title-tag ${periodMode ? "" : "career-title-tag"}">${esc(periodMode ? periodWindowText(periodWindow) : careerRangeWindowText(careerHistoryWindow?.window, { includeLabel: true }))}</span></h1>${shareButtonHtml()}</div>
     ${viewRangeState.view === "period" && !periodSupported(stat.key) ? `<div class="period-unsupported-note" role="note">${esc(stat.title)} is a progression stat with no Period form — showing Career history.</div>` : ""}
     <p class="page-sub">${
       periodMode
         ? "Overlaying each player's day-by-day Period form inside the selected range · gaps are days without gameplay · yellow points are carried (member missing from that refresh)"
-        : `Pick players and a stat to overlay their daily Career history · comparing to ${esc(careerRangeWindowText())}`
+        : `Pick players and a stat to overlay their daily Career history · comparing ${esc(careerRangeWindowText(careerHistoryWindow?.window))}`
     }</p>
+    ${viewRangeControlHtml()}
     <div class="group-label">Stat</div>
     ${statTabsHtml(stat.key)}
-    <div class="group-label compare-players-label"><span>Players</span><button class="compare-clear" type="button" ${compareState.selected.length === 0 ? "disabled" : ""}>Unselect all</button></div>
+    <div class="group-label compare-players-label"><span>Players</span><span class="compare-player-actions"><button class="compare-reset" type="button">Reset to Top 2</button><button class="compare-clear" type="button" ${compareState.selected.length === 0 ? "disabled" : ""}>Unselect all</button></span></div>
     <div class="chip-row">${candidates
       .map(
         (member) =>
@@ -1441,6 +1603,11 @@ function renderCompare() {
   app.querySelector(".compare-clear")?.addEventListener("click", () => {
     compareState.selectionMode = "manual";
     compareState.selected = [];
+    replaceHashAndRender(compareHref());
+  });
+  app.querySelector(".compare-reset")?.addEventListener("click", () => {
+    compareState.selectionMode = "default";
+    compareState.selected = latestRanking(stat.key).slice(0, 2).map((row) => row.discordId);
     replaceHashAndRender(compareHref());
   });
   for (const chip of app.querySelectorAll(".chip[data-id]")) {
@@ -1496,6 +1663,10 @@ function timeMachineHref(statKey = timeMachineState.statKey, index = timeMachine
   return hashRoute("history", { stat: statKey, date: state.history.dates[snapshotIndexes[index]] });
 }
 
+function timeMachinePlayerHref(discordId, statKey) {
+  return hashRoute(`player/${encodeURIComponent(discordId)}/${statKey}`);
+}
+
 function loadTimeMachineState(params) {
   const dates = state.history.dates;
   const snapshotIndexes = authoritativeHistoryIndexes();
@@ -1522,17 +1693,25 @@ function renderTimeMachine() {
   const date = dates[historyIndex];
   history.replaceState(null, "", timeMachineHref(stat.key, index));
 
-  const memberIds = Object.keys(state.history.members ?? {});
+  const memberIds = state.latest.members.map((member) => member.discordId);
   const ranking = authoritativeRankingAt(stat.key, historyIndex, memberIds);
+  const rankedIds = new Set(ranking.map((row) => row.discordId));
+  const missingRows = memberIds
+    .filter((discordId) => !rankedIds.has(discordId))
+    .map((discordId) => ({ discordId, trackedSince: memberTrackedSince(discordId) }))
+    .sort((a, b) =>
+      String(a.trackedSince ?? "9999-99-99").localeCompare(String(b.trackedSince ?? "9999-99-99"))
+      || memberName(a.discordId).localeCompare(memberName(b.discordId), undefined, { sensitivity: "base", numeric: true })
+    );
 
   app.innerHTML = `
     <div class="page-heading-row"><h1 class="page-title">Time Machine</h1>${shareButtonHtml()}</div>
     <p class="page-sub">The ${esc(stat.title)} leaderboard as it stood on any snapshot day</p>
     ${statTabsHtml(stat.key)}
     <div class="date-control">
-      <span class="date-label">${fmtDate(`${date}T12:00:00`)}</span>
+      <span class="date-label" id="date-label">${fmtDate(`${date}T12:00:00`)}</span>
       <input type="range" min="0" max="${snapshotIndexes.length - 1}" value="${index}" id="date-slider" />
-      <span class="mono">${index + 1}/${snapshotIndexes.length} snapshots</span>
+      <span class="mono" id="snapshot-position">${index + 1}/${snapshotIndexes.length} snapshots</span>
     </div>
     <div class="table-wrap">
       <table>
@@ -1541,17 +1720,30 @@ function renderTimeMachine() {
           .map(
             (row, rankIndex) => `<tr class="r${rankIndex + 1}">
               <td class="rank-cell">${rankIndex + 1}</td>
-              <td><a class="player-link" href="${playerHref(row.discordId)}">${esc(memberName(row.discordId))}</a></td>
+              <td><a class="player-link" href="${timeMachinePlayerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a></td>
               <td class="num value-cell">${fmtStat(stat, row.value)}</td>
             </tr>`
           )
-          .join("") || `<tr><td colspan="3" class="empty">No data on this day.</td></tr>`}</tbody>
+          .join("")}${missingRows
+            .map((row) => `<tr class="time-machine-unranked">
+              <td class="rank-cell">—</td>
+              <td><a class="player-link" href="${timeMachinePlayerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a> ${timeMachineTrackedSinceBadgeHtml(row.trackedSince)}</td>
+              <td class="num">—</td>
+            </tr>`)
+            .join("")}</tbody>
       </table>
     </div>`;
 
   wireStatTabs((key) => replaceHashAndRender(timeMachineHref(key, index)));
-  document.getElementById("date-slider").addEventListener("input", (event) => {
+  const dateSlider = document.getElementById("date-slider");
+  dateSlider.addEventListener("input", (event) => {
     timeMachineState.index = Number(event.target.value);
+    const selectedHistoryIndex = snapshotIndexes[timeMachineState.index];
+    document.getElementById("date-label").textContent = fmtDate(`${dates[selectedHistoryIndex]}T12:00:00`);
+    document.getElementById("snapshot-position").textContent = `${timeMachineState.index + 1}/${snapshotIndexes.length} snapshots`;
+    history.replaceState(null, "", timeMachineHref(stat.key, timeMachineState.index));
+  });
+  dateSlider.addEventListener("change", () => {
     replaceHashAndRender(timeMachineHref(stat.key, timeMachineState.index));
   });
   wireShareButton();
@@ -1572,6 +1764,32 @@ function overtakeText(event) {
     passed
     <a class="who player-link" href="${playerHref(event.overtakenId)}">${esc(memberName(event.overtakenId))}</a>
     in <strong>${esc(stat?.title ?? event.statKey)}</strong>${compare}</span>`;
+}
+
+const activityFilterState = { text: "" };
+
+function activitySearchText(event) {
+  const memberTerms = (discordId) => {
+    const member = state.latest.members.find((candidate) => candidate.discordId === discordId);
+    return [
+      discordId,
+      memberName(discordId),
+      member?.displayName,
+      member?.discordUsername,
+      member?.eaName,
+      member?.profileName,
+      member?.personaId,
+      member?.nucleusId
+    ];
+  };
+  const stat = statByKey(event.statKey);
+  return [
+    ...memberTerms(event.overtakerId),
+    ...memberTerms(event.overtakenId),
+    event.statKey,
+    stat?.title,
+    stat?.label
+  ].filter(Boolean).join(" ").toLocaleLowerCase();
 }
 
 function auditOutcome(event) {
@@ -1647,20 +1865,41 @@ function auditText(event) {
 
 function renderActivity() {
   const items = (state.notifications.events ?? [])
-    .map((event) => ({ at: event.at, html: overtakeText(event) }))
+    .map((event) => ({ at: event.at, html: overtakeText(event), search: activitySearchText(event) }))
     .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
     .slice(0, 120);
 
   app.innerHTML = `
-    <h1 class="page-title">Activity</h1>
-    <p class="page-sub">Recent leaderboard overtakes</p>
+    <div class="activity-toolbar">
+      <div class="activity-heading-row">
+        <h1 class="page-title">Activity</h1>
+        <label class="player-search"><span class="sr-only">Search overtake activity</span><input id="activity-search" type="search" placeholder="Search players or stats" autocomplete="off" value="${esc(activityFilterState.text)}"></label>
+      </div>
+      <p class="page-sub">Recent leaderboard overtakes</p>
+    </div>
     ${
       items.length
         ? `<div class="feed">${items
-            .map((item) => `<div class="feed-item"><span class="feed-date">${fmtDateTime(item.at)}</span>${item.html}</div>`)
-            .join("")}</div>`
+            .map((item) => `<div class="feed-item" data-activity-search="${esc(item.search)}"><span class="feed-date">${fmtDateTime(item.at)}</span>${item.html}</div>`)
+            .join("")}</div><p id="activity-search-empty" class="empty" hidden>No overtake activity matches that search.</p>`
         : `<div class="empty">No overtakes yet — this feed records leaderboard changes only.</div>`
     }`;
+
+  const search = document.getElementById("activity-search");
+  const cards = [...app.querySelectorAll("[data-activity-search]")];
+  const empty = document.getElementById("activity-search-empty");
+  const applyFilter = () => {
+    activityFilterState.text = search.value;
+    const query = search.value.trim().toLocaleLowerCase();
+    let visible = 0;
+    for (const card of cards) {
+      card.hidden = Boolean(query) && !card.dataset.activitySearch.includes(query);
+      if (!card.hidden) visible += 1;
+    }
+    if (empty) empty.hidden = visible > 0;
+  };
+  search?.addEventListener("input", applyFilter);
+  if (search) applyFilter();
 }
 
 const auditFilterState = { text: "", action: "all", outcome: "all" };
@@ -1796,7 +2035,7 @@ function renderAudit() {
     <h1 class="page-title">Audit Log</h1>
     <p class="page-sub">Completed profile changes, imported Tracker mappings, and failed link attempts</p>
     <div class="filter-row">
-      <input type="search" id="audit-search" placeholder="Filter by name, EA account, player, nucleus, or Tracker ID…" value="${esc(auditFilterState.text)}" />
+      <input type="search" id="audit-search" placeholder="Filter by name, EA account, player, nucleus, or Tracker.gg ID…" value="${esc(auditFilterState.text)}" />
       <select id="audit-action">
         ${["all", "linked", "relinked", "unlinked", "tracker_linked", "tracker_updated", "tracker_unlinked", "link_attempt", "relink_attempt"]
           .map(
@@ -1820,7 +2059,7 @@ function renderAudit() {
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>When</th><th>Action</th><th>Result</th><th>Discord member</th><th>EA account</th><th>Persona / Player ID</th><th>User / Nucleus ID</th><th>Platform</th><th>Tracker ID</th></tr></thead>
+        <thead><tr><th>When</th><th>Action</th><th>Result</th><th>Discord member</th><th>EA account</th><th>Persona / Player ID</th><th>User / Nucleus ID</th><th>Platform</th><th>Tracker.gg ID</th></tr></thead>
         <tbody>${filtered
           .map(
             (event) => `<tr>
@@ -2114,6 +2353,11 @@ function render() {
   floatingHeaderCleanups = [];
   const { parts, params } = parsedHashRoute();
   const [route] = parts;
+  const routePath = parts.join("/");
+  if (lastRenderedRoutePath != null && routePath !== lastRenderedRoutePath) {
+    customCalendarState.open = false;
+  }
+  lastRenderedRoutePath = routePath;
 
   let nav = "board";
   if (!route || route === "board") {
@@ -2145,7 +2389,19 @@ function render() {
     renderLeaderboard(state.meta.stats[0].key, params);
   }
 
+  const selectedStatKey =
+    route === "board"
+      ? (statByKey(parts[1]) ?? state.meta.stats[0]).key
+      : route === "player"
+        ? (statByKey(parts[2]) ?? state.meta.stats[0]).key
+        : route === "compare"
+          ? compareState.statKey
+          : state.meta.stats[0].key;
+  const persistentParams = viewRangeParams();
   for (const link of document.querySelectorAll("#site-nav a")) {
+    if (link.dataset.nav === "board") link.href = hashRoute(`board/${selectedStatKey}`, persistentParams);
+    if (link.dataset.nav === "players") link.href = hashRoute("players", persistentParams);
+    if (link.dataset.nav === "compare") link.href = hashRoute("compare", { stat: selectedStatKey, ...persistentParams });
     link.classList.toggle("active", link.dataset.nav === nav);
   }
   wireFloatingTableHeaders();

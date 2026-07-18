@@ -10,7 +10,7 @@ Win Rate Residual uses Breakthrough-only season records with 20% / 35% / 45% wei
 
 **Live site:** <https://raymdl.github.io/kdm-bf6-rankings/>
 
-## Career vs Period views
+## Period Performance: Career vs Period views
 
 Every cohort page (leaderboards, Players, Compare) has two independent controls:
 
