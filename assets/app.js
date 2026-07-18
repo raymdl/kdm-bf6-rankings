@@ -29,17 +29,6 @@ const state = {
 
 let charts = [];
 let floatingHeaderCleanups = [];
-let leaderboardSparklineRange = 14;
-
-const SPARKLINE_RANGES = [
-  { value: 1, label: "Today" },
-  { value: 3, label: "3 Days" },
-  { value: 7, label: "7 Days" },
-  { value: 14, label: "14 Days" },
-  { value: 30, label: "30 Days" },
-  { value: "all", label: "All Time" }
-];
-const PLAYER_HISTORY_DEFAULT_RANGE = "all";
 
 /* ---------- utilities ---------- */
 
@@ -212,20 +201,12 @@ function memberBackfillFields(discordId) {
   return fields;
 }
 
-function playerHistoryHref(discordId, statKey, showEstimated, range = PLAYER_HISTORY_DEFAULT_RANGE, view = null) {
+function playerHistoryHref(discordId, statKey, showEstimated, range = "all", view = null) {
   return hashRoute(`player/${encodeURIComponent(discordId)}/${statKey}`, {
     estimated: showEstimated ? 1 : null,
-    range,
+    range: range === "all" ? null : range,
     view: view ?? (typeof viewRangeState !== "undefined" && viewRangeState.view === "period" ? "period" : null)
   });
-}
-
-function playerRangeSelectHtml(range) {
-  return `<label class="sparkline-range-select">
-    <select id="player-range-select" aria-label="Player history date range">${SPARKLINE_RANGES.map(
-      (option) => `<option value="${option.value}" ${option.value === range ? "selected" : ""}>${option.label}</option>`
-    ).join("")}</select>
-  </label>`;
 }
 
 function playerHref(discordId) {
@@ -429,15 +410,18 @@ function periodDataAvailable() {
   return validCounters(state.counters) && state.counters.dates.length >= 2;
 }
 
-function loadViewRange(params) {
+const LEGACY_RANGE_KEYS = { 1: "today", 3: "3d", 7: "7d", 14: "14d", 30: "30d", 90: "30d" };
+
+function loadViewRange(params, defaultRange = DEFAULT_RANGE) {
   const requestedView = params?.get("view") === "period" ? "period" : "career";
   viewRangeState.view = requestedView === "period" && periodDataAvailable() ? "period" : "career";
   const raw = params?.get("range") ?? "";
-  if (CUSTOM_RANGE_RE.test(raw)) {
+  const normalized = LEGACY_RANGE_KEYS[Number(raw)] ?? raw;
+  if (CUSTOM_RANGE_RE.test(normalized)) {
     viewRangeState.range = "custom";
-    viewRangeState.custom = raw;
+    viewRangeState.custom = normalized;
   } else {
-    viewRangeState.range = RANGE_OPTIONS.some((option) => option.key === raw) ? raw : DEFAULT_RANGE;
+    viewRangeState.range = RANGE_OPTIONS.some((option) => option.key === normalized) ? normalized : defaultRange;
     viewRangeState.custom = null;
   }
 }
@@ -646,16 +630,6 @@ function sparklineSvg(values, width = 110, height = 28) {
 
 // Human-readable description of the selected date range, used consistently for
 // the leaderboard/compare sub-headings, movement tooltips, and podium deltas.
-function rangeWindowText(range) {
-  if (range === "all") {
-    return "all snapshots";
-  }
-  if (range === 1) {
-    return "the previous day";
-  }
-  return `the last ${range} days`;
-}
-
 function movementHtml(prevRank, currentRank, windowText = "the previous day") {
   if (prevRank == null) {
     return `<span class="movement flat" title="New to this leaderboard">NEW</span>`;
@@ -704,24 +678,6 @@ function cachedFootnoteHtml(hasCachedStats) {
   return hasCachedStats
     ? `<p class="cached-footnote">${cachedMarkerHtml()} Cached stats are from the last successful GameTools refresh.</p>`
     : "";
-}
-
-function sparklineRangeSelectHtml() {
-  return `<label class="sparkline-range-select">
-    <select id="sparkline-range-select" aria-label="Sparkline date range">${SPARKLINE_RANGES.map(
-      (range) => `<option value="${range.value}" ${range.value === leaderboardSparklineRange ? "selected" : ""}>${range.label}</option>`
-    ).join("")}</select>
-  </label>`;
-}
-
-function wireSparklineRange() {
-  const select = document.getElementById("sparkline-range-select");
-  select?.addEventListener("change", () => {
-    leaderboardSparklineRange = select.value === "all" ? "all" : Number(select.value);
-    const scrollY = window.scrollY;
-    render();
-    window.scrollTo(0, scrollY);
-  });
 }
 
 const CHART_COLORS = ["#f26522", "#60a5fa", "#4ade80", "#c084fc", "#facc15", "#22d3ee", "#fb7185", "#a3e635"];
@@ -1139,13 +1095,19 @@ function renderPlayer(discordId, statKey, params) {
   const dates = state.history.dates;
   const lastIndex = dates.length - 1;
   const showEstimated = params?.get("estimated") === "1";
-  const playerView = params?.get("view") === "period" && periodDataAvailable() ? "period" : "career";
-  viewRangeState.view = playerView;
-  const historyRange = normalizedRange(params?.get("range"), PLAYER_HISTORY_DEFAULT_RANGE);
+  loadViewRange(params, "all");
+  const periodWindow = activePeriodWindow();
   const backfillFields = memberBackfillFields(discordId);
-  const pointCount = historyRange === 1 ? 2 : historyRange;
-  const rangeStart = pointCount === "all" ? 0 : Math.max(0, dates.length - pointCount);
-  const deltaRangeLabel = historyRange === "all" ? "all" : `${historyRange}d`;
+  const careerPoints = CAREER_RANGE_POINTS[viewRangeState.range] ?? "all";
+  const rangeStart =
+    viewRangeState.range === "custom" && viewRangeState.custom
+      ? Math.max(0, dates.findIndex((date) => date >= viewRangeState.custom.split("..")[0]))
+      : careerPoints === "all"
+        ? 0
+        : Math.max(0, dates.length - careerPoints);
+  const deltaRangeLabel =
+    RANGE_OPTIONS.find((option) => option.key === viewRangeState.range)?.label.toLowerCase() ??
+    careerRangeWindowText();
 
   const baselineForRange = (statKeyToRead) => {
     const values = series(discordId, statKeyToRead);
@@ -1158,23 +1120,54 @@ function renderPlayer(discordId, statKey, params) {
     return null;
   };
 
-  const summaries = state.meta.stats
-    .map((candidate) => {
-      const current = member ? member.stats[candidate.key] : valueAt(discordId, candidate.key, lastIndex);
-      const ranking = latestRanking(candidate.key);
-      const rankIndex = ranking.findIndex((row) => row.discordId === discordId);
-      const baseline = baselineForRange(candidate.key);
-      const delta = Number.isFinite(current) && Number.isFinite(baseline) ? fmtDelta(candidate, current - baseline) : null;
-      const deltaClass = delta ? (current > baseline ? "up" : "down") : "flat";
-      const hasBackfill = backfillFields.has(candidate.key);
+  const periodSummaryCard = (candidate) => {
+    if (!periodSupported(candidate.key)) {
+      const career = member ? member.stats[candidate.key] : valueAt(discordId, candidate.key, lastIndex);
       return `<div class="stat-summary ${candidate.key === stat.key ? "active" : ""}" data-stat="${candidate.key}">
-        <div class="stat-summary-head"><div class="k">${esc(candidate.title)}</div>${showEstimated && hasBackfill ? backfillMarkerHtml() : ""}</div>
-        <div class="v">${fmtStat(candidate, current)}</div>
-        <div class="m">${rankIndex >= 0 ? `Rank #${rankIndex + 1} of ${ranking.length}` : "Unranked"}${
-          delta ? ` · <span class="delta ${deltaClass}">${delta}</span> ${deltaRangeLabel}` : ""
-        }</div>
+        <div class="stat-summary-head"><div class="k">${esc(candidate.title)}</div></div>
+        <div class="v">${fmtStat(candidate, career)}</div>
+        <div class="m">Career-only stat</div>
       </div>`;
-    })
+    }
+    const periodStat = memberPeriodStat(state.counters, discordId, candidate.key, periodWindow);
+    const value = periodStat.invalid ? null : periodStat.value;
+    let meta = "No gameplay in this range";
+    if (periodStat.invalid && periodStat.reason === "negative_delta") {
+      meta = "Counter reset in this range";
+    } else if (value != null) {
+      const { ranked } = periodRanking(state.counters, candidate.key, periodWindow);
+      const rankIndex = ranked.findIndex((row) => row.discordId === discordId);
+      meta =
+        rankIndex >= 0
+          ? `Rank #${rankIndex + 1} of ${ranked.length} this range`
+          : `<span class="badge provisional" title="Under 15 active minutes in this range — too small a sample to rank">low time</span>`;
+    }
+    return `<div class="stat-summary ${candidate.key === stat.key ? "active" : ""}" data-stat="${candidate.key}">
+      <div class="stat-summary-head"><div class="k">${esc(candidate.title)}</div></div>
+      <div class="v">${fmtStat(candidate, value)}</div>
+      <div class="m">${meta}</div>
+    </div>`;
+  };
+
+  const careerSummaryCard = (candidate) => {
+    const current = member ? member.stats[candidate.key] : valueAt(discordId, candidate.key, lastIndex);
+    const ranking = latestRanking(candidate.key);
+    const rankIndex = ranking.findIndex((row) => row.discordId === discordId);
+    const baseline = baselineForRange(candidate.key);
+    const delta = Number.isFinite(current) && Number.isFinite(baseline) ? fmtDelta(candidate, current - baseline) : null;
+    const deltaClass = delta ? (current > baseline ? "up" : "down") : "flat";
+    const hasBackfill = backfillFields.has(candidate.key);
+    return `<div class="stat-summary ${candidate.key === stat.key ? "active" : ""}" data-stat="${candidate.key}">
+      <div class="stat-summary-head"><div class="k">${esc(candidate.title)}</div>${showEstimated && hasBackfill ? backfillMarkerHtml() : ""}</div>
+      <div class="v">${fmtStat(candidate, current)}</div>
+      <div class="m">${rankIndex >= 0 ? `Rank #${rankIndex + 1} of ${ranking.length}` : "Unranked"}${
+        delta ? ` · <span class="delta ${deltaClass}">${delta}</span> ${deltaRangeLabel}` : ""
+      }</div>
+    </div>`;
+  };
+
+  const summaries = state.meta.stats
+    .map((candidate) => (periodWindow ? periodSummaryCard(candidate) : careerSummaryCard(candidate)))
     .join("");
 
   const playerAudit = (state.audit.events ?? []).filter((event) => event.discordId === discordId);
@@ -1206,49 +1199,45 @@ function renderPlayer(discordId, statKey, params) {
     <div class="player-profile-top">
       <div class="player-profile-identity">
         <div class="profile-head">
-          <h1 class="page-title">${esc(name)}</h1>
+          <h1 class="page-title">${esc(name)}${periodWindow ? ` <span class="period-title-tag">${esc(periodWindowText(periodWindow))}</span>` : ""}</h1>
           ${member?.cachedStats ? cachedMarkerHtml() : ""}
         </div>
         <p class="profile-sub">${profileSubParts.join(" · ")}</p>
       </div>
       <div class="player-history-controls">
-        <span class="player-history-controls-label">Chart range</span>
-        ${playerRangeSelectHtml(historyRange)}
-        ${backfillFields.size > 0 ? `<button class="tracker-history-toggle ${showEstimated ? "active" : ""}" id="tracker-history-toggle" type="button" aria-pressed="${showEstimated}">${showEstimated ? "Hide Backfill" : "Show Backfill"}</button>` : ""}
+        ${!periodWindow && backfillFields.size > 0 ? `<button class="tracker-history-toggle ${showEstimated ? "active" : ""}" id="tracker-history-toggle" type="button" aria-pressed="${showEstimated}">${showEstimated ? "Hide Backfill" : "Show Backfill"}</button>` : ""}
       </div>
     </div>
-    ${showEstimated ? estimatedHistoryNoticeHtml(discordId) : ""}
+    ${viewRangeControlHtml()}
+    ${viewRangeState.view === "period" && !periodWindow ? `<div class="period-unsupported-note" role="note">The selected range is not available yet — showing Career values.</div>` : ""}
+    ${showEstimated && !periodWindow ? estimatedHistoryNoticeHtml(discordId) : ""}
     ${recentFormCardHtml(discordId, member)}
     <div class="stat-summary-grid">${summaries}</div>
     <div class="chart-card">
-      <h3>${esc(stat.title)} ${params?.get("view") === "period" && periodSupported(stat.key) ? "· daily Period form (yellow = carried snapshot)" : "over time"}</h3>
+      <h3>${esc(stat.title)} ${periodWindow && periodSupported(stat.key) ? "· daily Period form (yellow = carried snapshot)" : "over time"}</h3>
       <div class="chart-box"><canvas id="player-chart"></canvas></div>
     </div>
     ${auditHtml}
     ${cachedFootnoteHtml(Boolean(member?.cachedStats))}`;
 
+  const currentRangeKey = viewRangeState.range === "custom" ? viewRangeState.custom : viewRangeState.range;
   for (const card of app.querySelectorAll(".stat-summary")) {
     card.addEventListener("click", () => {
-      location.hash = playerHistoryHref(discordId, card.dataset.stat, showEstimated, historyRange);
+      location.hash = playerHistoryHref(discordId, card.dataset.stat, showEstimated, currentRangeKey);
     });
   }
 
-  document.getElementById("player-range-select")?.addEventListener("change", (event) => {
-    replaceHashAndRender(playerHistoryHref(discordId, stat.key, showEstimated, normalizedRange(event.target.value, PLAYER_HISTORY_DEFAULT_RANGE)));
-  });
+  wireViewRangeControl((rangeParams) =>
+    hashRoute(`player/${encodeURIComponent(discordId)}/${stat.key}`, {
+      estimated: showEstimated ? 1 : null,
+      ...rangeParams
+    })
+  );
   document.getElementById("tracker-history-toggle")?.addEventListener("click", () => {
-    replaceHashAndRender(playerHistoryHref(discordId, stat.key, !showEstimated, historyRange));
+    replaceHashAndRender(playerHistoryHref(discordId, stat.key, !showEstimated, currentRangeKey));
   });
 
-  const periodChartWindow =
-    playerView === "period" && periodSupported(stat.key)
-      ? (() => {
-          const key = historyRange === "all" ? "all" : historyRange === 1 ? "today" : `${historyRange}d`;
-          let window = resolveRange(state.counters, key);
-          if (window.unavailable && key === "today") window = resolveRange(state.counters, "3d");
-          return window.unavailable ? null : window;
-        })()
-      : null;
+  const periodChartWindow = periodWindow && periodSupported(stat.key) ? periodWindow : null;
   if (periodChartWindow) {
     const points = memberDailySeries(state.counters, discordId, stat.key, periodChartWindow);
     lineChart(
@@ -1347,14 +1336,6 @@ function recentFormCardHtml(discordId, member) {
 }
 
 const compareState = { selected: [], statKey: null, selectionMode: "default" };
-
-function normalizedRange(value, fallback = 14) {
-  if (value === "all") {
-    return "all";
-  }
-  const numeric = Number(value);
-  return SPARKLINE_RANGES.some((range) => range.value === numeric) ? numeric : fallback;
-}
 
 function compareHref(
   statKey = compareState.statKey,
