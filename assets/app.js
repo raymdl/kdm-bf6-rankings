@@ -972,6 +972,18 @@ function renderPeriodLeaderboard(stat, window) {
     value: row.value,
     time: row.activeSeconds
   })[key]);
+  // Members with no derivable stats in this range (didn't play, or not yet
+  // tracked) still appear at the bottom with null values, like Time Machine.
+  const shownIds = new Set(allRows.map((row) => row.discordId));
+  const invalidIds = new Set(invalid.map((row) => row.discordId));
+  const missingRows = state.latest.members
+    .map((member) => member.discordId)
+    .filter((discordId) => !shownIds.has(discordId) && !invalidIds.has(discordId))
+    .map((discordId) => ({ discordId, trackedSince: memberTrackedSince(discordId) }))
+    .sort((a, b) =>
+      String(a.trackedSince ?? "9999-99-99").localeCompare(String(b.trackedSince ?? "9999-99-99"))
+      || memberName(a.discordId).localeCompare(memberName(b.discordId), undefined, { sensitivity: "base", numeric: true })
+    );
   const bodyRows = sortedRanking
     .map((row) => {
       const spark = memberDailySeries(state.counters, row.discordId, stat.key, window).map((point) => point.value);
@@ -991,6 +1003,15 @@ function renderPeriodLeaderboard(stat, window) {
       </tr>`;
     })
     .join("");
+  const missingRowsHtml = missingRows
+    .map((row) => `<tr class="time-machine-unranked">
+        <td class="rank-cell">—</td>
+        <td><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a> <span class="badge provisional" title="No gameplay recorded in this range">no play</span></td>
+        <td class="num">—</td>
+        <td class="num">—</td>
+        <td></td>
+      </tr>`)
+    .join("");
 
   const invalidNote = invalid.length
     ? `<p class="cached-footnote">Not shown (counter reset or upstream correction in this range): ${invalid
@@ -1007,7 +1028,7 @@ function renderPeriodLeaderboard(stat, window) {
     <div class="table-wrap">
       <table>
         <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true })}<th>Daily trend</th></tr></thead>
-        <tbody>${bodyRows || `<tr><td colspan="5" class="empty">No gameplay recorded in this range.</td></tr>`}</tbody>
+        <tbody>${bodyRows}${missingRowsHtml}${bodyRows || missingRowsHtml ? "" : `<tr><td colspan="5" class="empty">No gameplay recorded in this range.</td></tr>`}</tbody>
       </table>
     </div>
     ${invalidNote}`;
