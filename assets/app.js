@@ -1386,7 +1386,15 @@ function renderPlayer(discordId, statKey, params) {
     ${recentFormCardHtml(discordId, member)}
     <div class="stat-summary-grid">${summaries}</div>
     <div class="chart-card">
-      <h3>${esc(stat.title)} ${periodWindow && periodSupported(stat.key) ? "· daily Period form (yellow = carried snapshot)" : "over time"}</h3>
+      <h3>${esc(stat.title)} ${
+        periodWindow && periodSupported(stat.key)
+          ? `· daily Period form${
+              memberDailySeries(state.counters, discordId, stat.key, periodWindow).some((point) => point.value != null && !point.observedEnd)
+                ? " (yellow = carried snapshot)"
+                : ""
+            }`
+          : "over time"
+      }</h3>
       <div class="chart-box"><canvas id="player-chart"></canvas></div>
     </div>
     ${auditHtml}
