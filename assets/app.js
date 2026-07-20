@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260720-compare-overtakes-3";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260720-compare-overtakes-4";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -10,7 +10,7 @@ import {
   periodSupported,
   resolveRange,
   validCounters
-} from "./period.js?v=20260720-compare-overtakes-3";
+} from "./period.js?v=20260720-compare-overtakes-4";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -22,7 +22,7 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260720-compare-overtakes-3";
+} from "./view-state.js?v=20260720-compare-overtakes-4";
 
 const app = document.getElementById("app");
 
@@ -923,7 +923,7 @@ function lineChart(canvas, labels, datasets, stat) {
           caretPadding: 24,
           callbacks: {
             afterTitle: (items) =>
-              todayInProgress && items[0]?.dataIndex === lastIndex ? "today so far · still updating" : "",
+              todayInProgress && items[0]?.dataIndex === lastIndex ? "today · in progress" : "",
             label: (ctx) => `${ctx.dataset.label}${ctx.dataset.estimated?.[ctx.dataIndex] ? " (estimated)" : ""}: ${fmtStat(stat, ctx.parsed.y)}${ctx.dataset.overtakes?.[ctx.dataIndex] ? " · overtake" : ""}`
           }
         }
