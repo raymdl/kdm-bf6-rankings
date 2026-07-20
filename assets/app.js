@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260720-compare-overtakes-1";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260720-compare-overtakes-2";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -10,7 +10,7 @@ import {
   periodSupported,
   resolveRange,
   validCounters
-} from "./period.js?v=20260720-compare-overtakes-1";
+} from "./period.js?v=20260720-compare-overtakes-2";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -22,7 +22,7 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260720-compare-overtakes-1";
+} from "./view-state.js?v=20260720-compare-overtakes-2";
 
 const app = document.getElementById("app");
 
@@ -461,6 +461,12 @@ function fmtShortDate(date) {
 // days, so match them on the Eastern date.
 function easternDateKey(iso) {
   return new Date(iso).toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+}
+
+function previousDateKey(date) {
+  const shifted = new Date(`${date}T12:00:00Z`);
+  shifted.setUTCDate(shifted.getUTCDate() - 1);
+  return shifted.toISOString().slice(0, 10);
 }
 
 function asOfEasternText(iso) {
@@ -1700,6 +1706,9 @@ function renderCompare() {
   } else if (state.history.dates.length > 0 && compareState.selected.length > 0) {
     const window = compareHistoryWindow(stat.key);
     const selectedIds = new Set(compareState.selected);
+    // The morning refresh that records an overtake writes the snapshot dated
+    // the previous game day, so the crossing is visible one label earlier
+    // than the event timestamp.
     const overtakeDatesFor = (id) =>
       new Set(
         (state.notifications?.events ?? [])
@@ -1707,7 +1716,7 @@ function renderCompare() {
             (event) =>
               event.statKey === stat.key && event.overtakerId === id && selectedIds.has(event.overtakenId)
           )
-          .map((event) => easternDateKey(event.at))
+          .map((event) => previousDateKey(easternDateKey(event.at)))
       );
     lineChart(
       document.getElementById("compare-chart"),
