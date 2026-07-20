@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260720-favorites-1";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260720-default-7d-1";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -10,7 +10,7 @@ import {
   periodSupported,
   resolveRange,
   validCounters
-} from "./period.js?v=20260720-favorites-1";
+} from "./period.js?v=20260720-default-7d-1";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -22,7 +22,7 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260720-favorites-1";
+} from "./view-state.js?v=20260720-default-7d-1";
 
 const app = document.getElementById("app");
 
@@ -1673,10 +1673,6 @@ function recentFormCardHtml(discordId, member) {
 
 const compareState = { selected: [], statKey: null, selectionMode: "default" };
 
-// Head to Head favors a tighter window than the site-wide default so the
-// overlay opens on recent movement (including overtake-link arrivals).
-const COMPARE_DEFAULT_RANGE = "7d";
-
 function compareHref(
   statKey = compareState.statKey,
   selected = compareState.selected,
@@ -1690,7 +1686,7 @@ function compareHref(
 }
 
 function loadCompareState(params) {
-  loadViewRange(params, COMPARE_DEFAULT_RANGE);
+  loadViewRange(params);
   const stat = statByKey(params.get("stat")) ?? state.meta.stats[0];
   const candidateIds = new Set(state.latest.members.map((member) => member.discordId));
   compareState.statKey = stat.key;

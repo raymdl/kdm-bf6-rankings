@@ -13,9 +13,9 @@ import {
 const dates = ["2026-07-10", "2026-07-11", "2026-07-12", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17"];
 const indexes = dates.map((_, index) => index);
 
-test("default route state is Career over 14 days", () => {
-  assert.deepEqual(normalizedViewRange(new URLSearchParams()), { view: "career", range: "14d", custom: null });
-  assert.deepEqual(viewRangeParams({ view: "career", range: "14d", custom: null }), { view: null, range: null });
+test("default route state is Career over 7 days", () => {
+  assert.deepEqual(normalizedViewRange(new URLSearchParams()), { view: "career", range: "7d", custom: null });
+  assert.deepEqual(viewRangeParams({ view: "career", range: "7d", custom: null }), { view: null, range: null });
 });
 
 test("leaderboard stat, Period view, and range survive a player link", () => {

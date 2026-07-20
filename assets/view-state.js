@@ -7,7 +7,7 @@ export const RANGE_OPTIONS = [
   { key: "all", label: "All Time" }
 ];
 
-export const DEFAULT_RANGE = "14d";
+export const DEFAULT_RANGE = "7d";
 export const CUSTOM_RANGE_RE = /^(\d{4}-\d{2}-\d{2})\.\.(\d{4}-\d{2}-\d{2})$/;
 const LEGACY_RANGE_KEYS = { 1: "today", 3: "3d", 7: "7d", 14: "14d", 30: "30d", 90: "30d" };
 
