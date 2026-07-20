@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260720-compare-overtakes-2";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260720-compare-overtakes-3";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -10,7 +10,7 @@ import {
   periodSupported,
   resolveRange,
   validCounters
-} from "./period.js?v=20260720-compare-overtakes-2";
+} from "./period.js?v=20260720-compare-overtakes-3";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -22,7 +22,7 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260720-compare-overtakes-2";
+} from "./view-state.js?v=20260720-compare-overtakes-3";
 
 const app = document.getElementById("app");
 
@@ -826,8 +826,40 @@ function chartBase() {
   Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
 }
 
+// Soft glow behind overtake points, drawn as a plugin so it stays out of the
+// legend and index-mode tooltips and is never clipped at the chart edge.
+const overtakeHaloPlugin = {
+  id: "overtakeHalo",
+  afterDatasetsDraw(chart) {
+    const ctx = chart.ctx;
+    chart.data.datasets.forEach((dataset, datasetIndex) => {
+      if (!dataset.overtakes || !chart.isDatasetVisible(datasetIndex)) return;
+      const meta = chart.getDatasetMeta(datasetIndex);
+      dataset.overtakes.forEach((flag, pointIndex) => {
+        if (!flag) return;
+        const element = meta.data[pointIndex];
+        if (!element || element.skip) return;
+        ctx.save();
+        ctx.fillStyle = dataset.borderColor;
+        ctx.strokeStyle = dataset.borderColor;
+        ctx.globalAlpha = 0.22;
+        ctx.beginPath();
+        ctx.arc(element.x, element.y, 9, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 0.5;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.restore();
+      });
+    });
+  }
+};
+
 function lineChart(canvas, labels, datasets, stat) {
   chartBase();
+  const lastIndex = labels.length - 1;
+  const todayInProgress =
+    lastIndex > 0 && labels[lastIndex] === easternDateKey(new Date().toISOString());
   const chart = new Chart(canvas, {
     type: "line",
     data: {
@@ -836,26 +868,40 @@ function lineChart(canvas, labels, datasets, stat) {
         const color = CHART_COLORS[index % CHART_COLORS.length];
         const baseRadius = labels.length > 45 ? 0 : 2.5;
         const overtakes = dataset.overtakes;
+        const pointColorAt = (pointIndex) => (dataset.estimated?.[pointIndex] ? "#facc15" : color);
         return {
           ...dataset,
           borderColor: color,
           backgroundColor: color,
           borderWidth: 2,
-          // Overtake days get a bigger point with a light ring so they stand
-          // out from ordinary snapshots even on dense charts.
-          pointRadius: overtakes ? overtakes.map((flag) => (flag ? 5.5 : baseRadius)) : baseRadius,
-          pointHoverRadius: overtakes ? overtakes.map((flag) => (flag ? 7 : 4)) : 4,
-          pointBorderWidth: overtakes ? overtakes.map((flag) => (flag ? 2 : 1)) : 1,
-          pointBackgroundColor: dataset.estimated?.map((estimated) => estimated ? "#facc15" : color),
-          pointBorderColor: overtakes
-            ? overtakes.map((flag, pointIndex) =>
-                flag ? "#f8fafc" : dataset.estimated?.[pointIndex] ? "#facc15" : color
-              )
-            : dataset.estimated?.map((estimated) => estimated ? "#facc15" : color),
+          // Edge values sit exactly on the top gridline; without this the
+          // overtake halo's host point gets shaved off by the chart area.
+          clip: false,
+          // Overtake days grow slightly; the glow itself comes from
+          // overtakeHaloPlugin. Today-in-progress keeps a visible point even
+          // on dense charts so its hollow marker can read.
+          pointRadius: labels.map((_, pointIndex) =>
+            overtakes?.[pointIndex]
+              ? 3.5
+              : todayInProgress && pointIndex === lastIndex
+                ? Math.max(baseRadius, 3)
+                : baseRadius
+          ),
+          pointHoverRadius: labels.map((_, pointIndex) => (overtakes?.[pointIndex] ? 5.5 : 4)),
+          // A hollow final point marks today's still-updating value.
+          pointBackgroundColor: labels.map((_, pointIndex) =>
+            todayInProgress && pointIndex === lastIndex ? "#191d23" : pointColorAt(pointIndex)
+          ),
+          pointBorderColor: labels.map((_, pointIndex) => pointColorAt(pointIndex)),
+          pointBorderWidth: labels.map((_, pointIndex) =>
+            todayInProgress && pointIndex === lastIndex ? 1.5 : 1
+          ),
           segment: {
             borderColor: (ctx) => dataset.estimated?.[ctx.p0DataIndex] || dataset.estimated?.[ctx.p1DataIndex]
               ? "#facc15"
-              : color
+              : color,
+            borderDash: (ctx) =>
+              todayInProgress && ctx.p1DataIndex === lastIndex ? [5, 4] : undefined
           },
           spanGaps: true,
           // Monotone cubic interpolation softens corners without overshooting
@@ -876,6 +922,8 @@ function lineChart(canvas, labels, datasets, stat) {
           // on top of them (it flips to the other side near the chart edge).
           caretPadding: 24,
           callbacks: {
+            afterTitle: (items) =>
+              todayInProgress && items[0]?.dataIndex === lastIndex ? "today so far · still updating" : "",
             label: (ctx) => `${ctx.dataset.label}${ctx.dataset.estimated?.[ctx.dataIndex] ? " (estimated)" : ""}: ${fmtStat(stat, ctx.parsed.y)}${ctx.dataset.overtakes?.[ctx.dataIndex] ? " · overtake" : ""}`
           }
         }
@@ -884,7 +932,8 @@ function lineChart(canvas, labels, datasets, stat) {
         x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } },
         y: { ticks: { callback: (value) => fmtStat(stat, value) } }
       }
-    }
+    },
+    plugins: [overtakeHaloPlugin]
   });
   charts.push(chart);
   return chart;
