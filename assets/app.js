@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260720-ui-hardening-1";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260720-compare-overtakes-1";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -10,7 +10,7 @@ import {
   periodSupported,
   resolveRange,
   validCounters
-} from "./period.js?v=20260720-ui-hardening-1";
+} from "./period.js?v=20260720-compare-overtakes-1";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -22,7 +22,7 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260720-ui-hardening-1";
+} from "./view-state.js?v=20260720-compare-overtakes-1";
 
 const app = document.getElementById("app");
 
@@ -457,6 +457,12 @@ function fmtShortDate(date) {
   return fmtDate(`${date}T12:00:00`);
 }
 
+// Overtake timestamps are UTC instants; snapshot dates are Eastern calendar
+// days, so match them on the Eastern date.
+function easternDateKey(iso) {
+  return new Date(iso).toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+}
+
 function asOfEasternText(iso) {
   return new Date(iso).toLocaleString("en-US", {
     timeZone: "America/New_York",
@@ -822,15 +828,24 @@ function lineChart(canvas, labels, datasets, stat) {
       labels,
       datasets: datasets.map((dataset, index) => {
         const color = CHART_COLORS[index % CHART_COLORS.length];
+        const baseRadius = labels.length > 45 ? 0 : 2.5;
+        const overtakes = dataset.overtakes;
         return {
           ...dataset,
           borderColor: color,
           backgroundColor: color,
           borderWidth: 2,
-          pointRadius: labels.length > 45 ? 0 : 2.5,
-          pointHoverRadius: 4,
+          // Overtake days get a bigger point with a light ring so they stand
+          // out from ordinary snapshots even on dense charts.
+          pointRadius: overtakes ? overtakes.map((flag) => (flag ? 5.5 : baseRadius)) : baseRadius,
+          pointHoverRadius: overtakes ? overtakes.map((flag) => (flag ? 7 : 4)) : 4,
+          pointBorderWidth: overtakes ? overtakes.map((flag) => (flag ? 2 : 1)) : 1,
           pointBackgroundColor: dataset.estimated?.map((estimated) => estimated ? "#facc15" : color),
-          pointBorderColor: dataset.estimated?.map((estimated) => estimated ? "#facc15" : color),
+          pointBorderColor: overtakes
+            ? overtakes.map((flag, pointIndex) =>
+                flag ? "#f8fafc" : dataset.estimated?.[pointIndex] ? "#facc15" : color
+              )
+            : dataset.estimated?.map((estimated) => estimated ? "#facc15" : color),
           segment: {
             borderColor: (ctx) => dataset.estimated?.[ctx.p0DataIndex] || dataset.estimated?.[ctx.p1DataIndex]
               ? "#facc15"
@@ -855,7 +870,7 @@ function lineChart(canvas, labels, datasets, stat) {
           // on top of them (it flips to the other side near the chart edge).
           caretPadding: 24,
           callbacks: {
-            label: (ctx) => `${ctx.dataset.label}${ctx.dataset.estimated?.[ctx.dataIndex] ? " (estimated)" : ""}: ${fmtStat(stat, ctx.parsed.y)}`
+            label: (ctx) => `${ctx.dataset.label}${ctx.dataset.estimated?.[ctx.dataIndex] ? " (estimated)" : ""}: ${fmtStat(stat, ctx.parsed.y)}${ctx.dataset.overtakes?.[ctx.dataIndex] ? " · overtake" : ""}`
           }
         }
       },
@@ -1547,6 +1562,10 @@ function recentFormCardHtml(discordId, member) {
 
 const compareState = { selected: [], statKey: null, selectionMode: "default" };
 
+// Head to Head favors a tighter window than the site-wide default so the
+// overlay opens on recent movement (including overtake-link arrivals).
+const COMPARE_DEFAULT_RANGE = "7d";
+
 function compareHref(
   statKey = compareState.statKey,
   selected = compareState.selected,
@@ -1560,7 +1579,7 @@ function compareHref(
 }
 
 function loadCompareState(params) {
-  loadViewRange(params);
+  loadViewRange(params, COMPARE_DEFAULT_RANGE);
   const stat = statByKey(params.get("stat")) ?? state.meta.stats[0];
   const candidateIds = new Set(state.latest.members.map((member) => member.discordId));
   compareState.statKey = stat.key;
@@ -1680,15 +1699,29 @@ function renderCompare() {
     );
   } else if (state.history.dates.length > 0 && compareState.selected.length > 0) {
     const window = compareHistoryWindow(stat.key);
+    const selectedIds = new Set(compareState.selected);
+    const overtakeDatesFor = (id) =>
+      new Set(
+        (state.notifications?.events ?? [])
+          .filter(
+            (event) =>
+              event.statKey === stat.key && event.overtakerId === id && selectedIds.has(event.overtakenId)
+          )
+          .map((event) => easternDateKey(event.at))
+      );
     lineChart(
       document.getElementById("compare-chart"),
       window.labels,
-      compareState.selected.map((id) => ({
-        label: memberName(id),
-        data: series(id, stat.key)
-          .slice(window.start, window.end)
-          .map((value, index) => (historyProvenance(id, window.labels[index], stat.key) ? null : value))
-      })),
+      compareState.selected.map((id) => {
+        const overtakeDates = overtakeDatesFor(id);
+        return {
+          label: memberName(id),
+          data: series(id, stat.key)
+            .slice(window.start, window.end)
+            .map((value, index) => (historyProvenance(id, window.labels[index], stat.key) ? null : value)),
+          overtakes: window.labels.map((date) => overtakeDates.has(date))
+        };
+      }),
       stat
     );
   }
@@ -1794,7 +1827,6 @@ function overtakeText(event) {
     ? `<a class="feed-action" href="${compareHref(
         stat.key,
         [event.overtakerId, event.overtakenId],
-        14,
         "manual"
       )}">Compare</a>`
     : "";
