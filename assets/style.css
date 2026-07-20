@@ -9,6 +9,11 @@
   --text-faint: #6b7480;
   --accent: #f26522;
   --accent-soft: rgba(242, 101, 34, 0.14);
+  /* Favorites are rose so they never read as the orange accent (selection)
+     or the yellow used for cached/estimated markers. */
+  --fav: #fb7185;
+  --fav-soft: rgba(251, 113, 133, 0.12);
+  --fav-row: rgba(251, 113, 133, 0.07);
   --up: #4ade80;
   --down: #f87171;
   --gold: #fbbf24;
@@ -481,6 +486,55 @@ tbody tr:hover {
   background: var(--bg-hover);
 }
 
+/* ---------- favorites ---------- */
+
+.fav-toggle {
+  font: inherit;
+  font-size: 1.05rem;
+  line-height: 1;
+  color: var(--text-faint);
+  background: transparent;
+  border: 0;
+  padding: 0.15rem;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.fav-toggle:hover {
+  color: var(--fav);
+  transform: scale(1.15);
+}
+
+.fav-toggle.active {
+  color: var(--fav);
+}
+
+.fav-toggle:focus-visible {
+  outline: 2px solid var(--fav);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.fav-toggle-lg {
+  font-size: 1.45rem;
+  vertical-align: middle;
+}
+
+.fav-badge {
+  color: var(--fav);
+  font-size: 0.78em;
+  margin-left: 0.32rem;
+  vertical-align: baseline;
+}
+
+tbody tr.fav-row {
+  background: var(--fav-row);
+}
+
+tbody tr.fav-row:hover {
+  background: var(--bg-hover);
+}
+
 /* Keep column labels visible while scrolling long tables (Leaderboard, Time
    Machine, Audit Log): a fixed clone of the header row pinned below the
    sticky site header. */
@@ -692,6 +746,24 @@ tr.r3 .rank-cell { color: var(--bronze); }
   padding: 0.7rem 0.85rem;
   color: var(--text);
   display: block;
+  position: relative;
+}
+
+.player-card .fav-toggle {
+  position: absolute;
+  right: 0.45rem;
+  bottom: 0.35rem;
+}
+
+.player-card.favorited {
+  border-color: rgba(251, 113, 133, 0.5);
+  box-shadow: 0 0 0 1px rgba(251, 113, 133, 0.22);
+  background: linear-gradient(var(--fav-soft), transparent 45%), var(--bg-card);
+}
+
+.player-card.favorited:hover {
+  border-color: var(--fav);
+  background: linear-gradient(var(--fav-soft), transparent 45%), var(--bg-hover);
 }
 
 .player-card[hidden] {
@@ -1009,6 +1081,44 @@ tr.r3 .rank-cell { color: var(--bronze); }
   gap: 0.8rem;
 }
 
+.compare-favorites {
+  font: inherit;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fav);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.compare-favorites:hover:not(:disabled) {
+  color: #fff;
+}
+
+.compare-favorites:focus-visible {
+  outline: 2px solid var(--fav);
+  outline-offset: 3px;
+}
+
+.compare-favorites:disabled {
+  color: var(--text-faint);
+  cursor: default;
+}
+
+.chip-fav {
+  color: var(--fav);
+  font-size: 0.85em;
+  margin-right: 0.3rem;
+}
+
+/* Selected chips have the orange accent background; the rose heart has no
+   contrast there so it flips to white. */
+.chip.active .chip-fav {
+  color: #fff;
+}
+
 .compare-reset,
 .compare-clear {
   font: inherit;
@@ -1125,6 +1235,14 @@ tr.r3 .rank-cell { color: var(--bronze); }
 }
 
 .feed-item[hidden] { display: none; }
+
+/* Overtakes involving a favorited player get the same rose card treatment
+   as favorited player cards. */
+.feed-item.favorited {
+  border-color: rgba(251, 113, 133, 0.5);
+  box-shadow: 0 0 0 1px rgba(251, 113, 133, 0.22);
+  background: linear-gradient(var(--fav-soft), transparent 45%), var(--bg-card);
+}
 
 .feed-date {
   color: var(--text-faint);

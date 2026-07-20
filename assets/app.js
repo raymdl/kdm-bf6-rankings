@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260720-compare-overtakes-4";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260720-favorites-1";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -10,7 +10,7 @@ import {
   periodSupported,
   resolveRange,
   validCounters
-} from "./period.js?v=20260720-compare-overtakes-4";
+} from "./period.js?v=20260720-favorites-1";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -22,7 +22,7 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260720-compare-overtakes-4";
+} from "./view-state.js?v=20260720-favorites-1";
 
 const app = document.getElementById("app");
 
@@ -254,6 +254,59 @@ function replaceHashAndRender(hash, { preserveScroll = true } = {}) {
 
 function shareButtonHtml() {
   return `<button class="share-button" type="button">Share</button>`;
+}
+
+/* ---------- favorites ----------
+   Per-browser only (localStorage); the site has no accounts, so favorites
+   never leave the visitor's machine. */
+
+const FAVORITES_STORAGE_KEY = "kdm-favorite-players";
+
+const favoriteIds = new Set((() => {
+  try {
+    const raw = JSON.parse(localStorage.getItem(FAVORITES_STORAGE_KEY) ?? "[]");
+    return Array.isArray(raw) ? raw.filter((id) => typeof id === "string") : [];
+  } catch {
+    return [];
+  }
+})());
+
+function isFavorite(discordId) {
+  return favoriteIds.has(discordId);
+}
+
+function toggleFavorite(discordId) {
+  if (!favoriteIds.delete(discordId)) {
+    favoriteIds.add(discordId);
+  }
+  try {
+    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify([...favoriteIds]));
+  } catch {
+    // Private browsing or full storage — the in-memory set still works for
+    // this visit.
+  }
+}
+
+function favoriteButtonHtml(discordId, { size = "" } = {}) {
+  const active = isFavorite(discordId);
+  const label = active ? "Remove from favorites" : "Add to favorites";
+  return `<button class="fav-toggle ${size} ${active ? "active" : ""}" type="button" data-fav-id="${discordId}" aria-pressed="${active}" aria-label="${label}" title="${label}">${active ? "♥" : "♡"}</button>`;
+}
+
+function favoriteBadgeHtml(discordId) {
+  return isFavorite(discordId) ? `<span class="fav-badge" title="Favorite">♥</span>` : "";
+}
+
+function wireFavoriteToggles() {
+  for (const button of app.querySelectorAll(".fav-toggle")) {
+    button.addEventListener("click", (event) => {
+      // Hearts can sit inside link cards; the toggle must never navigate.
+      event.preventDefault();
+      event.stopPropagation();
+      toggleFavorite(button.dataset.favId);
+      replaceHashAndRender(location.hash || "#/");
+    });
+  }
 }
 
 async function copyText(text) {
@@ -1213,10 +1266,10 @@ function renderLeaderboard(statKey, params) {
         historyProvenance(row.discordId, state.history.dates[historyIndex], stat.key) ? null : values[historyIndex]
       );
       const cached = row.member?.cachedStats ? cachedMarkerHtml() : "";
-      return `<tr class="r${rank}">
+      return `<tr class="r${rank}${isFavorite(row.discordId) ? " fav-row" : ""}">
         <td class="rank-cell">${rank}</td>
         <td>${movementHtml(prevRank, endRank, windowText)}</td>
-        <td><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${cached}</td>
+        <td><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${favoriteBadgeHtml(row.discordId)}${cached}</td>
         <td class="num value-cell">${fmtStat(stat, row.value)}</td>
         <td class="num"><span class="delta ${deltaClass}">${delta ?? "–"}</span></td>
         <td>${sparklineSvg(spark)}</td>
@@ -1287,10 +1340,11 @@ function renderPlayers(params) {
     ${viewRangeControlHtml()}
     <div class="player-grid">${sorted
       .map(
-        (member) => `<a class="player-card" data-player-search="${esc(playerSearchText(member))}" href="${playerHref(member.discordId, kd.key)}">
+        (member) => `<a class="player-card ${isFavorite(member.discordId) ? "favorited" : ""}" data-player-search="${esc(playerSearchText(member))}" href="${playerHref(member.discordId, kd.key)}">
           <div class="player-card-name"><span title="${esc(member.displayName ?? member.discordId)}">${esc(member.displayName ?? member.discordId)}</span>${platformIconHtml(member.platform)}${
             member.cachedStats ? cachedMarkerHtml() : ""
           }</div>
+          ${favoriteButtonHtml(member.discordId)}
           <div class="player-card-sub">${esc(member.profileName ?? member.eaName ?? "")}</div>
           <div class="player-card-stats">
             ${[[kd, kd.label], playerKpm ? [playerKpm, "Player KPM"] : null, kills ? [kills, kills.label] : null]
@@ -1307,6 +1361,7 @@ function renderPlayers(params) {
     <p id="player-search-empty" class="empty" hidden>No players match that search.</p>
     ${cachedFootnoteHtml(sorted.some((member) => member.cachedStats))}`;
   wireViewRangeControl((params) => hashRoute("players", params));
+  wireFavoriteToggles();
 
   const search = document.getElementById("player-search");
   const empty = document.getElementById("player-search-empty");
@@ -1451,7 +1506,7 @@ function renderPlayer(discordId, statKey, params) {
     <div class="player-profile-top">
       <div class="player-profile-identity">
         <div class="profile-head">
-          <h1 class="page-title">${esc(name)} <span class="period-title-tag ${periodWindow ? "" : "career-title-tag"}">${esc(periodWindow ? periodWindowText(periodWindow) : careerRangeWindowText(careerWindow, { includeLabel: true }))}</span></h1>
+          <h1 class="page-title">${esc(name)} ${favoriteButtonHtml(discordId, { size: "fav-toggle-lg" })} <span class="period-title-tag ${periodWindow ? "" : "career-title-tag"}">${esc(periodWindow ? periodWindowText(periodWindow) : careerRangeWindowText(careerWindow, { includeLabel: true }))}</span></h1>
           ${member?.cachedStats ? cachedMarkerHtml() : ""}
         </div>
         <p class="profile-sub"><span class="profile-identity-row">${profileIdentityParts.join(" · ")}</span>${profileLinkParts.length ? `<span class="profile-links-row">${profileLinkParts.join(" · ")}</span>` : ""}</p>
@@ -1500,6 +1555,7 @@ function renderPlayer(discordId, statKey, params) {
     }
     replaceHashAndRender(playerHistoryHref(discordId, stat.key, !showEstimated));
   });
+  wireFavoriteToggles();
   const recentPerformanceCard = app.querySelector(".recent-form-card");
   recentPerformanceCard?.addEventListener("toggle", () => {
     recentPerformanceCollapsed = !recentPerformanceCard.open;
@@ -1699,11 +1755,11 @@ function renderCompare() {
     ${viewRangeControlHtml()}
     <div class="group-label">Stat</div>
     ${statTabsHtml(stat.key)}
-    <div class="group-label compare-players-label"><span>Players</span><span class="compare-player-actions"><button class="compare-reset" type="button">Reset to Top 2</button><button class="compare-clear" type="button" ${compareState.selected.length === 0 ? "disabled" : ""}>Unselect all</button></span></div>
+    <div class="group-label compare-players-label"><span>Players</span><span class="compare-player-actions"><button class="compare-favorites" type="button" ${candidates.some((member) => isFavorite(member.discordId)) ? "" : "disabled"} title="Select your favorited players">&hearts; Favorites</button><button class="compare-reset" type="button">Reset to Top 2</button><button class="compare-clear" type="button" ${compareState.selected.length === 0 ? "disabled" : ""}>Unselect all</button></span></div>
     <div class="chip-row">${candidates
       .map(
         (member) =>
-          `<button class="chip ${compareState.selected.includes(member.discordId) ? "active" : ""}" data-id="${member.discordId}">${esc(member.displayName ?? member.discordId)}</button>`
+          `<button class="chip ${compareState.selected.includes(member.discordId) ? "active" : ""}" data-id="${member.discordId}">${isFavorite(member.discordId) ? `<span class="chip-fav">&hearts;</span>` : ""}${esc(member.displayName ?? member.discordId)}</button>`
       )
       .join("")}</div>
     <div class="chart-card">
@@ -1721,6 +1777,13 @@ function renderCompare() {
   app.querySelector(".compare-reset")?.addEventListener("click", () => {
     compareState.selectionMode = "default";
     compareState.selected = latestRanking(stat.key).slice(0, 2).map((row) => row.discordId);
+    replaceHashAndRender(compareHref());
+  });
+  app.querySelector(".compare-favorites")?.addEventListener("click", () => {
+    compareState.selectionMode = "manual";
+    compareState.selected = candidates
+      .filter((member) => isFavorite(member.discordId))
+      .map((member) => member.discordId);
     replaceHashAndRender(compareHref());
   });
   for (const chip of app.querySelectorAll(".chip[data-id]")) {
@@ -1848,16 +1911,16 @@ function renderTimeMachine() {
         <thead><tr><th>#</th><th>Player</th><th class="num">${esc(stat.title)}</th></tr></thead>
         <tbody>${ranking
           .map(
-            (row, rankIndex) => `<tr class="r${rankIndex + 1}">
+            (row, rankIndex) => `<tr class="r${rankIndex + 1}${isFavorite(row.discordId) ? " fav-row" : ""}">
               <td class="rank-cell">${rankIndex + 1}</td>
-              <td><a class="player-link" href="${timeMachinePlayerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a></td>
+              <td><a class="player-link" href="${timeMachinePlayerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${favoriteBadgeHtml(row.discordId)}</td>
               <td class="num value-cell">${fmtStat(stat, row.value)}</td>
             </tr>`
           )
           .join("")}${missingRows
-            .map((row) => `<tr class="time-machine-unranked">
+            .map((row) => `<tr class="time-machine-unranked${isFavorite(row.discordId) ? " fav-row" : ""}">
               <td class="rank-cell">—</td>
-              <td><a class="player-link" href="${timeMachinePlayerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a> ${timeMachineTrackedSinceBadgeHtml(row.trackedSince)}</td>
+              <td><a class="player-link" href="${timeMachinePlayerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${favoriteBadgeHtml(row.discordId)} ${timeMachineTrackedSinceBadgeHtml(row.trackedSince)}</td>
               <td class="num">—</td>
             </tr>`)
             .join("")}</tbody>
@@ -1889,9 +1952,9 @@ function overtakeText(event) {
       )}">Compare</a>`
     : "";
   return `<span class="feed-text"><span class="badge overtake">overtake</span>
-    <a class="who player-link" href="${playerHref(event.overtakerId)}">${esc(memberName(event.overtakerId))}</a>
+    <a class="who player-link" href="${playerHref(event.overtakerId)}">${esc(memberName(event.overtakerId))}</a>${favoriteBadgeHtml(event.overtakerId)}
     passed
-    <a class="who player-link" href="${playerHref(event.overtakenId)}">${esc(memberName(event.overtakenId))}</a>
+    <a class="who player-link" href="${playerHref(event.overtakenId)}">${esc(memberName(event.overtakenId))}</a>${favoriteBadgeHtml(event.overtakenId)}
     in <strong>${esc(stat?.title ?? event.statKey)}</strong>${compare}</span>`;
 }
 
@@ -1994,7 +2057,12 @@ function auditText(event) {
 
 function renderActivity() {
   const items = (state.notifications.events ?? [])
-    .map((event) => ({ at: event.at, html: overtakeText(event), search: activitySearchText(event) }))
+    .map((event) => ({
+      at: event.at,
+      html: overtakeText(event),
+      search: activitySearchText(event),
+      favorited: isFavorite(event.overtakerId) || isFavorite(event.overtakenId)
+    }))
     .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
     .slice(0, 120);
 
@@ -2009,7 +2077,7 @@ function renderActivity() {
     ${
       items.length
         ? `<div class="feed">${items
-            .map((item) => `<div class="feed-item" data-activity-search="${esc(item.search)}"><span class="feed-date">${fmtDateTime(item.at)}</span>${item.html}</div>`)
+            .map((item) => `<div class="feed-item${item.favorited ? " favorited" : ""}" data-activity-search="${esc(item.search)}"><span class="feed-date">${fmtDateTime(item.at)}</span>${item.html}</div>`)
             .join("")}</div><p id="activity-search-empty" class="empty" hidden>No overtake activity matches that search.</p>`
         : `<div class="empty">No overtakes yet — this feed records leaderboard changes only.</div>`
     }`;
@@ -2425,7 +2493,7 @@ function effectivenessTableHtml(key, ranking) {
         ? `<td class="num value-cell">${row.scores.sortino.toFixed(1)}</td><td class="num">${row.sortinoUpside.toFixed(1)}</td><td class="num">${row.adjusted.deathsPerHour.toFixed(1)}</td>`
         : `<td class="num value-cell">${row.scores.trident.toFixed(1)}</td><td>${row.bestSupportLanes.map((lane) => lane[0].toUpperCase() + lane.slice(1)).join(" + ")}</td>`;
     const detailId = `score-detail-${key}-${row.discordId}`;
-    return `<tr class="r${row.originalRank}"><td class="rank-cell">${row.originalRank}</td><td><div class="ranking-player-cell"><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${row.cachedStats ? cachedMarkerHtml() : ""}<button class="rank-detail-toggle" type="button" aria-expanded="false" aria-controls="${detailId}" data-detail-id="${detailId}">Breakdown</button></div></td>${detail}<td class="num pillar-score">${row.pillars.combat.toFixed(1)}</td><td class="num pillar-score">${row.pillars.objective.toFixed(1)}</td><td class="num pillar-score">${row.pillars.teamwork.toFixed(1)}</td></tr>
+    return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><div class="ranking-player-cell"><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${row.cachedStats ? cachedMarkerHtml() : ""}<button class="rank-detail-toggle" type="button" aria-expanded="false" aria-controls="${detailId}" data-detail-id="${detailId}">Breakdown</button></div></td>${detail}<td class="num pillar-score">${row.pillars.combat.toFixed(1)}</td><td class="num pillar-score">${row.pillars.objective.toFixed(1)}</td><td class="num pillar-score">${row.pillars.teamwork.toFixed(1)}</td></tr>
       <tr class="rank-detail-row" id="${detailId}" hidden><td colspan="${columnCount}">${effectivenessBreakdownHtml(key, row)}</td></tr>`;
   }).join("");
   return `<div class="table-wrap effectiveness-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", effectivenessSortState)}${sortableHeaderHtml("Player", "player", effectivenessSortState)}${header}${sortableHeaderHtml("Combat", "combat", effectivenessSortState, { numeric: true })}${sortableHeaderHtml("Objective", "objective", effectivenessSortState, { numeric: true })}${sortableHeaderHtml("Teamwork", "teamwork", effectivenessSortState, { numeric: true })}</tr></thead><tbody>${rows}</tbody></table></div>`;
