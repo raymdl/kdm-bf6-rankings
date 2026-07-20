@@ -1121,9 +1121,9 @@ function renderPeriodLeaderboard(stat, window) {
     .map((row) => {
       const spark = memberDailySeries(state.counters, row.discordId, stat.key, window).map((point) => point.value);
       const carried = row.provenance?.startCarried || row.provenance?.endCarried;
-      return `<tr class="${row.provisionalRow ? "period-provisional" : `r${row.originalRank}`}">
+      return `<tr class="${row.provisionalRow ? "period-provisional" : `r${row.originalRank}`}${isFavorite(row.discordId) ? " fav-row" : ""}">
         <td class="rank-cell">${row.provisionalRow ? "–" : row.originalRank}</td>
-        <td><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${
+        <td><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${favoriteBadgeHtml(row.discordId)}${
           row.provisionalRow
             ? ` <span class="badge provisional" title="Under 15 active minutes in this range — too small a sample to rank">low time</span>`
             : ""
@@ -1137,9 +1137,9 @@ function renderPeriodLeaderboard(stat, window) {
     })
     .join("");
   const missingRowsHtml = missingRows
-    .map((row) => `<tr class="time-machine-unranked">
+    .map((row) => `<tr class="time-machine-unranked${isFavorite(row.discordId) ? " fav-row" : ""}">
         <td class="rank-cell">—</td>
-        <td><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a> <span class="badge provisional" title="No gameplay recorded in this range">no play</span></td>
+        <td><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${favoriteBadgeHtml(row.discordId)} <span class="badge provisional" title="No gameplay recorded in this range">no play</span></td>
         <td class="num">—</td>
         <td class="num">—</td>
         <td></td>
