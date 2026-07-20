@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260720-ui-hardening-1";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -10,7 +10,7 @@ import {
   periodSupported,
   resolveRange,
   validCounters
-} from "./period.js?v=20260718-career-period-18";
+} from "./period.js?v=20260720-ui-hardening-1";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -22,7 +22,7 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260718-career-period-18";
+} from "./view-state.js?v=20260720-ui-hardening-1";
 
 const app = document.getElementById("app");
 
@@ -104,51 +104,54 @@ const PLATFORM_LABELS = {
   ps5: "PlayStation"
 };
 
+// Platform SVGs are vendored in assets/icons (downloaded once from
+// api.iconify.design/simple-icons) so rendering never depends on a
+// third-party origin being up.
 const PLATFORM_ICONS = {
   ea: {
     key: "ea",
     label: "EA",
-    src: "https://api.iconify.design/simple-icons:ea.svg?color=%230d0f12"
+    src: "assets/icons/ea-dark.svg"
   },
   pc: {
     key: "ea",
     label: "EA / PC",
-    src: "https://api.iconify.design/simple-icons:ea.svg?color=%230d0f12"
+    src: "assets/icons/ea-dark.svg"
   },
   psn: {
     key: "playstation",
     label: "PlayStation",
-    src: "https://api.iconify.design/simple-icons:playstation.svg?color=%239aa3ad"
+    src: "assets/icons/playstation.svg"
   },
   ps4: {
     key: "playstation",
     label: "PlayStation",
-    src: "https://api.iconify.design/simple-icons:playstation.svg?color=%239aa3ad"
+    src: "assets/icons/playstation.svg"
   },
   ps5: {
     key: "playstation",
     label: "PlayStation",
-    src: "https://api.iconify.design/simple-icons:playstation.svg?color=%239aa3ad"
+    src: "assets/icons/playstation.svg"
   },
   steam: {
     key: "steam",
     label: "Steam",
-    src: "https://api.iconify.design/simple-icons:steam.svg?color=%239aa3ad"
+    src: "assets/icons/steam.svg"
   },
   xbox: {
     key: "xbox",
     label: "Xbox",
-    src: "https://api.iconify.design/simple-icons:xbox.svg?color=%239aa3ad"
+    src: "assets/icons/xbox.svg"
   },
   xboxone: {
     key: "xbox",
     label: "Xbox",
-    src: "https://api.iconify.design/simple-icons:xbox.svg?color=%239aa3ad"
+    src: "assets/icons/xbox.svg"
   },
   xboxseries: {
     key: "xbox",
     label: "Xbox",
-    src: "https://api.iconify.design/simple-icons:xbox.svg?color=%239aa3ad"
+    src: "assets/icons/xbox.svg"
   }
 };
 
@@ -254,6 +257,14 @@ function shareButtonHtml() {
 }
 
 async function copyText(text) {
+  // Modern clipboard API first; the hidden-textarea execCommand path stays as
+  // a fallback for older/permission-restricted browsers.
+  try {
+    await navigator.clipboard.writeText(text);
+    return;
+  } catch {
+    // Fall through to execCommand.
+  }
   const textarea = document.createElement("textarea");
   textarea.value = text;
   textarea.setAttribute("readonly", "");
@@ -263,10 +274,9 @@ async function copyText(text) {
   textarea.select();
   const copied = document.execCommand("copy");
   textarea.remove();
-  if (copied) {
-    return;
+  if (!copied) {
+    throw new Error("Copy failed");
   }
-  await navigator.clipboard.writeText(text);
 }
 
 function wireShareButton() {
@@ -2433,29 +2443,47 @@ function render() {
     if (link.dataset.nav === "compare") link.href = hashRoute("compare", { stat: selectedStatKey, ...persistentParams });
     link.classList.toggle("active", link.dataset.nav === nav);
   }
+  const failureNotice = bootFailureNoticeHtml();
+  if (failureNotice) {
+    app.insertAdjacentHTML("afterbegin", failureNotice);
+  }
   wireFloatingTableHeaders();
   window.scrollTo(0, 0);
 }
 
 /* ---------- boot ---------- */
 
-async function fetchJson(path, fallback) {
+const failedBootFiles = [];
+
+async function fetchJson(path, fallback, { essential = false } = {}) {
   try {
     const response = await fetch(path, { cache: "no-cache" });
     if (!response.ok) {
+      if (essential) failedBootFiles.push(path);
       return fallback;
     }
     return await response.json();
   } catch {
+    if (essential) failedBootFiles.push(path);
     return fallback;
   }
+}
+
+// Essential files degrade the whole site when missing, so their failures get a
+// visible notice; the rest (provenance, effectiveness, counters) are optional
+// by design and simply switch their features off.
+function bootFailureNoticeHtml() {
+  if (failedBootFiles.length === 0) {
+    return "";
+  }
+  return `<div class="error-box" role="alert"><strong>Some data failed to load</strong> (${esc(failedBootFiles.join(", "))}). Rankings may be incomplete — try refreshing.</div>`;
 }
 
 async function boot() {
   const [meta, latest, history, historyProvenanceData, audit, notifications, effectivenessHistory, counters] = await Promise.all([
     fetchJson("data/meta.json", null),
-    fetchJson("data/latest.json", { members: [] }),
-    fetchJson("data/history.json", { dates: [], members: {} }),
+    fetchJson("data/latest.json", { members: [] }, { essential: true }),
+    fetchJson("data/history.json", { dates: [], members: {} }, { essential: true }),
     fetchJson("data/history-provenance.json", null),
     fetchJson("data/audit.json", { events: [] }),
     fetchJson("data/notifications.json", { events: [] }),
