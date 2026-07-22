@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260720-default-7d-1";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260722-compare-period-top2";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -10,7 +10,7 @@ import {
   periodSupported,
   resolveRange,
   validCounters
-} from "./period.js?v=20260720-default-7d-1";
+} from "./period.js?v=20260722-compare-period-top2";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -22,7 +22,7 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260720-default-7d-1";
+} from "./view-state.js?v=20260722-compare-period-top2";
 
 const app = document.getElementById("app");
 
@@ -1673,6 +1673,24 @@ function recentFormCardHtml(discordId, member) {
 
 const compareState = { selected: [], statKey: null, selectionMode: "default" };
 
+// Default selection follows whichever view is active: Period form for the
+// selected range when the stat supports it, otherwise the Career standings.
+function defaultCompareSelection(statKey) {
+  const periodWindow = activePeriodWindow();
+  if (periodWindow && periodSupported(statKey)) {
+    const candidateIds = new Set(state.latest.members.map((member) => member.discordId));
+    const { ranked } = periodRanking(state.counters, statKey, periodWindow);
+    const top = ranked
+      .map((row) => row.discordId)
+      .filter((id) => candidateIds.has(id))
+      .slice(0, 2);
+    if (top.length > 0) {
+      return top;
+    }
+  }
+  return latestRanking(statKey).slice(0, 2).map((row) => row.discordId);
+}
+
 function compareHref(
   statKey = compareState.statKey,
   selected = compareState.selected,
@@ -1695,7 +1713,7 @@ function loadCompareState(params) {
     compareState.selected = [...new Set((params.get("players") ?? "").split(",").filter((id) => candidateIds.has(id)))];
   } else {
     compareState.selectionMode = "default";
-    compareState.selected = latestRanking(stat.key).slice(0, 2).map((row) => row.discordId);
+    compareState.selected = defaultCompareSelection(stat.key);
   }
 }
 
@@ -1731,9 +1749,7 @@ function renderCompare() {
     String(a.displayName ?? "").localeCompare(String(b.displayName ?? ""))
   );
   if (compareState.selectionMode === "default") {
-    compareState.selected = latestRanking(stat.key)
-      .slice(0, 2)
-      .map((row) => row.discordId);
+    compareState.selected = defaultCompareSelection(stat.key);
   }
   history.replaceState(null, "", compareHref());
 
@@ -1772,7 +1788,7 @@ function renderCompare() {
   });
   app.querySelector(".compare-reset")?.addEventListener("click", () => {
     compareState.selectionMode = "default";
-    compareState.selected = latestRanking(stat.key).slice(0, 2).map((row) => row.discordId);
+    compareState.selected = defaultCompareSelection(stat.key);
     replaceHashAndRender(compareHref());
   });
   app.querySelector(".compare-favorites")?.addEventListener("click", () => {
