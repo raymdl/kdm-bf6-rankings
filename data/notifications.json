@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-23T13:03:26.754Z",
-  "lastOvertakeDate": "2026-07-21",
+  "updatedAt": "2026-07-23T17:41:10.054Z",
+  "lastOvertakeDate": "2026-07-22",
   "events": [
     {
       "at": "2026-07-10T13:11:26.381Z",
@@ -914,6 +914,108 @@
       "statKey": "multiKills",
       "overtakerId": "211731212480282624",
       "overtakenId": "379816775526776832"
+    },
+    {
+      "at": "2026-07-23T17:41:10.054Z",
+      "statKey": "scorePerMinute",
+      "overtakerId": "379816775526776832",
+      "overtakenId": "110501250566492160"
+    },
+    {
+      "at": "2026-07-23T17:41:10.054Z",
+      "statKey": "scorePerMinute",
+      "overtakerId": "365653146200047616",
+      "overtakenId": "532179643927756803"
+    },
+    {
+      "at": "2026-07-23T17:41:10.054Z",
+      "statKey": "kills",
+      "overtakerId": "391072156353822722",
+      "overtakenId": "110501250566492160"
+    },
+    {
+      "at": "2026-07-23T17:41:10.054Z",
+      "statKey": "assists",
+      "overtakerId": "132955607509630977",
+      "overtakenId": "106533246161948672"
+    },
+    {
+      "at": "2026-07-23T17:41:10.054Z",
+      "statKey": "assists",
+      "overtakerId": "1302676035929636979",
+      "overtakenId": "199574297541476352"
+    },
+    {
+      "at": "2026-07-23T17:41:10.054Z",
+      "statKey": "vehicleKills",
+      "overtakerId": "206528087578378240",
+      "overtakenId": "399026036685144066"
+    },
+    {
+      "at": "2026-07-23T17:41:10.054Z",
+      "statKey": "revives",
+      "overtakerId": "234364939492524032",
+      "overtakenId": "399026036685144066"
+    },
+    {
+      "at": "2026-07-23T17:41:10.054Z",
+      "statKey": "headshotPercent",
+      "overtakerId": "124870403742105600",
+      "overtakenId": "199574297541476352"
+    },
+    {
+      "at": "2026-07-23T17:41:10.054Z",
+      "statKey": "headshotPercent",
+      "overtakerId": "232628344477188096",
+      "overtakenId": "1280649502398611489"
+    },
+    {
+      "at": "2026-07-23T17:41:10.054Z",
+      "statKey": "headshotPercent",
+      "overtakerId": "532179643927756803",
+      "overtakenId": "206528087578378240"
+    },
+    {
+      "at": "2026-07-23T17:41:10.054Z",
+      "statKey": "playerRank",
+      "overtakerId": "211731212480282624",
+      "overtakenId": "124870403742105600"
+    },
+    {
+      "at": "2026-07-23T17:41:10.054Z",
+      "statKey": "timePlayedHours",
+      "overtakerId": "234840069305925633",
+      "overtakenId": "281960021024309248"
+    },
+    {
+      "at": "2026-07-23T17:41:10.054Z",
+      "statKey": "timePlayedHours",
+      "overtakerId": "463527125509603357",
+      "overtakenId": "429450913560789003"
+    },
+    {
+      "at": "2026-07-23T17:41:10.054Z",
+      "statKey": "objectiveCaptures",
+      "overtakerId": "379816775526776832",
+      "overtakenId": "391072156353822722"
+    },
+    {
+      "at": "2026-07-23T17:41:10.054Z",
+      "statKey": "multiKills",
+      "overtakerId": "208693345768308736",
+      "overtakenId": "1488685212509540444"
+    },
+    {
+      "at": "2026-07-23T17:41:10.054Z",
+      "statKey": "meleeKills",
+      "overtakerId": "379816775526776832",
+      "overtakenId": "1198566495475732564"
+    },
+    {
+      "at": "2026-07-23T17:41:10.054Z",
+      "statKey": "meleeKills",
+      "overtakerId": "463527125509603357",
+      "overtakenId": "391072156353822722"
     }
   ],
   "milestones": [
@@ -1373,6 +1475,17 @@
     "melee-kills:97465129314045952": 0,
     "vehicle-kills:97465129314045952": 0,
     "defib-kills:97465129314045952": 0,
-    "time-played:97465129314045952": 1
+    "time-played:97465129314045952": 1,
+    "player-rank:249603414193995781": 3,
+    "rank-69:249603414193995781": 1,
+    "rank-420:249603414193995781": 0,
+    "rank-777:249603414193995781": 0,
+    "player-kills:249603414193995781": 1,
+    "objective-captures:249603414193995781": 1,
+    "player-kd:249603414193995781": 2,
+    "melee-kills:249603414193995781": 0,
+    "vehicle-kills:249603414193995781": 0,
+    "defib-kills:249603414193995781": 0,
+    "time-played:249603414193995781": 0
   }
 }
