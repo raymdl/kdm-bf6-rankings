@@ -1,16 +1,17 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260722-compare-period-top2";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260722-scaled-period-floor";
 import {
   memberDailySeries,
   memberPeriodDeltas,
   memberPeriodStat,
+  minActiveSecondsForWindow,
   periodRanking,
   periodSupported,
   resolveRange,
   validCounters
-} from "./period.js?v=20260722-compare-period-top2";
+} from "./period.js?v=20260722-scaled-period-floor";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -22,7 +23,7 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260722-compare-period-top2";
+} from "./view-state.js?v=20260722-scaled-period-floor";
 
 const app = document.getElementById("app");
 
@@ -1080,6 +1081,8 @@ function activeTimeText(activeSeconds) {
 function renderPeriodLeaderboard(stat, window) {
   prepareSortState(leaderboardSortState, `period:${stat.key}:${window.startDate}:${window.endDate}`);
   const { ranked, provisional, invalid } = periodRanking(state.counters, stat.key, window);
+  // Active-playtime floor to rank scales with the range length (15 min/day).
+  const floorMin = Math.round(minActiveSecondsForWindow(window) / 60);
 
   const podium = ranked.slice(0, 3);
   const podiumHtml = podium.length
@@ -1125,7 +1128,7 @@ function renderPeriodLeaderboard(stat, window) {
         <td class="rank-cell">${row.provisionalRow ? "–" : row.originalRank}</td>
         <td><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${favoriteBadgeHtml(row.discordId)}${
           row.provisionalRow
-            ? ` <span class="badge provisional" title="Under 15 active minutes in this range — too small a sample to rank">low time</span>`
+            ? ` <span class="badge provisional" title="Under ${floorMin} active minutes in this range — too small a sample to rank">low time</span>`
             : ""
         }${trackedSinceBadgeHtml(window, row.trackedSince)}${
           carried ? ` <span class="cached-marker" role="img" aria-label="Endpoint carried from an earlier snapshot" title="One endpoint was carried from this member's most recent earlier snapshot (they were missing from a refresh)">◷</span>` : ""
@@ -1154,7 +1157,7 @@ function renderPeriodLeaderboard(stat, window) {
 
   app.innerHTML = `
     <h1 class="page-title">${esc(stat.title)} Leaderboard <span class="period-title-tag">${esc(periodWindowText(window))}</span></h1>
-    <p class="page-sub">Stats earned during this range only, from daily snapshot differences · rates need 15+ active minutes to rank · daily trend per player</p>
+    <p class="page-sub">Stats earned during this range only, from daily snapshot differences · rates need ${floorMin}+ active minutes to rank · daily trend per player</p>
     ${viewRangeControlHtml()}
     ${statTabsHtml(stat.key, (key) => hashRoute(`board/${key}`, viewRangeParams()))}
     ${podiumHtml}

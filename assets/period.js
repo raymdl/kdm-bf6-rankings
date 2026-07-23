@@ -6,7 +6,37 @@
    values; missing member endpoints carry the last observed column forward
    with provenance; negative deltas invalidate the member's window. */
 
-export const MIN_ACTIVE_SECONDS_TO_RANK = 900;
+// Per-day active-playtime floor for rate stats to rank. The effective floor
+// scales linearly with the window's calendar-day span (see
+// minActiveSecondsForWindow), so a 1-day range needs 15 active minutes, a 3-day
+// range needs 45, a 30-day range needs 450, etc. This stops a tiny sample from
+// topping a long-range leaderboard.
+export const MIN_ACTIVE_SECONDS_PER_DAY_TO_RANK = 900;
+
+// Back-compat alias: the base (1-day) floor.
+export const MIN_ACTIVE_SECONDS_TO_RANK = MIN_ACTIVE_SECONDS_PER_DAY_TO_RANK;
+
+// The calendar-day span a window covers, from its start to end endpoint dates
+// (minimum 1). Uses actual dates rather than column counts so gaps in the daily
+// snapshots don't understate the span, and a clamped/short window scales its
+// floor down honestly rather than demanding the full preset's playtime.
+export function windowDaySpan(window) {
+  if (!window || !window.startDate || !window.endDate) {
+    return 1;
+  }
+  const start = Date.parse(`${window.startDate}T00:00:00Z`);
+  const end = Date.parse(`${window.endDate}T00:00:00Z`);
+  if (!Number.isFinite(start) || !Number.isFinite(end)) {
+    return 1;
+  }
+  return Math.max(1, Math.round((end - start) / 86_400_000));
+}
+
+// The active-playtime floor (seconds) a rate stat must meet to rank over this
+// window: the per-day floor scaled by the window's day span.
+export function minActiveSecondsForWindow(window) {
+  return MIN_ACTIVE_SECONDS_PER_DAY_TO_RANK * windowDaySpan(window);
+}
 
 export const PERIOD_RANGE_KEYS = ["today", "3d", "7d", "14d", "30d", "all", "custom"];
 export const CUSTOM_RANGE_RE = /^(\d{4}-\d{2}-\d{2})\.\.(\d{4}-\d{2}-\d{2})$/;
@@ -235,7 +265,7 @@ export function memberPeriodStat(counters, discordId, statKey, window) {
   return {
     value: Number.isFinite(value) ? value : null,
     activeSeconds: resolved.activeSeconds,
-    qualifies: !def.rate || (resolved.activeSeconds ?? 0) >= MIN_ACTIVE_SECONDS_TO_RANK,
+    qualifies: !def.rate || (resolved.activeSeconds ?? 0) >= minActiveSecondsForWindow(window),
     isRate: def.rate,
     provenance: { startCarried: resolved.startCarried, endCarried: resolved.endCarried },
     trackedSince: counters.dates[resolved.trackedSinceIndex] ?? null

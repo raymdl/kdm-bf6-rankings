@@ -6,9 +6,11 @@ import {
   memberFirstObservedIndex,
   memberPeriodDeltas,
   memberPeriodStat,
+  minActiveSecondsForWindow,
   periodRanking,
   periodSupported,
-  resolveRange
+  resolveRange,
+  windowDaySpan
 } from "../assets/period.js";
 
 // Column helper: build one member's aligned counter arrays from per-day
@@ -259,13 +261,35 @@ test("the 15-active-minute rule qualifies rates only, at exactly the threshold",
   assert.equal(count.qualifies, true, "count stats ignore the playtime threshold");
 });
 
+test("the active-playtime floor scales with the window's day span (15 min/day)", () => {
+  assert.equal(windowDaySpan({ startDate: "2026-07-14", endDate: "2026-07-17" }), 3);
+  assert.equal(minActiveSecondsForWindow({ startDate: "2026-07-14", endDate: "2026-07-17" }), 3 * MIN_ACTIVE_SECONDS_TO_RANK);
+
+  // Over a 3-day window, 20 active minutes is provisional but 45 qualifies.
+  const build = (activeSeconds) =>
+    counters({
+      dates: ["2026-07-14", "2026-07-17"],
+      members: { p: member("P", [[0, 0, 0, 0, 0], [90, 99, 30, activeSeconds, 120_000]]) }
+    });
+  const window3d = resolveRange(build(20 * 60), "custom", "2026-07-14..2026-07-17");
+  assert.equal(windowDaySpan(window3d), 3);
+  assert.equal(memberPeriodStat(build(20 * 60), "p", "infantryKillDeath", window3d).qualifies, false, "20 min over 3 days is provisional");
+  assert.equal(memberPeriodStat(build(44 * 60), "p", "infantryKillDeath", window3d).qualifies, false, "44 min falls just short of the 45 min floor");
+  assert.equal(memberPeriodStat(build(45 * 60), "p", "infantryKillDeath", window3d).qualifies, true, "45 min meets the scaled floor");
+  // Count stats still ignore the floor entirely, at any span.
+  assert.equal(memberPeriodStat(build(20 * 60), "p", "kills", window3d).qualifies, true);
+});
+
 test("periodRanking splits qualified, provisional, and invalid rows deterministically", () => {
   const c = fixture();
   const window = resolveRange(c, "7d");
   const { ranked, provisional, invalid } = periodRanking(c, "infantryKillDeath", window);
-  assert.deepEqual(ranked.map((row) => row.discordId), ["latecomer", "gappy", "steady"]);
-  assert.deepEqual(ranked.map((row) => row.rank), [1, 2, 3]);
-  assert.equal(provisional.length, 0);
+  // Over this 7-day window the floor is 105 active minutes (15/day). Gappy
+  // logged only 60 active minutes across the range, so it drops to provisional
+  // rather than topping a week-long leaderboard on an hour of play.
+  assert.deepEqual(ranked.map((row) => row.discordId), ["latecomer", "steady"]);
+  assert.deepEqual(ranked.map((row) => row.rank), [1, 2]);
+  assert.deepEqual(provisional.map((row) => row.discordId), ["gappy"]);
   assert.deepEqual(invalid, [{ discordId: "reset", reason: "negative_delta" }]);
   const kills = periodRanking(c, "kills", window);
   assert.ok(kills.ranked.some((row) => row.discordId === "idle"), "idle's observed 0 kills still ranks in count stats");
