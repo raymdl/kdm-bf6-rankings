@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260722-scaled-period-floor";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260725-series-overtakes";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -11,7 +11,7 @@ import {
   periodSupported,
   resolveRange,
   validCounters
-} from "./period.js?v=20260722-scaled-period-floor";
+} from "./period.js?v=20260725-series-overtakes";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -23,7 +23,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260722-scaled-period-floor";
+} from "./view-state.js?v=20260725-series-overtakes";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260725-series-overtakes";
 
 const app = document.getElementById("app");
 
@@ -511,16 +512,9 @@ function fmtShortDate(date) {
   return fmtDate(`${date}T12:00:00`);
 }
 
-// Overtake timestamps are UTC instants; snapshot dates are Eastern calendar
-// days, so match them on the Eastern date.
+// Snapshot dates use the Eastern calendar day.
 function easternDateKey(iso) {
   return new Date(iso).toLocaleDateString("en-CA", { timeZone: "America/New_York" });
-}
-
-function previousDateKey(date) {
-  const shifted = new Date(`${date}T12:00:00Z`);
-  shifted.setUTCDate(shifted.getUTCDate() - 1);
-  return shifted.toISOString().slice(0, 10);
 }
 
 function asOfEasternText(iso) {
@@ -1832,32 +1826,23 @@ function renderCompare() {
     );
   } else if (state.history.dates.length > 0 && compareState.selected.length > 0) {
     const window = compareHistoryWindow(stat.key);
-    const selectedIds = new Set(compareState.selected);
-    // The morning refresh that records an overtake writes the snapshot dated
-    // the previous game day, so the crossing is visible one label earlier
-    // than the event timestamp.
-    const overtakeDatesFor = (id) =>
-      new Set(
-        (state.notifications?.events ?? [])
-          .filter(
-            (event) =>
-              event.statKey === stat.key && event.overtakerId === id && selectedIds.has(event.overtakenId)
-          )
-          .map((event) => previousDateKey(easternDateKey(event.at)))
-      );
+    const careerSeries = Object.fromEntries(
+      compareState.selected.map((id) => [
+        id,
+        series(id, stat.key)
+          .slice(window.start, window.end)
+          .map((value, index) => (historyProvenance(id, window.labels[index], stat.key) ? null : value))
+      ])
+    );
+    const overtakeFlags = pairwiseOvertakeFlags(careerSeries);
     lineChart(
       document.getElementById("compare-chart"),
       window.labels,
-      compareState.selected.map((id) => {
-        const overtakeDates = overtakeDatesFor(id);
-        return {
-          label: memberName(id),
-          data: series(id, stat.key)
-            .slice(window.start, window.end)
-            .map((value, index) => (historyProvenance(id, window.labels[index], stat.key) ? null : value)),
-          overtakes: window.labels.map((date) => overtakeDates.has(date))
-        };
-      }),
+      compareState.selected.map((id) => ({
+        label: memberName(id),
+        data: careerSeries[id],
+        overtakes: overtakeFlags[id]
+      })),
       stat
     );
   }
