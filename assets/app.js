@@ -903,7 +903,7 @@ const overtakeHaloPlugin = {
   }
 };
 
-function lineChart(canvas, labels, datasets, stat) {
+function lineChart(canvas, labels, datasets, stat, options = {}) {
   chartBase();
   const lastIndex = labels.length - 1;
   const todayInProgress =
@@ -969,6 +969,7 @@ function lineChart(canvas, labels, datasets, stat) {
           // Keep the tooltip clear of the hovered points instead of sitting
           // on top of them (it flips to the other side near the chart edge).
           caretPadding: 24,
+          ...(options.itemSort ? { itemSort: options.itemSort } : {}),
           callbacks: {
             afterTitle: (items) =>
               todayInProgress && items[0]?.dataIndex === lastIndex ? "today · in progress" : "",
@@ -1670,6 +1671,12 @@ function recentFormCardHtml(discordId, member) {
 
 const compareState = { selected: [], statKey: null, selectionMode: "default" };
 
+function compareTooltipItemSort(a, b) {
+  const aValue = Number.isFinite(a.parsed?.y) ? a.parsed.y : Number.NEGATIVE_INFINITY;
+  const bValue = Number.isFinite(b.parsed?.y) ? b.parsed.y : Number.NEGATIVE_INFINITY;
+  return bValue - aValue || a.datasetIndex - b.datasetIndex;
+}
+
 // Default selection follows whichever view is active: Period form for the
 // selected range when the stat supports it, otherwise the Career standings.
 function defaultCompareSelection(statKey) {
@@ -1822,7 +1829,8 @@ function renderCompare() {
           estimated: points.map((point) => !point.observedEnd)
         };
       }),
-      stat
+      stat,
+      { itemSort: compareTooltipItemSort }
     );
   } else if (state.history.dates.length > 0 && compareState.selected.length > 0) {
     const window = compareHistoryWindow(stat.key);
@@ -1843,7 +1851,8 @@ function renderCompare() {
         data: careerSeries[id],
         overtakes: overtakeFlags[id]
       })),
-      stat
+      stat,
+      { itemSort: compareTooltipItemSort }
     );
   }
   wireShareButton();
@@ -1945,11 +1954,11 @@ function renderTimeMachine() {
 function overtakeText(event) {
   const stat = statByKey(event.statKey);
   const compare = stat
-    ? `<a class="feed-action" href="${compareHref(
-        stat.key,
-        [event.overtakerId, event.overtakenId],
-        "manual"
-      )}">Compare</a>`
+    ? `<a class="feed-action" href="${hashRoute("compare", {
+        stat: stat.key,
+        players: [event.overtakerId, event.overtakenId],
+        range: "7d"
+      })}">Compare</a>`
     : "";
   return `<span class="feed-text"><span class="badge overtake">overtake</span>
     <a class="who player-link" href="${playerHref(event.overtakerId)}">${esc(memberName(event.overtakerId))}</a>${favoriteBadgeHtml(event.overtakerId)}
