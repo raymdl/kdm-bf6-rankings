@@ -1954,11 +1954,11 @@ function renderTimeMachine() {
 function overtakeText(event) {
   const stat = statByKey(event.statKey);
   const compare = stat
-    ? `<a class="feed-action" href="${compareHref(
-        stat.key,
-        [event.overtakerId, event.overtakenId],
-        "manual"
-      )}">Compare</a>`
+    ? `<a class="feed-action" href="${hashRoute("compare", {
+        stat: stat.key,
+        players: [event.overtakerId, event.overtakenId],
+        range: "7d"
+      })}">Compare</a>`
     : "";
   return `<span class="feed-text"><span class="badge overtake">overtake</span>
     <a class="who player-link" href="${playerHref(event.overtakerId)}">${esc(memberName(event.overtakerId))}</a>${favoriteBadgeHtml(event.overtakerId)}
