@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-07-26T16:47:20.760Z",
+  "updatedAt": "2026-07-26T16:49:23.717Z",
   "events": [
     {
       "at": "2026-07-06T15:06:25.829Z",
@@ -455,22 +455,6 @@
       "resultMessageId": "1524443282602725396"
     },
     {
-      "at": "2026-07-09T14:34:10.946Z",
-      "action": "link_attempt",
-      "outcome": "failed",
-      "failureReason": "profile_not_found",
-      "discordId": "647037738792648715",
-      "discordUsername": "sorathfps",
-      "displayName": "SorathBF",
-      "eaName": "SorathBF",
-      "previousEaName": null,
-      "playerId": null,
-      "nucleusId": null,
-      "profileName": null,
-      "messageId": "1524785745791815780",
-      "resultMessageId": "1524795253377470524"
-    },
-    {
       "at": "2026-07-09T14:40:24.704Z",
       "action": "relinked",
       "outcome": "success",
@@ -519,23 +503,6 @@
       "resultMessageId": "1524797579328487529",
       "platform": "steam",
       "platformId": "steam"
-    },
-    {
-      "at": "2026-07-09T15:17:01.050Z",
-      "action": "linked",
-      "outcome": "success",
-      "failureReason": null,
-      "discordId": "647037738792648715",
-      "discordUsername": "sorathfps",
-      "displayName": "SorathBF",
-      "eaName": "TTV_SorathFPS",
-      "previousEaName": null,
-      "playerId": "1008648132947",
-      "nucleusId": "1006176732947",
-      "profileName": "TTV_SorathFPS",
-      "messageId": "1524796525589430465",
-      "resultMessageId": "1524797706390999182",
-      "platform": "psn"
     },
     {
       "at": "2026-07-09T23:05:13.044Z",
@@ -1617,29 +1584,6 @@
       "platformId": "cem_ea_id",
       "profileName": "Roahh",
       "messageId": "tracker-import-532179643927756803-1012305526649",
-      "resultMessageId": null
-    },
-    {
-      "at": "2026-07-14T23:19:21.686Z",
-      "action": "tracker_linked",
-      "outcome": "success",
-      "failureReason": null,
-      "discordId": "647037738792648715",
-      "discordUsername": "sorathfps",
-      "displayName": "[KDM] SorathBF",
-      "requesterId": null,
-      "requesterUsername": null,
-      "trackerProfileId": "1006928678585",
-      "previousTrackerProfileId": null,
-      "trackerMappingSource": "confirmed",
-      "eaName": "TTV_SorathFPS",
-      "previousEaName": null,
-      "playerId": "1008648132947",
-      "nucleusId": "1006176732947",
-      "platform": "psn",
-      "platformId": null,
-      "profileName": "TTV_SorathFPS",
-      "messageId": "tracker-import-647037738792648715-1006928678585",
       "resultMessageId": null
     },
     {
