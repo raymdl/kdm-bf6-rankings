@@ -2682,7 +2682,7 @@ async function boot() {
   });
 
   const updated = document.getElementById("footer-updated");
-  updated.textContent = `Last updated ${fmtDateTime(meta.updatedAt)}`;
+  updated.textContent = `Last updated ${fmtDateTime(meta.updatedAt)} ET`;
 
   window.addEventListener("hashchange", render);
   render();
