@@ -34,13 +34,21 @@ Star any player to pin them. Favorites are **per-browser only** — the site has
 
 Tests for the calculation engine run with `npm test` (plain `node --test`, no build step).
 
-`test/parity.test.js` re-derives representative values from the raw archive files to prove the published artifact and the browser engine agree. **It currently skips in this repository**: the raw archives moved to a separate private repo on 2026-07-26, and the test needs two archive dates to compare endpoints while the public checkout retains only the newest. Its skip message says the archives are "not present in this checkout," which is now misleading — they are deliberately elsewhere, not missing. `dataDir` is hardcoded, so the test cannot yet be pointed at a private archive checkout; until it takes an override, the parity guarantee is unverified in CI.
+`test/parity.test.js` re-derives representative values from the raw archive files to prove the published artifact and the browser engine agree — the two are computed by independent code (the bot publisher writes `data/counters.json`; `assets/period.js` derives Period values from it), so drift between them would show wrong numbers with no error.
+
+The raw archives moved to a separate private repo on 2026-07-26 and this checkout no longer carries them, so the test **skips by default**. Point it at a private archive checkout to run the real comparison:
+
+```
+BF6_PARITY_ARCHIVE_DIR=../.bf6-archive-repo/archive/bf6 npm test
+```
+
+It needs two archive dates to compare range endpoints, and asserts kills exactly plus K/D and KPM within `1e-9` across at least three fully comparable members. Without the variable it skips rather than fails, because a bare clone before the first publish legitimately has neither input.
 
 ## Layout
 
 - `index.html` + `assets/` — the single-page site; it reads the JSON below at runtime.
 - `data/*.json` — generated leaderboard data (current stats, daily history, overtake notifications, link audit log, stat definitions).
-- `data/archive/` — **mostly moved out.** Raw per-day GameTools payloads now go to a private archive repository; only the most recent day is retained here. Anything needing the full raw history has to read the private archive, not this repo.
+- `data/archive/` — **gone.** Raw per-day GameTools payloads now go to a private archive repository, and the publisher removes this directory from the site checkout. Anything needing raw payloads has to read the private archive, not this repo.
 
 ## Do not edit `data/` by hand
 

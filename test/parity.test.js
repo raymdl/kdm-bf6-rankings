@@ -7,15 +7,34 @@ import { memberPeriodStat, resolveRange, validCounters } from "../assets/period.
 
 // Cross-implementation parity: the published counters artifact (written by the
 // bot publisher) must reproduce the same Period values as an independent
-// recomputation straight from the raw archive files. Runs only when both real
-// data sources are present in this checkout; skips cleanly otherwise (e.g. a
-// bare clone before the first artifact publish).
+// recomputation straight from the raw archive files.
+//
+// The raw archives moved to a private repository on 2026-07-26, so this
+// checkout retains only the newest day and cannot supply the two endpoints the
+// comparison needs. Point BF6_PARITY_ARCHIVE_DIR at a private archive checkout
+// (its archive/bf6 directory) to run the real comparison:
+//
+//   BF6_PARITY_ARCHIVE_DIR=../.bf6-archive-repo/archive/bf6 npm test
+//
+// Without it the test skips rather than fails, because a bare clone before the
+// first artifact publish legitimately has neither input.
 
 const dataDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "data");
+const archiveDir = process.env.BF6_PARITY_ARCHIVE_DIR?.trim()
+  ? path.resolve(process.env.BF6_PARITY_ARCHIVE_DIR.trim())
+  : path.join(dataDir, "archive");
 
 async function loadJson(relative) {
   try {
     return JSON.parse(await readFile(path.join(dataDir, relative), "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+async function loadArchive(date) {
+  try {
+    return JSON.parse(await readFile(path.join(archiveDir, `${date}.json`), "utf8"));
   } catch {
     return null;
   }
@@ -31,22 +50,33 @@ test("counters artifact matches independent recomputation from raw archives", as
   const counters = await loadJson("counters.json");
   let archiveDates = [];
   try {
-    archiveDates = (await readdir(path.join(dataDir, "archive")))
+    archiveDates = (await readdir(archiveDir))
       .map((name) => name.match(/^(\d{4}-\d{2}-\d{2})\.json$/)?.[1])
       .filter(Boolean)
       .sort();
   } catch {
     archiveDates = [];
   }
-  if (!validCounters(counters) || archiveDates.length < 2) {
-    t.skip("real counters.json and archives not present in this checkout");
+  if (!validCounters(counters)) {
+    t.skip("no real counters.json in this checkout");
+    return;
+  }
+  // Distinguish "the archives live elsewhere now" from "nothing has been
+  // published yet" -- the first is the normal state of this repo and is fixed
+  // by setting BF6_PARITY_ARCHIVE_DIR, the second is a genuinely bare clone.
+  if (archiveDates.length < 2) {
+    t.skip(
+      process.env.BF6_PARITY_ARCHIVE_DIR?.trim()
+        ? `BF6_PARITY_ARCHIVE_DIR=${archiveDir} has ${archiveDates.length} archive date(s); 2 are needed`
+        : `only ${archiveDates.length} archive date(s) here since the raw archives moved to the private repo; set BF6_PARITY_ARCHIVE_DIR to run this`
+    );
     return;
   }
 
   const window = resolveRange(counters, "7d");
   assert.ok(!window.unavailable, "7d window must resolve on real data");
-  const startArchive = await loadJson(`archive/${window.startDate}.json`);
-  const endArchive = await loadJson(`archive/${window.endDate}.json`);
+  const startArchive = await loadArchive(window.startDate);
+  const endArchive = await loadArchive(window.endDate);
   assert.ok(startArchive && endArchive, "endpoint archives must exist");
 
   let compared = 0;
