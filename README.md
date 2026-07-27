@@ -26,12 +26,21 @@ Semantics worth knowing:
 - A member whose upstream counters went backwards in the range (reset/correction) is excluded with a note instead of showing negative stats; a ◷ marker means one endpoint was carried from that member's most recent earlier snapshot.
 - State lives entirely in the URL (`?view=…&range=…`): a copied link reproduces exactly what the sender saw, and a clean URL always opens Career.
 
-Tests for the calculation engine run with `npm test` (plain `node --test`, no build step); `test/parity.test.js` re-derives representative values straight from the raw archives to prove the artifact and engine agree.
+## Favorites
+
+Star any player to pin them. Favorites are **per-browser only** — the site has no accounts — and live in `localStorage` under `kdm-favorite-players`, so they do not follow you between devices and are cleared along with site data. Favorited rows are highlighted site-wide (leaderboards, Players, Compare) using the `--fav` theme variables. Clearing every star returns the site to its default ordering.
+
+## Tests
+
+Tests for the calculation engine run with `npm test` (plain `node --test`, no build step).
+
+`test/parity.test.js` re-derives representative values from the raw archive files to prove the published artifact and the browser engine agree. **It currently skips in this repository**: the raw archives moved to a separate private repo on 2026-07-26, and the test needs two archive dates to compare endpoints while the public checkout retains only the newest. Its skip message says the archives are "not present in this checkout," which is now misleading — they are deliberately elsewhere, not missing. `dataDir` is hardcoded, so the test cannot yet be pointed at a private archive checkout; until it takes an override, the parity guarantee is unverified in CI.
 
 ## Layout
 
 - `index.html` + `assets/` — the single-page site; it reads the JSON below at runtime.
 - `data/*.json` — generated leaderboard data (current stats, daily history, overtake notifications, link audit log, stat definitions).
+- `data/archive/` — **mostly moved out.** Raw per-day GameTools payloads now go to a private archive repository; only the most recent day is retained here. Anything needing the full raw history has to read the private archive, not this repo.
 
 ## Do not edit `data/` by hand
 
