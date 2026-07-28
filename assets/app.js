@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260725-series-overtakes";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260728-provenance-v2";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -11,7 +11,7 @@ import {
   periodSupported,
   resolveRange,
   validCounters
-} from "./period.js?v=20260725-series-overtakes";
+} from "./period.js?v=20260728-provenance-v2";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -23,8 +23,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260725-series-overtakes";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260725-series-overtakes";
+} from "./view-state.js?v=20260728-provenance-v2";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260728-provenance-v2";
 
 const app = document.getElementById("app");
 
@@ -33,6 +33,7 @@ const state = {
   latest: null,
   history: null,
   historyProvenance: null,
+  historyProvenanceIndex: null,
   audit: null,
   notifications: null,
   effectiveness: null,
@@ -196,16 +197,25 @@ function memberTrackedSince(discordId) {
   return historyIndex >= 0 ? state.history.dates[historyIndex] : null;
 }
 
-function historyProvenance(discordId, date, statKey = null) {
-  const entry = state.historyProvenance?.members?.[discordId];
-  const dateEntry = entry?.dates?.[date];
-  if (!dateEntry) {
-    return null;
+// The provenance artifact answers one question -- was this (member, date, stat)
+// point reconstructed from Tracker sessions rather than observed? -- and v2
+// stores it as a shared date axis plus per-member index arrays. Expanding it
+// once into a Set keeps the thousands of per-point lookups below O(1).
+function buildHistoryProvenanceIndex(artifact) {
+  const dates = artifact?.dates ?? [];
+  const index = new Set();
+  for (const [discordId, member] of Object.entries(artifact?.members ?? {})) {
+    for (const [statKey, positions] of Object.entries(member?.estimated ?? {})) {
+      for (const position of positions) {
+        if (dates[position]) index.add(`${discordId}|${statKey}|${dates[position]}`);
+      }
+    }
   }
-  if (statKey) {
-    return dateEntry.fields?.[statKey] ?? null;
-  }
-  return dateEntry;
+  return index;
+}
+
+function historyProvenance(discordId, date, statKey) {
+  return Boolean(state.historyProvenanceIndex?.has(`${discordId}|${statKey}|${date}`));
 }
 
 function estimatedHistoryNoticeHtml(discordId) {
@@ -220,17 +230,7 @@ function estimatedHistoryNoticeHtml(discordId) {
 }
 
 function memberBackfillFields(discordId) {
-  const entry = state.historyProvenance?.members?.[discordId];
-  if (!entry) {
-    return new Set();
-  }
-  const fields = new Set();
-  for (const date of Object.values(entry.dates ?? {})) {
-    for (const field of Object.keys(date.fields ?? {})) {
-      fields.add(field);
-    }
-  }
-  return fields;
+  return new Set(Object.keys(state.historyProvenance?.members?.[discordId]?.estimated ?? {}));
 }
 
 function playerHistoryHref(discordId, statKey, showEstimated) {
@@ -2674,6 +2674,7 @@ async function boot() {
     latest,
     history,
     historyProvenance: historyProvenanceData,
+    historyProvenanceIndex: buildHistoryProvenanceIndex(historyProvenanceData),
     audit,
     notifications,
     effectiveness,

@@ -49,6 +49,7 @@ It needs two archive dates to compare range endpoints, and asserts kills exactly
 - `index.html` + `assets/` — the single-page site; it reads the JSON below at runtime.
 - `data/*.json` — generated leaderboard data (current stats, daily history, overtake notifications, link audit log, stat definitions).
 - `data/archive/` — **gone.** Raw per-day GameTools payloads now go to a private archive repository, and the publisher removes this directory from the site checkout. Anything needing raw payloads has to read the private archive, not this repo.
+- `data/history-provenance.json` — which pre-2026-07-10 chart points were reconstructed from Tracker sessions rather than observed, so the site can dash them and offer the Hide Backfill toggle. **Version 2** is a shared `dates[]` axis plus per-member `estimated: { statKey: [dateIndex] }`; the browser expands it into a lookup set at boot. Version 1 carried the reconstruction's full working detail — per-point `source`, `confidence`, `groupedSessions`, and a repeated notice string — none of which the site read, at 3.7 MB per page load. The window is closed (`anchorDate` 2026-07-10) so this file never grows. The v1 dump is retained outside this repo; see `tools/README.md` in the bot repo.
 
 ## Do not edit `data/` by hand
 
