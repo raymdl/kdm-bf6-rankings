@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   MIN_ACTIVE_SECONDS_TO_RANK,
+  PERIOD_STAT_DEFS,
+  counterKeysPresent,
   memberDailySeries,
   memberFirstObservedIndex,
   memberPeriodDeltas,
@@ -9,7 +11,9 @@ import {
   minActiveSecondsForWindow,
   periodRanking,
   periodSupported,
+  periodUnsupportedReason,
   resolveRange,
+  validCounters,
   windowDaySpan
 } from "../assets/period.js";
 
@@ -153,6 +157,74 @@ test("all resolves the global window; members get per-member starts", () => {
   assert.equal(late.trackedSince, "2026-07-15", "late joiner ranks from their own first column");
   assert.equal(late.value, 200, "250 − 50 since their own start");
   assert.equal(memberFirstObservedIndex(c, "latecomer"), 5);
+});
+
+/* ---------- artifact compatibility ---------- */
+
+// Regression for the 2026-08-08 outage: the bot bumped formulaVersion for a
+// headshot change and the site's equality pin rejected the whole artifact,
+// hiding the Career/Period toggle and every range chip site-wide. An unknown
+// formulaVersion must stay usable; only a stat whose counters actually went
+// missing may lose its Period form.
+test("an unrecognized formulaVersion keeps the artifact usable", () => {
+  const future = { ...fixture(), formulaVersion: 99 };
+  assert.equal(validCounters(future), true, "unknown formula versions are accepted, not rejected");
+  const window = resolveRange(future, "7d");
+  assert.equal(memberPeriodStat(future, "steady", "kills", window).value, 700, "unaffected stats still derive");
+});
+
+test("a stat whose counters vanished degrades alone, not site-wide", () => {
+  const c = fixture();
+  for (const member of Object.values(c.members)) {
+    delete member.values.weaponHeadshotWeighted;
+    delete member.values.weaponKills;
+  }
+  assert.equal(validCounters(c), true, "the artifact is still structurally valid");
+  assert.equal(periodSupported("headshotPercent", c), false, "the stat that lost its counters drops out");
+  assert.equal(periodUnsupportedReason("headshotPercent", c), "counters_missing");
+  assert.equal(periodRanking(c, "headshotPercent", resolveRange(c, "7d")).ranked.length, 0);
+
+  assert.equal(periodSupported("infantryKillDeath", c), true, "every other stat is untouched");
+  assert.equal(periodSupported("kills", c), true);
+  assert.equal(periodUnsupportedReason("playerRank", c), "career_only", "progression stats stay career_only");
+});
+
+// An artifact carrying every counter any stat declares, with two growing
+// columns so all stats derive a real value. Built from the defs themselves so
+// a newly added stat is covered the day it lands.
+function completeCounters() {
+  const required = [...new Set(Object.values(PERIOD_STAT_DEFS).flatMap((def) => def.requires))];
+  const values = Object.fromEntries(required.map((key, index) => [key, [100 + index, 200 + index * 2]]));
+  return counters({
+    dates: ["2026-07-16", "2026-07-17"],
+    members: { complete: { name: "Complete", values } }
+  });
+}
+
+test("every stat declares the counters its derive reads", () => {
+  const c = completeCounters();
+  const window = resolveRange(c, "all");
+  assert.ok(!window.unavailable, "the fixture window resolves, so the assertions below mean something");
+  const present = counterKeysPresent(c);
+  for (const [statKey, def] of Object.entries(PERIOD_STAT_DEFS)) {
+    assert.ok(def.requires?.length, `${statKey} declares its counters`);
+    assert.ok(def.requires.every((key) => present.has(key)), `${statKey} requires only real counters`);
+    assert.equal(periodSupported(statKey, c), true, `${statKey} is supported when all its counters exist`);
+    assert.notEqual(memberPeriodStat(c, "complete", statKey, window).value, null, `${statKey} derives a value`);
+
+    // Dropping a declared counter must actually cost this stat its value —
+    // catches a requires list that drifted away from its derive.
+    for (const key of def.requires) {
+      const stripped = structuredClone(c);
+      delete stripped.members.complete.values[key];
+      assert.equal(periodSupported(statKey, stripped), false, `${statKey} needs ${key} to be supported`);
+      assert.equal(
+        memberPeriodStat(stripped, "complete", statKey, window).value,
+        null,
+        `${statKey} cannot derive without ${key}`
+      );
+    }
+  }
 });
 
 /* ---------- formulas and guards ---------- */

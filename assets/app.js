@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260808-counters-formula-v2";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260808-period-capability-detect";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -9,9 +9,10 @@ import {
   minActiveSecondsForWindow,
   periodRanking,
   periodSupported,
+  periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260808-counters-formula-v2";
+} from "./period.js?v=20260808-period-capability-detect";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -23,8 +24,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260808-counters-formula-v2";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260808-counters-formula-v2";
+} from "./view-state.js?v=20260808-period-capability-detect";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260808-period-capability-detect";
 
 const app = document.getElementById("app");
 
@@ -481,6 +482,20 @@ let recentPerformanceCollapsed = (() => {
 
 function periodDataAvailable() {
   return validCounters(state.counters) && state.counters.dates.length >= 2;
+}
+
+// Whether one stat has a Period form given the artifact we actually loaded.
+// Always ask through here rather than importing periodSupported directly — the
+// counters argument is what makes a bot-side counter rename cost a single stat
+// instead of the whole Period view.
+function statHasPeriodForm(statKey) {
+  return periodSupported(statKey, state.counters);
+}
+
+function periodUnsupportedNote(stat, fallback = "Career history") {
+  return periodUnsupportedReason(stat.key, state.counters) === "counters_missing"
+    ? `${stat.title} has no Period data in the current counters artifact — showing ${fallback}.`
+    : `${stat.title} is a progression stat with no Period form — showing ${fallback}.`;
 }
 
 function loadViewRange(params, defaultRange = DEFAULT_RANGE) {
@@ -1172,13 +1187,13 @@ function renderLeaderboard(statKey, params) {
   loadViewRange(params);
   const stat = statByKey(statKey) ?? state.meta.stats[0];
   const periodWindow = activePeriodWindow();
-  if (periodWindow && periodSupported(stat.key)) {
+  if (periodWindow && statHasPeriodForm(stat.key)) {
     renderPeriodLeaderboard(stat, periodWindow);
     return;
   }
   const periodNotice =
-    viewRangeState.view === "period" && !periodSupported(stat.key)
-      ? `<div class="period-unsupported-note" role="note">${esc(stat.title)} is a progression stat with no Period form — showing Career values.</div>`
+    viewRangeState.view === "period" && !statHasPeriodForm(stat.key)
+      ? `<div class="period-unsupported-note" role="note">${esc(periodUnsupportedNote(stat, "Career values"))}</div>`
       : viewRangeState.view === "period" && !periodWindow
         ? `<div class="period-unsupported-note" role="note">The selected range is not available yet — showing Career values.</div>`
         : "";
@@ -1423,12 +1438,12 @@ function renderPlayer(discordId, statKey, params) {
   };
 
   const periodSummaryCard = (candidate) => {
-    if (!periodSupported(candidate.key)) {
+    if (!statHasPeriodForm(candidate.key)) {
       const career = member ? member.stats[candidate.key] : valueAt(discordId, candidate.key, lastIndex);
       return `<div class="stat-summary ${candidate.key === stat.key ? "active" : ""}" data-stat="${candidate.key}">
         <div class="stat-summary-head"><div class="k">${esc(candidate.title)}</div></div>
         <div class="v">${fmtStat(candidate, career)}</div>
-        <div class="m">Career-only stat</div>
+        <div class="m">${periodUnsupportedReason(candidate.key, state.counters) === "counters_missing" ? "No Period data" : "Career-only stat"}</div>
       </div>`;
     }
     const periodStat = memberPeriodStat(state.counters, discordId, candidate.key, periodWindow);
@@ -1520,7 +1535,7 @@ function renderPlayer(discordId, statKey, params) {
     <div class="stat-summary-grid">${summaries}</div>
     <div class="chart-card">
       <h3>${esc(stat.title)} ${
-        periodWindow && periodSupported(stat.key)
+        periodWindow && statHasPeriodForm(stat.key)
           ? `· daily Period form${
               memberDailySeries(state.counters, discordId, stat.key, periodWindow).some((point) => point.value != null && !point.observedEnd)
                 ? " (yellow = carried snapshot)"
@@ -1565,7 +1580,7 @@ function renderPlayer(discordId, statKey, params) {
     }
   });
 
-  const periodChartWindow = periodWindow && periodSupported(stat.key) ? periodWindow : null;
+  const periodChartWindow = periodWindow && statHasPeriodForm(stat.key) ? periodWindow : null;
   if (periodChartWindow) {
     const points = memberDailySeries(state.counters, discordId, stat.key, periodChartWindow);
     lineChart(
@@ -1681,7 +1696,7 @@ function compareTooltipItemSort(a, b) {
 // selected range when the stat supports it, otherwise the Career standings.
 function defaultCompareSelection(statKey) {
   const periodWindow = activePeriodWindow();
-  if (periodWindow && periodSupported(statKey)) {
+  if (periodWindow && statHasPeriodForm(statKey)) {
     const candidateIds = new Set(state.latest.members.map((member) => member.discordId));
     const { ranked } = periodRanking(state.counters, statKey, periodWindow);
     const top = ranked
@@ -1758,11 +1773,11 @@ function renderCompare() {
   history.replaceState(null, "", compareHref());
 
   const periodWindow = activePeriodWindow();
-  const periodMode = Boolean(periodWindow && periodSupported(stat.key));
+  const periodMode = Boolean(periodWindow && statHasPeriodForm(stat.key));
   const careerHistoryWindow = periodMode ? null : compareHistoryWindow(stat.key);
   app.innerHTML = `
     <div class="page-heading-row"><h1 class="page-title">Head to Head <span class="period-title-tag ${periodMode ? "" : "career-title-tag"}">${esc(periodMode ? periodWindowText(periodWindow) : careerRangeWindowText(careerHistoryWindow?.window, { includeLabel: true }))}</span></h1>${shareButtonHtml()}</div>
-    ${viewRangeState.view === "period" && !periodSupported(stat.key) ? `<div class="period-unsupported-note" role="note">${esc(stat.title)} is a progression stat with no Period form — showing Career history.</div>` : ""}
+    ${viewRangeState.view === "period" && !statHasPeriodForm(stat.key) ? `<div class="period-unsupported-note" role="note">${esc(periodUnsupportedNote(stat))}</div>` : ""}
     <p class="page-sub">${
       periodMode
         ? "Overlaying each player's day-by-day Period form inside the selected range · gaps are days without gameplay · yellow points are carried (member missing from that refresh)"

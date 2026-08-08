@@ -44,15 +44,29 @@ export const CUSTOM_RANGE_RE = /^(\d{4}-\d{2}-\d{2})\.\.(\d{4}-\d{2}-\d{2})$/;
 // Site stat key → how its Period value derives from window counter deltas.
 // `rate: true` marks stats subject to the minimum-active-time qualification.
 // Anything absent here (playerRank) is Career-only.
+//
+// `requires` names the counter keys the derive reads. It is not decoration:
+// periodSupported() feature-detects against the published artifact's actual
+// keys, so when the bot renames or drops a counter, that one stat degrades to
+// Career-only instead of the site guessing. Keep it in sync with `derive` —
+// note the stat key is not always the counter key (`kills` reads playerKills).
 export const PERIOD_STAT_DEFS = {
-  infantryKillDeath: { rate: true, derive: (d) => ratio(d.playerKills, d.deaths) },
-  killDeath: { rate: true, derive: (d) => ratio(d.kills, d.deaths) },
-  playerKillsPerMinute: { rate: true, derive: (d) => ratio(d.playerKills, d.activeSeconds / 60) },
-  scorePerMinute: { rate: true, derive: (d) => ratio(d.score, d.activeSeconds / 60) },
-  kills: { rate: false, derive: (d) => d.playerKills },
-  assists: { rate: false, derive: (d) => d.assists },
-  vehicleKills: { rate: false, derive: (d) => d.vehicleKills },
-  revives: { rate: false, derive: (d) => d.revives },
+  infantryKillDeath: { rate: true, requires: ["playerKills", "deaths"], derive: (d) => ratio(d.playerKills, d.deaths) },
+  killDeath: { rate: true, requires: ["kills", "deaths"], derive: (d) => ratio(d.kills, d.deaths) },
+  playerKillsPerMinute: {
+    rate: true,
+    requires: ["playerKills", "activeSeconds"],
+    derive: (d) => ratio(d.playerKills, d.activeSeconds / 60)
+  },
+  scorePerMinute: {
+    rate: true,
+    requires: ["score", "activeSeconds"],
+    derive: (d) => ratio(d.score, d.activeSeconds / 60)
+  },
+  kills: { rate: false, requires: ["playerKills"], derive: (d) => d.playerKills },
+  assists: { rate: false, requires: ["assists"], derive: (d) => d.assists },
+  vehicleKills: { rate: false, requires: ["vehicleKills"], derive: (d) => d.vehicleKills },
+  revives: { rate: false, requires: ["revives"], derive: (d) => d.revives },
   // Weapon-only headshots (formulaVersion 2): the bot publishes a cumulative
   // weighted numerator alongside weapon kills, because GameTools reports
   // per-weapon headshots as a percentage that cannot be averaged across a
@@ -60,18 +74,60 @@ export const PERIOD_STAT_DEFS = {
   // slip past ratio()'s finite check and rank a missing member at 0.00%.
   headshotPercent: {
     rate: true,
+    requires: ["weaponHeadshotWeighted", "weaponKills"],
     derive: (d) =>
       Number.isFinite(d.weaponHeadshotWeighted) ? ratio(d.weaponHeadshotWeighted * 100, d.weaponKills) : null
   },
-  timePlayedHours: { rate: false, derive: (d) => (Number.isFinite(d.activeSeconds) ? d.activeSeconds / 3600 : null) },
-  objectiveCaptures: { rate: false, derive: (d) => d.objectiveCaptures },
-  multiKills: { rate: false, derive: (d) => d.multiKills },
-  defibKills: { rate: false, derive: (d) => d.defibKills },
-  meleeKills: { rate: false, derive: (d) => d.meleeKills }
+  timePlayedHours: {
+    rate: false,
+    requires: ["activeSeconds"],
+    derive: (d) => (Number.isFinite(d.activeSeconds) ? d.activeSeconds / 3600 : null)
+  },
+  objectiveCaptures: { rate: false, requires: ["objectiveCaptures"], derive: (d) => d.objectiveCaptures },
+  multiKills: { rate: false, requires: ["multiKills"], derive: (d) => d.multiKills },
+  defibKills: { rate: false, requires: ["defibKills"], derive: (d) => d.defibKills },
+  meleeKills: { rate: false, requires: ["meleeKills"], derive: (d) => d.meleeKills }
 };
 
-export function periodSupported(statKey) {
-  return Boolean(PERIOD_STAT_DEFS[statKey]);
+// Counter keys actually present in an artifact, unioned across members (a
+// member absent from early snapshots can be missing keys another member has).
+// Memoized per artifact object — render paths ask this once per stat chip.
+const counterKeyCache = new WeakMap();
+
+export function counterKeysPresent(counters) {
+  if (!counters || typeof counters !== "object" || !counters.members) {
+    return new Set();
+  }
+  const cached = counterKeyCache.get(counters);
+  if (cached) return cached;
+  const keys = new Set();
+  for (const member of Object.values(counters.members)) {
+    for (const key of Object.keys(member?.values ?? {})) keys.add(key);
+  }
+  counterKeyCache.set(counters, keys);
+  return keys;
+}
+
+// Whether a stat has a Period form. Two independent reasons it may not:
+// the stat is progression-only (playerRank — no def at all), or the published
+// artifact no longer carries the counters its derive needs (a bot-side rename
+// the site hasn't learned yet). Both degrade to the same Career-only fallback.
+// Omit `counters` to ask the shape-only question.
+export function periodSupported(statKey, counters = null) {
+  return periodUnsupportedReason(statKey, counters) === null;
+}
+
+// Why a stat has no Period form: null (it does), "career_only" (progression
+// stat, permanent and expected), or "counters_missing" (the artifact dropped
+// counters this stat needs — transient, and a signal the site is behind the
+// bot). Renderers must distinguish them: telling an operator that Headshot %
+// is a progression stat during a counter rename sends them the wrong way.
+export function periodUnsupportedReason(statKey, counters = null) {
+  const def = PERIOD_STAT_DEFS[statKey];
+  if (!def) return "career_only";
+  if (!counters) return null;
+  const present = counterKeysPresent(counters);
+  return def.requires.every((key) => present.has(key)) ? null : "counters_missing";
 }
 
 function ratio(numerator, denominator) {
@@ -80,16 +136,28 @@ function ratio(numerator, denominator) {
     : null;
 }
 
-// `formulaVersion` must track the bot's BF6_COUNTERS_FORMULA_VERSION: a bump
-// means counter keys or their math changed, so an unrecognized version is
-// rejected rather than silently mis-derived. Note that rejecting also hides the
-// whole Career/Period view-range control, so this pin has to move in lockstep
-// with the bot.
+// Formula versions this engine must refuse outright. Deliberately a denylist,
+// not an equality pin: the bot owns BF6_COUNTERS_FORMULA_VERSION and bumps it
+// whenever counter math changes, and an equality pin turns every routine bump
+// into a site-wide outage — rejecting an artifact hides the entire Career/
+// Period control bar, not just the stat that changed (this happened on
+// 2026-08-08 with the weapon-only headshot bump).
+//
+// Renames and removals need nothing here: periodSupported() feature-detects
+// per stat, so an unknown counter layout costs one stat, not the whole UI. Add
+// a version here only for a change this engine cannot detect — same counter
+// keys, different meaning — where deriving confidently wrong numbers is worse
+// than showing none. Note the site then goes dark until it is taught the new
+// math, so pair any entry with the code change that handles it.
+export const KNOWN_INCOMPATIBLE_FORMULA_VERSIONS = new Set();
+
+// Structural validity only: is this artifact the shape the engine expects?
+// Formula compatibility is a separate, per-stat question — keep it that way.
 export function validCounters(counters) {
   return Boolean(
     counters &&
       counters.version === 1 &&
-      counters.formulaVersion === 2 &&
+      !KNOWN_INCOMPATIBLE_FORMULA_VERSIONS.has(counters.formulaVersion) &&
       Array.isArray(counters.dates) &&
       counters.dates.length > 0 &&
       counters.members &&
@@ -324,7 +392,7 @@ export function memberDailySeries(counters, discordId, statKey, window) {
 // numbers; provisional (under-threshold rate) rows follow unranked; invalid
 // windows (resets, no data) are reported separately for diagnostics.
 export function periodRanking(counters, statKey, window) {
-  if (!validCounters(counters) || !PERIOD_STAT_DEFS[statKey] || !window || window.unavailable) {
+  if (!validCounters(counters) || !periodSupported(statKey, counters) || !window || window.unavailable) {
     return { ranked: [], provisional: [], invalid: [] };
   }
   const ranked = [];
