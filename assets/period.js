@@ -53,7 +53,16 @@ export const PERIOD_STAT_DEFS = {
   assists: { rate: false, derive: (d) => d.assists },
   vehicleKills: { rate: false, derive: (d) => d.vehicleKills },
   revives: { rate: false, derive: (d) => d.revives },
-  headshotPercent: { rate: true, derive: (d) => ratio(d.headShots * 100, d.kills) },
+  // Weapon-only headshots (formulaVersion 2): the bot publishes a cumulative
+  // weighted numerator alongside weapon kills, because GameTools reports
+  // per-weapon headshots as a percentage that cannot be averaged across a
+  // window. Guard the numerator explicitly — `null * 100` is 0, which would
+  // slip past ratio()'s finite check and rank a missing member at 0.00%.
+  headshotPercent: {
+    rate: true,
+    derive: (d) =>
+      Number.isFinite(d.weaponHeadshotWeighted) ? ratio(d.weaponHeadshotWeighted * 100, d.weaponKills) : null
+  },
   timePlayedHours: { rate: false, derive: (d) => (Number.isFinite(d.activeSeconds) ? d.activeSeconds / 3600 : null) },
   objectiveCaptures: { rate: false, derive: (d) => d.objectiveCaptures },
   multiKills: { rate: false, derive: (d) => d.multiKills },
@@ -71,11 +80,16 @@ function ratio(numerator, denominator) {
     : null;
 }
 
+// `formulaVersion` must track the bot's BF6_COUNTERS_FORMULA_VERSION: a bump
+// means counter keys or their math changed, so an unrecognized version is
+// rejected rather than silently mis-derived. Note that rejecting also hides the
+// whole Career/Period view-range control, so this pin has to move in lockstep
+// with the bot.
 export function validCounters(counters) {
   return Boolean(
     counters &&
       counters.version === 1 &&
-      counters.formulaVersion === 1 &&
+      counters.formulaVersion === 2 &&
       Array.isArray(counters.dates) &&
       counters.dates.length > 0 &&
       counters.members &&

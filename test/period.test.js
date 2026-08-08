@@ -22,14 +22,15 @@ function member(name, days) {
   for (const day of days) {
     keys.forEach((key, i) => values[key].push(day == null ? null : day[i]));
   }
-  values.headShots = days.map((day) => (day == null ? null : Math.round((day[1] ?? 0) * 0.2)));
+  values.weaponKills = days.map((day) => (day == null ? null : day[1] ?? 0));
+  values.weaponHeadshotWeighted = days.map((day) => (day == null ? null : Math.round((day[1] ?? 0) * 0.2)));
   return { name, values };
 }
 
 function counters({ dates, members, settled = true }) {
   return {
     version: 1,
-    formulaVersion: 1,
+    formulaVersion: 2,
     timezone: "America/New_York",
     generatedAt: "2026-07-17T20:00:00.000Z",
     current: { date: dates.at(-1), settled, asOf: "2026-07-17T20:00:00.000Z" },

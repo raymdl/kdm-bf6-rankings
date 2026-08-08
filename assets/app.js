@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260728-provenance-v2";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260808-counters-formula-v2";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -11,7 +11,7 @@ import {
   periodSupported,
   resolveRange,
   validCounters
-} from "./period.js?v=20260728-provenance-v2";
+} from "./period.js?v=20260808-counters-formula-v2";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -23,8 +23,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260728-provenance-v2";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260728-provenance-v2";
+} from "./view-state.js?v=20260808-counters-formula-v2";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260808-counters-formula-v2";
 
 const app = document.getElementById("app");
 
