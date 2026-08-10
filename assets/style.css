@@ -2194,12 +2194,16 @@ tr.period-provisional {
 
 /* --- Weapon / vehicle chips --- */
 .equipment-band + .equipment-band { margin-top: 18px; }
+/* A quiet section label, deliberately below the panel title in the hierarchy.
+   At the same nominal size it read as LARGER than the panel header, because the
+   header is condensed Rajdhani and this is Inter. */
 .equipment-band > h3 {
   margin: 0 0 10px;
-  font-size: 0.95rem;
-  letter-spacing: 0.06em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  opacity: 0.8;
+  opacity: 0.5;
 }
 .equipment-class { display: grid; grid-template-columns: minmax(120px, 150px) 1fr; gap: 10px 14px; align-items: baseline; }
 .equipment-class + .equipment-class { margin-top: 8px; }
