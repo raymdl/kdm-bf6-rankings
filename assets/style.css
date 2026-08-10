@@ -2206,6 +2206,8 @@ tr.period-provisional {
 .equipment-band + .equipment-band { margin-top: 12px; }
 .equipment-band > h3 {
   margin: 0 0 10px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.14em;
@@ -2219,7 +2221,6 @@ tr.period-provisional {
   align-items: baseline;
   padding: 7px 0;
 }
-.equipment-class + .equipment-class { border-top: 1px solid rgba(255, 255, 255, 0.05); }
 .equipment-class > h4 {
   margin: 0;
   font-size: 0.8rem;
