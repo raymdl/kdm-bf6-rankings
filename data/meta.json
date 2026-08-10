@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-10T19:26:39.188Z",
-  "observedAt": "2026-08-10T19:26:39.188Z",
-  "generatedAt": "2026-08-10T19:26:39.188Z",
-  "refreshId": "bf6-20260810192604-8nkwqz",
+  "updatedAt": "2026-08-10T21:35:29.837Z",
+  "observedAt": "2026-08-10T21:35:29.837Z",
+  "generatedAt": "2026-08-10T21:35:29.837Z",
+  "refreshId": "bf6-20260810213456-06m7bf",
   "scheduledFor": null,
   "siteUrl": "https://raymdl.github.io/kdm-bf6-rankings/",
   "stats": [
@@ -11,14 +11,6 @@
       "key": "infantryKillDeath",
       "title": "Player K/D",
       "label": "Player K/D",
-      "format": "decimal",
-      "decimals": 2,
-      "higherIsBetter": true
-    },
-    {
-      "key": "killDeath",
-      "title": "K/D Ratio",
-      "label": "K/D Ratio",
       "format": "decimal",
       "decimals": 2,
       "higherIsBetter": true
@@ -123,6 +115,14 @@
       "key": "meleeKills",
       "title": "Melee Kills",
       "label": "Melee Kills",
+      "format": "integer",
+      "decimals": null,
+      "higherIsBetter": true
+    },
+    {
+      "key": "roadkills",
+      "title": "Roadkills",
+      "label": "Roadkills",
       "format": "integer",
       "decimals": null,
       "higherIsBetter": true
