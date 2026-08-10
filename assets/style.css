@@ -2193,10 +2193,17 @@ tr.period-provisional {
 .stat-panel .stat-tabs { margin: 0; }
 
 /* --- Weapon / vehicle chips --- */
-.equipment-band + .equipment-band { margin-top: 18px; }
-/* A quiet section label, deliberately below the panel title in the hierarchy.
-   At the same nominal size it read as LARGER than the panel header, because the
-   header is condensed Rajdhani and this is Inter. */
+/* Seventy-odd outlined pills read as noise: every chip drew its own border, so
+   the eye had nothing to group by. Inactive chips are a soft fill with no
+   border, the two bands sit on their own inset surface, and a hairline between
+   class rows does the separating that the borders were failing to do. */
+.equipment-band {
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid rgba(255, 255, 255, 0.045);
+  border-radius: 10px;
+  padding: 12px 12px 14px;
+}
+.equipment-band + .equipment-band { margin-top: 12px; }
 .equipment-band > h3 {
   margin: 0 0 10px;
   font-size: 0.7rem;
@@ -2205,32 +2212,40 @@ tr.period-provisional {
   text-transform: uppercase;
   opacity: 0.5;
 }
-.equipment-class { display: grid; grid-template-columns: minmax(120px, 150px) 1fr; gap: 10px 14px; align-items: baseline; }
-.equipment-class + .equipment-class { margin-top: 8px; }
+.equipment-class {
+  display: grid;
+  grid-template-columns: minmax(96px, 122px) 1fr;
+  gap: 8px 14px;
+  align-items: baseline;
+  padding: 7px 0;
+}
+.equipment-class + .equipment-class { border-top: 1px solid rgba(255, 255, 255, 0.05); }
 .equipment-class > h4 {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  opacity: 0.72;
+  letter-spacing: 0.02em;
+  opacity: 0.62;
   text-align: right;
 }
 .equipment-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .equipment-chip {
-  border: 1px solid var(--line, #2a3140);
-  background: transparent;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.055);
   color: inherit;
+  opacity: 0.88;
   border-radius: 999px;
-  padding: 4px 11px;
+  padding: 4px 10px;
   font-size: 0.83rem;
+  line-height: 1.35;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition: background 0.15s, opacity 0.15s, color 0.15s;
 }
-.equipment-chip:hover { border-color: var(--accent, #f26522); }
+.equipment-chip:hover { background: rgba(255, 255, 255, 0.12); opacity: 1; }
 .equipment-chip.active {
   background: var(--accent, #f26522);
-  border-color: var(--accent, #f26522);
   color: #10131a;
+  opacity: 1;
   font-weight: 600;
 }
 @media (max-width: 720px) {
