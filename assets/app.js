@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260810-equipment-8";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260810-equipment-11";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260810-equipment-8";
+} from "./period.js?v=20260810-equipment-11";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,18 +26,19 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260810-equipment-8";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260810-equipment-8";
+} from "./view-state.js?v=20260810-equipment-11";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260810-equipment-11";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
   equipmentFieldsPresent,
   equipmentPeriodStats,
   latestObservedIndex,
+  readEquipmentField,
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260810-equipment-8";
+} from "./equipment.js?v=20260810-equipment-11";
 
 const app = document.getElementById("app");
 
@@ -248,6 +249,44 @@ function estimatedHistoryNoticeHtml(discordId) {
 
 function memberBackfillFields(discordId) {
   return new Set(Object.keys(state.historyProvenance?.members?.[discordId]?.estimated ?? {}));
+}
+
+// The member's own equipment file, already cached by the panel below. Returns
+// null until that fetch lands, so the graph simply stays on the soldier stat
+// rather than rendering an empty box.
+function profileEquipmentSelection(discordId, equipmentId) {
+  const cached = equipmentProfileCache.get(discordId);
+  const data = cached?.status === "loaded" ? cached.data : null;
+  if (!data) return null;
+  for (const category of ["weapons", "vehicles"]) {
+    const entry = data[category]?.[equipmentId];
+    if (entry) {
+      return { id: equipmentId, category, entry, data, name: equipmentDisplayName(category, equipmentId) };
+    }
+  }
+  return null;
+}
+
+// Cumulative kills per date in Career, or kills gained since the window start in
+// Period -- the same two readings the soldier-stat chart shows. Dates the member
+// has no observation for stay null so the line breaks instead of implying data.
+function equipmentChartPoints(selection, periodWindow) {
+  const dates = Array.isArray(selection.data.dates) ? selection.data.dates : [];
+  const observed = selection.data.observed ?? [];
+  const from = periodWindow ? periodWindow.startIndex : 0;
+  const to = periodWindow ? periodWindow.endIndex : dates.length - 1;
+  const baseline = periodWindow ? readEquipmentField(selection.entry, "kills", from, observed) : null;
+  const points = [];
+  for (let index = Math.max(0, from); index <= Math.min(to, dates.length - 1); index += 1) {
+    const read = readEquipmentField(selection.entry, "kills", index, observed);
+    const value = !read.known
+      ? null
+      : periodWindow
+        ? (baseline?.known ? Math.max(0, read.value - baseline.value) : null)
+        : read.value;
+    points.push({ date: dates[index], value });
+  }
+  return points;
 }
 
 function playerHistoryHref(discordId, statKey, showEstimated, equipment = equipmentViewState()) {
@@ -1672,6 +1711,22 @@ function renderPlayer(discordId, statKey, params) {
     </div>`;
   };
 
+  // A weapon or vehicle selected in the panel below takes over the graph; with
+  // nothing selected it stays the soldier-stat chart it has always been.
+  const chartEquipmentId = params.get("equipment");
+  const chartEquipment = chartEquipmentId ? profileEquipmentSelection(discordId, chartEquipmentId) : null;
+  const chartHeading = chartEquipment
+    ? `${esc(chartEquipment.name)} Kills ${periodWindow ? "· daily Period form" : "over time"}`
+    : `${esc(stat.title)} ${
+        periodWindow && statHasPeriodForm(stat.key)
+          ? `· daily Period form${
+              memberDailySeries(state.counters, discordId, stat.key, periodWindow).some((point) => point.value != null && !point.observedEnd)
+                ? " (yellow = carried snapshot)"
+                : ""
+            }`
+          : "over time"
+      }`;
+
   const summaries = state.meta.stats
     .map((candidate) => (periodWindow ? periodSummaryCard(candidate) : careerSummaryCard(candidate)))
     .join("");
@@ -1727,21 +1782,13 @@ function renderPlayer(discordId, statKey, params) {
       </summary>
       <div class="player-stats-content">
         <div class="stat-summary-grid">${summaries}</div>
-        <div class="chart-card">
-          <h3>${esc(stat.title)} ${
-            periodWindow && statHasPeriodForm(stat.key)
-              ? `· daily Period form${
-                  memberDailySeries(state.counters, discordId, stat.key, periodWindow).some((point) => point.value != null && !point.observedEnd)
-                    ? " (yellow = carried snapshot)"
-                    : ""
-                }`
-              : "over time"
-          }</h3>
-          <div class="chart-box"><canvas id="player-chart"></canvas></div>
-        </div>
       </div>
     </details>
     ${equipmentDetailsHtml(discordId, equipmentView, periodWindow)}
+    <div class="chart-card">
+      <h3>${chartHeading}</h3>
+      <div class="chart-box"><canvas id="player-chart"></canvas></div>
+    </div>
     ${auditHtml}
     ${cachedFootnoteHtml(Boolean(member?.cachedStats))}`;
 
@@ -1780,7 +1827,15 @@ function renderPlayer(discordId, statKey, params) {
   wireEquipmentDetails(discordId, stat.key, showEstimated, equipmentView);
 
   const periodChartWindow = periodWindow && statHasPeriodForm(stat.key) ? periodWindow : null;
-  if (periodChartWindow) {
+  if (chartEquipment) {
+    const points = equipmentChartPoints(chartEquipment, periodWindow);
+    lineChart(
+      document.getElementById("player-chart"),
+      points.map((point) => point.date),
+      [{ label: `${chartEquipment.name} kills`, data: points.map((point) => point.value) }],
+      { key: "kills", title: `${chartEquipment.name} Kills`, format: "integer" }
+    );
+  } else if (periodChartWindow) {
     const points = memberDailySeries(state.counters, discordId, stat.key, periodChartWindow);
     lineChart(
       document.getElementById("player-chart"),
@@ -1979,7 +2034,7 @@ function equipmentRowsHtml(category, memberData, dates, fieldTrackingStarts, per
   });
   const metrics = equipmentMetricFields(category);
   const header = `<thead><tr><th>Equipment</th>${metrics.map((metric) => `<th class="num">${EQUIPMENT_METRIC_LABELS[metric]}</th>`).join("")}</tr></thead>`;
-  const row = (item) => `<tr>
+  const row = (item) => `<tr class="equipment-row" data-equipment-row="${esc(item.id)}" tabindex="0" role="button" aria-label="Graph ${esc(item.name)} kills">
     <td><span class="equipment-name">${esc(item.name)}</span>${category === "weapons" ? `<small class="equipment-id">${esc(weaponClassName(item.id))}</small>` : ""}</td>
     ${metrics.map((metric) => `<td class="num value-cell">${equipmentValueText(metric, equipmentMetricValue(item.stats, metric))}</td>`).join("")}
   </tr>`;
@@ -2060,7 +2115,7 @@ function equipmentDetailsHtml(discordId, equipmentView, periodWindow) {
     ? `<div class="equipment-loading">Loading equipment data…</div>`
     : `<p class="equipment-empty">Expand to load this member’s weapon and vehicle history.</p>`;
   return `<details id="equipment-details" class="chart-card equipment-details" ${equipmentView.open ? "open" : ""}>
-    <summary class="recent-form-summary"><h3>Weapons &amp; Vehicles</h3><span class="panel-toggle" aria-hidden="true"></span></summary>
+    <summary class="recent-form-summary"><h3>Weapon/Vehicle Stats</h3><span class="panel-toggle" aria-hidden="true"></span></summary>
     ${content}
   </details>`;
 }
@@ -2097,6 +2152,26 @@ function wireEquipmentDetails(discordId, statKey, showEstimated, equipmentView) 
   details.addEventListener("toggle", () => {
     if (details.open !== equipmentView.open) updateRoute(details.open, equipmentView.grouping);
   });
+  // Picking a row graphs that item; picking it again clears back to the soldier
+  // stat, so the row doubles as the off switch and needs no separate control.
+  const selectRow = (id) => {
+    const current = parsedHashRoute().params.get("equipment");
+    replaceHashAndRender(playerProfileRoute(discordId, statKey, viewRangeState, {
+      estimated: showEstimated,
+      equipmentOpen: true,
+      equipmentGrouping: equipmentView.grouping,
+      equipment: current === id ? null : id
+    }));
+  };
+  for (const row of details.querySelectorAll("[data-equipment-row]")) {
+    row.addEventListener("click", () => selectRow(row.dataset.equipmentRow));
+    row.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        selectRow(row.dataset.equipmentRow);
+      }
+    });
+  }
   for (const button of details.querySelectorAll("[data-equipment-group]")) {
     button.addEventListener("click", (event) => {
       event.preventDefault();

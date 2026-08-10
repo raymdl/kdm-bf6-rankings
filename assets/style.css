@@ -2257,3 +2257,8 @@ tr.period-provisional {
 /* Profile panels reuse the leaderboard indicator so both pages agree. */
 .recent-form-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; list-style: none; }
 .recent-form-summary::-webkit-details-marker { display: none; }
+
+/* An equipment row is a control for the graph below it. */
+.equipment-row { cursor: pointer; }
+.equipment-row:hover, .equipment-row:focus-visible { background: rgba(255, 255, 255, 0.045); outline: none; }
+.equipment-row.selected { background: rgba(242, 101, 34, 0.13); }

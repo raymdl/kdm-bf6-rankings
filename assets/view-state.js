@@ -74,10 +74,12 @@ export function playerProfileRoute(
   discordId,
   statKey,
   viewRange,
-  { estimated = false, equipmentOpen = false, equipmentGrouping = "class" } = {}
+  { estimated = false, equipmentOpen = false, equipmentGrouping = "class", equipment = null } = {}
 ) {
   return hashRoute(`player/${encodeURIComponent(discordId)}/${statKey}`, {
     estimated: estimated ? 1 : null,
+    // Which weapon/vehicle drives the graph; absent means the soldier stat does.
+    equipment: equipment || null,
     ...equipmentViewParams({ open: equipmentOpen, grouping: equipmentGrouping }),
     ...viewRangeParams(viewRange)
   });
