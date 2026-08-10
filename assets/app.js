@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260810-equipment-2";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260810-equipment-3";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260810-equipment-2";
+} from "./period.js?v=20260810-equipment-3";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,8 +26,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260810-equipment-2";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260810-equipment-2";
+} from "./view-state.js?v=20260810-equipment-3";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260810-equipment-3";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -37,7 +37,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260810-equipment-2";
+} from "./equipment.js?v=20260810-equipment-3";
 
 const app = document.getElementById("app");
 
@@ -1253,9 +1253,26 @@ function equipmentGroups() {
   // to catch vehicles a content drop added before the class map caught up, so
   // showing it empty just advertises an internal bucket.
   const hasData = (id) => Object.values(state.equipmentIndex?.members ?? {}).some((member) => member?.vehicles?.[id]);
-  const vehicles = [...vehicleOrder, ...[...seen.vehicles].filter((id) => !vehicleOrder.includes(id))]
+  const orderedVehicles = [...vehicleOrder, ...[...seen.vehicles].filter((id) => !vehicleOrder.includes(id))]
     .filter((id) => seen.vehicles.has(id))
     .filter((id) => id !== "unclassified" || hasData(id));
+
+  const domains = Array.isArray(catalogue?.vehicleDomains) && catalogue.vehicleDomains.length
+    ? catalogue.vehicleDomains
+    : VEHICLE_DOMAIN_FALLBACKS;
+  const byDomain = new Map(domains.map((domain) => [domain.key, []]));
+  const undomained = [];
+  for (const id of orderedVehicles) {
+    const domain = catalogue?.vehicles?.[id]?.domain;
+    if (domain && byDomain.has(domain)) byDomain.get(domain).push(id);
+    else undomained.push(id);
+  }
+  const vehicles = domains
+    .map((domain) => ({ key: domain.key, label: domain.label, items: byDomain.get(domain.key) ?? [] }))
+    .filter((group) => group.items.length)
+    // A class with no domain (the internal catch-all, or one added before the
+    // site learned its domain) still has to be reachable.
+    .concat(undomained.length ? [{ key: "other", label: "Other", items: undomained }] : []);
 
   return { weapons, vehicles };
 }
@@ -1273,10 +1290,10 @@ function equipmentPanelHtml(selectedId) {
   const weaponRows = groups.weapons
     .map((group) => `<div class="equipment-class"><h4>${esc(group.label)}</h4><div class="equipment-chips">${group.items.map((id) => equipmentButtonHtml("weapons", id, selectedId)).join("")}</div></div>`)
     .join("");
-  const vehicleRow = groups.vehicles.length
-    ? `<div class="equipment-class"><h4>Vehicles</h4><div class="equipment-chips">${groups.vehicles.map((id) => equipmentButtonHtml("vehicles", id, selectedId)).join("")}</div></div>`
-    : "";
-  return `${weaponRows ? `<div class="equipment-band"><h3>Weapons</h3>${weaponRows}</div>` : ""}${vehicleRow ? `<div class="equipment-band">${vehicleRow}</div>` : ""}`;
+  const vehicleRows = groups.vehicles
+    .map((group) => `<div class="equipment-class"><h4>${esc(group.label)}</h4><div class="equipment-chips">${group.items.map((id) => equipmentButtonHtml("vehicles", id, selectedId)).join("")}</div></div>`)
+    .join("");
+  return `${weaponRows ? `<div class="equipment-band"><h3>Weapons</h3>${weaponRows}</div>` : ""}${vehicleRows ? `<div class="equipment-band"><h3>Vehicles</h3>${vehicleRows}</div>` : ""}`;
 }
 
 function equipmentIndexHasField(category, field) {
@@ -1301,7 +1318,7 @@ function renderEquipmentLeaderboard(params) {
   loadViewRange(params);
   const groups = equipmentGroups();
   const allItems = groups.weapons.flatMap((group) => group.items.map((id) => ({ id, category: "weapons" })))
-    .concat(groups.vehicles.map((id) => ({ id, category: "vehicles" })));
+    .concat(groups.vehicles.flatMap((group) => group.items.map((id) => ({ id, category: "vehicles" }))));
   const selected = allItems.find((item) => item.id === params.get("equipment")) ?? allItems[0] ?? null;
   const artifactReady = validEquipmentArtifact(state.equipmentIndex);
   const killsReady = artifactReady && (equipmentIndexHasField("weapons", "kills") || equipmentIndexHasField("vehicles", "kills"));
@@ -1804,6 +1821,12 @@ const EQUIPMENT_CLASS_FALLBACKS = {
   pst: "Pistols",
   other: "Other"
 };
+
+const VEHICLE_DOMAIN_FALLBACKS = [
+  { key: "land", label: "Land" },
+  { key: "air", label: "Air" },
+  { key: "naval", label: "Naval" }
+];
 
 const EQUIPMENT_METRIC_LABELS = {
   kills: "Kills",
