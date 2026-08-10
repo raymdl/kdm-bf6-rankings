@@ -2162,3 +2162,78 @@ tr.period-provisional {
     width: 100%;
   }
 }
+
+/* --- Stacked collapsible panels (leaderboard + profile) --- */
+.stat-panel {
+  border: 1px solid var(--line, #2a3140);
+  border-radius: 10px;
+  background: var(--panel, #141922);
+  margin: 0 0 12px;
+}
+.stat-panel > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  list-style: none;
+  font-family: Rajdhani, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.stat-panel > summary::-webkit-details-marker { display: none; }
+/* One indicator, driven off [open] so it can never disagree with the element's
+   real state -- a hand-maintained pair drifted out of sync. */
+.panel-toggle::before { content: "[+]"; font-family: ui-monospace, monospace; opacity: 0.75; }
+.stat-panel[open] > summary .panel-toggle::before { content: "[\2212]"; }
+.stat-panel > summary:hover .panel-toggle::before { opacity: 1; }
+.stat-panel-body { padding: 0 16px 16px; }
+.stat-panel .stat-tabs { margin: 0; }
+
+/* --- Weapon / vehicle chips --- */
+.equipment-band + .equipment-band { margin-top: 18px; }
+.equipment-band > h3 {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+.equipment-class { display: grid; grid-template-columns: minmax(120px, 150px) 1fr; gap: 10px 14px; align-items: baseline; }
+.equipment-class + .equipment-class { margin-top: 8px; }
+.equipment-class > h4 {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  opacity: 0.72;
+  text-align: right;
+}
+.equipment-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.equipment-chip {
+  border: 1px solid var(--line, #2a3140);
+  background: transparent;
+  color: inherit;
+  border-radius: 999px;
+  padding: 4px 11px;
+  font-size: 0.83rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.equipment-chip:hover { border-color: var(--accent, #f26522); }
+.equipment-chip.active {
+  background: var(--accent, #f26522);
+  border-color: var(--accent, #f26522);
+  color: #10131a;
+  font-weight: 600;
+}
+@media (max-width: 720px) {
+  .equipment-class { grid-template-columns: 1fr; gap: 4px; }
+  .equipment-class > h4 { text-align: left; }
+}
+
+/* Profile panels reuse the leaderboard indicator so both pages agree. */
+.recent-form-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; list-style: none; }
+.recent-form-summary::-webkit-details-marker { display: none; }

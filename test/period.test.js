@@ -423,12 +423,12 @@ test("equipment metrics that predate their tracking start remain unknown", () =>
 
   const vehicleStats = equipmentPeriodStats(
     { kills: [], timeIn: [], vehiclesDestroyedWith: [] },
-    "archetypes",
+    "vehicles",
     0,
     1,
     ["2026-07-10", "2026-08-09"],
     [0, 1],
-    { archetypes: { kills: "2026-08-10", timeIn: "2026-08-10", vehiclesDestroyedWith: "2026-08-10" } }
+    { vehicles: { kills: "2026-08-10", timeIn: "2026-08-10", vehiclesDestroyedWith: "2026-08-10" } }
   );
   assert.equal(vehicleStats.kills, null, "archetype kills begin on the published vehicle tracking date");
 });
@@ -468,16 +468,16 @@ test("equipment validators keep the member profile and kills index contracts sep
     observed: [0, 1],
     fieldTrackingStarts: {
       weapons: { kills: null, headshotKills: "2026-08-10", shotsHit: "2026-08-10", shotsFired: "2026-08-10", timeEquipped: "2026-08-10" },
-      archetypes: { kills: "2026-08-10", timeIn: "2026-08-10", vehiclesDestroyedWith: "2026-08-10" }
+      vehicles: { kills: "2026-08-10", timeIn: "2026-08-10", vehiclesDestroyedWith: "2026-08-10" }
     },
     weapons: { wp_crb_m4a1: { kills: [0, 10, 1, 20] } },
-    archetypes: { arch_ifv: { kills: [0, 2, 1, 4] } }
+    vehicles: { arch_ifv: { kills: [0, 2, 1, 4] } }
   };
   const killsIndex = {
     version: 1,
     formulaVersion: 1,
     dates: memberFile.dates,
-    members: { "42": { name: "Member", observed: [0, 1], weapons: memberFile.weapons, archetypes: memberFile.archetypes } }
+    members: { "42": { name: "Member", observed: [0, 1], weapons: memberFile.weapons, vehicles: memberFile.vehicles } }
   };
 
   assert.equal(validEquipmentMemberFile(memberFile), true);

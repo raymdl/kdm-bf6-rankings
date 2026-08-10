@@ -4,7 +4,7 @@
 
 export const EQUIPMENT_FIELDS = {
   weapons: ["kills", "headshotKills", "shotsHit", "shotsFired", "timeEquipped"],
-  archetypes: ["kills", "timeIn", "vehiclesDestroyedWith"]
+  vehicles: ["kills", "timeIn", "vehiclesDestroyedWith"]
 };
 
 export const EQUIPMENT_TRACKING_STARTS = {
@@ -22,7 +22,7 @@ const CATEGORY_STATS = {
     time: "timeEquipped",
     vehiclesDestroyed: null
   },
-  archetypes: {
+  vehicles: {
     time: "timeIn",
     vehiclesDestroyed: "vehiclesDestroyedWith"
   }
@@ -215,9 +215,9 @@ export function validEquipmentMemberFile(artifact) {
       artifact.weapons &&
       typeof artifact.weapons === "object" &&
       !Array.isArray(artifact.weapons) &&
-      artifact.archetypes &&
-      typeof artifact.archetypes === "object" &&
-      !Array.isArray(artifact.archetypes)
+      artifact.vehicles &&
+      typeof artifact.vehicles === "object" &&
+      !Array.isArray(artifact.vehicles)
   );
 }
 
@@ -228,8 +228,8 @@ export function validEquipmentCatalogue(catalogue) {
       typeof catalogue.classes === "object" &&
       catalogue.weapons &&
       typeof catalogue.weapons === "object" &&
-      catalogue.archetypes &&
-      typeof catalogue.archetypes === "object"
+      catalogue.vehicles &&
+      typeof catalogue.vehicles === "object"
   );
 }
 

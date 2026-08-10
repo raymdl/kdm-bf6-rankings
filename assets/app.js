@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260810-equipment-1";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260810-equipment-2";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260810-equipment-1";
+} from "./period.js?v=20260810-equipment-2";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,8 +26,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260810-equipment-1";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260810-equipment-1";
+} from "./view-state.js?v=20260810-equipment-2";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260810-equipment-2";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -37,7 +37,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260810-equipment-1";
+} from "./equipment.js?v=20260810-equipment-2";
 
 const app = document.getElementById("app");
 
@@ -53,7 +53,7 @@ const state = {
   effectivenessHistory: null,
   counters: null,
   equipmentCatalogue: null,
-  equipmentKills: null
+  equipmentIndex: null
 };
 
 let charts = [];
@@ -865,16 +865,23 @@ function movementHtml(prevRank, currentRank, windowText = "the previous day") {
   return `<span class="movement flat">–</span>`;
 }
 
-function statTabsHtml(activeKey, hrefFor, includeEquipment = false) {
-  const equipmentTab = includeEquipment
-    ? `<button class="${activeKey === "equipment" ? "active" : ""}" data-stat="equipment" data-href="${hashRoute("board/equipment", viewRangeParams())}">Weapons &amp; Vehicles</button>`
-    : "";
+function statTabsHtml(activeKey, hrefFor) {
   return `<div class="stat-tabs">${state.meta.stats
     .map(
       (stat) =>
         `<button class="${stat.key === activeKey ? "active" : ""}" data-stat="${stat.key}" data-href="${hrefFor ? hrefFor(stat.key) : ""}">${esc(stat.title)}</button>`
     )
-    .join("")}${equipmentTab}</div>`;
+    .join("")}</div>`;
+}
+
+// Selecting any weapon or vehicle chip navigates to the equipment board, so the
+// panel works identically whichever leaderboard you are looking at.
+function wireEquipmentChips() {
+  for (const button of app.querySelectorAll("[data-equipment]")) {
+    button.addEventListener("click", () => {
+      replaceHashAndRender(hashRoute("board/equipment", { equipment: button.dataset.equipment, ...viewRangeParams() }));
+    });
+  }
 }
 
 function wireStatTabs(onSelect) {
@@ -1192,7 +1199,8 @@ function renderPeriodLeaderboard(stat, window) {
     <h1 class="page-title">${esc(stat.title)} Leaderboard <span class="period-title-tag">${esc(periodWindowText(window))}</span></h1>
     <p class="page-sub">Stats earned during this range only, from daily snapshot differences · rates need ${floorMin}+ active minutes to rank · daily trend per player</p>
     ${viewRangeControlHtml()}
-    ${statTabsHtml(stat.key, (key) => hashRoute(`board/${key}`, viewRangeParams()), true)}
+    ${panelHtml("panel-soldier", "Soldier Stats", true, statTabsHtml(stat.key, (key) => hashRoute(`board/${key}`, viewRangeParams())))}
+    ${panelHtml("panel-equipment", "Weapon/Vehicle Stats", false, equipmentPanelHtml(null))}
     ${podiumHtml}
     <div class="table-wrap">
       <table>
@@ -1203,75 +1211,110 @@ function renderPeriodLeaderboard(stat, window) {
     ${invalidNote}`;
   wireViewRangeControl(leaderboardHrefFor(stat.key));
   wireStatTabs();
+  wireEquipmentChips();
   wireSortableHeaders(leaderboardSortState);
 }
 
-function equipmentLeaderboardItems() {
-  const items = { weapons: new Map(), archetypes: new Map() };
-  for (const category of Object.keys(items)) {
-    for (const id of Object.keys(equipmentCatalogue()?.[category] ?? {})) {
-      items[category].set(id, equipmentDisplayName(category, id));
-    }
-    for (const member of Object.values(state.equipmentKills?.members ?? {})) {
-      for (const id of Object.keys(member?.[category] ?? {})) {
-        if (!items[category].has(id)) items[category].set(id, equipmentDisplayName(category, id));
-      }
+// Weapons grouped by class, alphabetical within each group; vehicles in the
+// catalogue's published class order. Both are rendered as buttons rather than a
+// dropdown: the whole point of the panel is seeing what exists, and a <select>
+// hides the grouping that makes 60-odd weapons navigable.
+function equipmentGroups() {
+  const catalogue = equipmentCatalogue();
+  const seen = { weapons: new Set(), vehicles: new Set() };
+  for (const category of ["weapons", "vehicles"]) {
+    for (const id of Object.keys(catalogue?.[category] ?? {})) seen[category].add(id);
+    for (const member of Object.values(state.equipmentIndex?.members ?? {})) {
+      for (const id of Object.keys(member?.[category] ?? {})) seen[category].add(id);
     }
   }
-  return items;
+
+  const byClass = new Map();
+  for (const id of seen.weapons) {
+    const classId = equipmentCatalogue()?.weapons?.[id]?.class ?? weaponClassId(id);
+    if (!byClass.has(classId)) byClass.set(classId, []);
+    byClass.get(classId).push(id);
+  }
+  const classOrder = Object.keys(catalogue?.classes ?? EQUIPMENT_CLASS_FALLBACKS);
+  const weapons = classOrder
+    .filter((classId) => byClass.has(classId))
+    .map((classId) => ({
+      key: classId,
+      label: weaponClassLabel(classId),
+      items: byClass.get(classId).sort((a, b) =>
+        equipmentDisplayName("weapons", a).localeCompare(equipmentDisplayName("weapons", b), undefined, { sensitivity: "base", numeric: true }))
+    }));
+
+  // Vehicle classes keep their published order; an unpublished one still shows
+  // rather than vanishing, so a content drop is visible instead of silent.
+  const vehicleOrder = Array.isArray(catalogue?.vehicleOrder) ? catalogue.vehicleOrder : [];
+  // Every real class stays visible even when unused -- an empty leaderboard is
+  // still a target to race for. `unclassified` is the exception: it exists only
+  // to catch vehicles a content drop added before the class map caught up, so
+  // showing it empty just advertises an internal bucket.
+  const hasData = (id) => Object.values(state.equipmentIndex?.members ?? {}).some((member) => member?.vehicles?.[id]);
+  const vehicles = [...vehicleOrder, ...[...seen.vehicles].filter((id) => !vehicleOrder.includes(id))]
+    .filter((id) => seen.vehicles.has(id))
+    .filter((id) => id !== "unclassified" || hasData(id));
+
+  return { weapons, vehicles };
 }
 
-function equipmentPickerHtml(items, selectedId) {
-  const group = (category, label) => {
-    const options = [...items[category].entries()]
-      .sort((a, b) => a[1].localeCompare(b[1], undefined, { sensitivity: "base", numeric: true }) || a[0].localeCompare(b[0]))
-      .map(([id, name]) => `<option value="${esc(id)}" ${id === selectedId ? "selected" : ""}>${esc(name)}</option>`)
-      .join("");
-    return options ? `<optgroup label="${label}">${options}</optgroup>` : "";
-  };
-  return `<label class="equipment-picker"><span>Equipment</span><select id="equipment-picker">${group("weapons", "Weapons")}${group("archetypes", "Vehicles")}</select></label>`;
+function equipmentButtonHtml(category, id, selectedId) {
+  const title = category === "vehicles"
+    ? (equipmentCatalogue()?.vehicles?.[id]?.vehicles ?? []).join(", ")
+    : weaponClassLabel(equipmentCatalogue()?.weapons?.[id]?.class ?? weaponClassId(id));
+  return `<button type="button" class="equipment-chip${id === selectedId ? " active" : ""}" data-equipment="${esc(id)}"${title ? ` title="${esc(title)}"` : ""}>${esc(equipmentDisplayName(category, id))}</button>`;
 }
 
-function equipmentKillsHasField(category, field) {
-  return equipmentFieldsPresent(state.equipmentKills, category).has(field);
+function equipmentPanelHtml(selectedId) {
+  const groups = equipmentGroups();
+  if (!groups.weapons.length && !groups.vehicles.length) return "";
+  const weaponRows = groups.weapons
+    .map((group) => `<div class="equipment-class"><h4>${esc(group.label)}</h4><div class="equipment-chips">${group.items.map((id) => equipmentButtonHtml("weapons", id, selectedId)).join("")}</div></div>`)
+    .join("");
+  const vehicleRow = groups.vehicles.length
+    ? `<div class="equipment-class"><h4>Vehicles</h4><div class="equipment-chips">${groups.vehicles.map((id) => equipmentButtonHtml("vehicles", id, selectedId)).join("")}</div></div>`
+    : "";
+  return `${weaponRows ? `<div class="equipment-band"><h3>Weapons</h3>${weaponRows}</div>` : ""}${vehicleRow ? `<div class="equipment-band">${vehicleRow}</div>` : ""}`;
+}
+
+function equipmentIndexHasField(category, field) {
+  return equipmentFieldsPresent(state.equipmentIndex, category).has(field);
 }
 
 function equipmentLeaderboardRows(selectedId, category, periodWindow, usePeriod) {
-  return Object.entries(state.equipmentKills?.members ?? {})
+  return Object.entries(state.equipmentIndex?.members ?? {})
     .map(([discordId, member]) => {
       const entry = member?.[category]?.[selectedId];
       if (!entry) return null;
       const stats = usePeriod
-        ? equipmentPeriodStats(entry, category, periodWindow.startIndex, periodWindow.endIndex, state.equipmentKills.dates, member.observed, state.equipmentKills.fieldTrackingStarts)
-        : equipmentCareerStats(entry, category, latestObservedIndex(member.observed), member.observed, state.equipmentKills.dates, state.equipmentKills.fieldTrackingStarts);
-      return {
-        discordId,
-        name: member.name ?? memberName(discordId),
-        kills: stats.kills
-      };
+        ? equipmentPeriodStats(entry, category, periodWindow.startIndex, periodWindow.endIndex, state.equipmentIndex.dates, member.observed, state.equipmentIndex.fieldTrackingStarts)
+        : equipmentCareerStats(entry, category, latestObservedIndex(member.observed), member.observed, state.equipmentIndex.dates, state.equipmentIndex.fieldTrackingStarts);
+      return { discordId, name: member.name ?? memberName(discordId), stats };
     })
-    .filter((row) => row && Number.isFinite(row.kills))
-    .sort((a, b) => b.kills - a.kills || a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }));
+    .filter((row) => row && Number.isFinite(row.stats?.kills))
+    .sort((a, b) => b.stats.kills - a.stats.kills || a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }));
 }
 
 function renderEquipmentLeaderboard(params) {
   loadViewRange(params);
-  const items = equipmentLeaderboardItems();
-  const allItems = [...items.weapons.keys()].map((id) => ({ id, category: "weapons" }))
-    .concat([...items.archetypes.keys()].map((id) => ({ id, category: "archetypes" })));
+  const groups = equipmentGroups();
+  const allItems = groups.weapons.flatMap((group) => group.items.map((id) => ({ id, category: "weapons" })))
+    .concat(groups.vehicles.map((id) => ({ id, category: "vehicles" })));
   const selected = allItems.find((item) => item.id === params.get("equipment")) ?? allItems[0] ?? null;
-  const artifactReady = validEquipmentArtifact(state.equipmentKills);
-  const killsReady = artifactReady && (equipmentKillsHasField("weapons", "kills") || equipmentKillsHasField("archetypes", "kills"));
+  const artifactReady = validEquipmentArtifact(state.equipmentIndex);
+  const killsReady = artifactReady && (equipmentIndexHasField("weapons", "kills") || equipmentIndexHasField("vehicles", "kills"));
   const periodWindow = activePeriodWindow();
-  const periodMatches = Boolean(periodWindow && state.equipmentKills?.dates[periodWindow.startIndex] === periodWindow.startDate && state.equipmentKills?.dates[periodWindow.endIndex] === periodWindow.endDate);
-  const usePeriod = Boolean(selected && periodMatches && equipmentKillsHasField(selected.category, "kills"));
+  const periodMatches = Boolean(periodWindow && state.equipmentIndex?.dates[periodWindow.startIndex] === periodWindow.startDate && state.equipmentIndex?.dates[periodWindow.endIndex] === periodWindow.endDate);
+  const usePeriod = Boolean(selected && periodMatches && equipmentIndexHasField(selected.category, "kills"));
   const rows = usePeriod ? equipmentLeaderboardRows(selected.id, selected.category, periodWindow, true) : selected ? equipmentLeaderboardRows(selected.id, selected.category, null, false) : [];
   const periodNote = viewRangeState.view === "period"
     ? !periodWindow
       ? `<p class="period-unsupported-note" role="note">The selected Period range is not available yet — showing Career kills.</p>`
       : !periodMatches
         ? `<p class="period-unsupported-note" role="note">The selected Period range is not available in the equipment archive — showing Career kills.</p>`
-        : selected && !equipmentKillsHasField(selected.category, "kills")
+        : selected && !equipmentIndexHasField(selected.category, "kills")
           ? `<p class="period-unsupported-note" role="note">This equipment item has no Period kills field — showing Career kills.</p>`
           : ""
     : "";
@@ -1280,25 +1323,24 @@ function renderEquipmentLeaderboard(params) {
     : !killsReady
       ? `<p class="period-unsupported-note" role="note">The equipment kills artifact has no usable kills field, so this leaderboard is unavailable.</p>`
       : "";
+  // Kills stays the sort key and the first column -- it is what the informal
+  // challenges are scored on -- with the rest of the metrics alongside it.
+  const metrics = selected ? equipmentMetricFields(selected.category) : [];
   const body = rows.length
-    ? rows.map((row, index) => `<tr class="r${index + 1}"><td class="rank-cell">${index + 1}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}</td><td class="num value-cell">${row.kills.toLocaleString("en-US")}</td></tr>`).join("")
-    : `<tr><td colspan="3" class="empty">No observed kills for this equipment item in the selected range.</td></tr>`;
-  const heading = selected ? `${esc(items[selected.category].get(selected.id))} Kills` : "Equipment Kills";
+    ? rows.map((row, index) => `<tr class="r${index + 1}"><td class="rank-cell">${index + 1}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}</td>${metrics.map((metric) => `<td class="num${metric === "kills" ? " value-cell" : ""}">${equipmentValueText(metric, equipmentMetricValue(row.stats, metric))}</td>`).join("")}</tr>`).join("")
+    : `<tr><td colspan="${2 + (metrics.length || 1)}" class="empty">No observed kills for this equipment item in the selected range.</td></tr>`;
+  const heading = selected ? `${esc(equipmentDisplayName(selected.category, selected.id))} Kills` : "Equipment Kills";
   app.innerHTML = `
     <h1 class="page-title">Equipment Leaderboard</h1>
     <p class="page-sub">${heading} · ${usePeriod ? esc(periodWindowText(periodWindow)) : "Career totals"}</p>
     ${viewRangeControlHtml()}
-    ${statTabsHtml("equipment", null, true)}
-    ${artifactNote}
-    ${periodNote}
-    ${selected ? equipmentPickerHtml(items, selected.id) : ""}
-    ${selected ? `<div class="table-wrap equipment-leaderboard-table"><table><thead><tr><th>#</th><th>Player</th><th class="num">${usePeriod ? "Kills" : "Career Kills"}</th></tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
+    ${panelHtml("panel-soldier", "Soldier Stats", false, statTabsHtml(null, (key) => hashRoute(`board/${key}`, viewRangeParams())))}
+    ${panelHtml("panel-equipment", "Weapon/Vehicle Stats", true, `${artifactNote}${periodNote}${equipmentPanelHtml(selected?.id ?? null)}`)}
+    ${selected ? `<div class="table-wrap equipment-leaderboard-table"><table><thead><tr><th>#</th><th>Player</th>${metrics.map((metric) => `<th class="num">${metric === "kills" && !usePeriod ? "Career Kills" : EQUIPMENT_METRIC_LABELS[metric]}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
   const equipmentHref = (rangeParams) => hashRoute("board/equipment", { equipment: selected?.id ?? null, ...rangeParams });
   wireViewRangeControl(equipmentHref);
   wireStatTabs();
-  document.getElementById("equipment-picker")?.addEventListener("change", (event) => {
-    replaceHashAndRender(hashRoute("board/equipment", { equipment: event.target.value, ...viewRangeParams() }));
-  });
+  wireEquipmentChips();
 }
 
 function renderLeaderboard(statKey, params) {
@@ -1417,7 +1459,8 @@ function renderLeaderboard(statKey, params) {
     ${periodNotice}
     <p class="page-sub">Current Career values · movement, deltas, and sparkline show change over ${esc(windowText)}</p>
     ${viewRangeControlHtml()}
-    ${statTabsHtml(stat.key, (key) => hashRoute(`board/${key}`, viewRangeParams()), true)}
+    ${panelHtml("panel-soldier", "Soldier Stats", true, statTabsHtml(stat.key, (key) => hashRoute(`board/${key}`, viewRangeParams())))}
+    ${panelHtml("panel-equipment", "Weapon/Vehicle Stats", false, equipmentPanelHtml(null))}
     ${podiumHtml}
     <div class="table-wrap">
       <table>
@@ -1428,6 +1471,7 @@ function renderLeaderboard(statKey, params) {
     ${cachedFootnoteHtml(ranking.some((row) => row.member?.cachedStats))}`;
   wireViewRangeControl(leaderboardHrefFor(stat.key));
   wireStatTabs();
+  wireEquipmentChips();
   wireSortableHeaders(leaderboardSortState);
 }
 
@@ -1653,14 +1697,14 @@ function renderPlayer(discordId, statKey, params) {
     </div>
     ${viewRangeState.view === "period" && !periodWindow ? `<div class="period-unsupported-note" role="note">The selected range is not available yet — showing Career values.</div>` : ""}
     ${showEstimated && !periodWindow ? estimatedHistoryNoticeHtml(discordId) : ""}
+    ${viewRangeControlHtml()}
+    ${recentFormCardHtml(discordId, member)}
     <details class="chart-card player-stats-details" open>
       <summary class="recent-form-summary">
-        <h3>Stats</h3>
-        <span class="recent-form-toggle" aria-hidden="true"><span class="when-open">[−]</span><span class="when-closed">[+]</span></span>
+        <h3>Soldier Stats</h3>
+        <span class="panel-toggle" aria-hidden="true"></span>
       </summary>
       <div class="player-stats-content">
-        ${viewRangeControlHtml()}
-        ${recentFormCardHtml(discordId, member)}
         <div class="stat-summary-grid">${summaries}</div>
         <div class="chart-card">
           <h3>${esc(stat.title)} ${
@@ -1774,6 +1818,16 @@ const EQUIPMENT_METRIC_LABELS = {
   vehiclesDestroyedWith: "Vehicles Destroyed"
 };
 
+// One indicator, not a stacked pair: [+] when collapsed, [-] when open. The
+// glyph is CSS-driven off the open attribute so it can never disagree with the
+// element's real state.
+function panelHtml(id, title, open, body, extraClass = "") {
+  return `<details class="stat-panel ${extraClass}" id="${esc(id)}"${open ? " open" : ""}>
+    <summary><span class="panel-title">${esc(title)}</span><span class="panel-toggle" aria-hidden="true"></span></summary>
+    <div class="stat-panel-body">${body}</div>
+  </details>`;
+}
+
 function equipmentCatalogue() {
   return validEquipmentCatalogue(state.equipmentCatalogue) ? state.equipmentCatalogue : null;
 }
@@ -1784,6 +1838,10 @@ function equipmentDisplayName(category, id) {
 
 function weaponClassId(id) {
   return String(id).match(/^wp_([^_]+)_/)?.[1] ?? "other";
+}
+
+function weaponClassLabel(classId) {
+  return equipmentCatalogue()?.classes?.[classId] ?? EQUIPMENT_CLASS_FALLBACKS[classId] ?? String(classId).toUpperCase();
 }
 
 function weaponClassName(id) {
@@ -1833,7 +1891,7 @@ function equipmentPeriodTrackingNote(fields, category) {
       metricFields.add("kpm");
     }
   }
-  if (category === "archetypes" && metricFields.has("timeIn")) {
+  if (category === "vehicles" && metricFields.has("timeIn")) {
     metricFields.add("timeIn");
     metricFields.add("kpm");
   }
@@ -1847,7 +1905,7 @@ function equipmentPeriodTrackingNote(fields, category) {
 }
 
 function equipmentProfileMember(data, discordId) {
-  return data?.members?.[discordId] ?? (data?.weapons || data?.archetypes ? data : null);
+  return data?.members?.[discordId] ?? (data?.weapons || data?.vehicles ? data : null);
 }
 
 function equipmentRowsHtml(category, memberData, dates, fieldTrackingStarts, periodWindow, usePeriod, grouping) {
@@ -1878,7 +1936,7 @@ function equipmentRowsHtml(category, memberData, dates, fieldTrackingStarts, per
     });
     return grouped.map(([group, items]) => `<section class="equipment-group"><h4>${esc(group)}</h4><div class="table-wrap"><table>${header}<tbody>${items.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true })).map(row).join("")}</tbody></table></div></section>`).join("");
   }
-  if (category === "archetypes") {
+  if (category === "vehicles") {
     const groups = [...entries].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }));
     return groups.map((item) => `<section class="equipment-group"><h4>${esc(item.name)}</h4><div class="table-wrap"><table>${header}<tbody>${row(item)}</tbody></table></div></section>`).join("");
   }
@@ -1908,7 +1966,7 @@ function equipmentSectionHtml(category, memberData, dates, fieldTrackingStarts, 
   }
   const trackingNote = equipmentPeriodTrackingNote(trackingFields, category);
   const controls = category === "weapons"
-    ? `<div class="equipment-section-head"><h3>${title}</h3><div class="equipment-group-toggle" role="group" aria-label="Weapon grouping"><button type="button" class="chip ${grouping === "class" ? "active" : ""}" data-equipment-group="class">By class</button><button type="button" class="chip ${grouping === "az" ? "active" : ""}" data-equipment-group="az">A–Z</button></div></div>`
+    ? `<div class="equipment-section-head"><h3>${title}</h3></div>`
     : `<div class="equipment-section-head"><h3>${title}</h3></div>`;
   return `<section class="equipment-section">${controls}${missingNote}${trackingNote ? `<p class="period-unsupported-note" role="note">${esc(trackingNote)}</p>` : ""}${entries.length ? rows : `<p class="equipment-empty">No ${title.toLocaleLowerCase()} recorded for this member.</p>`}</section>`;
 }
@@ -1931,7 +1989,7 @@ function equipmentProfileContentHtml(discordId, equipmentView, periodWindow) {
   return `<div class="equipment-content-head"><p class="page-sub">${usePeriod ? esc(periodWindowText(periodWindow)) : "Career totals at the latest observed equipment snapshot."}</p></div>
     ${periodNote}
     ${equipmentSectionHtml("weapons", memberData, dates, data.fieldTrackingStarts, periodWindow, usePeriod, equipmentView.grouping)}
-    ${equipmentSectionHtml("archetypes", memberData, dates, data.fieldTrackingStarts, periodWindow, usePeriod, equipmentView.grouping)}`;
+    ${equipmentSectionHtml("vehicles", memberData, dates, data.fieldTrackingStarts, periodWindow, usePeriod, equipmentView.grouping)}`;
 }
 
 function equipmentDetailsHtml(discordId, equipmentView, periodWindow) {
@@ -1940,7 +1998,7 @@ function equipmentDetailsHtml(discordId, equipmentView, periodWindow) {
     ? `<div class="equipment-loading">Loading equipment data…</div>`
     : `<p class="equipment-empty">Expand to load this member’s weapon and vehicle history.</p>`;
   return `<details id="equipment-details" class="chart-card equipment-details" ${equipmentView.open ? "open" : ""}>
-    <summary class="recent-form-summary"><h3>Weapons &amp; Vehicles</h3><span class="recent-form-toggle" aria-hidden="true"><span class="when-open">[−]</span><span class="when-closed">[+]</span></span></summary>
+    <summary class="recent-form-summary"><h3>Weapons &amp; Vehicles</h3><span class="panel-toggle" aria-hidden="true"></span></summary>
     ${content}
   </details>`;
 }
@@ -2027,7 +2085,6 @@ function recentFormCardHtml(discordId, member) {
     { label: "Player K/D", stat: decimal, career: member?.stats?.infantryKillDeath, statKey: "infantryKillDeath" },
     { label: "Player KPM", stat: decimal, career: member?.stats?.playerKillsPerMinute, statKey: "playerKillsPerMinute" },
     { label: "Player Kills", stat: integer, career: member?.stats?.kills, statKey: "kills" },
-    { label: "Deaths", stat: integer, career: careerDeaths, counterKey: "deaths" },
     { label: "Active Time", stat: hours, career: member?.stats?.timePlayedHours, statKey: "timePlayedHours" }
   ];
   const windowValue = (row, window) => {
@@ -2042,7 +2099,7 @@ function recentFormCardHtml(discordId, member) {
   return `<details class="chart-card recent-form-card" ${recentPerformanceCollapsed ? "" : "open"}>
     <summary class="recent-form-summary">
       <h3>Recent Performance Snapshot</h3>
-      <span class="recent-form-toggle" aria-hidden="true"><span class="when-open">[–]</span><span class="when-closed">[+]</span></span>
+      <span class="panel-toggle" aria-hidden="true"></span>
     </summary>
     <div class="recent-form-content">
     <div class="table-wrap"><table class="recent-form-table">
@@ -3042,7 +3099,7 @@ function bootFailureNoticeHtml() {
 }
 
 async function boot() {
-  const [meta, latest, history, historyProvenanceData, audit, notifications, effectivenessHistory, counters, equipmentCatalogueData, equipmentKills] = await Promise.all([
+  const [meta, latest, history, historyProvenanceData, audit, notifications, effectivenessHistory, counters, equipmentCatalogueData, equipmentIndex] = await Promise.all([
     fetchJson("data/meta.json", null),
     fetchJson("data/latest.json", { members: [] }, { essential: true }),
     fetchJson("data/history.json", { dates: [], members: {} }, { essential: true }),
@@ -3052,7 +3109,7 @@ async function boot() {
     fetchJson("data/effectiveness-history.json", null),
     fetchJson("data/counters.json", null),
     fetchJson("data/equipment-catalogue.json", null),
-    fetchJson("data/equipment-kills.json", null)
+    fetchJson("data/equipment-index.json", null)
   ]);
 
   if (!meta) {
@@ -3078,7 +3135,7 @@ async function boot() {
     effectivenessHistory: compatibleEffectiveness,
     counters: counters?.dates && counters?.members ? counters : null,
     equipmentCatalogue: validEquipmentCatalogue(equipmentCatalogueData) ? equipmentCatalogueData : null,
-    equipmentKills: validEquipmentArtifact(equipmentKills) ? equipmentKills : null
+    equipmentIndex: validEquipmentArtifact(equipmentIndex) ? equipmentIndex : null
   });
 
   const updated = document.getElementById("footer-updated");
