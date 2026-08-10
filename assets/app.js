@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260810-equipment-7";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260810-equipment-8";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260810-equipment-7";
+} from "./period.js?v=20260810-equipment-8";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,8 +26,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260810-equipment-7";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260810-equipment-7";
+} from "./view-state.js?v=20260810-equipment-8";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260810-equipment-8";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -37,7 +37,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260810-equipment-7";
+} from "./equipment.js?v=20260810-equipment-8";
 
 const app = document.getElementById("app");
 
@@ -1212,6 +1212,7 @@ function renderPeriodLeaderboard(stat, window) {
   wireViewRangeControl(leaderboardHrefFor(stat.key));
   wireStatTabs();
   wireEquipmentChips();
+  wirePanelState();
   wireSortableHeaders(leaderboardSortState);
 }
 
@@ -1353,11 +1354,13 @@ function renderEquipmentLeaderboard(params) {
     ${viewRangeControlHtml()}
     ${panelHtml("panel-soldier", "Soldier Stats", false, statTabsHtml(null, (key) => hashRoute(`board/${key}`, viewRangeParams())))}
     ${panelHtml("panel-equipment", "Weapon/Vehicle Stats", true, `${artifactNote}${periodNote}${equipmentPanelHtml(selected?.id ?? null)}`)}
-    ${selected ? `<div class="table-wrap equipment-leaderboard-table"><table><thead><tr><th>#</th><th>Player</th>${metrics.map((metric) => `<th class="num">${metric === "kills" && !usePeriod ? "Career Kills" : EQUIPMENT_METRIC_LABELS[metric]}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
+    ${selected ? `<div class="table-wrap equipment-leaderboard-table"><table><thead><tr><th>#</th><th>Player</th>${metrics.map((metric) => `<th class="num">${metric === "kills" && selected ? `${esc(equipmentDisplayName(selected.category, selected.id))} Kills` : EQUIPMENT_METRIC_LABELS[metric]}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
   const equipmentHref = (rangeParams) => hashRoute("board/equipment", { equipment: selected?.id ?? null, ...rangeParams });
   wireViewRangeControl(equipmentHref);
   wireStatTabs();
+  wirePanelState();
   wireEquipmentChips();
+  wirePanelState();
 }
 
 function renderLeaderboard(statKey, params) {
@@ -1489,6 +1492,7 @@ function renderLeaderboard(statKey, params) {
   wireViewRangeControl(leaderboardHrefFor(stat.key));
   wireStatTabs();
   wireEquipmentChips();
+  wirePanelState();
   wireSortableHeaders(leaderboardSortState);
 }
 
@@ -1844,7 +1848,42 @@ const EQUIPMENT_METRIC_LABELS = {
 // One indicator, not a stacked pair: [+] when collapsed, [-] when open. The
 // glyph is CSS-driven off the open attribute so it can never disagree with the
 // element's real state.
-function panelHtml(id, title, open, body, extraClass = "") {
+// A panel the user opened stays open when they pick a different stat or weapon.
+// The route only supplies the FIRST-visit default; after that their choice wins,
+// because re-deriving from the route silently collapsed a panel they had just
+// opened. Per-browser only, like favorites -- the site has no accounts.
+const PANEL_STATE_STORAGE_KEY = "kdm-bf6-panel-state";
+
+function readPanelState() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(PANEL_STATE_STORAGE_KEY) ?? "{}");
+    return raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+  } catch {
+    return {};
+  }
+}
+
+function writePanelState(id, open) {
+  try {
+    localStorage.setItem(PANEL_STATE_STORAGE_KEY, JSON.stringify({ ...readPanelState(), [id]: open }));
+  } catch {
+    /* storage disabled; the panel still works for this page view */
+  }
+}
+
+function panelIsOpen(id, fallback) {
+  const stored = readPanelState()[id];
+  return typeof stored === "boolean" ? stored : fallback;
+}
+
+function wirePanelState() {
+  for (const panel of app.querySelectorAll(".stat-panel[id]")) {
+    panel.addEventListener("toggle", () => writePanelState(panel.id, panel.open));
+  }
+}
+
+function panelHtml(id, title, defaultOpen, body, extraClass = "") {
+  const open = panelIsOpen(id, defaultOpen);
   return `<details class="stat-panel ${extraClass}" id="${esc(id)}"${open ? " open" : ""}>
     <summary><span class="panel-title">${esc(title)}</span><span class="panel-toggle" aria-hidden="true"></span></summary>
     <div class="stat-panel-body">${body}</div>
