@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260810-roadkills";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260810-equipment-1";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,20 +12,32 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260810-roadkills";
+} from "./period.js?v=20260810-equipment-1";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
   RANGE_OPTIONS,
   hashRoute,
+  equipmentViewParams,
+  equipmentViewState,
   normalizedViewRange,
   parseHashRoute,
   playerProfileRoute,
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260810-roadkills";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260810-roadkills";
+} from "./view-state.js?v=20260810-equipment-1";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260810-equipment-1";
+import {
+  EQUIPMENT_FIELDS,
+  equipmentCareerStats,
+  equipmentFieldsPresent,
+  equipmentPeriodStats,
+  latestObservedIndex,
+  validEquipmentArtifact,
+  validEquipmentCatalogue,
+  validEquipmentMemberFile
+} from "./equipment.js?v=20260810-equipment-1";
 
 const app = document.getElementById("app");
 
@@ -39,11 +51,15 @@ const state = {
   notifications: null,
   effectiveness: null,
   effectivenessHistory: null,
-  counters: null
+  counters: null,
+  equipmentCatalogue: null,
+  equipmentKills: null
 };
 
 let charts = [];
 let floatingHeaderCleanups = [];
+const equipmentProfileCache = new Map();
+const equipmentProfileLoads = new Map();
 
 /* ---------- utilities ---------- */
 
@@ -234,8 +250,12 @@ function memberBackfillFields(discordId) {
   return new Set(Object.keys(state.historyProvenance?.members?.[discordId]?.estimated ?? {}));
 }
 
-function playerHistoryHref(discordId, statKey, showEstimated) {
-  return playerProfileRoute(discordId, statKey, viewRangeState, { estimated: showEstimated });
+function playerHistoryHref(discordId, statKey, showEstimated, equipment = equipmentViewState()) {
+  return playerProfileRoute(discordId, statKey, viewRangeState, {
+    estimated: showEstimated,
+    equipmentOpen: equipment.open,
+    equipmentGrouping: equipment.grouping
+  });
 }
 
 function playerHref(discordId, statKey = state.meta.stats[0].key) {
@@ -845,13 +865,16 @@ function movementHtml(prevRank, currentRank, windowText = "the previous day") {
   return `<span class="movement flat">–</span>`;
 }
 
-function statTabsHtml(activeKey, hrefFor) {
+function statTabsHtml(activeKey, hrefFor, includeEquipment = false) {
+  const equipmentTab = includeEquipment
+    ? `<button class="${activeKey === "equipment" ? "active" : ""}" data-stat="equipment" data-href="${hashRoute("board/equipment", viewRangeParams())}">Weapons &amp; Vehicles</button>`
+    : "";
   return `<div class="stat-tabs">${state.meta.stats
     .map(
       (stat) =>
         `<button class="${stat.key === activeKey ? "active" : ""}" data-stat="${stat.key}" data-href="${hrefFor ? hrefFor(stat.key) : ""}">${esc(stat.title)}</button>`
     )
-    .join("")}</div>`;
+    .join("")}${equipmentTab}</div>`;
 }
 
 function wireStatTabs(onSelect) {
@@ -1169,7 +1192,7 @@ function renderPeriodLeaderboard(stat, window) {
     <h1 class="page-title">${esc(stat.title)} Leaderboard <span class="period-title-tag">${esc(periodWindowText(window))}</span></h1>
     <p class="page-sub">Stats earned during this range only, from daily snapshot differences · rates need ${floorMin}+ active minutes to rank · daily trend per player</p>
     ${viewRangeControlHtml()}
-    ${statTabsHtml(stat.key, (key) => hashRoute(`board/${key}`, viewRangeParams()))}
+    ${statTabsHtml(stat.key, (key) => hashRoute(`board/${key}`, viewRangeParams()), true)}
     ${podiumHtml}
     <div class="table-wrap">
       <table>
@@ -1183,7 +1206,106 @@ function renderPeriodLeaderboard(stat, window) {
   wireSortableHeaders(leaderboardSortState);
 }
 
+function equipmentLeaderboardItems() {
+  const items = { weapons: new Map(), archetypes: new Map() };
+  for (const category of Object.keys(items)) {
+    for (const id of Object.keys(equipmentCatalogue()?.[category] ?? {})) {
+      items[category].set(id, equipmentDisplayName(category, id));
+    }
+    for (const member of Object.values(state.equipmentKills?.members ?? {})) {
+      for (const id of Object.keys(member?.[category] ?? {})) {
+        if (!items[category].has(id)) items[category].set(id, equipmentDisplayName(category, id));
+      }
+    }
+  }
+  return items;
+}
+
+function equipmentPickerHtml(items, selectedId) {
+  const group = (category, label) => {
+    const options = [...items[category].entries()]
+      .sort((a, b) => a[1].localeCompare(b[1], undefined, { sensitivity: "base", numeric: true }) || a[0].localeCompare(b[0]))
+      .map(([id, name]) => `<option value="${esc(id)}" ${id === selectedId ? "selected" : ""}>${esc(name)}</option>`)
+      .join("");
+    return options ? `<optgroup label="${label}">${options}</optgroup>` : "";
+  };
+  return `<label class="equipment-picker"><span>Equipment</span><select id="equipment-picker">${group("weapons", "Weapons")}${group("archetypes", "Vehicles")}</select></label>`;
+}
+
+function equipmentKillsHasField(category, field) {
+  return equipmentFieldsPresent(state.equipmentKills, category).has(field);
+}
+
+function equipmentLeaderboardRows(selectedId, category, periodWindow, usePeriod) {
+  return Object.entries(state.equipmentKills?.members ?? {})
+    .map(([discordId, member]) => {
+      const entry = member?.[category]?.[selectedId];
+      if (!entry) return null;
+      const stats = usePeriod
+        ? equipmentPeriodStats(entry, category, periodWindow.startIndex, periodWindow.endIndex, state.equipmentKills.dates, member.observed, state.equipmentKills.fieldTrackingStarts)
+        : equipmentCareerStats(entry, category, latestObservedIndex(member.observed), member.observed, state.equipmentKills.dates, state.equipmentKills.fieldTrackingStarts);
+      return {
+        discordId,
+        name: member.name ?? memberName(discordId),
+        kills: stats.kills
+      };
+    })
+    .filter((row) => row && Number.isFinite(row.kills))
+    .sort((a, b) => b.kills - a.kills || a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }));
+}
+
+function renderEquipmentLeaderboard(params) {
+  loadViewRange(params);
+  const items = equipmentLeaderboardItems();
+  const allItems = [...items.weapons.keys()].map((id) => ({ id, category: "weapons" }))
+    .concat([...items.archetypes.keys()].map((id) => ({ id, category: "archetypes" })));
+  const selected = allItems.find((item) => item.id === params.get("equipment")) ?? allItems[0] ?? null;
+  const artifactReady = validEquipmentArtifact(state.equipmentKills);
+  const killsReady = artifactReady && (equipmentKillsHasField("weapons", "kills") || equipmentKillsHasField("archetypes", "kills"));
+  const periodWindow = activePeriodWindow();
+  const periodMatches = Boolean(periodWindow && state.equipmentKills?.dates[periodWindow.startIndex] === periodWindow.startDate && state.equipmentKills?.dates[periodWindow.endIndex] === periodWindow.endDate);
+  const usePeriod = Boolean(selected && periodMatches && equipmentKillsHasField(selected.category, "kills"));
+  const rows = usePeriod ? equipmentLeaderboardRows(selected.id, selected.category, periodWindow, true) : selected ? equipmentLeaderboardRows(selected.id, selected.category, null, false) : [];
+  const periodNote = viewRangeState.view === "period"
+    ? !periodWindow
+      ? `<p class="period-unsupported-note" role="note">The selected Period range is not available yet — showing Career kills.</p>`
+      : !periodMatches
+        ? `<p class="period-unsupported-note" role="note">The selected Period range is not available in the equipment archive — showing Career kills.</p>`
+        : selected && !equipmentKillsHasField(selected.category, "kills")
+          ? `<p class="period-unsupported-note" role="note">This equipment item has no Period kills field — showing Career kills.</p>`
+          : ""
+    : "";
+  const artifactNote = !artifactReady
+    ? `<p class="period-unsupported-note" role="note">Equipment kills data has not been published yet. This leaderboard is unavailable until the next equipment refresh.</p>`
+    : !killsReady
+      ? `<p class="period-unsupported-note" role="note">The equipment kills artifact has no usable kills field, so this leaderboard is unavailable.</p>`
+      : "";
+  const body = rows.length
+    ? rows.map((row, index) => `<tr class="r${index + 1}"><td class="rank-cell">${index + 1}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}</td><td class="num value-cell">${row.kills.toLocaleString("en-US")}</td></tr>`).join("")
+    : `<tr><td colspan="3" class="empty">No observed kills for this equipment item in the selected range.</td></tr>`;
+  const heading = selected ? `${esc(items[selected.category].get(selected.id))} Kills` : "Equipment Kills";
+  app.innerHTML = `
+    <h1 class="page-title">Equipment Leaderboard</h1>
+    <p class="page-sub">${heading} · ${usePeriod ? esc(periodWindowText(periodWindow)) : "Career totals"}</p>
+    ${viewRangeControlHtml()}
+    ${statTabsHtml("equipment", null, true)}
+    ${artifactNote}
+    ${periodNote}
+    ${selected ? equipmentPickerHtml(items, selected.id) : ""}
+    ${selected ? `<div class="table-wrap equipment-leaderboard-table"><table><thead><tr><th>#</th><th>Player</th><th class="num">${usePeriod ? "Kills" : "Career Kills"}</th></tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
+  const equipmentHref = (rangeParams) => hashRoute("board/equipment", { equipment: selected?.id ?? null, ...rangeParams });
+  wireViewRangeControl(equipmentHref);
+  wireStatTabs();
+  document.getElementById("equipment-picker")?.addEventListener("change", (event) => {
+    replaceHashAndRender(hashRoute("board/equipment", { equipment: event.target.value, ...viewRangeParams() }));
+  });
+}
+
 function renderLeaderboard(statKey, params) {
+  if (statKey === "equipment") {
+    renderEquipmentLeaderboard(params);
+    return;
+  }
   loadViewRange(params);
   const stat = statByKey(statKey) ?? state.meta.stats[0];
   const periodWindow = activePeriodWindow();
@@ -1295,7 +1417,7 @@ function renderLeaderboard(statKey, params) {
     ${periodNotice}
     <p class="page-sub">Current Career values · movement, deltas, and sparkline show change over ${esc(windowText)}</p>
     ${viewRangeControlHtml()}
-    ${statTabsHtml(stat.key, (key) => hashRoute(`board/${key}`, viewRangeParams()))}
+    ${statTabsHtml(stat.key, (key) => hashRoute(`board/${key}`, viewRangeParams()), true)}
     ${podiumHtml}
     <div class="table-wrap">
       <table>
@@ -1403,6 +1525,7 @@ function renderPlayer(discordId, statKey, params) {
   const dates = state.history.dates;
   const lastIndex = dates.length - 1;
   const showEstimated = params?.get("estimated") === "1";
+  const equipmentView = equipmentViewState(params);
   loadViewRange(params, "all");
   const periodWindow = activePeriodWindow();
   const backfillFields = memberBackfillFields(discordId);
@@ -1528,35 +1651,45 @@ function renderPlayer(discordId, statKey, params) {
         ${!periodWindow && backfillFields.size > 0 ? `<button class="tracker-history-toggle ${showEstimated ? "active" : ""}" id="tracker-history-toggle" type="button" aria-pressed="${showEstimated}">${showEstimated ? "Hide Backfill" : "Show Backfill"}</button>` : ""}
       </div>
     </div>
-    ${viewRangeControlHtml()}
     ${viewRangeState.view === "period" && !periodWindow ? `<div class="period-unsupported-note" role="note">The selected range is not available yet — showing Career values.</div>` : ""}
     ${showEstimated && !periodWindow ? estimatedHistoryNoticeHtml(discordId) : ""}
-    ${recentFormCardHtml(discordId, member)}
-    <div class="stat-summary-grid">${summaries}</div>
-    <div class="chart-card">
-      <h3>${esc(stat.title)} ${
-        periodWindow && statHasPeriodForm(stat.key)
-          ? `· daily Period form${
-              memberDailySeries(state.counters, discordId, stat.key, periodWindow).some((point) => point.value != null && !point.observedEnd)
-                ? " (yellow = carried snapshot)"
-                : ""
-            }`
-          : "over time"
-      }</h3>
-      <div class="chart-box"><canvas id="player-chart"></canvas></div>
-    </div>
+    <details class="chart-card player-stats-details" open>
+      <summary class="recent-form-summary">
+        <h3>Stats</h3>
+        <span class="recent-form-toggle" aria-hidden="true"><span class="when-open">[−]</span><span class="when-closed">[+]</span></span>
+      </summary>
+      <div class="player-stats-content">
+        ${viewRangeControlHtml()}
+        ${recentFormCardHtml(discordId, member)}
+        <div class="stat-summary-grid">${summaries}</div>
+        <div class="chart-card">
+          <h3>${esc(stat.title)} ${
+            periodWindow && statHasPeriodForm(stat.key)
+              ? `· daily Period form${
+                  memberDailySeries(state.counters, discordId, stat.key, periodWindow).some((point) => point.value != null && !point.observedEnd)
+                    ? " (yellow = carried snapshot)"
+                    : ""
+                }`
+              : "over time"
+          }</h3>
+          <div class="chart-box"><canvas id="player-chart"></canvas></div>
+        </div>
+      </div>
+    </details>
+    ${equipmentDetailsHtml(discordId, equipmentView, periodWindow)}
     ${auditHtml}
     ${cachedFootnoteHtml(Boolean(member?.cachedStats))}`;
 
   for (const card of app.querySelectorAll(".stat-summary")) {
     card.addEventListener("click", () => {
-      location.hash = playerHistoryHref(discordId, card.dataset.stat, showEstimated);
+      location.hash = playerHistoryHref(discordId, card.dataset.stat, showEstimated, equipmentView);
     });
   }
 
   wireViewRangeControl((rangeParams) =>
     hashRoute(`player/${encodeURIComponent(discordId)}/${stat.key}`, {
       estimated: showEstimated ? 1 : null,
+      ...equipmentViewParams(equipmentView),
       ...rangeParams
     })
   );
@@ -1566,7 +1699,7 @@ function renderPlayer(discordId, statKey, params) {
       viewRangeState.range = "all";
       viewRangeState.custom = null;
     }
-    replaceHashAndRender(playerHistoryHref(discordId, stat.key, !showEstimated));
+    replaceHashAndRender(playerHistoryHref(discordId, stat.key, !showEstimated, equipmentView));
   });
   wireFavoriteToggles();
   const recentPerformanceCard = app.querySelector(".recent-form-card");
@@ -1579,6 +1712,7 @@ function renderPlayer(discordId, statKey, params) {
       // in-memory preference still survives normal SPA navigation.
     }
   });
+  wireEquipmentDetails(discordId, stat.key, showEstimated, equipmentView);
 
   const periodChartWindow = periodWindow && statHasPeriodForm(stat.key) ? periodWindow : null;
   if (periodChartWindow) {
@@ -1610,6 +1744,252 @@ function renderPlayer(discordId, statKey, params) {
       [{ label: name, data: chartData, estimated: chartDates.map((date) => showEstimated && Boolean(historyProvenance(discordId, date, stat.key))) }],
       stat
     );
+  }
+}
+
+/* ---------- equipment profile ---------- */
+
+const EQUIPMENT_CLASS_FALLBACKS = {
+  ar: "Assault Rifles",
+  crb: "Carbines",
+  smg: "SMGs",
+  mg: "LMGs",
+  sg: "Shotguns",
+  snp: "Sniper Rifles",
+  dmr: "DMRs",
+  pst: "Pistols",
+  other: "Other"
+};
+
+const EQUIPMENT_METRIC_LABELS = {
+  kills: "Kills",
+  accuracy: "Accuracy",
+  hsPercent: "HS %",
+  timeEquipped: "Time Played",
+  timeIn: "Time Played",
+  shotsHit: "Accuracy",
+  headshotKills: "HS %",
+  kpm: "KPM",
+  vehiclesDestroyed: "Vehicles Destroyed",
+  vehiclesDestroyedWith: "Vehicles Destroyed"
+};
+
+function equipmentCatalogue() {
+  return validEquipmentCatalogue(state.equipmentCatalogue) ? state.equipmentCatalogue : null;
+}
+
+function equipmentDisplayName(category, id) {
+  return equipmentCatalogue()?.[category]?.[id]?.name ?? id;
+}
+
+function weaponClassId(id) {
+  return String(id).match(/^wp_([^_]+)_/)?.[1] ?? "other";
+}
+
+function weaponClassName(id) {
+  const catalogueClass = equipmentCatalogue()?.weapons?.[id]?.class;
+  const classId = catalogueClass ?? weaponClassId(id);
+  return equipmentCatalogue()?.classes?.[classId] ?? EQUIPMENT_CLASS_FALLBACKS[classId] ?? classId.toUpperCase();
+}
+
+function equipmentValueText(metric, value) {
+  if (!Number.isFinite(value)) return "—";
+  if (metric === "timeEquipped" || metric === "timeIn") {
+    const minutes = Math.round(value / 60);
+    const hours = Math.floor(minutes / 60);
+    const remaining = minutes % 60;
+    return hours ? `${hours}h ${remaining}m` : `${remaining}m`;
+  }
+  if (metric === "accuracy" || metric === "hsPercent") return `${value.toFixed(1)}%`;
+  if (metric === "kpm") return value.toFixed(2);
+  return Math.round(value).toLocaleString("en-US");
+}
+
+function equipmentMetricFields(category) {
+  return category === "weapons"
+    ? ["kills", "timeEquipped", "accuracy", "hsPercent", "kpm"]
+    : ["kills", "timeIn", "kpm", "vehiclesDestroyed"];
+}
+
+function equipmentMetricValue(stats, metric) {
+  if (metric === "timeEquipped" || metric === "timeIn") return stats.timeSeconds;
+  if (metric === "accuracy") return stats.accuracy;
+  if (metric === "hsPercent") return stats.hsPercent;
+  if (metric === "vehiclesDestroyed") return stats.vehiclesDestroyed;
+  return stats[metric] ?? null;
+}
+
+function equipmentPeriodTrackingNote(fields, category) {
+  const metricFields = new Set(
+    Object.entries(fields)
+      .filter(([, field]) => field?.reason === "tracking_not_started")
+      .map(([field]) => field)
+  );
+  if (category === "weapons") {
+    if (metricFields.has("shotsFired") || metricFields.has("shotsHit")) metricFields.add("accuracy");
+    if (metricFields.has("headshotKills")) metricFields.add("hsPercent");
+    if (metricFields.has("timeEquipped")) {
+      metricFields.add("timeEquipped");
+      metricFields.add("kpm");
+    }
+  }
+  if (category === "archetypes" && metricFields.has("timeIn")) {
+    metricFields.add("timeIn");
+    metricFields.add("kpm");
+  }
+  const labels = [...metricFields]
+    .map((field) => EQUIPMENT_METRIC_LABELS[field])
+    .filter(Boolean);
+  if (!labels.length) return "";
+  const readable = labels.length > 1 ? `${labels.slice(0, -1).join(", ")}, and ${labels.at(-1)}` : labels[0];
+  const trackingStart = Object.values(fields).find((field) => field?.trackingStartDate)?.trackingStartDate;
+  return `Tracking for ${readable} began ${trackingStart ? fmtShortDate(trackingStart) : "the published tracking start"}; the selected window predates that metric.`;
+}
+
+function equipmentProfileMember(data, discordId) {
+  return data?.members?.[discordId] ?? (data?.weapons || data?.archetypes ? data : null);
+}
+
+function equipmentRowsHtml(category, memberData, dates, fieldTrackingStarts, periodWindow, usePeriod, grouping) {
+  const entries = Object.entries(memberData?.[category] ?? {}).map(([id, entry]) => {
+    const stats = usePeriod
+      ? equipmentPeriodStats(entry, category, periodWindow.startIndex, periodWindow.endIndex, dates, memberData.observed, fieldTrackingStarts)
+      : equipmentCareerStats(entry, category, latestObservedIndex(memberData.observed), memberData.observed, dates, fieldTrackingStarts);
+    return { id, entry, name: equipmentDisplayName(category, id), stats };
+  });
+  const metrics = equipmentMetricFields(category);
+  const header = `<thead><tr><th>Equipment</th>${metrics.map((metric) => `<th class="num">${EQUIPMENT_METRIC_LABELS[metric]}</th>`).join("")}</tr></thead>`;
+  const row = (item) => `<tr>
+    <td><span class="equipment-name">${esc(item.name)}</span>${category === "weapons" ? `<small class="equipment-id">${esc(weaponClassName(item.id))}</small>` : ""}</td>
+    ${metrics.map((metric) => `<td class="num value-cell">${equipmentValueText(metric, equipmentMetricValue(item.stats, metric))}</td>`).join("")}
+  </tr>`;
+  if (category === "weapons" && grouping === "class") {
+    const groups = new Map();
+    for (const item of entries) {
+      const group = weaponClassName(item.id);
+      if (!groups.has(group)) groups.set(group, []);
+      groups.get(group).push(item);
+    }
+    const order = Object.values(equipmentCatalogue()?.classes ?? EQUIPMENT_CLASS_FALLBACKS);
+    const grouped = [...groups.entries()].sort((a, b) => {
+      const aOrder = order.indexOf(a[0]);
+      const bOrder = order.indexOf(b[0]);
+      return (aOrder < 0 ? 999 : aOrder) - (bOrder < 0 ? 999 : bOrder) || a[0].localeCompare(b[0]);
+    });
+    return grouped.map(([group, items]) => `<section class="equipment-group"><h4>${esc(group)}</h4><div class="table-wrap"><table>${header}<tbody>${items.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true })).map(row).join("")}</tbody></table></div></section>`).join("");
+  }
+  if (category === "archetypes") {
+    const groups = [...entries].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }));
+    return groups.map((item) => `<section class="equipment-group"><h4>${esc(item.name)}</h4><div class="table-wrap"><table>${header}<tbody>${row(item)}</tbody></table></div></section>`).join("");
+  }
+  return entries
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }) || a.id.localeCompare(b.id))
+    .map(row)
+    .join("");
+}
+
+function equipmentSectionHtml(category, memberData, dates, fieldTrackingStarts, periodWindow, usePeriod, grouping) {
+  const entries = Object.entries(memberData?.[category] ?? {});
+  const title = category === "weapons" ? "Weapons" : "Vehicles";
+  const present = new Set(EQUIPMENT_FIELDS[category].filter((field) => entries.some(([, entry]) => Array.isArray(entry?.[field]))));
+  const missing = usePeriod ? EQUIPMENT_FIELDS[category].filter((field) => !present.has(field)) : [];
+  const missingNames = [...new Set(missing.map((field) => EQUIPMENT_METRIC_LABELS[field]).filter(Boolean))];
+  const missingNote = missingNames.length
+    ? `<p class="period-unsupported-note" role="note">Period data is missing ${esc(missingNames.join(", "))} in this equipment artifact — showing Career values for this section.</p>`
+    : "";
+  const actualUsePeriod = usePeriod && missing.length === 0;
+  const rows = equipmentRowsHtml(category, memberData, dates, fieldTrackingStarts, periodWindow, actualUsePeriod, grouping);
+  const trackingFields = {};
+  if (actualUsePeriod) {
+    for (const [, entry] of entries) {
+      const stats = equipmentPeriodStats(entry, category, periodWindow.startIndex, periodWindow.endIndex, dates, memberData.observed, fieldTrackingStarts);
+      Object.assign(trackingFields, stats.fields);
+    }
+  }
+  const trackingNote = equipmentPeriodTrackingNote(trackingFields, category);
+  const controls = category === "weapons"
+    ? `<div class="equipment-section-head"><h3>${title}</h3><div class="equipment-group-toggle" role="group" aria-label="Weapon grouping"><button type="button" class="chip ${grouping === "class" ? "active" : ""}" data-equipment-group="class">By class</button><button type="button" class="chip ${grouping === "az" ? "active" : ""}" data-equipment-group="az">A–Z</button></div></div>`
+    : `<div class="equipment-section-head"><h3>${title}</h3></div>`;
+  return `<section class="equipment-section">${controls}${missingNote}${trackingNote ? `<p class="period-unsupported-note" role="note">${esc(trackingNote)}</p>` : ""}${entries.length ? rows : `<p class="equipment-empty">No ${title.toLocaleLowerCase()} recorded for this member.</p>`}</section>`;
+}
+
+function equipmentProfileContentHtml(discordId, equipmentView, periodWindow) {
+  const cached = equipmentProfileCache.get(discordId);
+  if (cached?.status === "missing") return `<p class="equipment-empty">No equipment data has been published for this member yet.</p>`;
+  if (cached?.status === "error") return `<p class="equipment-empty">Equipment data is temporarily unavailable. Try expanding this section again later.</p>`;
+  const data = cached?.data;
+  const memberData = equipmentProfileMember(data, discordId);
+  if (!memberData) return `<p class="equipment-empty">No equipment data has been published for this member yet.</p>`;
+  const dates = Array.isArray(data?.dates) ? data.dates : [];
+  const periodMatches = periodWindow && dates[periodWindow.startIndex] === periodWindow.startDate && dates[periodWindow.endIndex] === periodWindow.endDate;
+  const periodRequested = viewRangeState.view === "period";
+  const periodAvailable = Boolean(periodMatches);
+  const periodNote = periodRequested && !periodAvailable
+    ? `<p class="period-unsupported-note" role="note">The selected Period range is not available for this equipment file — showing Career values.</p>`
+    : "";
+  const usePeriod = periodAvailable;
+  return `<div class="equipment-content-head"><p class="page-sub">${usePeriod ? esc(periodWindowText(periodWindow)) : "Career totals at the latest observed equipment snapshot."}</p></div>
+    ${periodNote}
+    ${equipmentSectionHtml("weapons", memberData, dates, data.fieldTrackingStarts, periodWindow, usePeriod, equipmentView.grouping)}
+    ${equipmentSectionHtml("archetypes", memberData, dates, data.fieldTrackingStarts, periodWindow, usePeriod, equipmentView.grouping)}`;
+}
+
+function equipmentDetailsHtml(discordId, equipmentView, periodWindow) {
+  const cached = equipmentProfileCache.get(discordId);
+  const content = cached ? equipmentProfileContentHtml(discordId, equipmentView, periodWindow) : equipmentView.open
+    ? `<div class="equipment-loading">Loading equipment data…</div>`
+    : `<p class="equipment-empty">Expand to load this member’s weapon and vehicle history.</p>`;
+  return `<details id="equipment-details" class="chart-card equipment-details" ${equipmentView.open ? "open" : ""}>
+    <summary class="recent-form-summary"><h3>Weapons &amp; Vehicles</h3><span class="recent-form-toggle" aria-hidden="true"><span class="when-open">[−]</span><span class="when-closed">[+]</span></span></summary>
+    ${content}
+  </details>`;
+}
+
+async function fetchEquipmentProfile(discordId) {
+  if (equipmentProfileCache.has(discordId)) return equipmentProfileCache.get(discordId);
+  if (equipmentProfileLoads.has(discordId)) return equipmentProfileLoads.get(discordId);
+  const load = (async () => {
+    try {
+      const response = await fetch(`data/equipment/${encodeURIComponent(discordId)}.json`, { cache: "no-cache" });
+      if (response.status === 404) return { status: "missing" };
+      if (!response.ok) return { status: "error" };
+      const data = await response.json();
+      return validEquipmentMemberFile(data) ? { status: "loaded", data } : { status: "error" };
+    } catch {
+      return { status: "error" };
+    }
+  })();
+  equipmentProfileLoads.set(discordId, load);
+  const result = await load;
+  equipmentProfileLoads.delete(discordId);
+  equipmentProfileCache.set(discordId, result);
+  return result;
+}
+
+function wireEquipmentDetails(discordId, statKey, showEstimated, equipmentView) {
+  const details = document.getElementById("equipment-details");
+  if (!details) return;
+  const updateRoute = (open, grouping) => replaceHashAndRender(playerProfileRoute(discordId, statKey, viewRangeState, {
+    estimated: showEstimated,
+    equipmentOpen: open,
+    equipmentGrouping: grouping
+  }));
+  details.addEventListener("toggle", () => {
+    if (details.open !== equipmentView.open) updateRoute(details.open, equipmentView.grouping);
+  });
+  for (const button of details.querySelectorAll("[data-equipment-group]")) {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      updateRoute(true, button.dataset.equipmentGroup);
+    });
+  }
+  if (equipmentView.open && !equipmentProfileCache.has(discordId)) {
+    fetchEquipmentProfile(discordId).then(() => {
+      const route = parseHashRoute(location.hash);
+      if (route.parts[0] === "player" && decodeURIComponent(route.parts[1] ?? "") === discordId && equipmentViewState(route.params).open) {
+        render();
+      }
+    });
   }
 }
 
@@ -2662,7 +3042,7 @@ function bootFailureNoticeHtml() {
 }
 
 async function boot() {
-  const [meta, latest, history, historyProvenanceData, audit, notifications, effectivenessHistory, counters] = await Promise.all([
+  const [meta, latest, history, historyProvenanceData, audit, notifications, effectivenessHistory, counters, equipmentCatalogueData, equipmentKills] = await Promise.all([
     fetchJson("data/meta.json", null),
     fetchJson("data/latest.json", { members: [] }, { essential: true }),
     fetchJson("data/history.json", { dates: [], members: {} }, { essential: true }),
@@ -2670,7 +3050,9 @@ async function boot() {
     fetchJson("data/audit.json", { events: [] }),
     fetchJson("data/notifications.json", { events: [] }),
     fetchJson("data/effectiveness-history.json", null),
-    fetchJson("data/counters.json", null)
+    fetchJson("data/counters.json", null),
+    fetchJson("data/equipment-catalogue.json", null),
+    fetchJson("data/equipment-kills.json", null)
   ]);
 
   if (!meta) {
@@ -2694,7 +3076,9 @@ async function boot() {
     notifications,
     effectiveness,
     effectivenessHistory: compatibleEffectiveness,
-    counters: counters?.dates && counters?.members ? counters : null
+    counters: counters?.dates && counters?.members ? counters : null,
+    equipmentCatalogue: validEquipmentCatalogue(equipmentCatalogueData) ? equipmentCatalogueData : null,
+    equipmentKills: validEquipmentArtifact(equipmentKills) ? equipmentKills : null
   });
 
   const updated = document.getElementById("footer-updated");

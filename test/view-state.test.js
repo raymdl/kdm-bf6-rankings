@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 
 import {
   normalizedViewRange,
+  equipmentViewParams,
+  equipmentViewState,
   parseHashRoute,
   playerProfileRoute,
   resolveCareerWindow,
@@ -41,6 +43,16 @@ test("custom view/range state round trips through a player route", () => {
     range: "custom",
     custom: "2026-07-11..2026-07-15"
   });
+});
+
+test("equipment details state round trips through the player URL", () => {
+  const route = playerProfileRoute("42", "kills", { view: "career", range: "7d", custom: null }, {
+    equipmentOpen: true,
+    equipmentGrouping: "az"
+  });
+  const parsed = parseHashRoute(route);
+  assert.deepEqual(equipmentViewState(parsed.params), { open: true, grouping: "az" });
+  assert.deepEqual(equipmentViewParams(equipmentViewState(parsed.params)), { equipmentOpen: 1, equipmentGroup: "az" });
 });
 
 test("Career Today compares the latest snapshot with the prior daily snapshot", () => {

@@ -16,6 +16,13 @@ import {
   validCounters,
   windowDaySpan
 } from "../assets/period.js";
+import {
+  equipmentCareerStats,
+  equipmentPeriodStats,
+  readSparseValue,
+  validEquipmentArtifact,
+  validEquipmentMemberFile
+} from "../assets/equipment.js";
 
 // Column helper: build one member's aligned counter arrays from per-day
 // cumulative tuples [playerKills, kills, deaths, activeSeconds, score]
@@ -366,4 +373,115 @@ test("periodRanking splits qualified, provisional, and invalid rows deterministi
   assert.deepEqual(invalid, [{ discordId: "reset", reason: "negative_delta" }]);
   const kills = periodRanking(c, "kills", window);
   assert.ok(kills.ranked.some((row) => row.discordId === "idle"), "idle's observed 0 kills still ranks in count stats");
+});
+
+/* ---------- sparse equipment counters ---------- */
+
+test("sparse equipment reads distinguish unknown, unchanged, and observed zero", () => {
+  const changes = [1, 4, 3, 9];
+  assert.deepEqual(readSparseValue(changes, 0, [0]), { value: 0, known: true, sourceIndex: null, observedZero: true });
+  assert.deepEqual(readSparseValue(changes, 1, [0, 1]), { value: 4, known: true, sourceIndex: 1 });
+  assert.deepEqual(readSparseValue(changes, 2, [0, 1, 2]), { value: 4, known: true, sourceIndex: 1 });
+  assert.deepEqual(readSparseValue(changes, 2, [0, 1]), { value: null, known: false, sourceIndex: null });
+});
+
+test("equipment Period stats use endpoint deltas and guard zero denominators", () => {
+  const entry = {
+    kills: [0, 10, 1, 16],
+    headshotKills: [0, 4, 1, 7],
+    shotsHit: [0, 30, 1, 50],
+    shotsFired: [0, 60, 1, 100],
+    timeEquipped: [0, 600, 1, 1_800]
+  };
+  const stats = equipmentPeriodStats(entry, "weapons", 0, 1, ["2026-08-10", "2026-08-11"], [0, 1]);
+  assert.deepEqual(
+    { kills: stats.kills, timeSeconds: stats.timeSeconds, accuracy: stats.accuracy, hsPercent: stats.hsPercent, kpm: stats.kpm },
+    { kills: 6, timeSeconds: 1_200, accuracy: 50, hsPercent: 50, kpm: 0.3 }
+  );
+
+  const idle = { ...entry, shotsHit: [0, 0], shotsFired: [0, 0], timeEquipped: [0, 0] };
+  const idleStats = equipmentPeriodStats(idle, "weapons", 0, 1, ["2026-08-10", "2026-08-11"], [0, 1]);
+  assert.equal(idleStats.accuracy, null);
+  assert.equal(idleStats.kpm, null);
+});
+
+test("equipment metrics that predate their tracking start remain unknown", () => {
+  const entry = {
+    kills: [0, 10, 1, 16],
+    timeEquipped: [],
+    shotsHit: [],
+    shotsFired: [],
+    headshotKills: []
+  };
+  const stats = equipmentPeriodStats(entry, "weapons", 0, 1, ["2026-07-10", "2026-08-10"], [0, 1]);
+  assert.equal(stats.kills, 6, "kills have history from the first date");
+  assert.equal(stats.timeSeconds, null);
+  assert.equal(stats.accuracy, null);
+  assert.equal(stats.hsPercent, null);
+  assert.equal(stats.kpm, null);
+  assert.equal(stats.fields.timeEquipped.reason, "tracking_not_started");
+
+  const vehicleStats = equipmentPeriodStats(
+    { kills: [], timeIn: [], vehiclesDestroyedWith: [] },
+    "archetypes",
+    0,
+    1,
+    ["2026-07-10", "2026-08-09"],
+    [0, 1],
+    { archetypes: { kills: "2026-08-10", timeIn: "2026-08-10", vehiclesDestroyedWith: "2026-08-10" } }
+  );
+  assert.equal(vehicleStats.kills, null, "archetype kills begin on the published vehicle tracking date");
+});
+
+test("Career equipment reads keep pre-tracking empty fields unknown", () => {
+  const entry = {
+    kills: [0, 10],
+    timeEquipped: [],
+    shotsHit: [],
+    shotsFired: [],
+    headshotKills: []
+  };
+  const stats = equipmentCareerStats(
+    entry,
+    "weapons",
+    1,
+    [0, 1],
+    ["2026-08-09", "2026-08-09"],
+    { weapons: { kills: null, headshotKills: "2026-08-10", shotsHit: "2026-08-10", shotsFired: "2026-08-10", timeEquipped: "2026-08-10" } }
+  );
+  assert.equal(stats.kills, 10);
+  assert.equal(stats.timeSeconds, null);
+  assert.equal(stats.accuracy, null);
+  assert.equal(stats.hsPercent, null);
+  assert.equal(stats.kpm, null);
+  assert.equal(stats.fields.timeEquipped.reason, "tracking_not_started");
+});
+
+test("equipment validators keep the member profile and kills index contracts separate", () => {
+  const memberFile = {
+    version: 1,
+    formulaVersion: 1,
+    discordId: "42",
+    name: "Member",
+    generatedAt: "2026-08-10T12:00:00.000Z",
+    dates: ["2026-07-10", "2026-08-10"],
+    observed: [0, 1],
+    fieldTrackingStarts: {
+      weapons: { kills: null, headshotKills: "2026-08-10", shotsHit: "2026-08-10", shotsFired: "2026-08-10", timeEquipped: "2026-08-10" },
+      archetypes: { kills: "2026-08-10", timeIn: "2026-08-10", vehiclesDestroyedWith: "2026-08-10" }
+    },
+    weapons: { wp_crb_m4a1: { kills: [0, 10, 1, 20] } },
+    archetypes: { arch_ifv: { kills: [0, 2, 1, 4] } }
+  };
+  const killsIndex = {
+    version: 1,
+    formulaVersion: 1,
+    dates: memberFile.dates,
+    members: { "42": { name: "Member", observed: [0, 1], weapons: memberFile.weapons, archetypes: memberFile.archetypes } }
+  };
+
+  assert.equal(validEquipmentMemberFile(memberFile), true);
+  assert.equal(validEquipmentArtifact(memberFile), false);
+  assert.equal(validEquipmentArtifact(killsIndex), true);
+  assert.equal(validEquipmentMemberFile(killsIndex), false);
 });

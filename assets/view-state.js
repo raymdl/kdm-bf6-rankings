@@ -56,9 +56,29 @@ export function viewRangeParams(viewRange) {
   };
 }
 
-export function playerProfileRoute(discordId, statKey, viewRange, { estimated = false } = {}) {
+export function equipmentViewState(params) {
+  return {
+    open: params?.get("equipmentOpen") === "1",
+    grouping: params?.get("equipmentGroup") === "az" ? "az" : "class"
+  };
+}
+
+export function equipmentViewParams({ open = false, grouping = "class" } = {}) {
+  return {
+    equipmentOpen: open ? 1 : null,
+    equipmentGroup: grouping === "az" ? "az" : null
+  };
+}
+
+export function playerProfileRoute(
+  discordId,
+  statKey,
+  viewRange,
+  { estimated = false, equipmentOpen = false, equipmentGrouping = "class" } = {}
+) {
   return hashRoute(`player/${encodeURIComponent(discordId)}/${statKey}`, {
     estimated: estimated ? 1 : null,
+    ...equipmentViewParams({ open: equipmentOpen, grouping: equipmentGrouping }),
     ...viewRangeParams(viewRange)
   });
 }

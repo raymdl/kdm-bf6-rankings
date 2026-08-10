@@ -2005,6 +2005,130 @@ tr.period-provisional {
   margin-top: 0.6rem;
 }
 
+.player-stats-details,
+.equipment-details {
+  padding: 0.75rem 0.9rem;
+}
+
+.player-stats-content {
+  margin-top: 0.65rem;
+}
+
+.player-stats-content > .chart-card {
+  margin-bottom: 0;
+}
+
+.equipment-details {
+  margin-bottom: 1.5rem;
+}
+
+.equipment-details .page-sub {
+  margin: 0 0 0.7rem;
+}
+
+.equipment-section {
+  margin-top: 1rem;
+}
+
+.equipment-section:first-of-type {
+  margin-top: 0.5rem;
+}
+
+.equipment-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.45rem;
+}
+
+.equipment-section-head h3,
+.equipment-group h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.equipment-section-head h3 {
+  font-size: 1rem;
+}
+
+.equipment-group h4 {
+  margin: 0.9rem 0 0.35rem;
+  color: var(--text-faint);
+  font-size: 0.78rem;
+}
+
+.equipment-group-toggle {
+  display: inline-flex;
+  gap: 0.35rem;
+}
+
+.equipment-group-toggle .chip {
+  padding: 0.25rem 0.55rem;
+}
+
+.equipment-section .table-wrap {
+  margin: 0;
+}
+
+.equipment-section table {
+  min-width: 620px;
+}
+
+.equipment-section td:first-child {
+  white-space: normal;
+}
+
+.equipment-name,
+.equipment-id {
+  display: block;
+}
+
+.equipment-id {
+  color: var(--text-faint);
+  font-size: 0.7rem;
+}
+
+.equipment-empty,
+.equipment-loading {
+  color: var(--text-dim);
+  margin: 0.7rem 0 0;
+  font-size: 0.85rem;
+}
+
+.equipment-loading {
+  padding: 1rem 0;
+}
+
+.equipment-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0 0 1rem;
+  color: var(--text-faint);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.equipment-picker select {
+  min-width: min(25rem, 100%);
+  max-width: 100%;
+  padding: 0.42rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  background: var(--bg-card);
+  font: 500 0.85rem var(--font-body);
+}
+
+.equipment-leaderboard-table table {
+  min-width: 520px;
+}
+
 @media (max-width: 700px) {
   .view-range-bar {
     gap: 0.5rem 0.9rem;
@@ -2022,5 +2146,19 @@ tr.period-provisional {
     width: auto;
     max-height: calc(100vh - 1.3rem);
     overflow-y: auto;
+  }
+
+  .equipment-section-head,
+  .equipment-picker {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .equipment-picker {
+    gap: 0.35rem;
+  }
+
+  .equipment-picker select {
+    width: 100%;
   }
 }
