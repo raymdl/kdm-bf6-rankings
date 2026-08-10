@@ -1,0 +1,431 @@
+{
+  "version": 1,
+  "formulaVersion": 1,
+  "generatedAt": "2026-08-10T21:09:12.595Z",
+  "classes": {
+    "ar": "Assault Rifles",
+    "crb": "Carbines",
+    "smg": "SMGs",
+    "mg": "LMGs",
+    "sg": "Shotguns",
+    "snp": "Sniper Rifles",
+    "dmr": "DMRs",
+    "pst": "Pistols",
+    "other": "Other"
+  },
+  "vehicleOrder": [
+    "mbt",
+    "ifv",
+    "apc",
+    "ltv",
+    "aa",
+    "unarmed",
+    "attackjet",
+    "fighter",
+    "attackheli",
+    "scoutheli",
+    "transportheli",
+    "attackboat",
+    "rhib",
+    "unclassified"
+  ],
+  "vehicleDomains": [
+    {
+      "key": "land",
+      "label": "Land"
+    },
+    {
+      "key": "air",
+      "label": "Air"
+    },
+    {
+      "key": "naval",
+      "label": "Naval"
+    }
+  ],
+  "weapons": {
+    "wp_mg_l110": {
+      "name": "L110",
+      "class": "mg"
+    },
+    "wp_smg_pw5a3": {
+      "name": "PW5A3",
+      "class": "smg"
+    },
+    "wp_ar_m433": {
+      "name": "M433",
+      "class": "ar"
+    },
+    "wp_mg_rpkm": {
+      "name": "RPKM",
+      "class": "mg"
+    },
+    "wp_sg_m87a1": {
+      "name": "M87A1",
+      "class": "sg"
+    },
+    "wp_pst_p18": {
+      "name": "P18",
+      "class": "pst"
+    },
+    "wp_crb_x277": {
+      "name": "M277",
+      "class": "crb"
+    },
+    "wp_ar_b36a4": {
+      "name": "B36A4",
+      "class": "ar"
+    },
+    "wp_ar_l85a3": {
+      "name": "L85A3",
+      "class": "ar"
+    },
+    "wp_snp_m2010": {
+      "name": "M2010 ESR",
+      "class": "snp"
+    },
+    "wp_sg_m1014": {
+      "name": "M1014",
+      "class": "sg"
+    },
+    "wp_crb_ak205": {
+      "name": "AK-205",
+      "class": "crb"
+    },
+    "wp_dmr_svk86": {
+      "name": "SVK-8.6",
+      "class": "dmr"
+    },
+    "wp_smg_sgx": {
+      "name": "SGX",
+      "class": "smg"
+    },
+    "wp_dmr_lmr27": {
+      "name": "LMR27",
+      "class": "dmr"
+    },
+    "wp_crb_qbz192": {
+      "name": "QBZ-192",
+      "class": "crb"
+    },
+    "wp_crb_m417a2": {
+      "name": "M417 A2",
+      "class": "crb"
+    },
+    "wp_mg_drsiar": {
+      "name": "DRS-IAR",
+      "class": "mg"
+    },
+    "wp_ar_kord6p67": {
+      "name": "KORD 6P67",
+      "class": "ar"
+    },
+    "wp_smg_usg90": {
+      "name": "USG-90",
+      "class": "smg"
+    },
+    "wp_crb_m4a1": {
+      "name": "M4A1",
+      "class": "crb"
+    },
+    "wp_mg_kts100mk8": {
+      "name": "KTS100 MK8",
+      "class": "mg"
+    },
+    "wp_pst_m45a1": {
+      "name": "M45A1",
+      "class": "pst"
+    },
+    "wp_smg_kv9": {
+      "name": "KV9",
+      "class": "smg"
+    },
+    "wp_ar_sor556mk2": {
+      "name": "SOR-556 Mk2",
+      "class": "ar"
+    },
+    "wp_smg_pw7a2": {
+      "name": "PW7A2",
+      "class": "smg"
+    },
+    "wp_mg_m123k": {
+      "name": "M123K",
+      "class": "mg"
+    },
+    "wp_pst_m44": {
+      "name": "M44",
+      "class": "pst"
+    },
+    "wp_mg_xm250": {
+      "name": "M250",
+      "class": "mg"
+    },
+    "wp_smg_umg40": {
+      "name": "UMG-40",
+      "class": "smg"
+    },
+    "wp_ar_tr7": {
+      "name": "TR-7",
+      "class": "ar"
+    },
+    "wp_smg_sl9": {
+      "name": "SL9",
+      "class": "smg"
+    },
+    "wp_mg_m240l": {
+      "name": "M240L",
+      "class": "mg"
+    },
+    "wp_smg_scw10": {
+      "name": "SCW-10",
+      "class": "smg"
+    },
+    "wp_ar_nvo228e": {
+      "name": "NVO-228E",
+      "class": "ar"
+    },
+    "wp_mg_m60": {
+      "name": "M/60",
+      "class": "mg"
+    },
+    "wp_snp_psr": {
+      "name": "PSR",
+      "class": "snp"
+    },
+    "wp_dmr_svdm": {
+      "name": "SVDM",
+      "class": "dmr"
+    },
+    "wp_ar_ak4d": {
+      "name": "AK4D",
+      "class": "ar"
+    },
+    "wp_crb_sor300sc": {
+      "name": "SOR-300SC",
+      "class": "crb"
+    },
+    "wp_crb_sg553r": {
+      "name": "SG 553R",
+      "class": "crb"
+    },
+    "wp_crb_grtbc": {
+      "name": "GRT-BC",
+      "class": "crb"
+    },
+    "wp_sg_185ksk": {
+      "name": "18.5KS-K",
+      "class": "sg"
+    },
+    "wp_pst_es57": {
+      "name": "ES 5.7",
+      "class": "pst"
+    },
+    "wp_dmr_m39emr": {
+      "name": "M39 EMR",
+      "class": "dmr"
+    },
+    "wp_snp_sv98": {
+      "name": "SV-98",
+      "class": "snp"
+    },
+    "wp_pst_m357trait": {
+      "name": "M357 Trait",
+      "class": "pst"
+    },
+    "wp_pst_ggh22": {
+      "name": "GGH-22",
+      "class": "pst"
+    },
+    "wp_snp_miniscout": {
+      "name": "Mini Scout",
+      "class": "snp"
+    },
+    "wp_sg_db12": {
+      "name": "DB-12",
+      "class": "sg"
+    },
+    "wp_ar_vhsk2": {
+      "name": "VCR-2",
+      "class": "ar"
+    },
+    "wp_dmr_msbsgrotc": {
+      "name": "GRT-CPS",
+      "class": "dmr"
+    },
+    "wp_pst_vz61": {
+      "name": "vz. 61",
+      "class": "pst"
+    },
+    "wp_smg_cz3a1": {
+      "name": "CZ3A1",
+      "class": "smg"
+    },
+    "wp_mg_mg525btk": {
+      "name": "M121 A2",
+      "class": "mg"
+    },
+    "wp_snp_l115": {
+      "name": "L115",
+      "class": "snp"
+    },
+    "wp_smg_pp19": {
+      "name": "PP-19",
+      "class": "smg"
+    },
+    "wp_ar_m16a3": {
+      "name": "M16A4",
+      "class": "ar"
+    },
+    "wp_mg_rpk74m": {
+      "name": "RPK-74M",
+      "class": "mg"
+    },
+    "wp_dmr_vssm": {
+      "name": "VSSM",
+      "class": "dmr"
+    },
+    "wp_ar_ef88": {
+      "name": "EF88",
+      "class": "ar"
+    },
+    "wp_crb_bren3": {
+      "name": "BROD 3",
+      "class": "crb"
+    }
+  },
+  "vehicles": {
+    "mbt": {
+      "name": "MBT",
+      "domain": "land",
+      "vehicles": [
+        "Leo A4",
+        "M1A2 SEPv3"
+      ]
+    },
+    "ifv": {
+      "name": "IFV",
+      "domain": "land",
+      "vehicles": [
+        "M3A3 Bradley",
+        "Strf 09 A4"
+      ]
+    },
+    "apc": {
+      "name": "APC",
+      "domain": "land",
+      "vehicles": [
+        "LTV",
+        "Traverser Mark 2"
+      ]
+    },
+    "ltv": {
+      "name": "LTV",
+      "domain": "land",
+      "vehicles": [
+        "Glider 96",
+        "VECTOR"
+      ]
+    },
+    "aa": {
+      "name": "Mobile AA",
+      "domain": "land",
+      "vehicles": [
+        "Cheetah 1A2"
+      ]
+    },
+    "unarmed": {
+      "name": "Unarmed",
+      "domain": "land",
+      "vehicles": [
+        "M1030-M1",
+        "Rugged MV740",
+        "TM/O 450",
+        "Turfpro PTV Royal"
+      ]
+    },
+    "attackjet": {
+      "name": "Attack Jet",
+      "domain": "air",
+      "vehicles": [
+        "F-39E",
+        "F-61V"
+      ]
+    },
+    "fighter": {
+      "name": "Fighter Jet",
+      "domain": "air",
+      "vehicles": [
+        "F-97 Kestrel",
+        "Su-57"
+      ]
+    },
+    "attackheli": {
+      "name": "Attack Heli",
+      "domain": "air",
+      "vehicles": [
+        "M77E Falchion",
+        "Panthera KHT"
+      ]
+    },
+    "scoutheli": {
+      "name": "Scout Heli",
+      "domain": "air",
+      "vehicles": [
+        "AH-6 Little Bird"
+      ]
+    },
+    "transportheli": {
+      "name": "Transport Heli",
+      "domain": "air",
+      "vehicles": [
+        "MH47 Chinook",
+        "UH-06"
+      ]
+    },
+    "attackboat": {
+      "name": "Attack Boat",
+      "domain": "naval",
+      "vehicles": [
+        "RCB-90"
+      ]
+    },
+    "rhib": {
+      "name": "RHIB",
+      "domain": "naval",
+      "vehicles": [
+        "7.7m NSW RHIB"
+      ]
+    },
+    "unclassified": {
+      "name": "Unclassified",
+      "domain": null,
+      "vehicles": []
+    }
+  },
+  "vehicleNames": {
+    "veh_air_panthera": "Panthera KHT",
+    "veh_sur_leoa4": "Leo A4",
+    "veh_sur_strf09a4": "Strf 09 A4",
+    "veh_sur_m1a2sepv3": "M1A2 SEPv3",
+    "veh_sur_cheetah1a2": "Cheetah 1A2",
+    "veh_sur_glider96": "Glider 96",
+    "veh_sur_bradley": "M3A3 Bradley",
+    "veh_air_su57": "Su-57",
+    "veh_air_f61v": "F-61V",
+    "veh_air_f39e": "F-39E",
+    "veh_air_m77efalchion": "M77E Falchion",
+    "veh_sur_vector": "VECTOR",
+    "veh_sur_travmark2": "Traverser Mark 2",
+    "veh_sur_quadbike": "Rugged MV740",
+    "veh_air_f97kes": "F-97 Kestrel",
+    "veh_air_ah6litbird": "AH-6 Little Bird",
+    "veh_sur_moto_db02": "M1030-M1",
+    "veh_air_uh06": "UH-06",
+    "veh_air_mh47": "MH47 Chinook",
+    "veh_sur_ptv": "Turfpro PTV Royal",
+    "veh_sur_ltv": "LTV",
+    "veh_sur_rhib": "7.7m NSW RHIB",
+    "veh_sur_CB90": "RCB-90",
+    "veh_sur_moto_db01": "TM/O 450"
+  }
+}
