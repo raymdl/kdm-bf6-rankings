@@ -22,6 +22,7 @@
      already used in the chart palette. */
   --silver: #7ab8ff;
   --bronze: #d97706;
+  --equipment-accent: #38bdf8;
   --font-display: "Rajdhani", "Segoe UI", system-ui, sans-serif;
   --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
 }
@@ -2176,19 +2177,22 @@ tr.period-provisional {
   justify-content: space-between;
   gap: 12px;
   padding: 12px 16px;
-  cursor: pointer;
+  cursor: default;
   list-style: none;
   font-family: Rajdhani, sans-serif;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+.stat-panel > summary .panel-title,
+.stat-panel > summary .panel-toggle { cursor: pointer; }
 .stat-panel > summary::-webkit-details-marker { display: none; }
 /* One indicator, driven off [open] so it can never disagree with the element's
    real state -- a hand-maintained pair drifted out of sync. */
 .panel-toggle::before { content: "[+]"; font-family: ui-monospace, monospace; opacity: 0.75; }
 .stat-panel[open] > summary .panel-toggle::before { content: "[\2212]"; }
-.stat-panel > summary:hover .panel-toggle::before { opacity: 1; }
+.stat-panel > summary .panel-title:hover ~ .panel-toggle::before,
+.stat-panel > summary .panel-toggle:hover::before { opacity: 1; }
 .stat-panel-body { padding: 0 16px 16px; }
 .stat-panel .stat-tabs { margin: 0; }
 
@@ -2201,25 +2205,51 @@ tr.period-provisional {
   background: rgba(255, 255, 255, 0.022);
   border: 1px solid rgba(255, 255, 255, 0.045);
   border-radius: 10px;
-  padding: 12px 12px 14px;
+  overflow: hidden;
 }
 .equipment-band + .equipment-band { margin-top: 12px; }
-.equipment-band > h3 {
-  margin: 0 0 10px;
-  padding-bottom: 9px;
+.equipment-band-head {
+  display: flex;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 10px 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: default;
+  list-style: none;
+}
+.equipment-band-head::-webkit-details-marker { display: none; }
+.equipment-band:not([open]) .equipment-band-head { border-bottom-color: transparent; }
+.equipment-band-head h3 {
+  margin: 0;
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  opacity: 0.5;
+  opacity: 0.72;
+  cursor: pointer;
+}
+.equipment-band-head .panel-toggle { margin-left: auto; cursor: pointer; }
+.equipment-band[open] > .equipment-band-head .panel-toggle::before { content: "[\2212]"; }
+.equipment-band-body { padding: 4px 12px 10px; }
+.stat-panel .equipment-panel-metrics { margin: 0 0 14px; }
+.equipment-panel-metrics button.active {
+  color: #10131a;
+  background: var(--equipment-accent);
+  border-color: var(--equipment-accent);
+}
+.equipment-panel-metrics button:disabled {
+  color: var(--text-faint);
+  background: var(--bg-card);
+  border-color: var(--border);
+  cursor: not-allowed;
+  opacity: 0.42;
 }
 .equipment-class {
   display: grid;
   grid-template-columns: minmax(96px, 122px) 1fr;
   gap: 8px 14px;
-  align-items: baseline;
-  padding: 7px 0;
+  align-items: center;
+  padding: 3px 0;
 }
 .equipment-class > h4 {
   margin: 0;
@@ -2231,23 +2261,28 @@ tr.period-provisional {
 }
 .equipment-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .equipment-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid transparent;
   background: rgba(255, 255, 255, 0.055);
   color: inherit;
   opacity: 0.88;
   border-radius: 999px;
   padding: 4px 10px;
-  font-size: 0.83rem;
-  line-height: 1.35;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+  min-height: 24px;
   cursor: pointer;
   transition: background 0.15s, opacity 0.15s, color 0.15s;
 }
+.equipment-chip[data-equipment-category="vehicles"] { padding: 5px 10px 3px; }
 .equipment-chip:hover { background: rgba(255, 255, 255, 0.12); opacity: 1; }
 .equipment-chip.active {
-  background: var(--accent, #f26522);
+  background: var(--equipment-accent);
   color: #10131a;
   opacity: 1;
-  font-weight: 600;
 }
 @media (max-width: 720px) {
   .equipment-class { grid-template-columns: 1fr; gap: 4px; }
