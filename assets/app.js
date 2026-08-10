@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260808-period-capability-detect";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260810-roadkills";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260808-period-capability-detect";
+} from "./period.js?v=20260810-roadkills";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -24,8 +24,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260808-period-capability-detect";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260808-period-capability-detect";
+} from "./view-state.js?v=20260810-roadkills";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260810-roadkills";
 
 const app = document.getElementById("app");
 

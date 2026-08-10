@@ -52,7 +52,6 @@ export const CUSTOM_RANGE_RE = /^(\d{4}-\d{2}-\d{2})\.\.(\d{4}-\d{2}-\d{2})$/;
 // note the stat key is not always the counter key (`kills` reads playerKills).
 export const PERIOD_STAT_DEFS = {
   infantryKillDeath: { rate: true, requires: ["playerKills", "deaths"], derive: (d) => ratio(d.playerKills, d.deaths) },
-  killDeath: { rate: true, requires: ["kills", "deaths"], derive: (d) => ratio(d.kills, d.deaths) },
   playerKillsPerMinute: {
     rate: true,
     requires: ["playerKills", "activeSeconds"],
@@ -66,6 +65,7 @@ export const PERIOD_STAT_DEFS = {
   kills: { rate: false, requires: ["playerKills"], derive: (d) => d.playerKills },
   assists: { rate: false, requires: ["assists"], derive: (d) => d.assists },
   vehicleKills: { rate: false, requires: ["vehicleKills"], derive: (d) => d.vehicleKills },
+  roadkills: { rate: false, requires: ["roadkills"], derive: (d) => d.roadkills },
   revives: { rate: false, requires: ["revives"], derive: (d) => d.revives },
   // Weapon-only headshots (formulaVersion 2): the bot publishes a cumulative
   // weighted numerator alongside weapon kills, because GameTools reports
