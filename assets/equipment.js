@@ -17,8 +17,8 @@ export const EQUIPMENT_TRACKING_STARTS = {
   timeEquipped: "2026-08-10",
   timeIn: "2026-08-10",
   vehiclesDestroyedWith: "2026-08-10",
-  assists: "2026-08-11",
-  roadKills: "2026-08-11"
+  assists: "2026-08-10",
+  roadKills: "2026-08-10"
 };
 
 const CATEGORY_STATS = {
