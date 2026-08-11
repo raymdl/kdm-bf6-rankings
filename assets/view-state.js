@@ -74,12 +74,17 @@ export function playerProfileRoute(
   discordId,
   statKey,
   viewRange,
-  { estimated = false, equipmentOpen = false, equipmentGrouping = "class", equipment = null } = {}
+  { estimated = false, equipmentOpen = false, equipmentGrouping = "class", equipment = null, equipmentMetric = null } = {}
 ) {
   return hashRoute(`player/${encodeURIComponent(discordId)}/${statKey}`, {
     estimated: estimated ? 1 : null,
     // Which weapon/vehicle drives the graph; absent means the soldier stat does.
     equipment: equipment || null,
+    // Which equipment stat that graph plots. With an item selected Kills is the
+    // default and stays out of the URL; with nothing selected it has to be
+    // written, because there "no stat picked" and "Kills picked" are different
+    // states and only the URL can tell them apart.
+    equipmentMetric: equipmentMetric && (!equipment || equipmentMetric !== "kills") ? equipmentMetric : null,
     ...equipmentViewParams({ open: equipmentOpen, grouping: equipmentGrouping }),
     ...viewRangeParams(viewRange)
   });

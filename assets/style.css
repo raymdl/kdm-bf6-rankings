@@ -23,6 +23,9 @@
   --silver: #7ab8ff;
   --bronze: #d97706;
   --equipment-accent: #38bdf8;
+  /* Vertical gap between top-level blocks -- panels, cards, toolbars, podium.
+     Matches the activity feed's item gap so every page keeps one rhythm. */
+  --block-gap: 0.6rem;
   --font-display: "Rajdhani", "Segoe UI", system-ui, sans-serif;
   --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
 }
@@ -169,7 +172,7 @@ main {
 
 .page-sub {
   color: var(--text-dim);
-  margin: 0 0 1.25rem;
+  margin: 0 0 var(--block-gap);
 }
 
 .page-heading-row {
@@ -229,7 +232,7 @@ main {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin-bottom: 1rem;
+  margin-bottom: var(--block-gap);
 }
 
 .stat-tabs button {
@@ -315,7 +318,7 @@ main {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.9rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: var(--block-gap);
 }
 
 .podium-card {
@@ -673,7 +676,7 @@ tr.r3 .rank-cell { color: var(--bronze); }
 /* ---------- player cards / profile ---------- */
 
 .players-toolbar {
-  margin-bottom: 1.25rem;
+  margin-bottom: var(--block-gap);
 }
 
 .players-heading-row,
@@ -689,7 +692,7 @@ tr.r3 .rank-cell { color: var(--bronze); }
   margin: 0;
 }
 
-.activity-toolbar { margin-bottom: 1.25rem; }
+.activity-toolbar { margin-bottom: var(--block-gap); }
 .activity-toolbar .page-sub { margin: 0.3rem 0 0; }
 
 .players-toolbar .page-sub {
@@ -864,7 +867,7 @@ tr.r3 .rank-cell { color: var(--bronze); }
   justify-content: space-between;
   gap: 1rem 1.5rem;
   flex-wrap: wrap;
-  margin-bottom: 1.25rem;
+  margin-bottom: var(--block-gap);
 }
 
 .player-profile-identity {
@@ -909,7 +912,7 @@ tr.r3 .rank-cell { color: var(--bronze); }
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
   gap: 0.7rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--block-gap);
 }
 
 .stat-summary {
@@ -958,17 +961,12 @@ tr.r3 .rank-cell { color: var(--bronze); }
   color: var(--text-dim);
 }
 
-.stat-summary-range {
-  display: block;
-  margin-top: 0.08rem;
-}
-
 .chart-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--block-gap);
 }
 
 .estimated-history-notice {
@@ -1153,7 +1151,7 @@ tr.r3 .rank-cell { color: var(--bronze); }
   display: flex;
   gap: 0.4rem;
   flex-wrap: wrap;
-  margin-bottom: 1rem;
+  margin-bottom: var(--block-gap);
 }
 
 /* Player chips are square-cornered and darker than the pill-shaped stat tabs
@@ -1333,7 +1331,7 @@ tr.r3 .rank-cell { color: var(--bronze); }
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.75rem;
-  margin: 0.5rem 0 1.75rem;
+  margin: 0.5rem 0 var(--block-gap);
 }
 
 .effectiveness-tab {
@@ -1404,7 +1402,7 @@ tr.r3 .rank-cell { color: var(--bronze); }
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
   gap: 1rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: var(--block-gap);
 }
 
 .formula-card {
@@ -1483,10 +1481,10 @@ tr.r3 .rank-cell { color: var(--bronze); }
 .pillar-letter.objective { background: var(--silver); }
 .pillar-letter.teamwork { background: var(--up); }
 .pillar-letter.risk { background: var(--down); }
-.effectiveness-podium { margin-top: 1.5rem; }
+.effectiveness-podium { margin-top: var(--block-gap); }
 
 .effectiveness-chart {
-  margin: 0 0 1.75rem;
+  margin: 0 0 var(--block-gap);
   padding: 1rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -1711,7 +1709,7 @@ tr.r3 .rank-cell { color: var(--bronze); }
   flex-wrap: wrap;
   align-items: center;
   gap: 0.6rem 1.4rem;
-  margin: 0 0 1rem;
+  margin: 0 0 var(--block-gap);
   padding: 0.6rem 0.8rem;
   background: var(--bg-raise);
   border: 1px solid var(--border);
@@ -2019,77 +2017,18 @@ tr.period-provisional {
   margin-bottom: 0;
 }
 
+/* The grid carries its own trailing margin for standalone use; inside the panel
+   that stacks on the panel's padding and leaves a dead band under the cards. */
+.player-stats-content > .stat-summary-grid {
+  margin-bottom: 0;
+}
+
 .equipment-details {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--block-gap);
 }
 
 .equipment-details .page-sub {
   margin: 0 0 0.7rem;
-}
-
-.equipment-section {
-  margin-top: 1rem;
-}
-
-.equipment-section:first-of-type {
-  margin-top: 0.5rem;
-}
-
-.equipment-section-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 0.45rem;
-}
-
-.equipment-section-head h3,
-.equipment-group h4 {
-  margin: 0;
-  font-family: var(--font-display);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.equipment-section-head h3 {
-  font-size: 1rem;
-}
-
-.equipment-group h4 {
-  margin: 0.9rem 0 0.35rem;
-  color: var(--text-faint);
-  font-size: 0.78rem;
-}
-
-.equipment-group-toggle {
-  display: inline-flex;
-  gap: 0.35rem;
-}
-
-.equipment-group-toggle .chip {
-  padding: 0.25rem 0.55rem;
-}
-
-.equipment-section .table-wrap {
-  margin: 0;
-}
-
-.equipment-section table {
-  min-width: 620px;
-}
-
-.equipment-section td:first-child {
-  white-space: normal;
-}
-
-.equipment-name,
-.equipment-id {
-  display: block;
-}
-
-.equipment-id {
-  color: var(--text-faint);
-  font-size: 0.7rem;
 }
 
 .equipment-empty,
@@ -2149,7 +2088,6 @@ tr.period-provisional {
     overflow-y: auto;
   }
 
-  .equipment-section-head,
   .equipment-picker {
     align-items: flex-start;
     flex-direction: column;
@@ -2169,7 +2107,7 @@ tr.period-provisional {
   border: 1px solid var(--line, #2a3140);
   border-radius: 10px;
   background: var(--panel, #141922);
-  margin: 0 0 12px;
+  margin: 0 0 var(--block-gap);
 }
 .stat-panel > summary {
   display: flex;
@@ -2237,13 +2175,17 @@ tr.period-provisional {
   background: var(--equipment-accent);
   border-color: var(--equipment-accent);
 }
-.equipment-panel-metrics button:disabled {
+/* Greyed because the current selection cannot report it -- still clickable,
+   since taking it just drops that selection. */
+.equipment-panel-metrics button:disabled,
+.equipment-panel-metrics button.unavailable {
   color: var(--text-faint);
   background: var(--bg-card);
   border-color: var(--border);
-  cursor: not-allowed;
   opacity: 0.42;
 }
+.equipment-panel-metrics button:disabled { cursor: not-allowed; }
+.equipment-panel-metrics button.unavailable:hover { opacity: 0.7; }
 .equipment-class {
   display: grid;
   grid-template-columns: minmax(96px, 122px) 1fr;
@@ -2278,7 +2220,14 @@ tr.period-provisional {
   transition: background 0.15s, opacity 0.15s, color 0.15s;
 }
 .equipment-chip[data-equipment-category="vehicles"] { padding: 5px 10px 3px; }
-.equipment-chip:hover { background: rgba(255, 255, 255, 0.12); opacity: 1; }
+.equipment-chip:hover:not(:disabled) { background: rgba(255, 255, 255, 0.12); opacity: 1; }
+/* The selected stat cannot be read for this half of the panel. Greyed rather
+   than removed: the item still exists, it just has nothing to say here. */
+.equipment-chip:disabled {
+  color: var(--text-faint);
+  opacity: 0.35;
+  cursor: not-allowed;
+}
 .equipment-chip.active {
   background: var(--equipment-accent);
   color: #10131a;
@@ -2289,11 +2238,15 @@ tr.period-provisional {
   .equipment-class > h4 { text-align: left; }
 }
 
-/* Profile panels reuse the leaderboard indicator so both pages agree. */
-.recent-form-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; list-style: none; }
+/* Profile panels reuse the leaderboard indicator so both pages agree: same
+   [open]-driven glyph, and only the parts that actually toggle take the
+   pointer, since the rest of the bar is guarded against stray clicks. */
+.recent-form-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: default; list-style: none; }
 .recent-form-summary::-webkit-details-marker { display: none; }
+.recent-form-summary h3,
+.recent-form-summary .panel-toggle { cursor: pointer; }
+details[open] > .recent-form-summary .panel-toggle::before { content: "[\2212]"; }
+.recent-form-summary h3:hover ~ .panel-toggle::before,
+.recent-form-summary .panel-toggle:hover::before { opacity: 1; }
 
 /* An equipment row is a control for the graph below it. */
-.equipment-row { cursor: pointer; }
-.equipment-row:hover, .equipment-row:focus-visible { background: rgba(255, 255, 255, 0.045); outline: none; }
-.equipment-row.selected { background: rgba(242, 101, 34, 0.13); }

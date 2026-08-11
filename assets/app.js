@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260810-equipment-20";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260810-equipment-31";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260810-equipment-20";
+} from "./period.js?v=20260810-equipment-31";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,19 +26,18 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260810-equipment-20";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260810-equipment-20";
+} from "./view-state.js?v=20260810-equipment-31";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260810-equipment-31";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
   equipmentFieldsPresent,
   equipmentPeriodStats,
   latestObservedIndex,
-  readEquipmentField,
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260810-equipment-20";
+} from "./equipment.js?v=20260810-equipment-31";
 
 const app = document.getElementById("app");
 
@@ -267,26 +266,40 @@ function profileEquipmentSelection(discordId, equipmentId) {
   return null;
 }
 
-// Cumulative kills per date in Career, or kills gained since the window start in
-// Period -- the same two readings the soldier-stat chart shows. Dates the member
-// has no observation for stay null so the line breaks instead of implying data.
-function equipmentChartPoints(selection, periodWindow) {
+// The selected stat per date in Career, or the same stat measured over the
+// window start-to-date in Period -- the same two readings the soldier-stat chart
+// shows. Dates the member has no observation for stay null so the line breaks
+// instead of implying data.
+function equipmentChartPoints(selection, periodWindow, metric = "kills") {
   const dates = Array.isArray(selection.data.dates) ? selection.data.dates : [];
   const observed = selection.data.observed ?? [];
+  const trackingStarts = selection.data.fieldTrackingStarts;
   const from = periodWindow ? periodWindow.startIndex : 0;
   const to = periodWindow ? periodWindow.endIndex : dates.length - 1;
-  const baseline = periodWindow ? readEquipmentField(selection.entry, "kills", from, observed) : null;
   const points = [];
   for (let index = Math.max(0, from); index <= Math.min(to, dates.length - 1); index += 1) {
-    const read = readEquipmentField(selection.entry, "kills", index, observed);
-    const value = !read.known
-      ? null
-      : periodWindow
-        ? (baseline?.known ? Math.max(0, read.value - baseline.value) : null)
-        : read.value;
+    const stats = periodWindow
+      ? equipmentPeriodStats(selection.entry, selection.category, from, index, dates, observed, trackingStarts)
+      : equipmentCareerStats(selection.entry, selection.category, index, observed, dates, trackingStarts);
+    const raw = equipmentMetricValue(stats, metric);
+    const value = Number.isFinite(raw)
+      ? (metric === "timeEquipped" || metric === "timeIn" ? raw / 3600 : raw)
+      : null;
     points.push({ date: dates[index], value });
   }
   return points;
+}
+
+// Chart axis/tooltip formatting for an equipment metric. Time series are
+// converted to hours by equipmentChartPoints, so this matches that unit.
+function equipmentChartStat(metric, name) {
+  const label = EQUIPMENT_METRIC_LABELS[metric] ?? "Kills";
+  const format = metric === "timeEquipped" || metric === "timeIn"
+    ? "hours"
+    : metric === "kpm" || metric === "accuracy" || metric === "hsPercent"
+      ? "decimal"
+      : "integer";
+  return { key: metric, title: `${name} ${label}`, format, decimals: metric === "kpm" ? 2 : 1, label };
 }
 
 function playerHistoryHref(discordId, statKey, showEstimated, equipment = equipmentViewState()) {
@@ -920,7 +933,11 @@ function wireEquipmentChips() {
     button.addEventListener("click", () => {
       const category = button.dataset.equipmentCategory;
       const requestedMetric = parsedHashRoute().params.get("metric") ?? "kills";
-      const metric = equipmentMetricFields(category).includes(requestedMetric) ? requestedMetric : "kills";
+      // Time Played survives a category switch under the other category's field
+      // name; a stat the new category cannot report at all falls back to Kills.
+      const metric = equipmentMetricAppliesTo(requestedMetric, category)
+        ? resolvedEquipmentMetric(sharedEquipmentMetric(requestedMetric), category)
+        : "kills";
       replaceHashAndRender(hashRoute("board/equipment", {
         equipment: button.dataset.equipment,
         metric: metric === "kills" ? null : metric,
@@ -950,7 +967,10 @@ function wireStatTabs(onSelect) {
     button.addEventListener("click", () => {
       const href = button.dataset.href;
       if (href) {
-        location.hash = href;
+        // Same in-place swap the equipment buttons use. Assigning location.hash
+        // scrolls back to the top, which throws the panel out from under the
+        // pointer when the panel is what you were clicking in.
+        replaceHashAndRender(href);
       } else {
         onSelect?.(button.dataset.stat);
       }
@@ -1273,6 +1293,10 @@ function renderPeriodLeaderboard(stat, window) {
   wireViewRangeControl(leaderboardHrefFor(stat.key));
   wireStatTabs();
   wireEquipmentChips();
+  // The panel is the same control on every board, so its stat buttons have to
+  // work here too -- they were only wired on the equipment board, which left
+  // them inert on the soldier-stat boards.
+  wireEquipmentMetricTabs();
   wirePanelState();
   wireSortableHeaders(leaderboardSortState);
 }
@@ -1281,10 +1305,17 @@ function renderPeriodLeaderboard(stat, window) {
 // catalogue's published class order. Both are rendered as buttons rather than a
 // dropdown: the whole point of the panel is seeing what exists, and a <select>
 // hides the grouping that makes 60-odd weapons navigable.
-function equipmentGroups() {
+// `source` narrows the buttons to one member's own equipment file: a profile
+// should only offer what that player has actually used, while the leaderboard
+// offers everything the catalogue and index know about.
+function equipmentGroups(source = null) {
   const catalogue = equipmentCatalogue();
   const seen = { weapons: new Set(), vehicles: new Set() };
   for (const category of ["weapons", "vehicles"]) {
+    if (source) {
+      for (const id of Object.keys(source?.[category] ?? {})) seen[category].add(id);
+      continue;
+    }
     for (const id of Object.keys(catalogue?.[category] ?? {})) seen[category].add(id);
     for (const member of Object.values(state.equipmentIndex?.members ?? {})) {
       for (const id of Object.keys(member?.[category] ?? {})) seen[category].add(id);
@@ -1314,7 +1345,9 @@ function equipmentGroups() {
   // still a target to race for. `unclassified` is the exception: it exists only
   // to catch vehicles a content drop added before the class map caught up, so
   // showing it empty just advertises an internal bucket.
-  const hasData = (id) => Object.values(state.equipmentIndex?.members ?? {}).some((member) => member?.vehicles?.[id]);
+  const hasData = (id) => (source
+    ? Boolean(source.vehicles?.[id])
+    : Object.values(state.equipmentIndex?.members ?? {}).some((member) => member?.vehicles?.[id]));
   const orderedVehicles = [...vehicleOrder, ...[...seen.vehicles].filter((id) => !vehicleOrder.includes(id))]
     .filter((id) => seen.vehicles.has(id))
     .filter((id) => id !== "unclassified" || hasData(id));
@@ -1339,27 +1372,68 @@ function equipmentGroups() {
   return { weapons, vehicles };
 }
 
-function equipmentButtonHtml(category, id, selectedId) {
-  const title = category === "vehicles"
-    ? (equipmentCatalogue()?.vehicles?.[id]?.vehicles ?? []).join(", ")
-    : weaponClassLabel(equipmentCatalogue()?.weapons?.[id]?.class ?? weaponClassId(id));
-  return `<button type="button" class="equipment-chip${id === selectedId ? " active" : ""}" data-equipment="${esc(id)}" data-equipment-category="${esc(category)}"${title ? ` title="${esc(title)}"` : ""}>${esc(equipmentDisplayName(category, id))}</button>`;
+// Time Played is one button over two differently named fields, so the panel
+// reasons in shared names and only resolves to a real field once a category is
+// known. Every other metric is its own shared name.
+const EQUIPMENT_SHARED_METRICS = ["kills", "assists", "kpm", "timePlayed", "accuracy", "hsPercent", "vehiclesDestroyed", "roadKills"];
+
+// Which categories a stat can be read for. Accuracy and Headshot % are weapon
+// readings; Vehicles Destroyed, Assists and Roadkills are vehicle readings --
+// GameTools publishes no per-weapon assists counter at all.
+const EQUIPMENT_METRIC_CATEGORIES = {
+  accuracy: ["weapons"],
+  hsPercent: ["weapons"],
+  vehiclesDestroyed: ["vehicles"],
+  assists: ["vehicles"],
+  roadKills: ["vehicles"]
+};
+
+function sharedEquipmentMetric(metric) {
+  return metric === "timeEquipped" || metric === "timeIn" ? "timePlayed" : metric;
 }
 
+function resolvedEquipmentMetric(sharedMetric, category) {
+  return sharedMetric === "timePlayed" ? (category === "vehicles" ? "timeIn" : "timeEquipped") : sharedMetric;
+}
+
+function equipmentMetricCategories(metric) {
+  return EQUIPMENT_METRIC_CATEGORIES[sharedEquipmentMetric(metric)] ?? ["weapons", "vehicles"];
+}
+
+function equipmentMetricAppliesTo(metric, category) {
+  return equipmentMetricCategories(metric).includes(category);
+}
+
+function equipmentButtonHtml(category, id, selectedId, disabled = false) {
+  const title = disabled
+    ? `Not recorded for ${category === "vehicles" ? "vehicles" : "weapons"}`
+    : category === "vehicles"
+      ? (equipmentCatalogue()?.vehicles?.[id]?.vehicles ?? []).join(", ")
+      : weaponClassLabel(equipmentCatalogue()?.weapons?.[id]?.class ?? weaponClassId(id));
+  return `<button type="button" class="equipment-chip${id === selectedId ? " active" : ""}" data-equipment="${esc(id)}" data-equipment-category="${esc(category)}"${title ? ` title="${esc(title)}"` : ""}${disabled ? " disabled aria-disabled=\"true\"" : ""}>${esc(equipmentDisplayName(category, id))}</button>`;
+}
+
+// The stat is pickable first and the item second: a metric button is never
+// truly disabled over what happens to be selected, because that made the two
+// halves of the panel argue -- the selection blocked the stat and the stat
+// blocked the selection, with no way out of either. A stat the current
+// selection cannot report is greyed to say so and still clickable; taking it
+// drops that selection, which is the only honest thing it could do.
 function equipmentMetricTabsHtml(selectedCategory, activeMetric, selectedId, firstWeapon, firstVehicle) {
-  const metrics = ["kills", "kpm", "timePlayed", "accuracy", "hsPercent", "vehiclesDestroyed"];
-  return `<div class="stat-tabs equipment-panel-metrics" role="group" aria-label="Weapon and vehicle leaderboard stat">${metrics
+  const activeShared = sharedEquipmentMetric(activeMetric);
+  return `<div class="stat-tabs equipment-panel-metrics" role="group" aria-label="Weapon and vehicle leaderboard stat">${EQUIPMENT_SHARED_METRICS
     .map((sharedMetric) => {
-      const disabled = selectedCategory === "weapons"
-        ? sharedMetric === "vehiclesDestroyed"
-        : selectedCategory === "vehicles" && (sharedMetric === "accuracy" || sharedMetric === "hsPercent");
-      const targetCategory = selectedCategory ?? (sharedMetric === "vehiclesDestroyed" ? "vehicles" : "weapons");
-      const metric = sharedMetric === "timePlayed"
-        ? (targetCategory === "vehicles" ? "timeIn" : "timeEquipped")
-        : sharedMetric;
-      const targetId = selectedCategory ? selectedId : (targetCategory === "vehicles" ? firstVehicle : firstWeapon);
-      const active = Boolean(selectedCategory) && metric === activeMetric;
-      return `<button type="button" class="${active ? "active" : ""}" data-equipment-metric="${esc(metric)}" data-equipment-target="${esc(targetId)}"${disabled ? " disabled aria-disabled=\"true\"" : ""}>${esc(EQUIPMENT_METRIC_LABELS[metric])}</button>`;
+      const categories = equipmentMetricCategories(sharedMetric);
+      const applies = !selectedCategory || categories.includes(selectedCategory);
+      const targetCategory = applies && selectedCategory ? selectedCategory : categories[0];
+      const metric = resolvedEquipmentMetric(sharedMetric, targetCategory);
+      const targetId = applies && selectedCategory
+        ? selectedId
+        : (targetCategory === "vehicles" ? firstVehicle : firstWeapon);
+      const active = sharedMetric === activeShared;
+      const label = EQUIPMENT_METRIC_LABELS[metric];
+      const title = applies ? "" : ` title="Not recorded for ${selectedCategory === "vehicles" ? "vehicles" : "weapons"}"`;
+      return `<button type="button" class="${active ? "active" : ""}${applies ? "" : " unavailable"}" data-equipment-metric="${esc(metric)}" data-equipment-target="${esc(targetId)}"${title}>${esc(label)}</button>`;
     })
     .join("")}</div>`;
 }
@@ -1376,19 +1450,27 @@ function equipmentBandHtml(category, rows) {
   </details>`;
 }
 
-function equipmentPanelHtml(selectedId, selectedMetric = "kills") {
-  const groups = equipmentGroups();
+// `selectedMetric` null means no stat is picked yet, which is not the same as
+// Kills: the soldier-stat boards and the players list mount this panel purely as
+// a way in, so nothing there is highlighted until the user picks something.
+function equipmentPanelHtml(selectedId, selectedMetric = null, source = null) {
+  const groups = equipmentGroups(source);
   if (!groups.weapons.length && !groups.vehicles.length) return "";
   const selectedCategory = groups.weapons.some((group) => group.items.includes(selectedId))
     ? "weapons"
     : groups.vehicles.some((group) => group.items.includes(selectedId))
       ? "vehicles"
       : null;
+  // An item that cannot report the selected stat is greyed rather than hidden:
+  // it still shows what exists, and greying names the reason the click does
+  // nothing instead of silently retargeting the stat.
+  const weaponsDisabled = !equipmentMetricAppliesTo(selectedMetric, "weapons");
+  const vehiclesDisabled = !equipmentMetricAppliesTo(selectedMetric, "vehicles");
   const weaponRows = groups.weapons
-    .map((group) => `<div class="equipment-class"><h4>${esc(group.label)}</h4><div class="equipment-chips">${group.items.map((id) => equipmentButtonHtml("weapons", id, selectedId)).join("")}</div></div>`)
+    .map((group) => `<div class="equipment-class"><h4>${esc(group.label)}</h4><div class="equipment-chips">${group.items.map((id) => equipmentButtonHtml("weapons", id, selectedId, weaponsDisabled)).join("")}</div></div>`)
     .join("");
   const vehicleRows = groups.vehicles
-    .map((group) => `<div class="equipment-class"><h4>${esc(group.label)}</h4><div class="equipment-chips">${group.items.map((id) => equipmentButtonHtml("vehicles", id, selectedId)).join("")}</div></div>`)
+    .map((group) => `<div class="equipment-class"><h4>${esc(group.label)}</h4><div class="equipment-chips">${group.items.map((id) => equipmentButtonHtml("vehicles", id, selectedId, vehiclesDisabled)).join("")}</div></div>`)
     .join("");
   const firstWeapon = groups.weapons[0]?.items[0] ?? "";
   const firstVehicle = groups.vehicles[0]?.items[0] ?? "";
@@ -1695,6 +1777,10 @@ function renderLeaderboard(statKey, params) {
   wireViewRangeControl(leaderboardHrefFor(stat.key));
   wireStatTabs();
   wireEquipmentChips();
+  // The panel is the same control on every board, so its stat buttons have to
+  // work here too -- they were only wired on the equipment board, which left
+  // them inert on the soldier-stat boards.
+  wireEquipmentMetricTabs();
   wirePanelState();
   wireSortableHeaders(leaderboardSortState);
 }
@@ -1806,7 +1892,6 @@ function renderPlayer(discordId, statKey, params) {
   );
   const rangeStart = careerWindow.unavailable ? Math.max(0, lastIndex - 1) : careerWindow.startIndex;
   const rangeEnd = careerWindow.unavailable ? lastIndex : careerWindow.endIndex;
-  const deltaRangeLabel = careerRangeWindowText(careerWindow);
 
   const baselineForRange = (statKeyToRead) => {
     const values = series(discordId, statKeyToRead);
@@ -1828,10 +1913,15 @@ function renderPlayer(discordId, statKey, params) {
     return null;
   };
 
+  // Only one thing drives the graph at a time. While a weapon or vehicle has it,
+  // no soldier stat is selected -- leaving one highlighted claimed a selection
+  // the chart was not showing.
+  const statCardActive = (candidate) => candidate.key === stat.key && !chartEquipment;
+
   const periodSummaryCard = (candidate) => {
     if (!statHasPeriodForm(candidate.key)) {
       const career = member ? member.stats[candidate.key] : valueAt(discordId, candidate.key, lastIndex);
-      return `<div class="stat-summary ${candidate.key === stat.key ? "active" : ""}" data-stat="${candidate.key}">
+      return `<div class="stat-summary ${statCardActive(candidate) ? "active" : ""}" data-stat="${candidate.key}">
         <div class="stat-summary-head"><div class="k">${esc(candidate.title)}</div></div>
         <div class="v">${fmtStat(candidate, career)}</div>
         <div class="m">${periodUnsupportedReason(candidate.key, state.counters) === "counters_missing" ? "No Period data" : "Career-only stat"}</div>
@@ -1850,7 +1940,7 @@ function renderPlayer(discordId, statKey, params) {
           ? `Rank #${rankIndex + 1} of ${ranked.length} this range`
           : `<span class="badge provisional" title="Under 15 active minutes in this range — too small a sample to rank">low time</span>`;
     }
-    return `<div class="stat-summary ${candidate.key === stat.key ? "active" : ""}" data-stat="${candidate.key}">
+    return `<div class="stat-summary ${statCardActive(candidate) ? "active" : ""}" data-stat="${candidate.key}">
       <div class="stat-summary-head"><div class="k">${esc(candidate.title)}</div></div>
       <div class="v">${fmtStat(candidate, value)}</div>
       <div class="m">${meta}</div>
@@ -1866,12 +1956,12 @@ function renderPlayer(discordId, statKey, params) {
     const delta = Number.isFinite(rangeEndValue) && Number.isFinite(baseline) ? fmtDelta(candidate, rangeEndValue - baseline) : null;
     const deltaClass = delta ? (rangeEndValue > baseline ? "up" : "down") : "flat";
     const hasBackfill = backfillFields.has(candidate.key);
-    return `<div class="stat-summary ${candidate.key === stat.key ? "active" : ""}" data-stat="${candidate.key}">
+    return `<div class="stat-summary ${statCardActive(candidate) ? "active" : ""}" data-stat="${candidate.key}">
       <div class="stat-summary-head"><div class="k">${esc(candidate.title)}</div>${showEstimated && hasBackfill ? backfillMarkerHtml() : ""}</div>
       <div class="v">${fmtStat(candidate, current)}</div>
       <div class="m"><span>${rankIndex >= 0 ? `Rank #${rankIndex + 1} of ${ranking.length}` : "Unranked"}${
         delta ? ` · <span class="delta ${deltaClass}">${delta}</span>` : ""
-      }</span>${delta ? `<span class="stat-summary-range">${esc(deltaRangeLabel)}</span>` : ""}</div>
+      }</span></div>
     </div>`;
   };
 
@@ -1879,8 +1969,22 @@ function renderPlayer(discordId, statKey, params) {
   // nothing selected it stays the soldier-stat chart it has always been.
   const chartEquipmentId = params.get("equipment");
   const chartEquipment = chartEquipmentId ? profileEquipmentSelection(discordId, chartEquipmentId) : null;
+  // The metric buttons drive the graph. An item's category decides which metrics
+  // exist, so a metric the selection cannot report falls back to Kills.
+  // An absent param is "no stat picked", which is not the same as Kills: a
+  // soldier stat takes the graph back and leaves the panel with nothing to
+  // highlight. Once an item is selected the panel is live again, and Kills is
+  // what it is graphing, so that button lights up.
+  const requestedEquipmentMetric = params.get("equipmentMetric");
+  const equipmentMetric = chartEquipment
+    ? (equipmentMetricAppliesTo(requestedEquipmentMetric, chartEquipment.category)
+        ? resolvedEquipmentMetric(sharedEquipmentMetric(requestedEquipmentMetric ?? "kills"), chartEquipment.category)
+        : "kills")
+    : requestedEquipmentMetric;
+  const panelMetric = chartEquipmentId ? equipmentMetric ?? "kills" : requestedEquipmentMetric;
+  const equipmentChartStatDescriptor = chartEquipment ? equipmentChartStat(equipmentMetric ?? "kills", chartEquipment.name) : null;
   const chartHeading = chartEquipment
-    ? `${esc(chartEquipment.name)} Kills ${periodWindow ? "· daily Period form" : "over time"}`
+    ? `${esc(chartEquipment.name)} ${esc(equipmentChartStatDescriptor.label)} ${periodWindow ? "· daily Period form" : "over time"}`
     : `${esc(stat.title)} ${
         periodWindow && statHasPeriodForm(stat.key)
           ? `· daily Period form${
@@ -1939,7 +2043,7 @@ function renderPlayer(discordId, statKey, params) {
     ${showEstimated && !periodWindow ? estimatedHistoryNoticeHtml(discordId) : ""}
     ${viewRangeControlHtml()}
     ${recentFormCardHtml(discordId, member)}
-    <details class="chart-card player-stats-details" open>
+    <details class="chart-card player-stats-details" id="player-stats-panel"${panelIsOpen("player-stats-panel", true) ? " open" : ""}>
       <summary class="recent-form-summary">
         <h3>Soldier Stats</h3>
         <span class="panel-toggle" aria-hidden="true"></span>
@@ -1948,7 +2052,7 @@ function renderPlayer(discordId, statKey, params) {
         <div class="stat-summary-grid">${summaries}</div>
       </div>
     </details>
-    ${equipmentDetailsHtml(discordId, equipmentView, periodWindow)}
+    ${equipmentDetailsHtml(discordId, equipmentView, periodWindow, chartEquipmentId, panelMetric)}
     <div class="chart-card">
       <h3>${chartHeading}</h3>
       <div class="chart-box"><canvas id="player-chart"></canvas></div>
@@ -1958,7 +2062,7 @@ function renderPlayer(discordId, statKey, params) {
 
   for (const card of app.querySelectorAll(".stat-summary")) {
     card.addEventListener("click", () => {
-      location.hash = playerHistoryHref(discordId, card.dataset.stat, showEstimated, equipmentView);
+      replaceHashAndRender(playerHistoryHref(discordId, card.dataset.stat, showEstimated, equipmentView));
     });
   }
 
@@ -1988,16 +2092,22 @@ function renderPlayer(discordId, statKey, params) {
       // in-memory preference still survives normal SPA navigation.
     }
   });
-  wireEquipmentDetails(discordId, stat.key, showEstimated, equipmentView);
+  wireEquipmentDetails(discordId, stat.key, showEstimated, equipmentView, chartEquipmentId, panelMetric);
+  // The weapon/vehicle bands inside the panel are the same collapsibles the
+  // leaderboard uses, so they get the same click guard and remembered state.
+  wirePanelState();
+  for (const summary of app.querySelectorAll(".chart-card > summary.recent-form-summary")) {
+    wireSummaryClickGuard(summary);
+  }
 
   const periodChartWindow = periodWindow && statHasPeriodForm(stat.key) ? periodWindow : null;
   if (chartEquipment) {
-    const points = equipmentChartPoints(chartEquipment, periodWindow);
+    const points = equipmentChartPoints(chartEquipment, periodWindow, equipmentMetric ?? "kills");
     lineChart(
       document.getElementById("player-chart"),
       points.map((point) => point.date),
-      [{ label: `${chartEquipment.name} kills`, data: points.map((point) => point.value) }],
-      { key: "kills", title: `${chartEquipment.name} Kills`, format: "integer" }
+      [{ label: equipmentChartStatDescriptor.title, data: points.map((point) => point.value) }],
+      equipmentChartStatDescriptor
     );
   } else if (periodChartWindow) {
     const points = memberDailySeries(state.counters, discordId, stat.key, periodChartWindow);
@@ -2061,7 +2171,9 @@ const EQUIPMENT_METRIC_LABELS = {
   headshotKills: "Headshot %",
   kpm: "KPM",
   vehiclesDestroyed: "Vehicles Destroyed",
-  vehiclesDestroyedWith: "Vehicles Destroyed"
+  vehiclesDestroyedWith: "Vehicles Destroyed",
+  assists: "Assists",
+  roadKills: "Roadkills"
 };
 
 // One indicator, not a stacked pair: [+] when collapsed, [-] when open. The
@@ -2095,15 +2207,25 @@ function panelIsOpen(id, fallback) {
   return typeof stored === "boolean" ? stored : fallback;
 }
 
+// Only the header text and the [-]/[+] indicator toggle a panel. The rest of
+// the summary bar is a wide, easy target to hit by accident, and collapsing a
+// panel the user was reading is the most annoying way to lose their place.
+// Keyboard activation (event.detail === 0) always passes through.
+function wireSummaryClickGuard(summary) {
+  summary?.addEventListener("click", (event) => {
+    if (event.detail === 0) return;
+    if (!event.target.closest(".panel-title, .panel-toggle, .equipment-band-head h3, .recent-form-summary h3")) {
+      event.preventDefault();
+    }
+  });
+}
+
 function wirePanelState() {
-  for (const panel of app.querySelectorAll(".stat-panel[id], .equipment-band[id]")) {
-    const summary = panel.querySelector(":scope > summary");
-    summary?.addEventListener("click", (event) => {
-      if (event.detail === 0) return;
-      if (!event.target.closest(".panel-title, .panel-toggle, .equipment-band-head h3")) {
-        event.preventDefault();
-      }
-    });
+  // The profile's Soldier Stats panel is in here too: it used to render with a
+  // hardcoded `open`, so any re-render -- including opening the panel below it
+  // -- silently re-expanded a panel the user had collapsed.
+  for (const panel of app.querySelectorAll(".stat-panel[id], .equipment-band[id], .player-stats-details[id]")) {
+    wireSummaryClickGuard(panel.querySelector(":scope > summary"));
     panel.addEventListener("toggle", () => writePanelState(panel.id, panel.open));
   }
 }
@@ -2132,12 +2254,6 @@ function weaponClassLabel(classId) {
   return equipmentCatalogue()?.classes?.[classId] ?? EQUIPMENT_CLASS_FALLBACKS[classId] ?? String(classId).toUpperCase();
 }
 
-function weaponClassName(id) {
-  const catalogueClass = equipmentCatalogue()?.weapons?.[id]?.class;
-  const classId = catalogueClass ?? weaponClassId(id);
-  return equipmentCatalogue()?.classes?.[classId] ?? EQUIPMENT_CLASS_FALLBACKS[classId] ?? classId.toUpperCase();
-}
-
 function equipmentValueText(metric, value) {
   if (!Number.isFinite(value)) return "—";
   if (metric === "timeEquipped" || metric === "timeIn") {
@@ -2154,7 +2270,7 @@ function equipmentValueText(metric, value) {
 function equipmentMetricFields(category) {
   return category === "weapons"
     ? ["kills", "kpm", "accuracy", "hsPercent", "timeEquipped"]
-    : ["kills", "kpm", "vehiclesDestroyed", "timeIn"];
+    : ["kills", "assists", "kpm", "vehiclesDestroyed", "roadKills", "timeIn"];
 }
 
 function equipmentMetricValue(stats, metric) {
@@ -2162,6 +2278,8 @@ function equipmentMetricValue(stats, metric) {
   if (metric === "accuracy") return stats.accuracy;
   if (metric === "hsPercent") return stats.hsPercent;
   if (metric === "vehiclesDestroyed") return stats.vehiclesDestroyed;
+  if (metric === "assists") return stats.assists;
+  if (metric === "roadKills") return stats.roadKills;
   return stats[metric] ?? null;
 }
 
@@ -2196,70 +2314,26 @@ function equipmentProfileMember(data, discordId) {
   return data?.members?.[discordId] ?? (data?.weapons || data?.vehicles ? data : null);
 }
 
-function equipmentRowsHtml(category, memberData, dates, fieldTrackingStarts, periodWindow, usePeriod, grouping) {
-  const entries = Object.entries(memberData?.[category] ?? {}).map(([id, entry]) => {
-    const stats = usePeriod
-      ? equipmentPeriodStats(entry, category, periodWindow.startIndex, periodWindow.endIndex, dates, memberData.observed, fieldTrackingStarts)
-      : equipmentCareerStats(entry, category, latestObservedIndex(memberData.observed), memberData.observed, dates, fieldTrackingStarts);
-    return { id, entry, name: equipmentDisplayName(category, id), stats };
-  });
-  const metrics = equipmentMetricFields(category);
-  const header = `<thead><tr><th>Equipment</th>${metrics.map((metric) => `<th class="num">${EQUIPMENT_METRIC_LABELS[metric]}</th>`).join("")}</tr></thead>`;
-  const row = (item) => `<tr class="equipment-row" data-equipment-row="${esc(item.id)}" tabindex="0" role="button" aria-label="Graph ${esc(item.name)} kills">
-    <td><span class="equipment-name">${esc(item.name)}</span>${category === "weapons" ? `<small class="equipment-id">${esc(weaponClassName(item.id))}</small>` : ""}</td>
-    ${metrics.map((metric) => `<td class="num value-cell">${equipmentValueText(metric, equipmentMetricValue(item.stats, metric))}</td>`).join("")}
-  </tr>`;
-  if (category === "weapons" && grouping === "class") {
-    const groups = new Map();
-    for (const item of entries) {
-      const group = weaponClassName(item.id);
-      if (!groups.has(group)) groups.set(group, []);
-      groups.get(group).push(item);
-    }
-    const order = Object.values(equipmentCatalogue()?.classes ?? EQUIPMENT_CLASS_FALLBACKS);
-    const grouped = [...groups.entries()].sort((a, b) => {
-      const aOrder = order.indexOf(a[0]);
-      const bOrder = order.indexOf(b[0]);
-      return (aOrder < 0 ? 999 : aOrder) - (bOrder < 0 ? 999 : bOrder) || a[0].localeCompare(b[0]);
-    });
-    return grouped.map(([group, items]) => `<section class="equipment-group"><h4>${esc(group)}</h4><div class="table-wrap"><table>${header}<tbody>${items.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true })).map(row).join("")}</tbody></table></div></section>`).join("");
-  }
-  if (category === "vehicles") {
-    const groups = [...entries].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }));
-    return groups.map((item) => `<section class="equipment-group"><h4>${esc(item.name)}</h4><div class="table-wrap"><table>${header}<tbody>${row(item)}</tbody></table></div></section>`).join("");
-  }
-  return entries
-    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }) || a.id.localeCompare(b.id))
-    .map(row)
-    .join("");
-}
-
-function equipmentSectionHtml(category, memberData, dates, fieldTrackingStarts, periodWindow, usePeriod, grouping) {
-  const entries = Object.entries(memberData?.[category] ?? {});
-  const title = category === "weapons" ? "Weapons" : "Vehicles";
-  const present = new Set(EQUIPMENT_FIELDS[category].filter((field) => entries.some(([, entry]) => Array.isArray(entry?.[field]))));
-  const missing = usePeriod ? EQUIPMENT_FIELDS[category].filter((field) => !present.has(field)) : [];
-  const missingNames = [...new Set(missing.map((field) => EQUIPMENT_METRIC_LABELS[field]).filter(Boolean))];
+// Notes for the item currently driving the graph. The panel shows one weapon or
+// vehicle at a time, so a caveat about the whole file's coverage would be noise;
+// only the selected item's own gaps are worth interrupting for.
+function equipmentSelectionNotesHtml(category, entry, memberData, dates, fieldTrackingStarts, periodWindow, usePeriod) {
+  if (!usePeriod || !entry) return "";
+  const missingNames = [...new Set(
+    EQUIPMENT_FIELDS[category]
+      .filter((field) => !Array.isArray(entry?.[field]))
+      .map((field) => EQUIPMENT_METRIC_LABELS[field])
+      .filter(Boolean)
+  )];
   const missingNote = missingNames.length
-    ? `<p class="period-unsupported-note" role="note">Period data is missing ${esc(missingNames.join(", "))} in this equipment artifact — showing Career values for this section.</p>`
+    ? `<p class="period-unsupported-note" role="note">Period data is missing ${esc(missingNames.join(", "))} for this item — those stats show Career values.</p>`
     : "";
-  const actualUsePeriod = usePeriod && missing.length === 0;
-  const rows = equipmentRowsHtml(category, memberData, dates, fieldTrackingStarts, periodWindow, actualUsePeriod, grouping);
-  const trackingFields = {};
-  if (actualUsePeriod) {
-    for (const [, entry] of entries) {
-      const stats = equipmentPeriodStats(entry, category, periodWindow.startIndex, periodWindow.endIndex, dates, memberData.observed, fieldTrackingStarts);
-      Object.assign(trackingFields, stats.fields);
-    }
-  }
-  const trackingNote = equipmentPeriodTrackingNote(trackingFields, category);
-  const controls = category === "weapons"
-    ? `<div class="equipment-section-head"><h3>${title}</h3></div>`
-    : `<div class="equipment-section-head"><h3>${title}</h3></div>`;
-  return `<section class="equipment-section">${controls}${missingNote}${trackingNote ? `<p class="period-unsupported-note" role="note">${esc(trackingNote)}</p>` : ""}${entries.length ? rows : `<p class="equipment-empty">No ${title.toLocaleLowerCase()} recorded for this member.</p>`}</section>`;
+  const stats = equipmentPeriodStats(entry, category, periodWindow.startIndex, periodWindow.endIndex, dates, memberData.observed, fieldTrackingStarts);
+  const trackingNote = equipmentPeriodTrackingNote(stats.fields, category);
+  return `${missingNote}${trackingNote ? `<p class="period-unsupported-note" role="note">${esc(trackingNote)}</p>` : ""}`;
 }
 
-function equipmentProfileContentHtml(discordId, equipmentView, periodWindow) {
+function equipmentProfileContentHtml(discordId, equipmentView, periodWindow, selectedId, metric) {
   const cached = equipmentProfileCache.get(discordId);
   if (cached?.status === "missing") return `<p class="equipment-empty">No equipment data has been published for this member yet.</p>`;
   if (cached?.status === "error") return `<p class="equipment-empty">Equipment data is temporarily unavailable. Try expanding this section again later.</p>`;
@@ -2274,15 +2348,23 @@ function equipmentProfileContentHtml(discordId, equipmentView, periodWindow) {
     ? `<p class="period-unsupported-note" role="note">The selected Period range is not available for this equipment file — showing Career values.</p>`
     : "";
   const usePeriod = periodAvailable;
-  return `<div class="equipment-content-head"><p class="page-sub">${usePeriod ? esc(periodWindowText(periodWindow)) : "Career totals at the latest observed equipment snapshot."}</p></div>
+  const source = { weapons: memberData.weapons ?? {}, vehicles: memberData.vehicles ?? {} };
+  if (!Object.keys(source.weapons).length && !Object.keys(source.vehicles).length) {
+    return `<p class="equipment-empty">No weapons or vehicles are recorded for this member yet.</p>`;
+  }
+  const selectedCategory = source.weapons[selectedId] ? "weapons" : source.vehicles[selectedId] ? "vehicles" : null;
+  const selectionNotes = selectedCategory
+    ? equipmentSelectionNotesHtml(selectedCategory, source[selectedCategory][selectedId], memberData, dates, data.fieldTrackingStarts, periodWindow, usePeriod)
+    : "";
+  return `<div class="equipment-content-head"><p class="page-sub">${usePeriod ? esc(periodWindowText(periodWindow)) : "Career totals at the latest observed equipment snapshot."} Pick a stat and an item to graph it below.</p></div>
     ${periodNote}
-    ${equipmentSectionHtml("weapons", memberData, dates, data.fieldTrackingStarts, periodWindow, usePeriod, equipmentView.grouping)}
-    ${equipmentSectionHtml("vehicles", memberData, dates, data.fieldTrackingStarts, periodWindow, usePeriod, equipmentView.grouping)}`;
+    ${selectionNotes}
+    ${equipmentPanelHtml(selectedId, metric, source)}`;
 }
 
-function equipmentDetailsHtml(discordId, equipmentView, periodWindow) {
+function equipmentDetailsHtml(discordId, equipmentView, periodWindow, selectedId, metric) {
   const cached = equipmentProfileCache.get(discordId);
-  const content = cached ? equipmentProfileContentHtml(discordId, equipmentView, periodWindow) : equipmentView.open
+  const content = cached ? equipmentProfileContentHtml(discordId, equipmentView, periodWindow, selectedId, metric) : equipmentView.open
     ? `<div class="equipment-loading">Loading equipment data…</div>`
     : `<p class="equipment-empty">Expand to load this member’s weapon and vehicle history.</p>`;
   return `<details id="equipment-details" class="chart-card equipment-details" ${equipmentView.open ? "open" : ""}>
@@ -2312,41 +2394,54 @@ async function fetchEquipmentProfile(discordId) {
   return result;
 }
 
-function wireEquipmentDetails(discordId, statKey, showEstimated, equipmentView) {
+function wireEquipmentDetails(discordId, statKey, showEstimated, equipmentView, selectedId, metric) {
   const details = document.getElementById("equipment-details");
   if (!details) return;
-  const updateRoute = (open, grouping) => replaceHashAndRender(playerProfileRoute(discordId, statKey, viewRangeState, {
-    estimated: showEstimated,
-    equipmentOpen: open,
-    equipmentGrouping: grouping
-  }));
-  details.addEventListener("toggle", () => {
-    if (details.open !== equipmentView.open) updateRoute(details.open, equipmentView.grouping);
-  });
-  // Picking a row graphs that item; picking it again clears back to the soldier
-  // stat, so the row doubles as the off switch and needs no separate control.
-  const selectRow = (id) => {
-    const current = parsedHashRoute().params.get("equipment");
+  const updateRoute = ({ open = true, equipment = null, equipmentMetric = "kills" }) =>
     replaceHashAndRender(playerProfileRoute(discordId, statKey, viewRangeState, {
       estimated: showEstimated,
-      equipmentOpen: true,
+      equipmentOpen: open,
       equipmentGrouping: equipmentView.grouping,
-      equipment: current === id ? null : id
+      equipment,
+      equipmentMetric
     }));
-  };
-  for (const row of details.querySelectorAll("[data-equipment-row]")) {
-    row.addEventListener("click", () => selectRow(row.dataset.equipmentRow));
-    row.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        selectRow(row.dataset.equipmentRow);
-      }
+  details.addEventListener("toggle", () => {
+    if (details.open !== equipmentView.open) {
+      updateRoute({ open: details.open, equipment: selectedId, equipmentMetric: metric });
+    }
+  });
+  // Picking a chip graphs that item; picking it again clears back to the soldier
+  // stat, so the chip doubles as the off switch and needs no separate control.
+  for (const button of details.querySelectorAll("[data-equipment]")) {
+    button.addEventListener("click", () => {
+      const id = button.dataset.equipment;
+      const category = button.dataset.equipmentCategory;
+      const deselecting = selectedId === id;
+      updateRoute({
+        equipment: deselecting ? null : id,
+        // Chips for a stat this category cannot report are greyed out, so the
+        // metric always survives the pick -- Time Played under the field name
+        // this category uses for it. Deselecting hands the graph back to the
+        // soldier stat, so the panel goes back to nothing picked with it:
+        // leaving a stat lit would claim a graph it no longer owns.
+        equipmentMetric: deselecting ? null : resolvedEquipmentMetric(sharedEquipmentMetric(metric), category)
+      });
     });
   }
-  for (const button of details.querySelectorAll("[data-equipment-group]")) {
+  // Same deal as the leaderboard: a stat always graphs something. It keeps the
+  // current selection when that item can report the stat, and otherwise falls
+  // to the panel's first item of a category that can -- so picking a stat is
+  // never a dead click, and the graph is never left empty.
+  for (const button of details.querySelectorAll("[data-equipment-metric]")) {
     button.addEventListener("click", (event) => {
       event.preventDefault();
-      updateRoute(true, button.dataset.equipmentGroup);
+      const nextMetric = button.dataset.equipmentMetric;
+      const selectedCategory = selectedId ? profileEquipmentSelection(discordId, selectedId)?.category : null;
+      const keepsSelection = Boolean(selectedCategory) && equipmentMetricAppliesTo(nextMetric, selectedCategory);
+      updateRoute({
+        equipment: keepsSelection ? selectedId : button.dataset.equipmentTarget || null,
+        equipmentMetric: keepsSelection ? resolvedEquipmentMetric(sharedEquipmentMetric(nextMetric), selectedCategory) : nextMetric
+      });
     });
   }
   if (equipmentView.open && !equipmentProfileCache.has(discordId)) {

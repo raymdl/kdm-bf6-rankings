@@ -4,7 +4,9 @@
 
 export const EQUIPMENT_FIELDS = {
   weapons: ["kills", "headshotKills", "shotsHit", "shotsFired", "timeEquipped"],
-  vehicles: ["kills", "timeIn", "vehiclesDestroyedWith"]
+  // GameTools has no per-weapon assists counter, so Assists is a vehicle-only
+  // stat rather than a gap in the weapon list.
+  vehicles: ["kills", "timeIn", "vehiclesDestroyedWith", "assists", "roadKills"]
 };
 
 export const EQUIPMENT_TRACKING_STARTS = {
@@ -14,17 +16,23 @@ export const EQUIPMENT_TRACKING_STARTS = {
   shotsFired: "2026-08-10",
   timeEquipped: "2026-08-10",
   timeIn: "2026-08-10",
-  vehiclesDestroyedWith: "2026-08-10"
+  vehiclesDestroyedWith: "2026-08-10",
+  assists: "2026-08-11",
+  roadKills: "2026-08-11"
 };
 
 const CATEGORY_STATS = {
   weapons: {
     time: "timeEquipped",
-    vehiclesDestroyed: null
+    vehiclesDestroyed: null,
+    assists: null,
+    roadKills: null
   },
   vehicles: {
     time: "timeIn",
-    vehiclesDestroyed: "vehiclesDestroyedWith"
+    vehiclesDestroyed: "vehiclesDestroyedWith",
+    assists: "assists",
+    roadKills: "roadKills"
   }
 };
 
@@ -138,7 +146,9 @@ function statsFromFields(category, fields) {
     accuracy: accuracyRatio === null ? null : accuracyRatio * 100,
     hsPercent: hsRatio === null ? null : hsRatio * 100,
     kpm: ratio(kills, Number.isFinite(timeSeconds) ? timeSeconds / 60 : null),
-    vehiclesDestroyed: fieldValue(fields, CATEGORY_STATS[category].vehiclesDestroyed)
+    vehiclesDestroyed: fieldValue(fields, CATEGORY_STATS[category].vehiclesDestroyed),
+    assists: fieldValue(fields, CATEGORY_STATS[category].assists),
+    roadKills: fieldValue(fields, CATEGORY_STATS[category].roadKills)
   };
   return stats;
 }
