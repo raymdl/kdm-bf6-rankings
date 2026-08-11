@@ -405,6 +405,26 @@ test("equipment Period stats use endpoint deltas and guard zero denominators", (
   assert.equal(idleStats.kpm, null);
 });
 
+// A shotgun counts pellet hits against shells fired, so hits over shots is not
+// its accuracy -- the DB-12 comes out at 131% and a two-shell M1014 at 300%.
+// Career reads GameTools' own figure instead; a window has no such figure to
+// read, so an impossible derivation is reported as no reading at all.
+test("weapon accuracy reads the published rate and never exceeds 100%", () => {
+  const dates = ["2026-08-10", "2026-08-11"];
+  const pellets = {
+    kills: [0, 100, 1, 140],
+    shotsHit: [0, 2671, 1, 3000],
+    shotsFired: [0, 2026, 1, 2300],
+    timeEquipped: [0, 600, 1, 900]
+  };
+  const career = (entry) => equipmentCareerStats(entry, "weapons", 1, [0, 1], dates).accuracy;
+
+  assert.equal(career(pellets), null);
+  assert.equal(equipmentPeriodStats(pellets, "weapons", 0, 1, dates, [0, 1]).accuracy, null);
+  // The published rate is authoritative and is not recomputed from the shots.
+  assert.equal(career({ ...pellets, accuracy: [0, 28.4, 1, 29.1] }), 29.1);
+});
+
 test("equipment metrics that predate their tracking start remain unknown", () => {
   const entry = {
     kills: [0, 10, 1, 16],

@@ -3,7 +3,7 @@
    distinction before they can safely derive a window statistic. */
 
 export const EQUIPMENT_FIELDS = {
-  weapons: ["kills", "headshotKills", "shotsHit", "shotsFired", "timeEquipped"],
+  weapons: ["kills", "headshotKills", "shotsHit", "shotsFired", "accuracy", "timeEquipped"],
   // GameTools has no per-weapon assists counter, so Assists is a vehicle-only
   // stat rather than a gap in the weapon list.
   vehicles: ["kills", "timeIn", "vehiclesDestroyedWith", "assists", "roadKills"]
@@ -14,6 +14,7 @@ export const EQUIPMENT_TRACKING_STARTS = {
   headshotKills: "2026-08-10",
   shotsHit: "2026-08-10",
   shotsFired: "2026-08-10",
+  accuracy: "2026-08-11",
   timeEquipped: "2026-08-10",
   timeIn: "2026-08-10",
   vehiclesDestroyedWith: "2026-08-10",
@@ -134,16 +135,30 @@ function ratio(numerator, denominator) {
     : null;
 }
 
-function statsFromFields(category, fields) {
+// A percentage outside 0-100 is not a reading, it is an artifact of counting
+// pellet hits against shells fired. Shotguns land at 131% and worse, so the
+// honest answer is that this window has no accuracy rather than an impossible
+// one. Career avoids the whole problem by reading GameTools' own figure.
+function sanePercent(value) {
+  return Number.isFinite(value) && value >= 0 && value <= 100 ? value : null;
+}
+
+// `mode` decides where accuracy comes from. Career reads the published rate,
+// which is exact and needs no arithmetic. Period cannot: differencing two
+// career percentages is meaningless, so the window is derived from its own shot
+// deltas -- the reason both the rate and the counters are published.
+function statsFromFields(category, fields, mode = "career") {
   const kills = fieldValue(fields, "kills");
   const timeField = CATEGORY_STATS[category].time;
   const timeSeconds = fieldValue(fields, timeField);
   const accuracyRatio = category === "weapons" ? ratio(fieldValue(fields, "shotsHit"), fieldValue(fields, "shotsFired")) : null;
+  const derivedAccuracy = accuracyRatio === null ? null : sanePercent(accuracyRatio * 100);
+  const publishedAccuracy = category === "weapons" ? fieldValue(fields, "accuracy") : null;
   const hsRatio = category === "weapons" ? ratio(fieldValue(fields, "headshotKills"), kills) : null;
   const stats = {
     kills,
     timeSeconds,
-    accuracy: accuracyRatio === null ? null : accuracyRatio * 100,
+    accuracy: mode === "career" ? publishedAccuracy ?? derivedAccuracy : derivedAccuracy,
     hsPercent: hsRatio === null ? null : hsRatio * 100,
     kpm: ratio(kills, Number.isFinite(timeSeconds) ? timeSeconds / 60 : null),
     vehiclesDestroyed: fieldValue(fields, CATEGORY_STATS[category].vehiclesDestroyed),
@@ -193,7 +208,7 @@ export function equipmentPeriodStats(
   const fields = statsFields(entry, category, (value, field) =>
     equipmentPeriodDelta(value, field, startIndex, endIndex, dates, observedIndexes, fieldTrackingStarts, category)
   );
-  return { ...statsFromFields(category, fields), fields };
+  return { ...statsFromFields(category, fields, "period"), fields };
 }
 
 export function latestObservedIndex(observedIndexes) {
