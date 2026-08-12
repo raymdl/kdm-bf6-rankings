@@ -3485,15 +3485,19 @@ async function loadBaseData() {
 }
 
 async function loadHistoryData() {
-  const [history, historyProvenanceData, counters] = await Promise.all([
+  const [history, historyProvenanceData] = await Promise.all([
     loadData("history", "data/history.json", { dates: [], members: {} }, { essential: true }),
-    loadData("historyProvenance", "data/history-provenance.json", null),
-    loadData("counters", "data/counters.json", null)
+    loadData("historyProvenance", "data/history-provenance.json", null)
   ]);
   state.history = history;
   state.historyProvenance = historyProvenanceData;
   state.historyProvenanceIndex = buildHistoryProvenanceIndex(historyProvenanceData);
+}
+
+async function loadCountersData() {
+  const counters = await loadData("counters", "data/counters.json", null);
   state.counters = counters?.dates && counters?.members ? counters : null;
+  return state.counters;
 }
 
 async function loadEquipmentData() {
@@ -3533,6 +3537,9 @@ async function ensureRouteData(parts, params) {
   const route = parts[0] || "board";
   const loads = [];
   if (route !== "activity" && route !== "audit" && route !== "effectiveness") loads.push(loadHistoryData());
+  if (["board", "players", "player", "compare"].includes(route) && params?.get("view") === "period") {
+    loads.push(loadCountersData());
+  }
   if (route === "activity") loads.push(loadData("notifications", "data/notifications.json", { events: [] }));
   if (route === "audit" || route === "player") loads.push(loadData("audit", "data/audit.json", { events: [] }));
   if (route === "effectiveness") loads.push(loadEffectivenessData());
@@ -3540,6 +3547,24 @@ async function ensureRouteData(parts, params) {
       (route === "player" && equipmentViewState(params).open)) loads.push(loadEquipmentData());
   if (route === "player" || route === "compare") loads.push(loadChartJs().catch(() => null));
   await Promise.all(loads);
+}
+
+function prefetchCountersAfterCareerRender(route, params) {
+  if (!["board", "players", "player", "compare"].includes(route || "board") || params?.get("view") === "period" || dataLoads.has("counters") || validCounters(state.counters)) {
+    return;
+  }
+  const renderedHash = location.hash;
+  loadCountersData().then(() => {
+    if (location.hash !== renderedHash || !validCounters(state.counters) || state.counters.dates.length < 2) {
+      return;
+    }
+    const scrollY = window.scrollY;
+    Promise.resolve(render()).then(() => {
+      if (location.hash === renderedHash) {
+        window.scrollTo(0, scrollY);
+      }
+    });
+  });
 }
 
 function wireDeferredEquipmentPanel() {
@@ -3634,6 +3659,7 @@ async function render() {
   }
   wireFloatingTableHeaders();
   wireDeferredEquipmentPanel();
+  prefetchCountersAfterCareerRender(route, params);
   window.scrollTo(0, 0);
 }
 
