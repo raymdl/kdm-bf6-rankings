@@ -2858,6 +2858,8 @@ function auditActionLabel(action) {
       linked: "linked",
       relinked: "relinked",
       unlinked: "unlinked",
+      unlisted: "unlisted",
+      relisted: "relisted",
       tracker_linked: "Tracker linked",
       tracker_updated: "Tracker updated",
       tracker_unlinked: "Tracker unlinked",
@@ -3094,11 +3096,11 @@ function renderAudit() {
 
   app.innerHTML = `
     <h1 class="page-title">Audit Log</h1>
-    <p class="page-sub">Completed profile changes, imported Tracker mappings, and failed link attempts</p>
+    <p class="page-sub">Completed profile and roster visibility changes, imported Tracker mappings, and failed link attempts</p>
     <div class="filter-row">
       <input type="search" id="audit-search" placeholder="Filter by name, EA account, player, nucleus, or Tracker.gg ID…" value="${esc(auditFilterState.text)}" />
       <select id="audit-action">
-        ${["all", "linked", "relinked", "unlinked", "tracker_linked", "tracker_updated", "tracker_unlinked", "link_attempt", "relink_attempt"]
+        ${["all", "linked", "relinked", "unlinked", "unlisted", "relisted", "tracker_linked", "tracker_updated", "tracker_unlinked", "link_attempt", "relink_attempt"]
           .map(
             (action) =>
               `<option value="${action}" ${auditFilterState.action === action ? "selected" : ""}>${
