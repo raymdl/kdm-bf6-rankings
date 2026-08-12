@@ -50,6 +50,18 @@ After any change here: run `npm test`, and bump the `?v=` string in `index.html`
 
 Star any player to pin them. Favorites are **per-browser only** — the site has no accounts — and live in `localStorage` under `kdm-favorite-players`, so they do not follow you between devices and are cleared along with site data. Favorited rows are highlighted site-wide (leaderboards, Players, Compare) using the `--fav` theme variables. Clearing every star returns the site to its default ordering.
 
+## Runtime loading
+
+The site remains a no-build vanilla JavaScript application, but it no longer
+downloads every optional artifact at startup. Meta and current standings are
+shared; history, counters, and provenance load only for leaderboard/history
+views, while Activity, Audit, Effectiveness, and equipment data load only when
+their route or panel is opened. Per-player equipment files load
+only when that profile section is expanded. Chart.js is pinned with SRI and is
+injected only for Player and Compare views; if the CDN is unavailable, the rest
+of those pages remains usable. Successful optional loads are cached for the
+browser session, while failed optional fetches remain retryable.
+
 ## Tests
 
 Tests for the calculation engine run with `npm test` (plain `node --test`, no build step).
@@ -69,10 +81,10 @@ It needs two archive dates to compare range endpoints, and asserts kills exactly
 - `index.html` + `assets/` — the single-page site; it reads the JSON below at runtime.
 - `data/*.json` — generated leaderboard data (current stats, daily history, overtake notifications, link audit log, stat definitions).
 - `data/archive/` — **gone.** Raw per-day GameTools payloads now go to a private archive repository, and the publisher removes this directory from the site checkout. Anything needing raw payloads has to read the private archive, not this repo.
-- `data/history-provenance.json` — which pre-2026-07-10 chart points were reconstructed from Tracker sessions rather than observed, so the site can dash them and offer the Hide Backfill toggle. **Version 2** is a shared `dates[]` axis plus per-member `estimated: { statKey: [dateIndex] }`; the browser expands it into a lookup set at boot. Version 1 carried the reconstruction's full working detail — per-point `source`, `confidence`, `groupedSessions`, and a repeated notice string — none of which the site read, at 3.7 MB per page load. The window is closed (`anchorDate` 2026-07-10) so this file never grows. The v1 dump is retained outside this repo; see `tools/README.md` in the bot repo.
+- `data/history-provenance.json` — which pre-2026-07-10 chart points were reconstructed from Tracker sessions rather than observed, so the site can dash them and offer the Hide Backfill toggle. **Version 2** is a shared `dates[]` axis plus per-member `estimated: { statKey: [dateIndex] }`; the browser expands it into a lookup set when a history-bearing route first loads. Version 1 carried the reconstruction's full working detail — per-point `source`, `confidence`, `groupedSessions`, and a repeated notice string — none of which the site read, at 3.7 MB per page load. The window is closed (`anchorDate` 2026-07-10) so this file never grows. The v1 dump is retained outside this repo; see `tools/README.md` in the bot repo.
 
 ## Do not edit `data/` by hand
 
-Everything under `data/` is machine-generated and pushed automatically by the [kdm-discord-bot](https://github.com/raymdl/kdm-discord-bot) tracker — its daily workflow, its 15-minute link-change checks, and the local bot's `!bf6-refresh`. The publisher syncs its checkout to `origin/main` and discards local `data/` drift before writing, so manual edits there will be overwritten.
+Everything under `data/` is machine-generated and pushed automatically by the [kdm-discord-bot](https://github.com/raymdl/kdm-discord-bot) tracker. The mini PC is the primary scheduled publisher; `!bf6-refresh` also publishes, and GitHub Actions retains a complete emergency fallback. The publisher syncs its checkout to `origin/main` and discards local `data/` drift before writing, so manual edits there will be overwritten.
 
 All documentation — which stats are tracked and how they're derived, the data file formats, and the publishing workflows — lives in the [kdm-discord-bot README](https://github.com/raymdl/kdm-discord-bot#readme).

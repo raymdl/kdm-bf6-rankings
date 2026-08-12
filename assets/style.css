@@ -63,6 +63,25 @@ a:hover {
   text-decoration: underline;
 }
 
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 100;
+  padding: 0.65rem 0.9rem;
+  border-radius: 6px;
+  color: #0d0f12;
+  background: var(--accent);
+  font-weight: 700;
+  transform: translateY(-160%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
 /* ---------- header ---------- */
 
 .site-header {
@@ -1645,8 +1664,15 @@ tr.r3 .rank-cell { color: var(--bronze); }
 /* ---------- responsive ---------- */
 
 @media (max-width: 700px) {
+  html,
+  body,
+  main {
+    max-width: 100%;
+  }
+
   main {
     padding: 1rem 0.75rem;
+    min-width: 0;
   }
 
   .site-header {
@@ -1685,6 +1711,29 @@ tr.r3 .rank-cell { color: var(--bronze); }
 
   .player-profile-top {
     display: block;
+  }
+
+  .page-heading-row,
+  .profile-head,
+  .page-title {
+    min-width: 0;
+  }
+
+  .page-heading-row {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .page-title {
+    overflow-wrap: anywhere;
+  }
+
+  .period-title-tag {
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0.35rem 0 0;
+    white-space: normal;
   }
 
   .player-history-controls {
@@ -2075,6 +2124,24 @@ tr.period-provisional {
   .view-range-bar {
     gap: 0.5rem 0.9rem;
     padding: 0.55rem 0.6rem;
+  }
+  .view-range-group {
+    width: 100%;
+  }
+  .view-toggle-option,
+  .range-chip,
+  .stat-tabs button,
+  .range-calendar-actions .chip {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+  }
+  .view-toggle-option {
+    padding-inline: 16px;
+  }
+  .range-calendar-actions {
+    flex-wrap: wrap;
   }
   .range-picker {
     width: 100%;

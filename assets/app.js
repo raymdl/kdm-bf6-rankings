@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260810-equipment-33";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260812-performance-35";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260810-equipment-33";
+} from "./period.js?v=20260812-performance-35";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,8 +26,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260810-equipment-33";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260810-equipment-33";
+} from "./view-state.js?v=20260812-performance-35";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260812-performance-35";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -37,14 +37,21 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260810-equipment-33";
+} from "./equipment.js?v=20260812-performance-35";
 
 const app = document.getElementById("app");
+const skipLink = document.querySelector(".skip-link");
+
+skipLink?.addEventListener("click", (event) => {
+  event.preventDefault();
+  app.focus({ preventScroll: true });
+  app.scrollIntoView({ block: "start" });
+});
 
 const state = {
   meta: null,
   latest: null,
-  history: null,
+  history: { dates: [], members: {} },
   historyProvenance: null,
   historyProvenanceIndex: null,
   audit: null,
@@ -60,6 +67,12 @@ let charts = [];
 let floatingHeaderCleanups = [];
 const equipmentProfileCache = new Map();
 const equipmentProfileLoads = new Map();
+const dataLoads = new Map();
+const failedDataFiles = new Set();
+const CHART_JS_URL = "https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js";
+const CHART_JS_INTEGRITY = "sha384-vsrfeLOOY6KuIYKDlmVH5UiBmgIdB1oEf7p01YgWHuqmOHfZr374+odEv96n9tNC";
+let chartJsLoad = null;
+let renderGeneration = 0;
 
 /* ---------- utilities ---------- */
 
@@ -321,10 +334,9 @@ function parsedHashRoute() {
 function replaceHashAndRender(hash, { preserveScroll = true } = {}) {
   const scrollY = window.scrollY;
   history.replaceState(null, "", hash);
-  render();
-  if (preserveScroll) {
-    window.scrollTo(0, scrollY);
-  }
+  Promise.resolve(render()).then(() => {
+    if (preserveScroll) window.scrollTo(0, scrollY);
+  });
 }
 
 function shareButtonHtml() {
@@ -1030,6 +1042,7 @@ const overtakeHaloPlugin = {
 };
 
 function lineChart(canvas, labels, datasets, stat, options = {}) {
+  if (!globalThis.Chart || !canvas) return null;
   chartBase();
   const lastIndex = labels.length - 1;
   const todayInProgress =
@@ -1281,7 +1294,7 @@ function renderPeriodLeaderboard(stat, window) {
     <p class="page-sub">Stats earned during this range only, from daily snapshot differences · rates need ${floorMin}+ active minutes to rank · daily trend per player</p>
     ${viewRangeControlHtml()}
     ${panelHtml("panel-soldier", "Soldier Stats", true, statTabsHtml(stat.key, (key) => hashRoute(`board/${key}`, viewRangeParams())))}
-    ${panelHtml("panel-equipment", "Weapon/Vehicle Stats", false, equipmentPanelHtml(null))}
+    ${panelHtml("panel-equipment", "Weapon/Vehicle Stats", false, equipmentBoardPanelBody(false))}
     ${podiumHtml}
     <div class="table-wrap">
       <table>
@@ -1636,7 +1649,7 @@ function renderEquipmentLeaderboard(params) {
     <p class="page-sub">${esc(heading)} · ${usePeriod ? esc(periodWindowText(periodWindow)) : "Career totals"}</p>
     ${viewRangeControlHtml()}
     ${panelHtml("panel-soldier", "Soldier Stats", false, statTabsHtml(null, (key) => hashRoute(`board/${key}`, viewRangeParams())))}
-    ${panelHtml("panel-equipment", "Weapon/Vehicle Stats", true, `${artifactNote}${periodNote}${equipmentPanelHtml(selected?.id ?? null, metric)}`)}
+    ${panelHtml("panel-equipment", "Weapon/Vehicle Stats", true, `${artifactNote}${periodNote}${equipmentBoardPanelBody(true, selected?.id ?? null, metric)}`)}
     ${equipmentPodiumHtml(rows, metric, windowText)}
     ${selected ? `<div class="table-wrap equipment-leaderboard-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(heading, "value", leaderboardSortState, { numeric: true })}${sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th>Trend</th></tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
   const equipmentHref = (rangeParams) => hashRoute("board/equipment", { equipment: selected?.id ?? null, metric: metric === "kills" ? null : metric, ...rangeParams });
@@ -1765,7 +1778,7 @@ function renderLeaderboard(statKey, params) {
     <p class="page-sub">Current Career values · movement, deltas, and sparkline show change over ${esc(windowText)}</p>
     ${viewRangeControlHtml()}
     ${panelHtml("panel-soldier", "Soldier Stats", true, statTabsHtml(stat.key, (key) => hashRoute(`board/${key}`, viewRangeParams())))}
-    ${panelHtml("panel-equipment", "Weapon/Vehicle Stats", false, equipmentPanelHtml(null))}
+    ${panelHtml("panel-equipment", "Weapon/Vehicle Stats", false, equipmentBoardPanelBody(false))}
     ${podiumHtml}
     <div class="table-wrap">
       <table>
@@ -2238,6 +2251,16 @@ function panelHtml(id, title, defaultOpen, body, extraClass = "") {
   </details>`;
 }
 
+function deferredEquipmentPanelHtml() {
+  return `<p class="equipment-empty">Expand to load weapon and vehicle leaderboards.</p>`;
+}
+
+function equipmentBoardPanelBody(defaultOpen, selectedId = null, metric = "kills") {
+  return panelIsOpen("panel-equipment", defaultOpen)
+    ? equipmentPanelHtml(selectedId, metric)
+    : deferredEquipmentPanelHtml();
+}
+
 function equipmentCatalogue() {
   return validEquipmentCatalogue(state.equipmentCatalogue) ? state.equipmentCatalogue : null;
 }
@@ -2406,6 +2429,9 @@ function wireEquipmentDetails(discordId, statKey, showEstimated, equipmentView, 
       equipmentMetric
     }));
   details.addEventListener("toggle", () => {
+    if (details.open && equipmentProfileCache.get(discordId)?.status === "error") {
+      equipmentProfileCache.delete(discordId);
+    }
     if (details.open !== equipmentView.open) {
       updateRoute({ open: details.open, equipment: selectedId, equipmentMetric: metric });
     }
@@ -2922,6 +2948,10 @@ function auditText(event) {
 }
 
 function renderActivity() {
+  if (failedDataFiles.has("data/notifications.json")) {
+    app.innerHTML = `<div class="error-box" role="alert"><strong>Activity data is temporarily unavailable.</strong><br>Leaderboards and other pages are unaffected.</div>`;
+    return;
+  }
   const items = (state.notifications.events ?? [])
     .map((event) => ({
       at: event.at,
@@ -3065,6 +3095,10 @@ function wireFloatingTableHeaders() {
 }
 
 function renderAudit() {
+  if (failedDataFiles.has("data/audit.json")) {
+    app.innerHTML = `<div class="error-box" role="alert"><strong>Audit data is temporarily unavailable.</strong><br>Leaderboards and other pages are unaffected.</div>`;
+    return;
+  }
   const events = [...(state.audit.events ?? [])].reverse();
   const text = auditFilterState.text.toLowerCase();
   const filtered = events.filter((event) => {
@@ -3382,6 +3416,10 @@ function renderEffectiveness(requestedKey) {
   const key = EFFECTIVENESS_KEYS.includes(requestedKey) ? requestedKey : "trident";
   prepareSortState(effectivenessSortState, key);
   const calculation = state.effectiveness;
+  if (failedDataFiles.has("data/effectiveness-history.json")) {
+    app.innerHTML = `<div class="error-box" role="alert"><strong>Effectiveness data is temporarily unavailable.</strong><br>Leaderboards and other pages are unaffected.</div>`;
+    return;
+  }
   if (!calculation?.rows?.length) {
     app.innerHTML = `<div class="error-box"><strong>Effectiveness data has not been published yet.</strong><br>The next tracker refresh will generate it.</div>`;
     return;
@@ -3406,15 +3444,138 @@ function renderEffectiveness(requestedKey) {
   wireSortableHeaders(effectivenessSortState);
 }
 
+/* ---------- route-level loading ---------- */
+
+async function fetchJson(path, fallback, { essential = false } = {}) {
+  try {
+    const response = await fetch(path, { cache: "no-cache" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const value = await response.json();
+    failedDataFiles.delete(path);
+    if (essential) {
+      const index = failedBootFiles.indexOf(path);
+      if (index >= 0) failedBootFiles.splice(index, 1);
+    }
+    return value;
+  } catch {
+    failedDataFiles.add(path);
+    if (essential && !failedBootFiles.includes(path)) failedBootFiles.push(path);
+    return fallback;
+  }
+}
+
+function loadData(key, path, fallback, options = {}) {
+  if (dataLoads.has(key)) return dataLoads.get(key);
+  const load = fetchJson(path, fallback, options).then((value) => {
+    state[key] = value;
+    if (failedDataFiles.has(path)) dataLoads.delete(key);
+    return value;
+  });
+  dataLoads.set(key, load);
+  return load;
+}
+
+async function loadBaseData() {
+  const [meta, latest] = await Promise.all([
+    loadData("meta", "data/meta.json", null, { essential: true }),
+    loadData("latest", "data/latest.json", { members: [] }, { essential: true })
+  ]);
+  state.meta = meta;
+  state.latest = latest;
+}
+
+async function loadHistoryData() {
+  const [history, historyProvenanceData, counters] = await Promise.all([
+    loadData("history", "data/history.json", { dates: [], members: {} }, { essential: true }),
+    loadData("historyProvenance", "data/history-provenance.json", null),
+    loadData("counters", "data/counters.json", null)
+  ]);
+  state.history = history;
+  state.historyProvenance = historyProvenanceData;
+  state.historyProvenanceIndex = buildHistoryProvenanceIndex(historyProvenanceData);
+  state.counters = counters?.dates && counters?.members ? counters : null;
+}
+
+async function loadEquipmentData() {
+  const [catalogue, index] = await Promise.all([
+    loadData("equipmentCatalogue", "data/equipment-catalogue.json", null),
+    loadData("equipmentIndex", "data/equipment-index.json", null)
+  ]);
+  state.equipmentCatalogue = validEquipmentCatalogue(catalogue) ? catalogue : null;
+  state.equipmentIndex = validEquipmentArtifact(index) ? index : null;
+}
+
+async function loadEffectivenessData() {
+  const history = await loadData("effectivenessHistory", "data/effectiveness-history.json", null);
+  state.effectivenessHistory = history?.version === 1 && Number.isInteger(history?.modelVersion) ? history : null;
+  state.effectiveness = state.effectivenessHistory?.current ?? null;
+}
+
+function loadChartJs() {
+  if (globalThis.Chart) return Promise.resolve(globalThis.Chart);
+  if (chartJsLoad) return chartJsLoad;
+  chartJsLoad = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = CHART_JS_URL;
+    script.integrity = CHART_JS_INTEGRITY;
+    script.crossOrigin = "anonymous";
+    script.onload = () => resolve(globalThis.Chart);
+    script.onerror = () => {
+      chartJsLoad = null;
+      reject(new Error("Chart.js failed to load."));
+    };
+    document.head.append(script);
+  });
+  return chartJsLoad;
+}
+
+async function ensureRouteData(parts, params) {
+  const route = parts[0] || "board";
+  const loads = [];
+  if (route !== "activity" && route !== "audit" && route !== "effectiveness") loads.push(loadHistoryData());
+  if (route === "activity") loads.push(loadData("notifications", "data/notifications.json", { events: [] }));
+  if (route === "audit" || route === "player") loads.push(loadData("audit", "data/audit.json", { events: [] }));
+  if (route === "effectiveness") loads.push(loadEffectivenessData());
+  if ((route === "board" && (parts[1] === "equipment" || panelIsOpen("panel-equipment", false))) ||
+      (route === "player" && equipmentViewState(params).open)) loads.push(loadEquipmentData());
+  if (route === "player" || route === "compare") loads.push(loadChartJs().catch(() => null));
+  await Promise.all(loads);
+}
+
+function wireDeferredEquipmentPanel() {
+  const panel = document.getElementById("panel-equipment");
+  if (!panel) return;
+  panel.addEventListener("toggle", async () => {
+    if (!panel.open) return;
+    const scrollY = window.scrollY;
+    const body = panel.querySelector(":scope > .stat-panel-body");
+    if (body) body.innerHTML = `<div class="equipment-loading">Loading equipment data…</div>`;
+    await loadEquipmentData();
+    await render();
+    window.scrollTo(0, scrollY);
+  });
+}
+
 /* ---------- router ---------- */
 
-function render() {
+async function render() {
+  const generation = ++renderGeneration;
+  const routeState = parsedHashRoute();
+  try {
+    await ensureRouteData(routeState.parts, routeState.params);
+  } catch (error) {
+    if (generation === renderGeneration) {
+      app.innerHTML = `<div class="error-box" role="alert"><strong>This view could not finish loading.</strong><br>${esc(error.message)} Try refreshing.</div>`;
+    }
+    return;
+  }
+  if (generation !== renderGeneration) return;
   destroyCharts();
   for (const cleanup of floatingHeaderCleanups) {
     cleanup();
   }
   floatingHeaderCleanups = [];
-  const { parts, params } = parsedHashRoute();
+  const { parts, params } = routeState;
   const [route] = parts;
   const routePath = parts.join("/");
   if (lastRenderedRoutePath != null && routePath !== lastRenderedRoutePath) {
@@ -3472,26 +3633,13 @@ function render() {
     app.insertAdjacentHTML("afterbegin", failureNotice);
   }
   wireFloatingTableHeaders();
+  wireDeferredEquipmentPanel();
   window.scrollTo(0, 0);
 }
 
 /* ---------- boot ---------- */
 
 const failedBootFiles = [];
-
-async function fetchJson(path, fallback, { essential = false } = {}) {
-  try {
-    const response = await fetch(path, { cache: "no-cache" });
-    if (!response.ok) {
-      if (essential) failedBootFiles.push(path);
-      return fallback;
-    }
-    return await response.json();
-  } catch {
-    if (essential) failedBootFiles.push(path);
-    return fallback;
-  }
-}
 
 // Essential files degrade the whole site when missing, so their failures get a
 // visible notice; the rest (provenance, effectiveness, counters) are optional
@@ -3504,50 +3652,19 @@ function bootFailureNoticeHtml() {
 }
 
 async function boot() {
-  const [meta, latest, history, historyProvenanceData, audit, notifications, effectivenessHistory, counters, equipmentCatalogueData, equipmentIndex] = await Promise.all([
-    fetchJson("data/meta.json", null),
-    fetchJson("data/latest.json", { members: [] }, { essential: true }),
-    fetchJson("data/history.json", { dates: [], members: {} }, { essential: true }),
-    fetchJson("data/history-provenance.json", null),
-    fetchJson("data/audit.json", { events: [] }),
-    fetchJson("data/notifications.json", { events: [] }),
-    fetchJson("data/effectiveness-history.json", null),
-    fetchJson("data/counters.json", null),
-    fetchJson("data/equipment-catalogue.json", null),
-    fetchJson("data/equipment-index.json", null)
-  ]);
+  await loadBaseData();
 
-  if (!meta) {
+  if (!state.meta) {
     app.innerHTML = `<div class="error-box"><strong>No data published yet.</strong><br />
       The daily update hasn't pushed its first snapshot. Check back soon.</div>`;
     return;
   }
 
-  const compatibleEffectiveness =
-    effectivenessHistory?.version === 1 && Number.isInteger(effectivenessHistory?.modelVersion)
-      ? effectivenessHistory
-      : null;
-  const effectiveness = compatibleEffectiveness?.current ?? null;
-  Object.assign(state, {
-    meta,
-    latest,
-    history,
-    historyProvenance: historyProvenanceData,
-    historyProvenanceIndex: buildHistoryProvenanceIndex(historyProvenanceData),
-    audit,
-    notifications,
-    effectiveness,
-    effectivenessHistory: compatibleEffectiveness,
-    counters: counters?.dates && counters?.members ? counters : null,
-    equipmentCatalogue: validEquipmentCatalogue(equipmentCatalogueData) ? equipmentCatalogueData : null,
-    equipmentIndex: validEquipmentArtifact(equipmentIndex) ? equipmentIndex : null
-  });
-
   const updated = document.getElementById("footer-updated");
-  updated.textContent = `Last updated ${fmtDateTime(meta.updatedAt)} ET`;
+  updated.textContent = `Last updated ${fmtDateTime(state.meta.updatedAt)} ET`;
 
   window.addEventListener("hashchange", render);
-  render();
+  await render();
 }
 
 boot();

@@ -17,7 +17,7 @@ async function read(relativePath) {
   return readFile(path.join(root, relativePath), "utf8");
 }
 
-test("index.html and all module imports share one ?v= version", async () => {
+test("static deployment assets share a cache version and Chart.js keeps its integrity contract", async () => {
   const indexHtml = await read("index.html");
   const appTag = indexHtml.match(/src="assets\/app\.js\?v=([^"]+)"/);
   assert.ok(appTag, "index.html must load assets/app.js with a ?v= version");
@@ -31,17 +31,10 @@ test("index.html and all module imports share one ?v= version", async () => {
     assert.ok(versioned, `unversioned module import in app.js: ${specifier}`);
     assert.equal(versioned[1], version, `version mismatch for ${specifier} (index.html has ${version})`);
   }
-});
-
-test("style.css is loaded with a cache-busting version", async () => {
-  const indexHtml = await read("index.html");
   assert.match(indexHtml, /href="assets\/style\.css\?v=[^"]+"/);
-});
-
-test("the Chart.js CDN script is pinned with subresource integrity", async () => {
-  const indexHtml = await read("index.html");
-  const tag = indexHtml.match(/<script[^>]+cdn\.jsdelivr\.net[^>]+>/s);
-  assert.ok(tag, "Chart.js script tag not found");
-  assert.match(tag[0], /integrity="sha384-[A-Za-z0-9+/=]+"/);
-  assert.match(tag[0], /crossorigin="anonymous"/);
+  assert.match(appJs, /CHART_JS_URL\s*=\s*"https:\/\/cdn\.jsdelivr\.net\/npm\/chart\.js@4\.4\.7\/dist\/chart\.umd\.min\.js"/);
+  assert.match(appJs, /CHART_JS_INTEGRITY\s*=\s*"sha384-[A-Za-z0-9+/=]+"/);
+  assert.match(appJs, /script\.integrity\s*=\s*CHART_JS_INTEGRITY/);
+  assert.match(appJs, /script\.crossOrigin\s*=\s*"anonymous"/);
+  assert.doesNotMatch(indexHtml, /cdn\.jsdelivr\.net\/npm\/chart\.js/, "Chart.js must not load on every route");
 });
