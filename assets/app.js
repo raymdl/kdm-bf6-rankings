@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-period-active-time-39";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-period-active-time-40";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260815-period-active-time-39";
+} from "./period.js?v=20260815-period-active-time-40";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,8 +26,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260815-period-active-time-39";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-period-active-time-39";
+} from "./view-state.js?v=20260815-period-active-time-40";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-period-active-time-40";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -37,7 +37,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260815-period-active-time-39";
+} from "./equipment.js?v=20260815-period-active-time-40";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -1564,14 +1564,29 @@ function equipmentCoverageStart(stats, category, metric) {
     .at(-1) ?? null;
 }
 
-// Time on the item across the window the displayed value covers, or null when
-// the two do not line up. See the call site for why an unknown is better than
-// the zero the raw reading would give.
-function equipmentActiveSeconds(stats, category, metric) {
+// Time on the item, plus the date that reading starts from when it covers less
+// of the range than the value beside it. Equipped time has been recorded since
+// Aug 10 and kills for far longer, so on a long window the two genuinely
+// describe different spans -- but withholding the figure would empty the column
+// on every All Time view forever, so it is shown and dated instead.
+function equipmentActiveTime(stats, category, metric) {
   const timeField = category === "vehicles" ? "timeIn" : "timeEquipped";
   const time = stats.fields?.[timeField];
-  if (!time?.known) return null;
-  return time.startDate === equipmentCoverageStart(stats, category, metric) ? stats.timeSeconds : null;
+  if (!time?.known) return { seconds: null, since: null };
+  const valueStart = equipmentCoverageStart(stats, category, metric);
+  return {
+    seconds: stats.timeSeconds,
+    since: time.startDate && time.startDate !== valueStart ? time.startDate : null
+  };
+}
+
+// Gold, against the blue of the player's own tracked-since badge: this one
+// dates the equipped time rather than the player, and the two can appear on the
+// same row.
+function equipmentTimeSinceBadgeHtml(since, category) {
+  if (!since) return "";
+  const noun = category === "vehicles" ? "Time in this vehicle" : "Time on this weapon";
+  return ` <span class="badge time-since" title="${esc(noun)} has only been recorded since ${esc(fmtShortDate(since))}, so this total covers that part of the range while the figure beside it covers all of it">since ${esc(fmtShortDate(since))}</span>`;
 }
 
 function equipmentLeaderboardRows(selectedId, category, metric, periodWindow, usePeriod, careerWindow) {
@@ -1593,6 +1608,7 @@ function equipmentLeaderboardRows(selectedId, category, metric, periodWindow, us
       const startValue = startStats ? equipmentMetricValue(startStats, metric) : null;
       const endValue = endStats ? equipmentMetricValue(endStats, metric) : null;
       const change = Number.isFinite(startValue) && Number.isFinite(endValue) ? endValue - startValue : null;
+      const activeTime = usePeriod ? equipmentActiveTime(stats, category, metric) : { seconds: null, since: null };
       return {
         discordId,
         name: member.name ?? memberName(discordId),
@@ -1607,12 +1623,10 @@ function equipmentLeaderboardRows(selectedId, category, metric, periodWindow, us
         // the same subtraction, so a Change column would just print the figure
         // beside itself.
         //
-        // Reported only when it covers the same span as the value beside it.
-        // Equipped time has been recorded for less of the past than kills have,
-        // so a long window can hold a full fortnight of kills against a few days
-        // of carry time, and printing "0 min" next to 119 kills reads as a bug
-        // rather than as two different spans.
-        activeSeconds: usePeriod ? equipmentActiveSeconds(stats, category, metric) : null,
+        // `activeSince` is set when that time covers less of the range than the
+        // value does, which its own badge then says out loud.
+        activeSeconds: activeTime.seconds,
+        activeSince: activeTime.since,
         trend: equipmentTrend(entry, member, category, metric, comparisonIndexes, usePeriod ? comparisonStart : null)
       };
     })
@@ -1693,7 +1707,7 @@ function renderEquipmentLeaderboard(params) {
         const delta = equipmentDeltaText(metric, row.change);
         const deltaClass = Number.isFinite(row.change) ? (row.change > 0 ? "up" : row.change < 0 ? "down" : "flat") : "flat";
         const trailingCell = usePeriod
-          ? `<td class="num"${Number.isFinite(row.activeSeconds) ? "" : ` title="Time on this ${selected?.category === "vehicles" ? "vehicle" : "weapon"} has been recorded for less of this range than the figure beside it, so there is no matching total to show"`}>${esc(activeTimeText(row.activeSeconds))}</td>`
+          ? `<td class="num">${esc(activeTimeText(row.activeSeconds))}${equipmentTimeSinceBadgeHtml(row.activeSince, selected?.category)}</td>`
           : `<td class="num"><span class="delta ${deltaClass}">${delta}</span></td>`;
         return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${usePeriod ? trackedSinceBadgeHtml(periodWindow, row.coverageStart, EQUIPMENT_COVERAGE_BADGE_TITLE) : ""}</td><td class="num value-cell">${equipmentValueText(metric, row.value)}</td>${trailingCell}<td>${sparklineSvg(row.trend)}</td></tr>`;
       }).join("")

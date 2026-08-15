@@ -1979,6 +1979,18 @@ tr.period-provisional {
   color: var(--silver);
   white-space: nowrap;
 }
+/* Deliberately not the blue of tracked-since. Both say "this row covers less
+   of the range than you asked for", but they answer for different things: the
+   blue one is the player's own start, this gold one is the date the equipped
+   time behind this figure began being recorded. Two badges on one row have to
+   be tellable apart at a glance. */
+.badge.time-since {
+  background: rgba(251, 191, 36, 0.13);
+  border-color: rgba(251, 191, 36, 0.4);
+  color: var(--gold);
+  white-space: nowrap;
+  margin-left: 0.35rem;
+}
 
 .recent-form-card .table-wrap {
   margin: 0;
