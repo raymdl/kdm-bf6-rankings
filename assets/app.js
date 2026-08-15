@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-coverage-badges-44";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-coverage-badges-45";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260815-coverage-badges-44";
+} from "./period.js?v=20260815-coverage-badges-45";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,8 +26,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260815-coverage-badges-44";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-coverage-badges-44";
+} from "./view-state.js?v=20260815-coverage-badges-45";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-coverage-badges-45";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -37,7 +37,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260815-coverage-badges-44";
+} from "./equipment.js?v=20260815-coverage-badges-45";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -879,7 +879,7 @@ function trackedSinceBadgeHtml(window, trackedSince, title = "This member's trac
   if (!window || !trackedSince || trackedSince === window.startDate) {
     return "";
   }
-  return ` <span class="badge tracked-since" title="${esc(title)}">stat ${esc(fmtBadgeDate(trackedSince))} &rarr;</span>`;
+  return ` <span class="badge tracked-since" title="${esc(title)}">stat &#128206; ${esc(fmtBadgeDate(trackedSince))}</span>`;
 }
 
 // On an equipment board the shortfall can be the member's own start date or the
@@ -1175,19 +1175,6 @@ function sortableHeaderHtml(label, key, sortState, { numeric = false } = {}) {
     : direction === "desc" ? "ascending" : direction === "asc" ? "unsorted" : "descending";
   const indicator = direction === "desc" ? "&#9660;" : direction === "asc" ? "&#9650;" : "&#8645;";
   return `<th class="sortable-column${numeric ? " num" : ""}" aria-sort="${direction === "desc" ? "descending" : direction === "asc" ? "ascending" : "none"}"><button class="sort-button" type="button" data-sort-key="${key}" aria-label="Sort ${esc(label)} ${nextAction}"><span>${esc(label)}</span><span class="sort-indicator" aria-hidden="true">${indicator}</span></button></th>`;
-}
-
-function mostCommonValue(values) {
-  const counts = new Map();
-  for (const value of values) {
-    if (value == null) continue;
-    counts.set(value, (counts.get(value) ?? 0) + 1);
-  }
-  let best = null;
-  for (const [value, count] of counts) {
-    if (best === null || count > counts.get(best)) best = value;
-  }
-  return best;
 }
 
 function sortedRows(rows, sortState, valueFor) {
@@ -1602,10 +1589,10 @@ function equipmentActiveTime(stats, category, metric) {
 // Gold, against the blue of the player's own tracked-since badge, and sitting
 // next to it in the player cell: one dates the stat, the other the play time
 // behind it, and a row can carry both.
-function equipmentTimeSinceBadgeHtml(since, category, commonSince = null) {
-  if (!since || since === commonSince) return "";
+function equipmentTimeSinceBadgeHtml(since, category) {
+  if (!since) return "";
   const noun = category === "vehicles" ? "Time in this vehicle" : "Time on this weapon";
-  return ` <span class="badge time-since" title="${esc(noun)} has only been recorded since ${esc(fmtShortDate(since))}, so the Active Time total covers that part of the range while the figure beside it covers all of it">time ${esc(fmtBadgeDate(since))} &rarr;</span>`;
+  return ` <span class="badge time-since" title="${esc(noun)} has only been recorded since ${esc(fmtShortDate(since))}, so the Active Time total covers that part of the range while the figure beside it covers all of it">time &#128206; ${esc(fmtBadgeDate(since))}</span>`;
 }
 
 function equipmentLeaderboardRows(selectedId, category, metric, periodWindow, usePeriod, careerWindow) {
@@ -1707,11 +1694,6 @@ function renderEquipmentLeaderboard(params) {
     change: row.change,
     time: row.activeSeconds
   })[key]);
-  // Equipped time starts on one date for the whole roster, so its badge was
-  // repeating the same words on nearly every row. That is a fact about the
-  // column, not about a player: it goes in the header once, and a row only
-  // carries a badge when its own coverage differs from everyone else's.
-  const commonActiveSince = usePeriod ? mostCommonValue(rows.map((row) => row.activeSince)) : null;
   const periodNote = viewRangeState.view === "period"
     ? !periodWindow
       ? `<p class="period-unsupported-note" role="note">The selected Period range is not available yet — showing Career ${esc(EQUIPMENT_METRIC_LABELS[metric])}.</p>`
@@ -1733,7 +1715,7 @@ function renderEquipmentLeaderboard(params) {
         const trailingCell = usePeriod
           ? `<td class="num">${esc(activeTimeText(row.activeSeconds))}</td>`
           : `<td class="num"><span class="delta ${deltaClass}">${delta}</span></td>`;
-        return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${usePeriod ? `${trackedSinceBadgeHtml(periodWindow, row.coverageStart, EQUIPMENT_COVERAGE_BADGE_TITLE)}${equipmentTimeSinceBadgeHtml(row.activeSince, selected?.category, commonActiveSince)}` : ""}</td><td class="num value-cell">${equipmentValueText(metric, row.value)}</td>${trailingCell}<td>${sparklineSvg(row.trend)}</td></tr>`;
+        return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${usePeriod ? `${trackedSinceBadgeHtml(periodWindow, row.coverageStart, EQUIPMENT_COVERAGE_BADGE_TITLE)}${equipmentTimeSinceBadgeHtml(row.activeSince, selected?.category)}` : ""}</td><td class="num value-cell">${equipmentValueText(metric, row.value)}</td>${trailingCell}<td>${sparklineSvg(row.trend)}</td></tr>`;
       }).join("")
     : `<tr><td colspan="5" class="empty">No observed ${esc(EQUIPMENT_METRIC_LABELS[metric])} for this equipment item in the selected range.</td></tr>`;
   const equipmentName = selected ? equipmentDisplayName(selected.category, selected.id) : "Equipment";
@@ -1746,7 +1728,7 @@ function renderEquipmentLeaderboard(params) {
     ${panelHtml("panel-soldier", "Soldier Stats", false, statTabsHtml(null, (key) => hashRoute(`board/${key}`, viewRangeParams())))}
     ${panelHtml("panel-equipment", "Weapon/Vehicle Stats", true, `${artifactNote}${periodNote}${equipmentBoardPanelBody(true, selected?.id ?? null, metric)}`)}
     ${equipmentPodiumHtml(rows, metric, windowText, usePeriod, selected?.category ?? "weapons")}
-    ${selected ? `<div class="table-wrap equipment-leaderboard-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(heading, "value", leaderboardSortState, { numeric: true })}${usePeriod ? sortableHeaderHtml(commonActiveSince ? `Active Time · since ${fmtBadgeDate(commonActiveSince)}` : "Active Time", "time", leaderboardSortState, { numeric: true }) : sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th>${usePeriod ? "Daily trend" : "Trend"}</th></tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
+    ${selected ? `<div class="table-wrap equipment-leaderboard-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(heading, "value", leaderboardSortState, { numeric: true })}${usePeriod ? sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true }) : sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th>${usePeriod ? "Daily trend" : "Trend"}</th></tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
   const equipmentHref = (rangeParams) => hashRoute("board/equipment", { equipment: selected?.id ?? null, metric: metric === "kills" ? null : metric, ...rangeParams });
   wireViewRangeControl(equipmentHref);
   wireStatTabs();
