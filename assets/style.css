@@ -1974,6 +1974,13 @@ tr.period-provisional {
   color: var(--gold);
 }
 
+/* The clip is drawn rather than typed, so it takes the badge's own colour. */
+.badge-clip {
+  width: 0.72em;
+  height: 0.72em;
+  vertical-align: -0.08em;
+  margin: 0 0.06em;
+}
 .badge.tracked-since {
   background: rgba(122, 184, 255, 0.14);
   color: var(--silver);
