@@ -425,6 +425,60 @@ test("weapon accuracy reads the published rate and never exceeds 100%", () => {
   assert.equal(career({ ...pellets, accuracy: [0, 28.4, 1, 29.1] }), 29.1);
 });
 
+// A 14-day range reaching back before weapon telemetry existed used to blank
+// the whole board. It now reports the part of the range that was recorded, and
+// each stat says where its own figures start.
+test("a window reaching before a metric's tracking start reports the covered span", () => {
+  const dates = ["2026-07-28", "2026-08-10", "2026-08-11", "2026-08-12"];
+  const trackingStarts = {
+    weapons: {
+      kills: null,
+      timeEquipped: "2026-08-10",
+      shotsHit: "2026-08-10",
+      shotsFired: "2026-08-10",
+      headshotKills: "2026-08-10",
+      accuracy: "2026-08-11"
+    }
+  };
+  const entry = {
+    kills: [0, 100, 1, 140, 3, 200],
+    timeEquipped: [1, 600, 3, 4200],
+    shotsHit: [1, 200, 3, 400],
+    shotsFired: [1, 1000, 3, 3000],
+    headshotKills: [1, 10, 3, 25],
+    accuracy: [2, 20]
+  };
+  const stats = equipmentPeriodStats(entry, "weapons", 0, 3, dates, [0, 1, 2, 3], trackingStarts);
+
+  // Kills were recorded across the whole range and keep it.
+  assert.equal(stats.kills, 100);
+  assert.equal(stats.fields.kills.startDate, "2026-07-28");
+  assert.equal(stats.fields.kills.clamped, false);
+
+  // Time only exists from the 10th, so it reports the 10th onward and says so.
+  assert.equal(stats.timeSeconds, 3600);
+  assert.equal(stats.fields.timeEquipped.startDate, "2026-08-10");
+  assert.equal(stats.fields.timeEquipped.clamped, true);
+
+  // KPM is 60 kills over those same 60 minutes — never the 100 kills of the
+  // wider span over the 60 minutes of the narrower one.
+  assert.equal(stats.kpm, 1);
+  assert.equal(stats.accuracy, 10);
+  assert.equal(stats.hsPercent, 25);
+});
+
+// A member linked mid-range has no observation at its start; their figures
+// begin at their own first snapshot rather than vanishing from the board.
+test("a member observed only inside the window reports from their first snapshot", () => {
+  const dates = ["2026-07-28", "2026-08-10", "2026-08-11", "2026-08-12"];
+  const entry = { kills: [2, 40, 3, 90], timeEquipped: [2, 600, 3, 1200], shotsHit: [], shotsFired: [], headshotKills: [] };
+  const stats = equipmentPeriodStats(entry, "weapons", 0, 3, dates, [2, 3], { weapons: { kills: null, timeEquipped: "2026-08-10" } });
+  assert.equal(stats.kills, 50);
+  assert.equal(stats.fields.kills.startDate, "2026-08-11");
+  assert.equal(stats.fields.kills.clamped, true);
+  assert.equal(stats.timeSeconds, 600);
+});
+
 test("equipment metrics that predate their tracking start remain unknown", () => {
   const entry = {
     kills: [0, 10, 1, 16],

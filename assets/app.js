@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260812-performance-35";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-equipment-coverage-36";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260812-performance-35";
+} from "./period.js?v=20260815-equipment-coverage-36";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,8 +26,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260812-performance-35";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260812-performance-35";
+} from "./view-state.js?v=20260815-equipment-coverage-36";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-equipment-coverage-36";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -37,7 +37,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260812-performance-35";
+} from "./equipment.js?v=20260815-equipment-coverage-36";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -869,12 +869,17 @@ document.addEventListener("keydown", (event) => {
   replaceHashAndRender(location.hash);
 });
 
-function trackedSinceBadgeHtml(window, trackedSince) {
+function trackedSinceBadgeHtml(window, trackedSince, title = "This member's tracking began after this range's start; their stats cover their own tracked portion of it") {
   if (!window || !trackedSince || trackedSince === window.startDate) {
     return "";
   }
-  return ` <span class="badge tracked-since" title="This member's tracking began after this range's start; their stats cover their own tracked portion of it">tracked since ${esc(fmtShortDate(trackedSince))}</span>`;
+  return ` <span class="badge tracked-since" title="${esc(title)}">tracked since ${esc(fmtShortDate(trackedSince))}</span>`;
 }
+
+// On an equipment board the shortfall can be the member's own start date or the
+// date the metric itself began being recorded, so the badge does not blame one.
+const EQUIPMENT_COVERAGE_BADGE_TITLE =
+  "This figure covers part of the selected range: either this metric or this member started being recorded after the range began";
 
 function timeMachineTrackedSinceBadgeHtml(trackedSince) {
   if (!trackedSince) return `<span class="badge tracked-since">not tracked yet</span>`;
@@ -1544,6 +1549,16 @@ function equipmentTrend(entry, member, category, metric, indexes, periodStartInd
   });
 }
 
+// The latest start among the fields this metric is built from: a rate begins
+// where its later half begins, not where its earlier half does.
+function equipmentCoverageStart(stats, category, metric) {
+  return equipmentMetricRequiredFields(category, metric)
+    .map((field) => (stats.fields?.[field]?.known ? stats.fields[field].startDate : null))
+    .filter(Boolean)
+    .sort()
+    .at(-1) ?? null;
+}
+
 function equipmentLeaderboardRows(selectedId, category, metric, periodWindow, usePeriod, careerWindow) {
   const comparisonIndexes = usePeriod
     ? Array.from({ length: periodWindow.endIndex - periodWindow.startIndex + 1 }, (_, offset) => periodWindow.startIndex + offset)
@@ -1568,6 +1583,10 @@ function equipmentLeaderboardRows(selectedId, category, metric, periodWindow, us
         name: member.name ?? memberName(discordId),
         value,
         change,
+        // Rows on one board can cover different spans — a metric that started
+        // being recorded mid-window, or a member linked after it began — so each
+        // row carries the date its own figure starts from.
+        coverageStart: usePeriod ? equipmentCoverageStart(stats, category, metric) : null,
         trend: equipmentTrend(entry, member, category, metric, comparisonIndexes, usePeriod ? comparisonStart : null)
       };
     })
@@ -1638,7 +1657,7 @@ function renderEquipmentLeaderboard(params) {
     ? sorted.map((row) => {
         const delta = equipmentDeltaText(metric, row.change);
         const deltaClass = Number.isFinite(row.change) ? (row.change > 0 ? "up" : row.change < 0 ? "down" : "flat") : "flat";
-        return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}</td><td class="num value-cell">${equipmentValueText(metric, row.value)}</td><td class="num"><span class="delta ${deltaClass}">${delta}</span></td><td>${sparklineSvg(row.trend)}</td></tr>`;
+        return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${usePeriod ? trackedSinceBadgeHtml(periodWindow, row.coverageStart, EQUIPMENT_COVERAGE_BADGE_TITLE) : ""}</td><td class="num value-cell">${equipmentValueText(metric, row.value)}</td><td class="num"><span class="delta ${deltaClass}">${delta}</span></td><td>${sparklineSvg(row.trend)}</td></tr>`;
       }).join("")
     : `<tr><td colspan="5" class="empty">No observed ${esc(EQUIPMENT_METRIC_LABELS[metric])} for this equipment item in the selected range.</td></tr>`;
   const equipmentName = selected ? equipmentDisplayName(selected.category, selected.id) : "Equipment";
@@ -2306,31 +2325,46 @@ function equipmentMetricValue(stats, metric) {
   return stats[metric] ?? null;
 }
 
-function equipmentPeriodTrackingNote(fields, category) {
-  const metricFields = new Set(
-    Object.entries(fields)
-      .filter(([, field]) => field?.reason === "tracking_not_started")
-      .map(([field]) => field)
-  );
+// A stored field carries the derived stats built on it, so a note about
+// timeEquipped has to name KPM too — that is the one the reader was looking at.
+function equipmentMetricLabelsFor(fieldNames, category) {
+  const metricFields = new Set(fieldNames);
   if (category === "weapons") {
     if (metricFields.has("shotsFired") || metricFields.has("shotsHit")) metricFields.add("accuracy");
     if (metricFields.has("headshotKills")) metricFields.add("hsPercent");
-    if (metricFields.has("timeEquipped")) {
-      metricFields.add("timeEquipped");
-      metricFields.add("kpm");
+    if (metricFields.has("timeEquipped")) metricFields.add("kpm");
+  }
+  if (category === "vehicles" && metricFields.has("timeIn")) metricFields.add("kpm");
+  return [...metricFields].map((field) => EQUIPMENT_METRIC_LABELS[field]).filter(Boolean);
+}
+
+function readableLabelList(labels) {
+  return labels.length > 1 ? `${labels.slice(0, -1).join(", ")}, and ${labels.at(-1)}` : labels[0];
+}
+
+// Two different situations, and the difference matters to whoever picked the
+// window: a metric that starts later than the window still has real figures for
+// the part it covers, and only a metric with no covered span at all is empty.
+function equipmentPeriodTrackingNote(fields, category) {
+  const entries = Object.entries(fields);
+  const clamped = entries.filter(([, field]) => field?.known && field.clamped);
+  const uncovered = entries.filter(([, field]) => field?.reason === "tracking_not_started");
+  const notes = [];
+  if (clamped.length) {
+    const labels = equipmentMetricLabelsFor(clamped.map(([field]) => field), category);
+    const from = clamped.map(([, field]) => field.startDate).filter(Boolean).sort().at(-1);
+    if (labels.length && from) {
+      notes.push(`${readableLabelList(labels)} ${labels.length > 1 ? "cover" : "covers"} ${fmtShortDate(from)} onward — the rest of the selected window predates ${labels.length > 1 ? "those metrics" : "that metric"}.`);
     }
   }
-  if (category === "vehicles" && metricFields.has("timeIn")) {
-    metricFields.add("timeIn");
-    metricFields.add("kpm");
+  if (uncovered.length) {
+    const labels = equipmentMetricLabelsFor(uncovered.map(([field]) => field), category);
+    const trackingStart = uncovered.map(([, field]) => field.trackingStartDate).find(Boolean);
+    if (labels.length) {
+      notes.push(`${readableLabelList(labels)} ${labels.length > 1 ? "have" : "has"} no data in this window; tracking began ${trackingStart ? fmtShortDate(trackingStart) : "after it"}.`);
+    }
   }
-  const labels = [...metricFields]
-    .map((field) => EQUIPMENT_METRIC_LABELS[field])
-    .filter(Boolean);
-  if (!labels.length) return "";
-  const readable = labels.length > 1 ? `${labels.slice(0, -1).join(", ")}, and ${labels.at(-1)}` : labels[0];
-  const trackingStart = Object.values(fields).find((field) => field?.trackingStartDate)?.trackingStartDate;
-  return `Tracking for ${readable} began ${trackingStart ? fmtShortDate(trackingStart) : "the published tracking start"}; the selected window predates that metric.`;
+  return notes.join(" ");
 }
 
 function equipmentProfileMember(data, discordId) {

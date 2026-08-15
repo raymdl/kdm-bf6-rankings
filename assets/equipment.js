@@ -93,6 +93,49 @@ function trackingStartIndex(category, field, dates, fieldTrackingStarts = null) 
   return { date: startDate ?? null, index };
 }
 
+// The first published date this field was being recorded on. A tracking start
+// that is not itself a published date still has a floor: the first date after
+// it. -1 means no published date is covered at all.
+function trackingFloorIndex(tracking, dates) {
+  if (!tracking.date) return 0;
+  if (tracking.index >= 0) return tracking.index;
+  if (!Array.isArray(dates)) return -1;
+  return dates.findIndex((date) => date >= tracking.date);
+}
+
+// A window endpoint has to be a date this member was actually observed on --
+// an unobserved date has no value to read, and carrying a neighbouring day's
+// counter is what the sparse reader exists to prevent.
+function firstObservedFrom(observedIndexes, floorIndex) {
+  if (!Array.isArray(observedIndexes) || floorIndex < 0) return -1;
+  let first = -1;
+  for (const index of observedIndexes) {
+    if (!isValidIndex(index) || index < floorIndex) continue;
+    if (first < 0 || index < first) first = index;
+  }
+  return first;
+}
+
+// Where this field's window really starts: no earlier than the date the field
+// began being recorded, and no earlier than this member's first observation on
+// or after that. A field promoted into the archive partway through, or a member
+// linked last week, is not a reason to refuse a 14-day window outright -- it is
+// a reason to report the span that exists and say which date it starts from,
+// the same way the counter period math resolves per-member start dates.
+export function equipmentPeriodStartIndex(
+  field,
+  startIndex,
+  dates = [],
+  observedIndexes = [],
+  fieldTrackingStarts = null,
+  category = "weapons"
+) {
+  const tracking = trackingStartIndex(category, field, dates, fieldTrackingStarts);
+  const floor = trackingFloorIndex(tracking, dates);
+  if (floor < 0 || !isValidIndex(startIndex)) return { index: -1, tracking };
+  return { index: firstObservedFrom(observedIndexes, Math.max(startIndex, floor)), tracking };
+}
+
 export function equipmentPeriodDelta(
   entry,
   field,
@@ -103,26 +146,43 @@ export function equipmentPeriodDelta(
   fieldTrackingStarts = null,
   category = "weapons"
 ) {
-  const tracking = trackingStartIndex(category, field, dates, fieldTrackingStarts);
-  const start = readEquipmentField(entry, field, startIndex, observedIndexes);
-  const end = readEquipmentField(entry, field, endIndex, observedIndexes);
-  const startPredatesTracking = tracking.index >= 0
-    ? startIndex < tracking.index
-    : Boolean(tracking.date && dates[startIndex] && dates[startIndex] < tracking.date);
-  if (startPredatesTracking) {
+  const { index: effectiveStart, tracking } = equipmentPeriodStartIndex(
+    field,
+    startIndex,
+    dates,
+    observedIndexes,
+    fieldTrackingStarts,
+    category
+  );
+  // Nothing left of the window once it is clamped: the field started after it,
+  // or this member has no observation inside it.
+  if (effectiveStart < 0 || effectiveStart >= endIndex) {
     return {
       value: null,
       known: false,
       reason: "tracking_not_started",
       trackingStartDate: tracking.date,
-      start,
-      end
+      startIndex: null,
+      start: readEquipmentField(entry, field, startIndex, observedIndexes),
+      end: readEquipmentField(entry, field, endIndex, observedIndexes)
     };
   }
+  const start = readEquipmentField(entry, field, effectiveStart, observedIndexes);
+  const end = readEquipmentField(entry, field, endIndex, observedIndexes);
   if (!start.known || !end.known) {
-    return { value: null, known: false, reason: start.reason ?? end.reason ?? "unknown_endpoint", start, end };
+    return { value: null, known: false, reason: start.reason ?? end.reason ?? "unknown_endpoint", startIndex: null, start, end };
   }
-  return { value: end.value - start.value, known: true, reason: null, start, end };
+  return {
+    value: end.value - start.value,
+    known: true,
+    reason: null,
+    startIndex: effectiveStart,
+    startDate: dates?.[effectiveStart] ?? null,
+    clamped: effectiveStart > startIndex,
+    trackingStartDate: tracking.date,
+    start,
+    end
+  };
 }
 
 function fieldValue(fields, field) {
@@ -147,20 +207,30 @@ function sanePercent(value) {
 // which is exact and needs no arithmetic. Period cannot: differencing two
 // career percentages is meaningless, so the window is derived from its own shot
 // deltas -- the reason both the rate and the counters are published.
-function statsFromFields(category, fields, mode = "career") {
+function statsFromFields(category, fields, mode = "career", alignedPair = null) {
   const kills = fieldValue(fields, "kills");
   const timeField = CATEGORY_STATS[category].time;
   const timeSeconds = fieldValue(fields, timeField);
-  const accuracyRatio = category === "weapons" ? ratio(fieldValue(fields, "shotsHit"), fieldValue(fields, "shotsFired")) : null;
+  // Two fields promoted into the archive on different dates cover different
+  // spans of the same window, and a rate built from one field's 14 days over
+  // another's 2 is not a number anyone should see. `alignedPair` re-reads both
+  // over the later of the two starts; without it the values are already
+  // comparable and are read straight off the fields.
+  const pair = alignedPair ?? ((numeratorField, denominatorField) =>
+    [fieldValue(fields, numeratorField), fieldValue(fields, denominatorField)]);
+  const [hits, shots] = category === "weapons" ? pair("shotsHit", "shotsFired") : [null, null];
+  const [headshotKills, headshotDenominator] = category === "weapons" ? pair("headshotKills", "kills") : [null, null];
+  const [rateKills, rateSeconds] = pair("kills", timeField);
+  const accuracyRatio = ratio(hits, shots);
   const derivedAccuracy = accuracyRatio === null ? null : sanePercent(accuracyRatio * 100);
   const publishedAccuracy = category === "weapons" ? fieldValue(fields, "accuracy") : null;
-  const hsRatio = category === "weapons" ? ratio(fieldValue(fields, "headshotKills"), kills) : null;
+  const hsRatio = category === "weapons" ? ratio(headshotKills, headshotDenominator) : null;
   const stats = {
     kills,
     timeSeconds,
     accuracy: mode === "career" ? publishedAccuracy ?? derivedAccuracy : derivedAccuracy,
     hsPercent: hsRatio === null ? null : hsRatio * 100,
-    kpm: ratio(kills, Number.isFinite(timeSeconds) ? timeSeconds / 60 : null),
+    kpm: ratio(rateKills, Number.isFinite(rateSeconds) ? rateSeconds / 60 : null),
     vehiclesDestroyed: fieldValue(fields, CATEGORY_STATS[category].vehiclesDestroyed),
     assists: fieldValue(fields, CATEGORY_STATS[category].assists),
     roadKills: fieldValue(fields, CATEGORY_STATS[category].roadKills)
@@ -205,10 +275,24 @@ export function equipmentPeriodStats(
   observedIndexes = entry?.observed,
   fieldTrackingStarts = null
 ) {
-  const fields = statsFields(entry, category, (value, field) =>
-    equipmentPeriodDelta(value, field, startIndex, endIndex, dates, observedIndexes, fieldTrackingStarts, category)
-  );
-  return { ...statsFromFields(category, fields, "period"), fields };
+  const delta = (field, from) =>
+    equipmentPeriodDelta(entry, field, from, endIndex, dates, observedIndexes, fieldTrackingStarts, category);
+  const fields = statsFields(entry, category, (value, field) => delta(field, startIndex));
+  // Both halves of a rate, read over the later of their two starts, so the
+  // window a rate describes is one span rather than two.
+  const alignedPair = (numeratorField, denominatorField) => {
+    const numerator = fields[numeratorField];
+    const denominator = fields[denominatorField];
+    if (!numerator?.known || !denominator?.known) return [null, null];
+    if (numerator.startIndex === denominator.startIndex) return [numerator.value, denominator.value];
+    const from = Math.max(numerator.startIndex, denominator.startIndex);
+    const alignedNumerator = delta(numeratorField, from);
+    const alignedDenominator = delta(denominatorField, from);
+    return alignedNumerator.known && alignedDenominator.known
+      ? [alignedNumerator.value, alignedDenominator.value]
+      : [null, null];
+  };
+  return { ...statsFromFields(category, fields, "period", alignedPair), fields };
 }
 
 export function latestObservedIndex(observedIndexes) {
