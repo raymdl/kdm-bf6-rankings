@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-equipment-coverage-36";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-panel-loop-37";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260815-equipment-coverage-36";
+} from "./period.js?v=20260815-panel-loop-37";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,8 +26,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260815-equipment-coverage-36";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-equipment-coverage-36";
+} from "./view-state.js?v=20260815-panel-loop-37";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-panel-loop-37";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -37,7 +37,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260815-equipment-coverage-36";
+} from "./equipment.js?v=20260815-panel-loop-37";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -2271,7 +2271,10 @@ function panelHtml(id, title, defaultOpen, body, extraClass = "") {
 }
 
 function deferredEquipmentPanelHtml() {
-  return `<p class="equipment-empty">Expand to load weapon and vehicle leaderboards.</p>`;
+  // The marker is what tells the panel's toggle handler that this body is still
+  // waiting for its data. "Empty" alone cannot: a member with nothing recorded
+  // renders the same class and must not be mistaken for unloaded.
+  return `<p class="equipment-empty" data-equipment-deferred="1">Expand to load weapon and vehicle leaderboards.</p>`;
 }
 
 function equipmentBoardPanelBody(defaultOpen, selectedId = null, metric = "kills") {
@@ -3606,9 +3609,19 @@ function wireDeferredEquipmentPanel() {
   if (!panel) return;
   panel.addEventListener("toggle", async () => {
     if (!panel.open) return;
-    const scrollY = window.scrollY;
     const body = panel.querySelector(":scope > .stat-panel-body");
-    if (body) body.innerHTML = `<div class="equipment-loading">Loading equipment data…</div>`;
+    // Inserting `<details open>` through innerHTML queues a toggle event, and
+    // the panel renders open from persisted state on every later render. Left
+    // unguarded this handler re-renders itself: render writes the panel, the
+    // queued toggle fires, and it renders again about a hundred times a second.
+    // The page never stops repainting, so a real click cannot survive from
+    // mousedown to mouseup and every control inside the app goes dead.
+    // A body that is not the deferred placeholder has already been rendered
+    // with whatever it should show, so this toggle came from a render rather
+    // than from the reader, and there is nothing left to load.
+    if (!body?.querySelector("[data-equipment-deferred]")) return;
+    const scrollY = window.scrollY;
+    body.innerHTML = `<div class="equipment-loading">Loading equipment data…</div>`;
     await loadEquipmentData();
     await render();
     window.scrollTo(0, scrollY);
