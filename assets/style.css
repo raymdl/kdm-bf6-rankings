@@ -26,6 +26,7 @@
   /* Vertical gap between top-level blocks -- panels, cards, toolbars, podium.
      Matches the activity feed's item gap so every page keeps one rhythm. */
   --block-gap: 0.875rem;
+  --search-clear-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M4 4l8 8M12 4l-8 8' stroke='black' stroke-width='2' stroke-linecap='round' fill='none'/></svg>") center / contain no-repeat;
   --font-display: "Rajdhani", "Segoe UI", system-ui, sans-serif;
   --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
 }
@@ -744,6 +745,30 @@ tr.r3 .rank-cell { color: var(--bronze); }
 
 .player-search input:focus {
   outline: 1px solid var(--accent);
+}
+
+/* The clear button is drawn rather than left to the browser: Chrome renders its
+   own in an accent blue that reads as a link against these dark fields, and it
+   is not one. Grey until you reach for it. Covers every search field on the
+   site -- Players, Activity and the Audit Log all use type="search". */
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0.85em;
+  height: 0.85em;
+  cursor: pointer;
+  background-color: var(--text-faint);
+  -webkit-mask: var(--search-clear-mask);
+  mask: var(--search-clear-mask);
+}
+
+input[type="search"]:hover::-webkit-search-cancel-button,
+input[type="search"]:focus::-webkit-search-cancel-button {
+  background-color: var(--text-dim);
+}
+
+input[type="search"]::-webkit-search-cancel-button:hover {
+  background-color: var(--text);
 }
 
 .sr-only {

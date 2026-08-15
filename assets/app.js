@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-audit-search-49";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-audit-search-50";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260815-audit-search-49";
+} from "./period.js?v=20260815-audit-search-50";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,8 +26,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260815-audit-search-49";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-audit-search-49";
+} from "./view-state.js?v=20260815-audit-search-50";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-audit-search-50";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -37,7 +37,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260815-audit-search-49";
+} from "./equipment.js?v=20260815-audit-search-50";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
