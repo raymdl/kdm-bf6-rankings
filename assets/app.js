@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-coverage-badges-48";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-audit-search-49";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260815-coverage-badges-48";
+} from "./period.js?v=20260815-audit-search-49";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,8 +26,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260815-coverage-badges-48";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-coverage-badges-48";
+} from "./view-state.js?v=20260815-audit-search-49";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-audit-search-49";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -37,7 +37,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260815-coverage-badges-48";
+} from "./equipment.js?v=20260815-audit-search-49";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -3206,7 +3206,6 @@ function renderAudit() {
     return;
   }
   const events = [...(state.audit.events ?? [])].reverse();
-  const text = auditFilterState.text.toLowerCase();
   const filtered = events.filter((event) => {
     if (auditFilterState.action !== "all" && event.action !== auditFilterState.action) {
       return false;
@@ -3214,25 +3213,29 @@ function renderAudit() {
     if (auditFilterState.outcome !== "all" && auditOutcome(event) !== auditFilterState.outcome) {
       return false;
     }
-    if (!text) {
-      return true;
-    }
-    return [
-      event.displayName,
-      event.discordUsername,
-      event.eaName,
-      event.previousEaName,
-      event.profileName,
-      event.playerId,
-      event.nucleusId,
-      event.trackerProfileId,
-      event.previousTrackerProfileId,
-      event.requesterUsername,
-      event.failureReason
-    ]
-      .filter(Boolean)
-      .some((field) => String(field).toLowerCase().includes(text));
+    return true;
   });
+
+  // The text filter hides rows that are already on the page rather than
+  // rebuilding it. Re-rendering per keystroke destroyed the input the keystroke
+  // came from, and focus went with it -- one letter per click into the box.
+  // Activity and Players have always filtered in place; this now matches.
+  const searchIndex = (event) => [
+    event.displayName,
+    event.discordUsername,
+    event.eaName,
+    event.previousEaName,
+    event.profileName,
+    event.playerId,
+    event.nucleusId,
+    event.trackerProfileId,
+    event.previousTrackerProfileId,
+    event.requesterUsername,
+    event.failureReason
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
 
   app.innerHTML = `
     <h1 class="page-title">Audit Log</h1>
@@ -3265,7 +3268,7 @@ function renderAudit() {
         <thead><tr><th>When</th><th>Action</th><th>Result</th><th>Discord member</th><th>EA account</th><th>Persona / Player ID</th><th>User / Nucleus ID</th><th>Platform</th><th>Tracker.gg ID</th></tr></thead>
         <tbody>${filtered
           .map(
-            (event) => `<tr>
+            (event) => `<tr data-audit-search="${esc(searchIndex(event))}">
               <td>${fmtDateTime(event.at)}</td>
               <td><span class="badge ${esc(event.action)}">${esc(auditActionLabel(event.action))}</span></td>
               <td><span class="badge ${esc(auditOutcome(event))}">${esc(auditOutcome(event))}</span>${
@@ -3283,18 +3286,27 @@ function renderAudit() {
               <td class="mono">${esc(event.trackerProfileId ?? "—")}</td>
             </tr>`
           )
-          .join("") || `<tr><td colspan="9" class="empty">No matching events.</td></tr>`}</tbody>
+          .join("") || `<tr><td colspan="9" class="empty">No matching events.</td></tr>`}
+          <tr id="audit-search-empty" hidden><td colspan="9" class="empty">No matching events.</td></tr></tbody>
       </table>
     </div>`;
 
   const search = document.getElementById("audit-search");
-  search.addEventListener("input", () => {
+  const rows = [...app.querySelectorAll("[data-audit-search]")];
+  const searchEmpty = document.getElementById("audit-search-empty");
+  const applyTextFilter = () => {
     auditFilterState.text = search.value;
-    render();
-    const restored = document.getElementById("audit-search");
-    restored.focus();
-    restored.setSelectionRange(restored.value.length, restored.value.length);
-  });
+    const query = search.value.trim().toLowerCase();
+    let visible = 0;
+    for (const row of rows) {
+      row.hidden = Boolean(query) && !row.dataset.auditSearch.includes(query);
+      if (!row.hidden) visible += 1;
+    }
+    if (searchEmpty) searchEmpty.hidden = visible > 0 || rows.length === 0;
+  };
+  search.addEventListener("input", applyTextFilter);
+  // A dropdown change rebuilds the rows, so the typed filter is reapplied.
+  applyTextFilter();
   document.getElementById("audit-action").addEventListener("change", (event) => {
     auditFilterState.action = event.target.value;
     render();
