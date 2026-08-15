@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-coverage-badges-47";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-coverage-badges-48";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260815-coverage-badges-47";
+} from "./period.js?v=20260815-coverage-badges-48";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,8 +26,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260815-coverage-badges-47";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-coverage-badges-47";
+} from "./view-state.js?v=20260815-coverage-badges-48";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-coverage-badges-48";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -37,7 +37,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260815-coverage-badges-47";
+} from "./equipment.js?v=20260815-coverage-badges-48";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -875,19 +875,22 @@ document.addEventListener("keydown", (event) => {
   replaceHashAndRender(location.hash);
 });
 
-// A drawn clip rather than the emoji: 📎 is a colour glyph that ignores `color`,
-// so it arrived brown inside both badges. This one is stroked with currentColor
-// and takes whichever badge it sits in.
-const COVERAGE_CLIP_SVG =
-  '<svg class="badge-clip" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
-  '<path d="M16.5 6.75v7.75a4.5 4.5 0 0 1-9 0V6a3 3 0 0 1 6 0v8.25a1.5 1.5 0 0 1-3 0V7.25"' +
-  ' fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+// A drawn mark rather than a typed one: an emoji is a colour glyph that ignores
+// `color`, so it arrived brown inside both badges. This is stroked and filled
+// with currentColor and takes whichever badge it sits in.
+//
+// A half-filled circle because that is what the badge actually reports: this
+// row covers part of the range you asked for, not all of it.
+const COVERAGE_MARK_SVG =
+  '<svg class="badge-mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+  '<circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2.2"/>' +
+  '<path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" stroke="none"/></svg>';
 
 function trackedSinceBadgeHtml(window, trackedSince, title = "This member's tracking began after this range's start; their stats cover their own tracked portion of it") {
   if (!window || !trackedSince || trackedSince === window.startDate) {
     return "";
   }
-  return ` <span class="badge tracked-since" title="${esc(title)}">stat${COVERAGE_CLIP_SVG}${esc(fmtBadgeDate(trackedSince))}</span>`;
+  return ` <span class="badge tracked-since" title="${esc(title)}">stat${COVERAGE_MARK_SVG}${esc(fmtBadgeDate(trackedSince))}</span>`;
 }
 
 // On an equipment board the shortfall can be the member's own start date or the
@@ -1600,7 +1603,7 @@ function equipmentActiveTime(stats, category, metric) {
 function equipmentTimeSinceBadgeHtml(since, category) {
   if (!since) return "";
   const noun = category === "vehicles" ? "Time in this vehicle" : "Time on this weapon";
-  return ` <span class="badge time-since" title="${esc(noun)} has only been recorded since ${esc(fmtShortDate(since))}, so the Active Time total covers that part of the range while the figure beside it covers all of it">time${COVERAGE_CLIP_SVG}${esc(fmtBadgeDate(since))}</span>`;
+  return ` <span class="badge time-since" title="${esc(noun)} has only been recorded since ${esc(fmtShortDate(since))}, so the Active Time total covers that part of the range while the figure beside it covers all of it">time${COVERAGE_MARK_SVG}${esc(fmtBadgeDate(since))}</span>`;
 }
 
 function equipmentLeaderboardRows(selectedId, category, metric, periodWindow, usePeriod, careerWindow) {

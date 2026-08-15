@@ -1974,12 +1974,14 @@ tr.period-provisional {
   color: var(--gold);
 }
 
-/* The clip is drawn rather than typed, so it takes the badge's own colour. */
-.badge-clip {
-  width: 0.72em;
-  height: 0.72em;
-  vertical-align: -0.08em;
-  margin: 0 0.06em;
+/* Drawn rather than typed, so it takes the badge's own colour. Sized above the
+   badge's own text: the half-fill is the meaning, and it has to survive at
+   0.72rem to be read as half rather than as a dot. */
+.badge-mark {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.14em;
+  margin: 0 0.25em;
 }
 .badge.tracked-since {
   background: rgba(122, 184, 255, 0.14);
