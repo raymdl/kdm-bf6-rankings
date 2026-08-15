@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-period-active-time-40";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-coverage-badges-41";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260815-period-active-time-40";
+} from "./period.js?v=20260815-coverage-badges-41";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,8 +26,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260815-period-active-time-40";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-period-active-time-40";
+} from "./view-state.js?v=20260815-coverage-badges-41";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-coverage-badges-41";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -37,7 +37,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260815-period-active-time-40";
+} from "./equipment.js?v=20260815-coverage-badges-41";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -611,6 +611,12 @@ function fmtShortDate(date) {
   return fmtDate(`${date}T12:00:00`);
 }
 
+// Month and day only. Coverage badges sit inline beside a player's name, often
+// two at once, and the year pushes them wide enough to crowd the name off.
+function fmtBadgeDate(date) {
+  return new Date(`${date}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 // Snapshot dates use the Eastern calendar day.
 function easternDateKey(iso) {
   return new Date(iso).toLocaleDateString("en-CA", { timeZone: "America/New_York" });
@@ -873,7 +879,7 @@ function trackedSinceBadgeHtml(window, trackedSince, title = "This member's trac
   if (!window || !trackedSince || trackedSince === window.startDate) {
     return "";
   }
-  return ` <span class="badge tracked-since" title="${esc(title)}">tracked since ${esc(fmtShortDate(trackedSince))}</span>`;
+  return ` <span class="badge tracked-since" title="${esc(title)}">stat tracked since ${esc(fmtBadgeDate(trackedSince))}</span>`;
 }
 
 // On an equipment board the shortfall can be the member's own start date or the
@@ -1580,13 +1586,13 @@ function equipmentActiveTime(stats, category, metric) {
   };
 }
 
-// Gold, against the blue of the player's own tracked-since badge: this one
-// dates the equipped time rather than the player, and the two can appear on the
-// same row.
+// Gold, against the blue of the player's own tracked-since badge, and sitting
+// next to it in the player cell: one dates the stat, the other the play time
+// behind it, and a row can carry both.
 function equipmentTimeSinceBadgeHtml(since, category) {
   if (!since) return "";
   const noun = category === "vehicles" ? "Time in this vehicle" : "Time on this weapon";
-  return ` <span class="badge time-since" title="${esc(noun)} has only been recorded since ${esc(fmtShortDate(since))}, so this total covers that part of the range while the figure beside it covers all of it">since ${esc(fmtShortDate(since))}</span>`;
+  return ` <span class="badge time-since" title="${esc(noun)} has only been recorded since ${esc(fmtShortDate(since))}, so the Active Time total covers that part of the range while the figure beside it covers all of it">play time tracked since ${esc(fmtBadgeDate(since))}</span>`;
 }
 
 function equipmentLeaderboardRows(selectedId, category, metric, periodWindow, usePeriod, careerWindow) {
@@ -1707,9 +1713,9 @@ function renderEquipmentLeaderboard(params) {
         const delta = equipmentDeltaText(metric, row.change);
         const deltaClass = Number.isFinite(row.change) ? (row.change > 0 ? "up" : row.change < 0 ? "down" : "flat") : "flat";
         const trailingCell = usePeriod
-          ? `<td class="num">${esc(activeTimeText(row.activeSeconds))}${equipmentTimeSinceBadgeHtml(row.activeSince, selected?.category)}</td>`
+          ? `<td class="num">${esc(activeTimeText(row.activeSeconds))}</td>`
           : `<td class="num"><span class="delta ${deltaClass}">${delta}</span></td>`;
-        return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${usePeriod ? trackedSinceBadgeHtml(periodWindow, row.coverageStart, EQUIPMENT_COVERAGE_BADGE_TITLE) : ""}</td><td class="num value-cell">${equipmentValueText(metric, row.value)}</td>${trailingCell}<td>${sparklineSvg(row.trend)}</td></tr>`;
+        return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${usePeriod ? `${trackedSinceBadgeHtml(periodWindow, row.coverageStart, EQUIPMENT_COVERAGE_BADGE_TITLE)}${equipmentTimeSinceBadgeHtml(row.activeSince, selected?.category)}` : ""}</td><td class="num value-cell">${equipmentValueText(metric, row.value)}</td>${trailingCell}<td>${sparklineSvg(row.trend)}</td></tr>`;
       }).join("")
     : `<tr><td colspan="5" class="empty">No observed ${esc(EQUIPMENT_METRIC_LABELS[metric])} for this equipment item in the selected range.</td></tr>`;
   const equipmentName = selected ? equipmentDisplayName(selected.category, selected.id) : "Equipment";
