@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-chip-fallback-38";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-period-active-time-39";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260815-chip-fallback-38";
+} from "./period.js?v=20260815-period-active-time-39";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,8 +26,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260815-chip-fallback-38";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-chip-fallback-38";
+} from "./view-state.js?v=20260815-period-active-time-39";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-period-active-time-39";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -37,7 +37,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260815-chip-fallback-38";
+} from "./equipment.js?v=20260815-period-active-time-39";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -1564,6 +1564,16 @@ function equipmentCoverageStart(stats, category, metric) {
     .at(-1) ?? null;
 }
 
+// Time on the item across the window the displayed value covers, or null when
+// the two do not line up. See the call site for why an unknown is better than
+// the zero the raw reading would give.
+function equipmentActiveSeconds(stats, category, metric) {
+  const timeField = category === "vehicles" ? "timeIn" : "timeEquipped";
+  const time = stats.fields?.[timeField];
+  if (!time?.known) return null;
+  return time.startDate === equipmentCoverageStart(stats, category, metric) ? stats.timeSeconds : null;
+}
+
 function equipmentLeaderboardRows(selectedId, category, metric, periodWindow, usePeriod, careerWindow) {
   const comparisonIndexes = usePeriod
     ? Array.from({ length: periodWindow.endIndex - periodWindow.startIndex + 1 }, (_, offset) => periodWindow.startIndex + offset)
@@ -1592,6 +1602,17 @@ function equipmentLeaderboardRows(selectedId, category, metric, periodWindow, us
         // being recorded mid-window, or a member linked after it began — so each
         // row carries the date its own figure starts from.
         coverageStart: usePeriod ? equipmentCoverageStart(stats, category, metric) : null,
+        // How long this item was actually carried in the window. Career keeps
+        // showing movement instead: over a window, the change and the value are
+        // the same subtraction, so a Change column would just print the figure
+        // beside itself.
+        //
+        // Reported only when it covers the same span as the value beside it.
+        // Equipped time has been recorded for less of the past than kills have,
+        // so a long window can hold a full fortnight of kills against a few days
+        // of carry time, and printing "0 min" next to 119 kills reads as a bug
+        // rather than as two different spans.
+        activeSeconds: usePeriod ? equipmentActiveSeconds(stats, category, metric) : null,
         trend: equipmentTrend(entry, member, category, metric, comparisonIndexes, usePeriod ? comparisonStart : null)
       };
     })
@@ -1605,16 +1626,24 @@ function equipmentDeltaText(metric, value) {
   return `${value > 0 ? "+" : "−"}${equipmentValueText(metric, Math.abs(value))}`;
 }
 
-function equipmentPodiumHtml(rows, metric, windowText) {
+// Career cards carry movement against the comparison window. Period cards carry
+// time on the item instead, the same way the soldier Period podium reads: the
+// window's change is its value, so printing both says one thing twice.
+function equipmentPodiumHtml(rows, metric, windowText, usePeriod = false, category = "weapons") {
   return rows.length
     ? `<div class="podium">${rows.slice(0, 3).map((row, index) => {
         const delta = equipmentDeltaText(metric, row.change);
         const deltaClass = Number.isFinite(row.change) ? (row.change > 0 ? "up" : row.change < 0 ? "down" : "flat") : "";
+        const footer = usePeriod
+          ? `${esc(activeTimeText(row.activeSeconds))} on this ${category === "vehicles" ? "vehicle" : "weapon"} this period`
+          : delta !== "–"
+            ? `<span class="podium-delta-value ${deltaClass}">${delta}</span> <span class="podium-delta-context">vs ${esc(windowText)}</span>`
+            : "&nbsp;";
         return `<div class="podium-card p${index + 1}">
           <div class="podium-rank">#${index + 1}${index === 0 ? " · TOP DOG" : ""}</div>
           <div class="podium-name"><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a></div>
           <div class="podium-value">${equipmentValueText(metric, row.value)} <span class="podium-stat-label">${esc(EQUIPMENT_METRIC_LABELS[metric])}</span></div>
-          <div class="podium-delta">${delta !== "–" ? `<span class="podium-delta-value ${deltaClass}">${delta}</span> <span class="podium-delta-context">vs ${esc(windowText)}</span>` : "&nbsp;"}</div>
+          <div class="podium-delta">${footer}</div>
         </div>`;
       }).join("")}</div>`
     : "";
@@ -1642,7 +1671,8 @@ function renderEquipmentLeaderboard(params) {
     rank: row.originalRank,
     player: row.name,
     value: row.value,
-    change: row.change
+    change: row.change,
+    time: row.activeSeconds
   })[key]);
   const periodNote = viewRangeState.view === "period"
     ? !periodWindow
@@ -1662,7 +1692,10 @@ function renderEquipmentLeaderboard(params) {
     ? sorted.map((row) => {
         const delta = equipmentDeltaText(metric, row.change);
         const deltaClass = Number.isFinite(row.change) ? (row.change > 0 ? "up" : row.change < 0 ? "down" : "flat") : "flat";
-        return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${usePeriod ? trackedSinceBadgeHtml(periodWindow, row.coverageStart, EQUIPMENT_COVERAGE_BADGE_TITLE) : ""}</td><td class="num value-cell">${equipmentValueText(metric, row.value)}</td><td class="num"><span class="delta ${deltaClass}">${delta}</span></td><td>${sparklineSvg(row.trend)}</td></tr>`;
+        const trailingCell = usePeriod
+          ? `<td class="num"${Number.isFinite(row.activeSeconds) ? "" : ` title="Time on this ${selected?.category === "vehicles" ? "vehicle" : "weapon"} has been recorded for less of this range than the figure beside it, so there is no matching total to show"`}>${esc(activeTimeText(row.activeSeconds))}</td>`
+          : `<td class="num"><span class="delta ${deltaClass}">${delta}</span></td>`;
+        return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${usePeriod ? trackedSinceBadgeHtml(periodWindow, row.coverageStart, EQUIPMENT_COVERAGE_BADGE_TITLE) : ""}</td><td class="num value-cell">${equipmentValueText(metric, row.value)}</td>${trailingCell}<td>${sparklineSvg(row.trend)}</td></tr>`;
       }).join("")
     : `<tr><td colspan="5" class="empty">No observed ${esc(EQUIPMENT_METRIC_LABELS[metric])} for this equipment item in the selected range.</td></tr>`;
   const equipmentName = selected ? equipmentDisplayName(selected.category, selected.id) : "Equipment";
@@ -1674,8 +1707,8 @@ function renderEquipmentLeaderboard(params) {
     ${viewRangeControlHtml()}
     ${panelHtml("panel-soldier", "Soldier Stats", false, statTabsHtml(null, (key) => hashRoute(`board/${key}`, viewRangeParams())))}
     ${panelHtml("panel-equipment", "Weapon/Vehicle Stats", true, `${artifactNote}${periodNote}${equipmentBoardPanelBody(true, selected?.id ?? null, metric)}`)}
-    ${equipmentPodiumHtml(rows, metric, windowText)}
-    ${selected ? `<div class="table-wrap equipment-leaderboard-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(heading, "value", leaderboardSortState, { numeric: true })}${sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th>Trend</th></tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
+    ${equipmentPodiumHtml(rows, metric, windowText, usePeriod, selected?.category ?? "weapons")}
+    ${selected ? `<div class="table-wrap equipment-leaderboard-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(heading, "value", leaderboardSortState, { numeric: true })}${usePeriod ? sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true }) : sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th>${usePeriod ? "Daily trend" : "Trend"}</th></tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
   const equipmentHref = (rangeParams) => hashRoute("board/equipment", { equipment: selected?.id ?? null, metric: metric === "kills" ? null : metric, ...rangeParams });
   wireViewRangeControl(equipmentHref);
   wireStatTabs();
