@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-panel-loop-37";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-chip-fallback-38";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260815-panel-loop-37";
+} from "./period.js?v=20260815-chip-fallback-38";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,8 +26,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260815-panel-loop-37";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-panel-loop-37";
+} from "./view-state.js?v=20260815-chip-fallback-38";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-chip-fallback-38";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -37,7 +37,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260815-panel-loop-37";
+} from "./equipment.js?v=20260815-chip-fallback-38";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -1422,13 +1422,18 @@ function equipmentMetricAppliesTo(metric, category) {
   return equipmentMetricCategories(metric).includes(category);
 }
 
-function equipmentButtonHtml(category, id, selectedId, disabled = false) {
-  const title = disabled
-    ? `Not recorded for ${category === "vehicles" ? "vehicles" : "weapons"}`
+// `unavailable` greys the chip without disabling it, the same bargain the stat
+// tabs strike: the stat on screen cannot be read for this half of the panel, but
+// the chip is still the way to get to that item. Blocking the click meant
+// picking a vehicle from a weapon-only stat took two moves through a stat you
+// did not want, so the click is allowed and it takes the stat back to Kills.
+function equipmentButtonHtml(category, id, selectedId, unavailable = false) {
+  const title = unavailable
+    ? `Not recorded for ${category === "vehicles" ? "vehicles" : "weapons"} — opens this ${category === "vehicles" ? "vehicle" : "weapon"} on Kills`
     : category === "vehicles"
       ? (equipmentCatalogue()?.vehicles?.[id]?.vehicles ?? []).join(", ")
       : weaponClassLabel(equipmentCatalogue()?.weapons?.[id]?.class ?? weaponClassId(id));
-  return `<button type="button" class="equipment-chip${id === selectedId ? " active" : ""}" data-equipment="${esc(id)}" data-equipment-category="${esc(category)}"${title ? ` title="${esc(title)}"` : ""}${disabled ? " disabled aria-disabled=\"true\"" : ""}>${esc(equipmentDisplayName(category, id))}</button>`;
+  return `<button type="button" class="equipment-chip${id === selectedId ? " active" : ""}${unavailable ? " unavailable" : ""}" data-equipment="${esc(id)}" data-equipment-category="${esc(category)}"${title ? ` title="${esc(title)}"` : ""}>${esc(equipmentDisplayName(category, id))}</button>`;
 }
 
 // The stat is pickable first and the item second: a metric button is never
@@ -1480,15 +1485,15 @@ function equipmentPanelHtml(selectedId, selectedMetric = null, source = null) {
       ? "vehicles"
       : null;
   // An item that cannot report the selected stat is greyed rather than hidden:
-  // it still shows what exists, and greying names the reason the click does
-  // nothing instead of silently retargeting the stat.
-  const weaponsDisabled = !equipmentMetricAppliesTo(selectedMetric, "weapons");
-  const vehiclesDisabled = !equipmentMetricAppliesTo(selectedMetric, "vehicles");
+  // it still shows what exists, and the greying says why this stat is not the
+  // one you will land on.
+  const weaponsUnavailable = !equipmentMetricAppliesTo(selectedMetric, "weapons");
+  const vehiclesUnavailable = !equipmentMetricAppliesTo(selectedMetric, "vehicles");
   const weaponRows = groups.weapons
-    .map((group) => `<div class="equipment-class"><h4>${esc(group.label)}</h4><div class="equipment-chips">${group.items.map((id) => equipmentButtonHtml("weapons", id, selectedId, weaponsDisabled)).join("")}</div></div>`)
+    .map((group) => `<div class="equipment-class"><h4>${esc(group.label)}</h4><div class="equipment-chips">${group.items.map((id) => equipmentButtonHtml("weapons", id, selectedId, weaponsUnavailable)).join("")}</div></div>`)
     .join("");
   const vehicleRows = groups.vehicles
-    .map((group) => `<div class="equipment-class"><h4>${esc(group.label)}</h4><div class="equipment-chips">${group.items.map((id) => equipmentButtonHtml("vehicles", id, selectedId, vehiclesDisabled)).join("")}</div></div>`)
+    .map((group) => `<div class="equipment-class"><h4>${esc(group.label)}</h4><div class="equipment-chips">${group.items.map((id) => equipmentButtonHtml("vehicles", id, selectedId, vehiclesUnavailable)).join("")}</div></div>`)
     .join("");
   const firstWeapon = groups.weapons[0]?.items[0] ?? "";
   const firstVehicle = groups.vehicles[0]?.items[0] ?? "";

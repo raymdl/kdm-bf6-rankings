@@ -2291,12 +2291,19 @@ tr.period-provisional {
 .equipment-chip[data-equipment-category="vehicles"] { padding: 5px 10px 3px; }
 .equipment-chip:hover:not(:disabled) { background: rgba(255, 255, 255, 0.12); opacity: 1; }
 /* The selected stat cannot be read for this half of the panel. Greyed rather
-   than removed: the item still exists, it just has nothing to say here. */
+   than removed: the item still exists, it just has nothing to say under this
+   stat. Still clickable, and it lifts toward full strength on hover, because
+   taking it is what moves you to a stat that does apply. */
 .equipment-chip:disabled {
   color: var(--text-faint);
   opacity: 0.35;
   cursor: not-allowed;
 }
+.equipment-chip.unavailable {
+  color: var(--text-faint);
+  opacity: 0.35;
+}
+.equipment-chip.unavailable:hover { opacity: 0.7; }
 .equipment-chip.active {
   background: var(--equipment-accent);
   color: #10131a;
