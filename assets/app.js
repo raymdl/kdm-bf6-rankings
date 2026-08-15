@@ -1,7 +1,7 @@
 /* KDM BF6 Rankings — static SPA reading data/*.json published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN. */
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-coverage-badges-41";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-coverage-badges-42";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +12,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260815-coverage-badges-41";
+} from "./period.js?v=20260815-coverage-badges-42";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,8 +26,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260815-coverage-badges-41";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-coverage-badges-41";
+} from "./view-state.js?v=20260815-coverage-badges-42";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-coverage-badges-42";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -37,7 +37,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260815-coverage-badges-41";
+} from "./equipment.js?v=20260815-coverage-badges-42";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -1592,7 +1592,7 @@ function equipmentActiveTime(stats, category, metric) {
 function equipmentTimeSinceBadgeHtml(since, category) {
   if (!since) return "";
   const noun = category === "vehicles" ? "Time in this vehicle" : "Time on this weapon";
-  return ` <span class="badge time-since" title="${esc(noun)} has only been recorded since ${esc(fmtShortDate(since))}, so the Active Time total covers that part of the range while the figure beside it covers all of it">play time tracked since ${esc(fmtBadgeDate(since))}</span>`;
+  return ` <span class="badge time-since" title="${esc(noun)} has only been recorded since ${esc(fmtShortDate(since))}, so the Active Time total covers that part of the range while the figure beside it covers all of it">time tracked since ${esc(fmtBadgeDate(since))}</span>`;
 }
 
 function equipmentLeaderboardRows(selectedId, category, metric, periodWindow, usePeriod, careerWindow) {
