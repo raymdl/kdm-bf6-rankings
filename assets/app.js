@@ -2346,7 +2346,10 @@ function deferredEquipmentPanelHtml() {
   return `<p class="equipment-empty" data-equipment-deferred="1">Expand to load weapon and vehicle leaderboards.</p>`;
 }
 
-function equipmentBoardPanelBody(defaultOpen, selectedId = null, metric = "kills") {
+// `metric` defaults to null so the panel highlights nothing when it is mounted
+// as a way in from a soldier-stat board or the players list: a lit-up Kills chip
+// there reads as if it describes the table on screen, which it does not.
+function equipmentBoardPanelBody(defaultOpen, selectedId = null, metric = null) {
   return panelIsOpen("panel-equipment", defaultOpen)
     ? equipmentPanelHtml(selectedId, metric)
     : deferredEquipmentPanelHtml();
