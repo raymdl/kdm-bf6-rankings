@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-16T06:22:26.499Z",
+  "updatedAt": "2026-08-16T06:28:01.294Z",
   "events": [
     {
       "at": "2026-07-06T15:06:25.829Z",
@@ -2111,6 +2111,24 @@
       "messageId": "roster-visibility-source-dyno-1537281797681971201",
       "resultMessageId": null,
       "source": "server_presence"
+    },
+    {
+      "at": "2026-08-16T06:27:24.176Z",
+      "action": "linked",
+      "outcome": "success",
+      "failureReason": null,
+      "discordId": "299328449305116672",
+      "discordUsername": "deepinyomomy",
+      "displayName": "DeepInYoMomy",
+      "eaName": "aarp_tacodefiler",
+      "previousEaName": null,
+      "playerId": "983143926",
+      "nucleusId": "2332310834",
+      "platform": "ea",
+      "platformId": "cem_ea_id",
+      "profileName": "AARP_TacoDefiler",
+      "messageId": "1538433982612381776",
+      "resultMessageId": "1538434047666294794"
     }
   ]
 }
