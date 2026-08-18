@@ -235,6 +235,13 @@ main {
   outline-offset: 3px;
 }
 
+/* Data older than the largest scheduled gap means a refresh was missed, so the
+   footer stops being quiet background text and says so. */
+#footer-updated.stale {
+  color: var(--warning, #f5a524);
+  font-weight: 600;
+}
+
 .site-footer {
   display: flex;
   justify-content: space-between;

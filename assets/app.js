@@ -1,7 +1,13 @@
-/* KDM BF6 Rankings — static SPA reading data/*.json published by the
-   kdm-discord-bot daily update. No build step; Chart.js from CDN. */
+/* KDM BF6 Rankings — static SPA reading the generated JSON published by the
+   kdm-discord-bot daily update. No build step; Chart.js from CDN.
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260815-audit-search-50";
+   Data files are resolved through assets/data-source.js rather than fetched by
+   literal path, so the app does not care whether they come from R2 or from this
+   repository. */
+
+import { dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20260818-r2-cutover-51";
+
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260818-r2-cutover-51";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -12,7 +18,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260815-audit-search-50";
+} from "./period.js?v=20260818-r2-cutover-51";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -26,8 +32,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260815-audit-search-50";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260815-audit-search-50";
+} from "./view-state.js?v=20260818-r2-cutover-51";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260818-r2-cutover-51";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -37,7 +43,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260815-audit-search-50";
+} from "./equipment.js?v=20260818-r2-cutover-51";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -107,6 +113,13 @@ function fmtDelta(stat, delta) {
 
 function fmtDate(iso) {
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function formatAge(ms) {
+  const hours = Math.floor(ms / 3600000);
+  if (hours < 48) return `${hours} hour${hours === 1 ? "" : "s"}`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days === 1 ? "" : "s"}`;
 }
 
 function fmtDateTime(iso) {
@@ -2510,7 +2523,7 @@ async function fetchEquipmentProfile(discordId) {
   if (equipmentProfileLoads.has(discordId)) return equipmentProfileLoads.get(discordId);
   const load = (async () => {
     try {
-      const response = await fetch(`data/equipment/${encodeURIComponent(discordId)}.json`, { cache: "no-cache" });
+      const response = await fetch(dataUrl(`data/equipment/${encodeURIComponent(discordId)}.json`), dataFetchOptions());
       if (response.status === 404) return { status: "missing" };
       if (!response.ok) return { status: "error" };
       const data = await response.json();
@@ -3569,7 +3582,9 @@ function renderEffectiveness(requestedKey) {
 
 async function fetchJson(path, fallback, { essential = false } = {}) {
   try {
-    const response = await fetch(path, { cache: "no-cache" });
+    // `path` stays the repository-relative logical name so failure messages and
+    // the failedDataFiles keys remain readable; only the request is redirected.
+    const response = await fetch(dataUrl(path), dataFetchOptions());
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const value = await response.json();
     failedDataFiles.delete(path);
@@ -3809,6 +3824,15 @@ function bootFailureNoticeHtml() {
 }
 
 async function boot() {
+  const release = await initDataSource();
+  if (!release) {
+    const { failureReason } = dataSourceStatus();
+    app.innerHTML = `<div class="error-box" role="alert"><strong>Live data is unavailable.</strong><br />
+      Could not read the published release pointer${failureReason ? ` (${esc(failureReason)})` : ""}.
+      This is a publication problem, not a problem with your connection — try again shortly.</div>`;
+    return;
+  }
+
   await loadBaseData();
 
   if (!state.meta) {
@@ -3818,7 +3842,13 @@ async function boot() {
   }
 
   const updated = document.getElementById("footer-updated");
+  const age = dataAge();
   updated.textContent = `Last updated ${fmtDateTime(state.meta.updatedAt)} ET`;
+  if (age.known && age.stale) {
+    updated.classList.add("stale");
+    updated.textContent += ` — ${formatAge(age.ageMs)} old`;
+    updated.title = `Newest published refresh is ${age.refreshId}. A refresh appears to have been missed.`;
+  }
 
   window.addEventListener("hashchange", render);
   await render();
