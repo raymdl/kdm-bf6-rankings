@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updatedAt": "2026-08-16T13:02:55.085Z",
+  "updatedAt": "2026-08-18T23:26:10.792Z",
   "events": [
     {
       "at": "2026-07-06T15:06:25.829Z",
@@ -1578,6 +1578,29 @@
       "action": "tracker_linked",
       "outcome": "success",
       "failureReason": null,
+      "discordId": "647037738792648715",
+      "discordUsername": "sorathfps",
+      "displayName": "SorathBF",
+      "requesterId": null,
+      "requesterUsername": null,
+      "trackerProfileId": "1006928678585",
+      "previousTrackerProfileId": null,
+      "trackerMappingSource": "confirmed",
+      "eaName": "TTV_SorathFPS",
+      "previousEaName": null,
+      "playerId": "1008648132947",
+      "nucleusId": "1006176732947",
+      "platform": "psn",
+      "platformId": null,
+      "profileName": "TTV_SorathFPS",
+      "messageId": "tracker-import-647037738792648715-1006928678585",
+      "resultMessageId": null
+    },
+    {
+      "at": "2026-07-14T23:19:21.686Z",
+      "action": "tracker_linked",
+      "outcome": "success",
+      "failureReason": null,
       "discordId": "754383753933226016",
       "discordUsername": "1rainy.",
       "displayName": "[KDM] Rainy",
@@ -2129,6 +2152,43 @@
       "profileName": "AARP_TacoDefiler",
       "messageId": "1538433982612381776",
       "resultMessageId": "1538434047666294794"
+    },
+    {
+      "at": "2026-08-16T17:14:15.412Z",
+      "action": "relisted",
+      "outcome": "success",
+      "failureReason": null,
+      "discordId": "647037738792648715",
+      "discordUsername": "sorathfps",
+      "displayName": "SorathBF",
+      "eaName": "TTV_SorathFPS",
+      "previousEaName": null,
+      "playerId": "1008648132947",
+      "nucleusId": "1006176732947",
+      "platform": "psn",
+      "platformId": null,
+      "profileName": "TTV_SorathFPS",
+      "messageId": "roster-visibility-source-dyno-1538596768734904412",
+      "resultMessageId": null,
+      "source": "server_presence"
+    },
+    {
+      "at": "2026-08-18T02:57:58.069Z",
+      "action": "linked",
+      "outcome": "success",
+      "failureReason": null,
+      "discordId": "940046889208909825",
+      "discordUsername": "the_audie_murphy",
+      "displayName": "LtAudieMurphy33",
+      "eaName": "LtAudieMurphy33",
+      "previousEaName": null,
+      "playerId": "1005413648774",
+      "nucleusId": "1009800648774",
+      "platform": "ea",
+      "platformId": "cem_ea_id",
+      "profileName": "LtAudieMurphy33",
+      "messageId": "1539106052270858330",
+      "resultMessageId": "1539106108067676171"
     }
   ]
 }
