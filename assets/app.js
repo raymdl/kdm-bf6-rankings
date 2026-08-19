@@ -5,9 +5,9 @@
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20260818-r2-cutover-51";
+import { dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20260819-rollback-rehearsal-52";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260818-r2-cutover-51";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260819-rollback-rehearsal-52";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -18,7 +18,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260818-r2-cutover-51";
+} from "./period.js?v=20260819-rollback-rehearsal-52";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -32,8 +32,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260818-r2-cutover-51";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260818-r2-cutover-51";
+} from "./view-state.js?v=20260819-rollback-rehearsal-52";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260819-rollback-rehearsal-52";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -43,7 +43,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260818-r2-cutover-51";
+} from "./equipment.js?v=20260819-rollback-rehearsal-52";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -3824,9 +3824,12 @@ function bootFailureNoticeHtml() {
 }
 
 async function boot() {
-  const release = await initDataSource();
-  if (!release) {
-    const { failureReason } = dataSourceStatus();
+  await initDataSource();
+  const { status: dataStatus, failureReason } = dataSourceStatus();
+  // Only a failed R2 lookup is an error. The "pages" rollback deliberately has
+  // no release pointer, and must boot normally rather than being mistaken for
+  // an outage - which is the whole point of keeping it as a rollback.
+  if (dataStatus === "failed") {
     app.innerHTML = `<div class="error-box" role="alert"><strong>Live data is unavailable.</strong><br />
       Could not read the published release pointer${failureReason ? ` (${esc(failureReason)})` : ""}.
       This is a publication problem, not a problem with your connection — try again shortly.</div>`;

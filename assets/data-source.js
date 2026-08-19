@@ -12,7 +12,7 @@
 // as published to GitHub Pages. Git publication still runs, so the data under
 // data/ stays current and this is a complete rollback on its own. Change this
 // constant, bump CACHE_VERSION in index.html, and deploy.
-const DATA_SOURCE = "r2";
+const DATA_SOURCE = "pages";
 
 const R2_BASE = "https://kdm-bf6-data.kdm-analytics.workers.dev";
 const POINTER_URL = `${R2_BASE}/current.json`;
