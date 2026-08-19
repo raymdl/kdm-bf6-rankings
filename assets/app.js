@@ -5,9 +5,9 @@
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20260819-rollback-rehearsal-52";
+import { dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20260819-r2-restored-53";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260819-rollback-rehearsal-52";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260819-r2-restored-53";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -18,7 +18,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260819-rollback-rehearsal-52";
+} from "./period.js?v=20260819-r2-restored-53";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -32,8 +32,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260819-rollback-rehearsal-52";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260819-rollback-rehearsal-52";
+} from "./view-state.js?v=20260819-r2-restored-53";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260819-r2-restored-53";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -43,7 +43,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260819-rollback-rehearsal-52";
+} from "./equipment.js?v=20260819-r2-restored-53";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
