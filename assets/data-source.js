@@ -9,9 +9,18 @@
    half one refresh and half the next. */
 
 // ROLLBACK: set to "pages" to serve every data file from this repository again,
-// as published to GitHub Pages. Git publication still runs, so the data under
-// data/ stays current and this is a complete rollback on its own. Change this
-// constant, bump CACHE_VERSION in index.html, and deploy.
+// as published to GitHub Pages.
+//
+// This is a COMPLETE rollback only while Git publication is still running, which
+// is true during Stage 5 and stops being true when Stage 6 retires it. After
+// that, data/ is a frozen snapshot and flipping this constant alone would serve
+// stale leaderboards that look current. The correct order is then: restore Git
+// publication, force a publication, verify Pages serves it, and only then change
+// this. See "Rollback is phase-specific" in the bot repository's
+// docs/BF6_R2_PUBLICATION_AND_REFRESH_SCHEDULE_IMPLEMENTATION_PLAN.md.
+//
+// Either way: change this constant, bump the cache version in index.html, and
+// deploy.
 const DATA_SOURCE = "r2";
 
 const R2_BASE = "https://kdm-bf6-data.kdm-analytics.workers.dev";
@@ -85,9 +94,13 @@ export function dataSourceStatus() {
 
 /* Freshness is the one check that survives every cause: an R2 outage, a stuck
    publisher, a bad pointer, or a Worker misconfiguration all surface here. */
-export function dataAge(now = Date.now()) {
-  const observedAt = release?.observedAt ?? null;
+export function dataAge(now = Date.now(), fallbackObservedAt = null) {
+  // In "pages" mode there is no release pointer, so the caller passes the
+  // observedAt from meta.json instead. Without it a rolled-back site shows no
+  // staleness marker at exactly the moment the data is most likely to be stale,
+  // and after Stage 6 the fallback data is frozen rather than merely lagging.
+  const observedAt = release?.observedAt ?? fallbackObservedAt;
   if (!observedAt) return { known: false, stale: false };
   const ageMs = now - Date.parse(observedAt);
-  return { known: true, ageMs, stale: ageMs > STALE_AFTER_MS, observedAt, refreshId: release.refreshId };
+  return { known: true, ageMs, stale: ageMs > STALE_AFTER_MS, observedAt, refreshId: release?.refreshId ?? null };
 }
