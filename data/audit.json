@@ -353,24 +353,6 @@
       "resultMessageId": "1523851144164540586"
     },
     {
-      "at": "2026-07-07T00:41:20.850Z",
-      "action": "linked",
-      "outcome": "success",
-      "failureReason": null,
-      "discordId": "106533246161948672",
-      "discordUsername": "bobbitthehobbit694",
-      "displayName": "Bobbitthehobbit",
-      "eaName": "Bobbit694",
-      "previousEaName": null,
-      "playerId": "1003443625456",
-      "nucleusId": "1011781925456",
-      "profileName": "Bobbit",
-      "messageId": "1523851380287213720",
-      "resultMessageId": "1523851417159336057",
-      "platform": "ea",
-      "platformId": "cem_ea_id"
-    },
-    {
       "at": "2026-07-07T00:55:00.770Z",
       "action": "link_attempt",
       "outcome": "failed",
@@ -859,29 +841,6 @@
       "profileName": "My blueberries are no help †",
       "messageId": "1526051414118371429",
       "resultMessageId": "1526051441091940454"
-    },
-    {
-      "at": "2026-07-14T23:19:21.686Z",
-      "action": "tracker_linked",
-      "outcome": "success",
-      "failureReason": null,
-      "discordId": "106533246161948672",
-      "discordUsername": "bobbitthehobbit694",
-      "displayName": "Bobbitthehobbit",
-      "requesterId": null,
-      "requesterUsername": null,
-      "trackerProfileId": "1012128035834",
-      "previousTrackerProfileId": null,
-      "trackerMappingSource": "fingerprint-verified",
-      "eaName": "Bobbit694",
-      "previousEaName": null,
-      "playerId": "1003443625456",
-      "nucleusId": "1011781925456",
-      "platform": "ea",
-      "platformId": "cem_ea_id",
-      "profileName": "Bobbit",
-      "messageId": "tracker-import-106533246161948672-1012128035834",
-      "resultMessageId": null
     },
     {
       "at": "2026-07-14T23:19:21.686Z",
@@ -2189,6 +2148,25 @@
       "profileName": "LtAudieMurphy33",
       "messageId": "1539106052270858330",
       "resultMessageId": "1539106108067676171"
+    },
+    {
+      "at": "2026-08-20T10:53:40.992Z",
+      "action": "unlisted",
+      "outcome": "success",
+      "failureReason": null,
+      "discordId": "106533246161948672",
+      "discordUsername": "bobbitthehobbit694",
+      "displayName": "bobbitthehobbit694",
+      "eaName": "Bobbit694",
+      "previousEaName": null,
+      "playerId": "1003443625456",
+      "nucleusId": "1011781925456",
+      "platform": "ea",
+      "platformId": "cem_ea_id",
+      "profileName": "Bobbit",
+      "messageId": "roster-visibility-source-dyno-1539950545698295838",
+      "resultMessageId": null,
+      "source": "server_presence"
     }
   ]
 }
