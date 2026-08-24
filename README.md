@@ -66,15 +66,7 @@ browser session, while failed optional fetches remain retryable.
 
 Tests for the calculation engine run with `npm test` (plain `node --test`, no build step).
 
-`test/parity.test.js` re-derives representative values from the raw archive files to prove the published artifact and the browser engine agree — the two are computed by independent code (the bot publisher writes `data/counters.json`; `assets/period.js` derives Period values from it), so drift between them would show wrong numbers with no error.
-
-The raw archives moved to a separate private repo on 2026-07-26 and this checkout no longer carries them, so the test **skips by default**. Point it at a private archive checkout to run the real comparison:
-
-```
-BF6_PARITY_ARCHIVE_DIR=../.bf6-archive-repo/archive/bf6 npm test
-```
-
-It needs two archive dates to compare range endpoints, and asserts kills exactly plus K/D and KPM within `1e-9` across at least three fully comparable members. Without the variable it skips rather than fails, because a bare clone before the first publish legitimately has neither input.
+The publication parity check moved to `test/bf6-publication-parity.test.js` in the bot repository when routine generated-data commits stopped. It reads the active publication-state generation and the private raw archive through `BF6_PARITY_PUBLICATION_STATE_DIR` and `BF6_PARITY_ARCHIVE_DIR`, so it follows current R2 output instead of this repository's frozen rollback snapshot.
 
 ## Layout
 
