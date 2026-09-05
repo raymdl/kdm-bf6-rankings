@@ -11,13 +11,13 @@
 // ROLLBACK: set to "pages" to serve every data file from this repository again,
 // as published to GitHub Pages.
 //
-// This is a COMPLETE rollback only while Git publication is still running, which
-// is true during Stage 5 and stops being true when Stage 6 retires it. After
-// that, data/ is a frozen snapshot and flipping this constant alone would serve
-// stale leaderboards that look current. The correct order is then: restore Git
-// publication, force a publication, verify Pages serves it, and only then change
-// this. See "Rollback is phase-specific" in the bot repository's
-// docs/BF6_R2_PUBLICATION_AND_REFRESH_SCHEDULE_IMPLEMENTATION_PLAN.md.
+// This is NOT a complete rollback on its own. Routine Git publication was
+// retired on 2026-08-24, so data/ is a frozen snapshot and flipping this
+// constant alone would serve stale leaderboards that look current. The correct
+// order is: restore Git publication, force a publication, verify Pages serves
+// it, and only then change this. If the frozen data/ has since been removed,
+// rehydrate it from the active R2 release first. See the bot repository's
+// docs/BF6_PUBLICATION_RECOVERY_RUNBOOK.md.
 //
 // Either way: change this constant, bump the cache version in index.html, and
 // deploy.
