@@ -5,9 +5,9 @@
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20260904-tighter-player-cards";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20260904-timezone-loading";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260904-tighter-player-cards";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260904-timezone-loading";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -18,7 +18,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260904-tighter-player-cards";
+} from "./period.js?v=20260904-timezone-loading";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -32,8 +32,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260904-tighter-player-cards";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260904-tighter-player-cards";
+} from "./view-state.js?v=20260904-timezone-loading";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260904-timezone-loading";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -43,7 +43,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260904-tighter-player-cards";
+} from "./equipment.js?v=20260904-timezone-loading";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -125,6 +125,7 @@ function formatAge(ms) {
 
 function fmtDateTime(iso) {
   return new Date(iso).toLocaleString("en-US", {
+    timeZone: "America/New_York",
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -3749,6 +3750,7 @@ async function fetchJson(path, fallback, { essential = false } = {}) {
     return value;
   } catch {
     failedDataFiles.add(path);
+    showDataNotice("Some data could not load.", "Retry");
     if (essential && !failedBootFiles.includes(path)) failedBootFiles.push(path);
     return fallback;
   }
@@ -3827,7 +3829,7 @@ async function ensureRouteData(parts, params) {
   const route = parts[0] || "board";
   const loads = [];
   if (route !== "activity" && route !== "audit" && route !== "effectiveness") loads.push(loadHistoryData());
-  if (["board", "players", "player", "compare"].includes(route) && params?.get("view") === "period") {
+  if (["board", "players", "player", "compare"].includes(route)) {
     loads.push(loadCountersData());
   }
   if (route === "activity") loads.push(loadData("notifications", "data/notifications.json", { events: [] }));
@@ -3840,24 +3842,6 @@ async function ensureRouteData(parts, params) {
   await Promise.all(loads);
 }
 
-function prefetchCountersAfterCareerRender(route, params) {
-  if (!["board", "players", "player", "compare"].includes(route || "board") || params?.get("view") === "period" || dataLoads.has("counters") || validCounters(state.counters)) {
-    return;
-  }
-  const renderedHash = location.hash;
-  loadCountersData().then(() => {
-    if (location.hash !== renderedHash || !validCounters(state.counters) || state.counters.dates.length < 2) {
-      return;
-    }
-    const scrollY = window.scrollY;
-    Promise.resolve(render()).then(() => {
-      if (location.hash === renderedHash) {
-        window.scrollTo(0, scrollY);
-      }
-    });
-  });
-}
-
 /* ---------- router ---------- */
 
 async function render() {
@@ -3868,6 +3852,7 @@ async function render() {
   } catch (error) {
     if (generation === renderGeneration) {
       app.innerHTML = `<div class="error-box" role="alert"><strong>This view could not finish loading.</strong><br>${esc(error.message)} Try refreshing.</div>`;
+      showDataNotice("This view could not load.", "Retry");
     }
     return;
   }
@@ -3940,7 +3925,6 @@ async function render() {
     app.insertAdjacentHTML("afterbegin", failureNotice);
   }
   wireFloatingTableHeaders();
-  prefetchCountersAfterCareerRender(route, params);
   window.scrollTo(0, 0);
 }
 
@@ -3967,32 +3951,67 @@ async function boot() {
   if (dataStatus === "failed") {
     app.innerHTML = `<div class="error-box" role="alert"><strong>Live data is unavailable.</strong><br />
       Could not read the published release pointer${failureReason ? ` (${esc(failureReason)})` : ""}.
-      This is a publication problem, not a problem with your connection — try again shortly.</div>`;
+      The service or your connection may be unavailable. Use Retry to try again.</div>`;
+    showDataNotice("Live data could not load.", "Retry");
     return;
   }
 
   await loadBaseData();
 
   if (!state.meta) {
-    app.innerHTML = `<div class="error-box"><strong>No data published yet.</strong><br />
-      The daily update hasn't pushed its first snapshot. Check back soon.</div>`;
+    app.innerHTML = `<div class="error-box" role="alert"><strong>Site data is unavailable.</strong><br />
+      Could not load the site metadata. Use Retry to try again.</div>`;
+    showDataNotice("Site data could not load.", "Retry");
     return;
   }
 
   document.getElementById("field-roster").textContent = `${state.latest.members.length} PLAYERS / ONE CLAN`;
-  const updated = document.getElementById("footer-updated");
-  const age = dataAge(Date.now(), state.meta.observedAt ?? state.meta.updatedAt ?? null);
-  updated.textContent = `Last updated ${fmtDateTime(state.meta.updatedAt)} ET`;
-  if (age.known && age.stale) {
-    updated.classList.add("stale");
-    updated.textContent += ` — ${formatAge(age.ageMs)} old`;
-    updated.title = age.refreshId
-      ? `Newest published refresh is ${age.refreshId}. A refresh appears to have been missed.`
-      : "A refresh appears to have been missed.";
-  }
+  updateFooterAge();
 
   window.addEventListener("hashchange", render);
   await render();
 }
+
+function updateFooterAge() {
+  if (!state.meta) return;
+  const updated = document.getElementById("footer-updated");
+  const age = dataAge(Date.now(), state.meta.observedAt ?? state.meta.updatedAt ?? null);
+  updated.classList.toggle("stale", Boolean(age.known && age.stale));
+  updated.title = "Time shown in America/New_York.";
+  updated.textContent = `Last updated ${fmtDateTime(state.meta.updatedAt)} ET`;
+  if (age.known && age.stale) {
+    updated.textContent += ` — ${formatAge(age.ageMs)} old`;
+    updated.title = age.refreshId
+      ? `Displayed refresh is ${age.refreshId}. Newer data is checked when you return to this tab.`
+      : "Displayed data is over eight hours old.";
+  }
+}
+
+const reloadData = document.getElementById("reload-data");
+const dataNotice = document.getElementById("data-notice");
+function showDataNotice(message, action) {
+  document.getElementById("data-notice-text").textContent = message;
+  reloadData.textContent = action;
+  dataNotice.hidden = false;
+}
+reloadData.addEventListener("click", () => location.reload());
+let dismissedUpdate = false;
+document.getElementById("dismiss-data-notice").addEventListener("click", () => {
+  if (reloadData.textContent === "Reload") dismissedUpdate = true;
+  dataNotice.hidden = true;
+});
+let checkingRelease = false;
+document.addEventListener("visibilitychange", async () => {
+  if (document.hidden) return;
+  updateFooterAge();
+  if (checkingRelease) return;
+  checkingRelease = true;
+  try {
+    const result = await checkForNewRelease();
+    if (result.available && !dismissedUpdate) showDataNotice("New stats available", "Reload");
+  } finally {
+    checkingRelease = false;
+  }
+});
 
 boot();

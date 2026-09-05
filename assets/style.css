@@ -3637,3 +3637,35 @@ body[data-route="player"] .recent-form-table .career-column {
 .feed-action:hover { background:#263640; border-color:#a9bdc9; color:var(--text); }
 body[data-route="activity"] .feed-item { padding:6px 14px; }
 body[data-route="activity"] .feed { gap:6px; }
+
+.data-notice {
+  position:fixed;
+  top:84px;
+  right:20px;
+  z-index:100;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  max-width:calc(100vw - 32px);
+  padding:8px 10px 8px 14px;
+  border:1px solid #78543e;
+  border-left:2px solid var(--accent);
+  background:#172027;
+  color:var(--text-dim);
+  box-shadow:0 4px 16px #0004;
+  font:12px/1.4 var(--font-mono);
+}
+.data-notice[hidden] { display:none; }
+.data-notice button {
+  flex-shrink:0;
+  padding:4px 8px;
+  border:1px solid #78543e;
+  background:transparent;
+  color:#ffab79;
+  font:inherit;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+.data-notice button:hover { background:#f4834a18; }
+.data-notice #dismiss-data-notice { padding:2px 4px; border:0; color:var(--text-dim); font-size:18px; }
+@media(max-width:700px) { .data-notice { top:12px; right:16px; gap:8px; } }

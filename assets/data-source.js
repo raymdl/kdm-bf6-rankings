@@ -4,7 +4,7 @@
    Every data path in the app goes through dataUrl() so the base URL lives in
    exactly one place - do not inline it in route loaders.
 
-   The pointer is read once per page session and the whole session is pinned to
+   The initial pointer pins the page session; freshness checks do not switch
    that release. A publish landing mid-session cannot produce a page showing
    half one refresh and half the next. */
 
@@ -66,6 +66,20 @@ export async function initDataSource() {
     status = "failed";
     failureReason = error.message;
     return null;
+  }
+}
+
+// Check freshness without moving the current session to a different release.
+// A full reload is required before any data URLs can use the new pointer.
+export async function checkForNewRelease() {
+  if (DATA_SOURCE !== "r2" || status !== "ready") return { available: false };
+  try {
+    const response = await fetch(POINTER_URL, { cache: "no-cache" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const pointer = validatePointer(await response.json());
+    return { available: pointer.refreshId !== release.refreshId };
+  } catch {
+    return { available: false, failed: true };
   }
 }
 
