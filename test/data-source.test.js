@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { dataAge } from "../assets/data-source.js";
+import { checkForNewRelease, dataAge, dataSourceStatus, dataUrl, initDataSource } from "../assets/data-source.js";
 
 // Without initDataSource() there is no release pointer, which is exactly the
 // state the "pages" rollback runs in. The fallback timestamp is then the only
@@ -34,4 +34,28 @@ test("data older than the largest scheduled gap is marked stale", () => {
 test("age is unknown when neither a pointer nor a published observation exists", () => {
   assert.deepEqual(dataAge(now, null), { known: false, stale: false });
   assert.deepEqual(dataAge(now), { known: false, stale: false });
+});
+
+test("freshness checks detect new data without changing the pinned release, including on failure", async (t) => {
+  const pointer = { version: 1, refreshId: "first", observedAt: "2026-09-04T12:00:00Z", releasePrefix: "releases/first/data/" };
+  const fetchMock = t.mock.method(globalThis, "fetch", async () => ({ ok: true, json: async () => pointer }));
+  await initDataSource();
+  const pinnedUrl = dataUrl("data/history.json");
+  assert.deepEqual(await checkForNewRelease(), { available: false });
+  fetchMock.mock.mockImplementation(async (_url, options) => {
+    assert.equal(options.cache, "no-cache");
+    return { ok: true, json: async () => ({ ...pointer, refreshId: "second", releasePrefix: "releases/second/data/" }) };
+  });
+  assert.deepEqual(await checkForNewRelease(), { available: true });
+  assert.equal(dataUrl("data/history.json"), pinnedUrl);
+  for (const response of [
+    async () => { throw new Error("offline"); },
+    async () => ({ ok: false, status: 503 }),
+    async () => ({ ok: true, json: async () => ({ ...pointer, releasePrefix: "releases/wrong/data/" }) })
+  ]) {
+    fetchMock.mock.mockImplementation(response);
+    assert.deepEqual(await checkForNewRelease(), { available: false, failed: true });
+    assert.equal(dataUrl("data/history.json"), pinnedUrl);
+    assert.equal(dataSourceStatus().status, "ready");
+  }
 });
