@@ -5,9 +5,9 @@
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20260904-compact-site-ranks";
+import { dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20260904-rank-dotted-gaps";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260904-compact-site-ranks";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260904-rank-dotted-gaps";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -18,7 +18,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260904-compact-site-ranks";
+} from "./period.js?v=20260904-rank-dotted-gaps";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -32,8 +32,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260904-compact-site-ranks";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260904-compact-site-ranks";
+} from "./view-state.js?v=20260904-rank-dotted-gaps";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260904-rank-dotted-gaps";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -43,7 +43,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260904-compact-site-ranks";
+} from "./equipment.js?v=20260904-rank-dotted-gaps";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -1182,9 +1182,11 @@ function lineChart(canvas, labels, datasets, stat, options = {}) {
               ? "#facc15"
               : color,
             borderDash: (ctx) =>
-              todayInProgress && ctx.p1DataIndex === lastIndex ? [5, 4] : undefined
+              stat.key === "playerRank" && (ctx.p0.skip || ctx.p1.skip || ctx.p1DataIndex > ctx.p0DataIndex + 1)
+                ? [2, 4]
+                : todayInProgress && ctx.p1DataIndex === lastIndex ? [5, 4] : undefined
           },
-          spanGaps: stat.key !== "playerRank",
+          spanGaps: true,
           // Monotone cubic interpolation softens corners without overshooting
           // the observed values; equal adjacent points remain truly flat.
           cubicInterpolationMode: "monotone",
