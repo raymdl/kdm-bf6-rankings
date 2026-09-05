@@ -3010,17 +3010,18 @@ body:not([data-route="board"]) main::before {
   pointer-events:none
 }
 .player-card {
-  padding:12px;
+  padding:12px 12px 10px;
   border:1px solid var(--border);
   border-radius:4px;
   background:var(--bg-card);
   transition:border-color .15s,background .15s
 }
 .player-card-name {
-  font-size:15px
+  font-size:15px;
+  line-height:1.2
 }
 .player-card-sub {
-  margin:4px 0 8px;
+  margin:2px 0 8px;
   min-height:1.2em;
   white-space:nowrap;
   overflow:hidden;
@@ -3037,19 +3038,21 @@ body:not([data-route="board"]) main::before {
 }
 .mini-stat .k {
   font-size:12px;
+  line-height:1.2;
   font-family:var(--font-mono);
   letter-spacing:.035em
 }
 .mini-stat .v {
   font-family:var(--font-brand);
   font-size:22px;
+  line-height:1.1;
   font-weight:600;
   color:var(--text)
 }
 .mini-stat:first-child .v {
   color:#ffab79;
   font-size:26px;
-  line-height:1.2
+  line-height:1.1
 }
 .compare-workspace {
   display:grid;
