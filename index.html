@@ -17,21 +17,21 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="assets/style.css?v=20260819-rollback-clarity-54" />
+  <link rel="stylesheet" href="assets/style.css?v=20260904-compact-site-ranks" />
 </head>
 <body>
   <a class="skip-link" href="#app">Skip to content</a>
   <header class="site-header">
     <a class="brand" href="#/">
       <span class="brand-tag">KDM</span>
-      <span class="brand-title">BF6 RANKINGS</span>
+      <span class="brand-title">BATTLEFIELD 6<span class="brand-subtitle">CLAN STATISTICS</span></span>
     </a>
-    <nav class="site-nav" id="site-nav">
-      <a href="#/" data-nav="board">Leaderboards</a>
-      <a href="#/effectiveness/trident" data-nav="effectiveness">Effectiveness Lab</a>
+    <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+      <a href="#/" data-nav="board">Rankings</a>
+      <a href="#/effectiveness/trident" data-nav="effectiveness">The Lab</a>
       <a href="#/players" data-nav="players">Players</a>
       <a href="#/compare" data-nav="compare">Compare</a>
       <a href="#/history" data-nav="history">Time Machine</a>
@@ -40,6 +40,10 @@
     </nav>
   </header>
 
+  <section class="field-masthead" aria-label="Battlefield 6 clan statistics">
+    <div class="field-intro"><p class="eyebrow">KDM COMMUNITY <span>/</span> BATTLEFIELD 6</p><p class="masthead-title">THE SQUAD.<br><span>THE STANDARD.</span></p><p class="field-deck">Rankings. Records. Rivalries.</p></div>
+  </section>
+  <div class="field-status"><span>CLAN OVERVIEW <b>／</b> <span id="field-roster">PLAYER STATISTICS</span></span></div>
   <main id="app" tabindex="-1">
     <div class="loading">Loading battlefield intel…</div>
   </main>
@@ -52,7 +56,7 @@
     </span>
   </footer>
 
-  <script type="module" src="assets/app.js?v=20260819-rollback-clarity-54"></script>
+  <script type="module" src="assets/app.js?v=20260904-compact-site-ranks"></script>
   <!-- Cloudflare Web Analytics --><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "bf59c26103f44305b93edc2c56d0ed30"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>

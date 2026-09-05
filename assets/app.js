@@ -5,9 +5,9 @@
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20260819-rollback-clarity-54";
+import { dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20260904-compact-site-ranks";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260819-rollback-clarity-54";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260904-compact-site-ranks";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -18,7 +18,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260819-rollback-clarity-54";
+} from "./period.js?v=20260904-compact-site-ranks";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -32,8 +32,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260819-rollback-clarity-54";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260819-rollback-clarity-54";
+} from "./view-state.js?v=20260904-compact-site-ranks";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260904-compact-site-ranks";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -43,7 +43,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260819-rollback-clarity-54";
+} from "./equipment.js?v=20260904-compact-site-ranks";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -73,6 +73,7 @@ let charts = [];
 let floatingHeaderCleanups = [];
 const equipmentProfileCache = new Map();
 const equipmentProfileLoads = new Map();
+const profileEquipmentTableState = { member: null, category: "weapons", key: "kills", direction: "desc", defaultKey: "kills", defaultDirection: "desc" };
 const dataLoads = new Map();
 const failedDataFiles = new Set();
 const CHART_JS_URL = "https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js";
@@ -775,7 +776,7 @@ function rangeCalendarHtml(dates) {
   </div>`;
 }
 
-function viewRangeControlHtml() {
+function viewRangeControlHtml(trailingControl = "") {
   if (!periodDataAvailable()) {
     return "";
   }
@@ -785,8 +786,8 @@ function viewRangeControlHtml() {
     <div class="view-range-group" role="group" aria-label="Stat view">
       <span class="view-range-label">View</span>
       <div class="view-toggle">
-        <button type="button" class="view-toggle-option ${viewRangeState.view === "career" ? "active" : ""}" data-view="career" title="Lifetime totals and ratios">Career</button>
-        <button type="button" class="view-toggle-option ${viewRangeState.view === "period" ? "active" : ""}" data-view="period" title="Stats earned during the selected range only">Period</button>
+        <button type="button" class="view-toggle-option ${viewRangeState.view === "career" ? "active" : ""}" data-view="career" aria-pressed="${viewRangeState.view === "career"}" title="Lifetime totals and ratios">Career</button>
+        <button type="button" class="view-toggle-option ${viewRangeState.view === "period" ? "active" : ""}" data-view="period" aria-pressed="${viewRangeState.view === "period"}" title="Stats earned during the selected range only">Period</button>
       </div>
     </div>
     <div class="view-range-group" role="group" aria-label="Date range">
@@ -797,6 +798,7 @@ function viewRangeControlHtml() {
       }).join("")}
       <span class="range-calendar-anchor"><button type="button" class="chip range-chip ${isCustom ? "active" : ""}" data-range="custom" title="Pick an exact date range" aria-expanded="${customCalendarState.open}">Custom…</button>${rangeCalendarHtml(dates)}</span>
     </div>
+    ${trailingControl}
   </div>`;
 }
 
@@ -964,11 +966,65 @@ function movementHtml(prevRank, currentRank, windowText = "the previous day") {
   return `<span class="movement flat">–</span>`;
 }
 
+function rankingControlsHtml(statKey, category = "combat", selectedId = null, metric = "kills") {
+  const routeButton = (label, href, active) => `<button type="button" data-ranking-route="${esc(href)}" aria-pressed="${active}">${esc(label)}</button>`;
+  const groups = category === "combat" ? [] : equipmentGroups()[category];
+  const selectedGroup = groups.find((group) => group.items.includes(selectedId)) ?? groups[0];
+  const stats = category === "combat"
+    ? state.meta.stats.map((stat) => routeButton(stat.title, hashRoute(`board/${stat.key}`, viewRangeParams()), stat.key === statKey)).join("")
+    : equipmentMetricFields(category).map((key) => routeButton(EQUIPMENT_METRIC_LABELS[key], hashRoute("board/equipment", { equipment: selectedId, metric: key, ...viewRangeParams() }), key === metric)).join("");
+  return `<div class="ranking-controls">
+    <div class="ranking-categories" role="group" aria-label="Statistics category">${[["combat", "Soldier"], ["weapons", "Weapons"], ["vehicles", "Vehicles"]].map(([key, label]) => `<button type="button" data-ranking-category="${key}" aria-pressed="${category === key}">${label}</button>`).join("")}</div>
+    <div class="ranking-options" role="group" aria-label="Statistic">${stats}</div>
+    ${groups.length ? `<div class="ranking-equipment">
+      <div class="ranking-group-tabs" role="group" aria-label="${category === "weapons" ? "Weapon class" : "Vehicle type"}">${groups.map((group, index) => `<button type="button" data-ranking-group="${index}" aria-pressed="${group === selectedGroup}">${esc(group.label)}</button>`).join("")}</div>
+      ${groups.map((group, index) => `<div class="ranking-options ranking-items" data-ranking-items="${index}" role="group" aria-label="${esc(group.label)}"${group === selectedGroup ? "" : " hidden"}>${group.items.map((id) => routeButton(equipmentDisplayName(category, id), hashRoute("board/equipment", { equipment: id, metric, ...viewRangeParams() }), id === selectedId)).join("")}</div>`).join("")}
+    </div>` : ""}
+    <span class="ranking-control-status" role="status"></span>
+  </div>`;
+}
+function wireRankingControls() {
+  for (const button of app.querySelectorAll("[data-ranking-route]")) {
+    button.addEventListener("click", () => replaceHashAndRender(button.dataset.rankingRoute));
+  }
+  for (const button of app.querySelectorAll("[data-ranking-group]")) {
+    button.addEventListener("click", () => {
+      for (const tab of app.querySelectorAll("[data-ranking-group]")) tab.setAttribute("aria-pressed", String(tab === button));
+      for (const group of app.querySelectorAll("[data-ranking-items]")) group.hidden = group.dataset.rankingItems !== button.dataset.rankingGroup;
+    });
+  }
+  for (const button of app.querySelectorAll("[data-ranking-category]")) {
+    button.addEventListener("click", async () => {
+      if (button.getAttribute("aria-pressed") === "true") return;
+      const category = button.dataset.rankingCategory;
+      if (category === "combat") {
+        replaceHashAndRender(hashRoute(`board/${state.meta.stats[0].key}`, viewRangeParams()));
+        return;
+      }
+      const hash = location.hash;
+      const status = app.querySelector(".ranking-control-status");
+      button.disabled = true;
+      status.textContent = "Loading equipment…";
+      try {
+        await loadEquipmentData();
+        if (location.hash !== hash) return;
+        const id = equipmentGroups()[category][0]?.items[0];
+        if (id) replaceHashAndRender(hashRoute("board/equipment", { equipment: id, ...viewRangeParams() }));
+        else status.textContent = "No equipment records available.";
+      } catch {
+        status.textContent = "Could not load equipment. Try again.";
+      } finally {
+        button.disabled = false;
+      }
+    });
+  }
+}
+
 function statTabsHtml(activeKey, hrefFor) {
   return `<div class="stat-tabs">${state.meta.stats
     .map(
       (stat) =>
-        `<button class="${stat.key === activeKey ? "active" : ""}" data-stat="${stat.key}" data-href="${hrefFor ? hrefFor(stat.key) : ""}">${esc(stat.title)}</button>`
+        `<button class="${stat.key === activeKey ? "active" : ""}" data-stat="${stat.key}" aria-pressed="${stat.key === activeKey}" data-href="${hrefFor ? hrefFor(stat.key) : ""}">${esc(stat.title)}</button>`
     )
     .join("")}</div>`;
 }
@@ -1042,7 +1098,7 @@ function cachedFootnoteHtml(hasCachedStats) {
 const CHART_COLORS = ["#f26522", "#60a5fa", "#4ade80", "#c084fc", "#facc15", "#22d3ee", "#fb7185", "#a3e635"];
 
 function chartBase() {
-  Chart.defaults.color = "#9aa3ad";
+  Chart.defaults.color = "#a4acb4";
   Chart.defaults.borderColor = "rgba(42, 48, 56, 0.6)";
   Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
 }
@@ -1093,6 +1149,9 @@ function lineChart(canvas, labels, datasets, stat, options = {}) {
         const pointColorAt = (pointIndex) => (dataset.estimated?.[pointIndex] ? "#facc15" : color);
         return {
           ...dataset,
+          data: stat.key === "playerRank"
+            ? dataset.data.map(value => Number.isFinite(value) && value > 0 ? value : null)
+            : dataset.data,
           borderColor: color,
           backgroundColor: color,
           borderWidth: 2,
@@ -1112,7 +1171,7 @@ function lineChart(canvas, labels, datasets, stat, options = {}) {
           pointHoverRadius: labels.map((_, pointIndex) => (overtakes?.[pointIndex] ? 5.5 : 4)),
           // A hollow final point marks today's still-updating value.
           pointBackgroundColor: labels.map((_, pointIndex) =>
-            todayInProgress && pointIndex === lastIndex ? "#191d23" : pointColorAt(pointIndex)
+            todayInProgress && pointIndex === lastIndex ? "#151b20" : pointColorAt(pointIndex)
           ),
           pointBorderColor: labels.map((_, pointIndex) => pointColorAt(pointIndex)),
           pointBorderWidth: labels.map((_, pointIndex) =>
@@ -1125,7 +1184,7 @@ function lineChart(canvas, labels, datasets, stat, options = {}) {
             borderDash: (ctx) =>
               todayInProgress && ctx.p1DataIndex === lastIndex ? [5, 4] : undefined
           },
-          spanGaps: true,
+          spanGaps: stat.key !== "playerRank",
           // Monotone cubic interpolation softens corners without overshooting
           // the observed values; equal adjacent points remain truly flat.
           cubicInterpolationMode: "monotone",
@@ -1327,9 +1386,10 @@ function renderPeriodLeaderboard(stat, window) {
   app.innerHTML = `
     <h1 class="page-title">${esc(stat.title)} Leaderboard <span class="period-title-tag">${esc(periodWindowText(window))}</span></h1>
     <p class="page-sub">Stats earned during this range only, from daily snapshot differences · rates need ${floorMin}+ active minutes to rank · daily trend per player</p>
-    ${viewRangeControlHtml()}
-    ${panelHtml("panel-soldier", "Soldier Stats", true, statTabsHtml(stat.key, (key) => hashRoute(`board/${key}`, viewRangeParams())))}
-    ${panelHtml("panel-equipment", "Weapon/Vehicle Stats", false, equipmentBoardPanelBody(false))}
+    <section class="ranking-toolbar" aria-label="Ranking filters">
+      ${viewRangeControlHtml()}
+      ${rankingControlsHtml(stat.key)}
+    </section>
     ${podiumHtml}
     <div class="table-wrap">
       <table>
@@ -1673,7 +1733,7 @@ function equipmentDeltaText(metric, value) {
 // Career cards carry movement against the comparison window. Period cards carry
 // time on the item instead, the same way the soldier Period podium reads: the
 // window's change is its value, so printing both says one thing twice.
-function equipmentPodiumHtml(rows, metric, windowText, usePeriod = false, category = "weapons") {
+function equipmentPodiumHtml(rows, metric, windowText, usePeriod = false, category = "weapons", equipmentName = "") {
   return rows.length
     ? `<div class="podium">${rows.slice(0, 3).map((row, index) => {
         const delta = equipmentDeltaText(metric, row.change);
@@ -1686,7 +1746,7 @@ function equipmentPodiumHtml(rows, metric, windowText, usePeriod = false, catego
         return `<div class="podium-card p${index + 1}">
           <div class="podium-rank">#${index + 1}${index === 0 ? " · TOP DOG" : ""}</div>
           <div class="podium-name"><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a></div>
-          <div class="podium-value">${equipmentValueText(metric, row.value)} <span class="podium-stat-label">${esc(EQUIPMENT_METRIC_LABELS[metric])}</span></div>
+          <div class="podium-value">${equipmentValueText(metric, row.value)} <span class="podium-stat-label">${esc(`${equipmentName} ${EQUIPMENT_METRIC_LABELS[metric]}`.trim())}</span></div>
           <div class="podium-delta">${footer}</div>
         </div>`;
       }).join("")}</div>`
@@ -1710,6 +1770,15 @@ function renderEquipmentLeaderboard(params) {
   const resolvedCareerWindow = selected ? resolveCareerWindow(state.equipmentIndex?.dates ?? [], observedIndexes, viewRangeState.range, viewRangeState.custom) : null;
   const careerWindow = resolvedCareerWindow?.unavailable ? null : resolvedCareerWindow;
   const rows = selected ? equipmentLeaderboardRows(selected.id, selected.category, metric, periodWindow, usePeriod, careerWindow) : [];
+  const rankedIds = new Set(rows.map((row) => row.discordId));
+  const missingRows = state.latest.members
+    .filter((member) => !rankedIds.has(member.discordId))
+    .sort((a, b) => memberName(a.discordId).localeCompare(memberName(b.discordId), undefined, { sensitivity: "base", numeric: true }));
+  const missingRowsHtml = missingRows.map((member) => `<tr class="time-machine-unranked${isFavorite(member.discordId) ? " fav-row" : ""}">
+    <td class="rank-cell">—</td>
+    <td><a class="player-link" href="${playerHref(member.discordId)}">${esc(memberName(member.discordId))}</a>${favoriteBadgeHtml(member.discordId)} <span class="badge provisional" title="No tracked stats for this equipment and metric in the selected view">no play</span></td>
+    <td class="num">—</td><td class="num">—</td><td></td>
+  </tr>`).join("");
   prepareSortState(leaderboardSortState, `equipment:${selected?.id ?? "none"}:${metric}:${usePeriod ? `period:${periodWindow?.startDate}:${periodWindow?.endDate}` : "career"}`);
   const sorted = sortedRows(rows, leaderboardSortState, (row, key) => ({
     rank: row.originalRank,
@@ -1732,7 +1801,7 @@ function renderEquipmentLeaderboard(params) {
     : !metricReady
       ? `<p class="period-unsupported-note" role="note">The equipment artifact has no usable ${esc(EQUIPMENT_METRIC_LABELS[metric])} data for this selection.</p>`
       : "";
-  const body = sorted.length
+  const body = (sorted.length
     ? sorted.map((row) => {
         const delta = equipmentDeltaText(metric, row.change);
         const deltaClass = Number.isFinite(row.change) ? (row.change > 0 ? "up" : row.change < 0 ? "down" : "flat") : "flat";
@@ -1741,17 +1810,19 @@ function renderEquipmentLeaderboard(params) {
           : `<td class="num"><span class="delta ${deltaClass}">${delta}</span></td>`;
         return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${usePeriod ? `${trackedSinceBadgeHtml(periodWindow, row.coverageStart, EQUIPMENT_COVERAGE_BADGE_TITLE)}${equipmentTimeSinceBadgeHtml(row.activeSince, selected?.category)}` : ""}</td><td class="num value-cell">${equipmentValueText(metric, row.value)}</td>${trailingCell}<td>${sparklineSvg(row.trend)}</td></tr>`;
       }).join("")
-    : `<tr><td colspan="5" class="empty">No observed ${esc(EQUIPMENT_METRIC_LABELS[metric])} for this equipment item in the selected range.</td></tr>`;
+    : missingRows.length ? "" : `<tr><td colspan="5" class="empty">No observed ${esc(EQUIPMENT_METRIC_LABELS[metric])} for this equipment item in the selected range.</td></tr>`) + missingRowsHtml;
   const equipmentName = selected ? equipmentDisplayName(selected.category, selected.id) : "Equipment";
   const heading = `${equipmentName} ${EQUIPMENT_METRIC_LABELS[metric]}`;
   const windowText = usePeriod ? periodWindowText(periodWindow) : careerRangeWindowText(careerWindow);
   app.innerHTML = `
-    <h1 class="page-title">Equipment Leaderboard</h1>
-    <p class="page-sub">${esc(heading)} · ${usePeriod ? esc(periodWindowText(periodWindow)) : "Career totals"}</p>
-    ${viewRangeControlHtml()}
-    ${panelHtml("panel-soldier", "Soldier Stats", false, statTabsHtml(null, (key) => hashRoute(`board/${key}`, viewRangeParams())))}
-    ${panelHtml("panel-equipment", "Weapon/Vehicle Stats", true, `${artifactNote}${periodNote}${equipmentBoardPanelBody(true, selected?.id ?? null, metric)}`)}
-    ${equipmentPodiumHtml(rows, metric, windowText, usePeriod, selected?.category ?? "weapons")}
+    <h1 class="page-title">${esc(heading)} Leaderboard <span class="period-title-tag ${usePeriod ? "" : "career-title-tag"}">${esc(usePeriod ? periodWindowText(periodWindow) : careerRangeWindowText(careerWindow, { includeLabel: true }))}</span></h1>
+    <p class="page-sub">${usePeriod ? "Stats earned during this range only, from daily snapshot differences · active time and daily trend per player" : "Current Career values · movement, deltas, and sparkline show change over " + esc(windowText)}</p>
+    <section class="ranking-toolbar" aria-label="Ranking filters">
+      ${viewRangeControlHtml()}
+      ${rankingControlsHtml(null, selected?.category ?? "weapons", selected?.id, metric)}
+    </section>
+    ${artifactNote}${periodNote}
+    ${equipmentPodiumHtml(rows, metric, windowText, usePeriod, selected?.category ?? "weapons", equipmentName)}
     ${selected ? `<div class="table-wrap equipment-leaderboard-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(heading, "value", leaderboardSortState, { numeric: true })}${usePeriod ? sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true }) : sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th>${usePeriod ? "Daily trend" : "Trend"}</th></tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
   const equipmentHref = (rangeParams) => hashRoute("board/equipment", { equipment: selected?.id ?? null, metric: metric === "kills" ? null : metric, ...rangeParams });
   wireViewRangeControl(equipmentHref);
@@ -1877,9 +1948,10 @@ function renderLeaderboard(statKey, params) {
     <h1 class="page-title">${esc(stat.title)} Leaderboard <span class="period-title-tag career-title-tag">${esc(careerRangeWindowText(careerWindow, { includeLabel: true }))}</span></h1>
     ${periodNotice}
     <p class="page-sub">Current Career values · movement, deltas, and sparkline show change over ${esc(windowText)}</p>
-    ${viewRangeControlHtml()}
-    ${panelHtml("panel-soldier", "Soldier Stats", true, statTabsHtml(stat.key, (key) => hashRoute(`board/${key}`, viewRangeParams())))}
-    ${panelHtml("panel-equipment", "Weapon/Vehicle Stats", false, equipmentBoardPanelBody(false))}
+    <section class="ranking-toolbar" aria-label="Ranking filters">
+      ${viewRangeControlHtml()}
+      ${rankingControlsHtml(stat.key)}
+    </section>
     ${podiumHtml}
     <div class="table-wrap">
       <table>
@@ -1902,6 +1974,9 @@ function renderLeaderboard(statKey, params) {
 function renderPlayers(params) {
   loadViewRange(params);
   const periodWindow = activePeriodWindow();
+  const careerWindow = periodWindow ? null : resolveCareerWindow(
+    state.history.dates, authoritativeHistoryIndexes(), viewRangeState.range, viewRangeState.custom
+  );
   const kd = statByKey("infantryKillDeath") ?? state.meta.stats[0];
   const playerKpm = statByKey("playerKillsPerMinute");
   const kills = statByKey("kills");
@@ -1935,10 +2010,10 @@ function renderPlayers(params) {
   app.innerHTML = `
     <div class="players-toolbar">
       <div class="players-heading-row">
-        <h1 class="page-title">Players${periodWindow ? ` <span class="period-title-tag">${esc(periodWindowText(periodWindow))}</span>` : ""}</h1>
+        <h1 class="page-title">Players <span class="period-title-tag ${periodWindow ? "" : "career-title-tag"}">${esc(periodWindow ? periodWindowText(periodWindow) : careerRangeWindowText(careerWindow, { includeLabel: true }))}</span></h1>
       <label class="player-search"><span class="sr-only">Search players</span><input id="player-search" type="search" placeholder="Search players" autocomplete="off"></label>
       </div>
-      <p class="page-sub">${sorted.length} linked member(s) · click a player for full history${periodWindow ? " · card stats are for this performance window only" : " · cards show current Career values; the selected change window carries into profiles"}</p>
+      <p class="page-sub">${sorted.length} linked member(s) · click a player for full history · cards show ${periodWindow ? "selected Period" : "current Career"} stats</p>
     </div>
     ${viewRangeControlHtml()}
     <div class="player-grid">${sorted
@@ -1954,7 +2029,7 @@ function renderPlayers(params) {
               .filter(Boolean)
               .map(([stat, label]) => {
                 const card = cardStat(member, stat);
-                return `<div class="mini-stat"${card.title ? ` title="${esc(card.title)}"` : ""}><div class="k">${esc(label)}</div><div class="v">${fmtStat(stat, card.value)}</div></div>`;
+                return `<div class="mini-stat"${card.title ? ` title="${esc(card.title)}"` : ""}><div class="k">${esc(label.replace(/^Player /, ""))}</div><div class="v">${fmtStat(stat, card.value)}</div></div>`;
               })
               .join("")}
           </div>
@@ -2149,17 +2224,14 @@ function renderPlayer(discordId, statKey, params) {
         </div>
         <p class="profile-sub"><span class="profile-identity-row">${profileIdentityParts.join(" · ")}</span>${profileLinkParts.length ? `<span class="profile-links-row">${profileLinkParts.join(" · ")}</span>` : ""}</p>
       </div>
-      <div class="player-history-controls">
-        ${!periodWindow && backfillFields.size > 0 ? `<button class="tracker-history-toggle ${showEstimated ? "active" : ""}" id="tracker-history-toggle" type="button" aria-pressed="${showEstimated}">${showEstimated ? "Hide Backfill" : "Show Backfill"}</button>` : ""}
-      </div>
     </div>
     ${viewRangeState.view === "period" && !periodWindow ? `<div class="period-unsupported-note" role="note">The selected range is not available yet — showing Career values.</div>` : ""}
+    ${viewRangeControlHtml(viewRangeState.view === "career" && backfillFields.size > 0 ? `<button class="chip range-chip profile-backfill ${showEstimated ? "active" : ""}" id="tracker-history-toggle" type="button" aria-pressed="${showEstimated}">${showEstimated ? "Hide Backfill" : "Show Backfill"}</button>` : "")}
     ${showEstimated && !periodWindow ? estimatedHistoryNoticeHtml(discordId) : ""}
-    ${viewRangeControlHtml()}
     ${recentFormCardHtml(discordId, member)}
     <details class="chart-card player-stats-details" id="player-stats-panel"${panelIsOpen("player-stats-panel", true) ? " open" : ""}>
       <summary class="recent-form-summary">
-        <h3>Soldier Stats</h3>
+        <h3>Soldier Performance</h3>
         <span class="panel-toggle" aria-hidden="true"></span>
       </summary>
       <div class="player-stats-content">
@@ -2167,10 +2239,11 @@ function renderPlayer(discordId, statKey, params) {
       </div>
     </details>
     ${equipmentDetailsHtml(discordId, equipmentView, periodWindow, chartEquipmentId, panelMetric)}
-    <div class="chart-card">
-      <h3>${chartHeading}</h3>
+    <details class="chart-card player-chart-panel" id="player-chart-panel"${panelIsOpen("player-chart-panel", true) ? " open" : ""}>
+      <summary class="recent-form-summary"><h3>${chartHeading}</h3><span class="panel-toggle" aria-hidden="true"></span></summary>
       <div class="chart-box"><canvas id="player-chart"></canvas></div>
-    </div>
+    </details>
+    <details class="chart-card profile-equipment-table" id="profile-equipment-table"${panelIsOpen("profile-equipment-table", true) ? " open" : ""}><summary class="recent-form-summary"><h3>Full Weapon/Vehicle Stats</h3><span class="panel-toggle" aria-hidden="true"></span></summary><div id="profile-equipment-table-content"></div></details>
     ${auditHtml}
     ${cachedFootnoteHtml(Boolean(member?.cachedStats))}`;
 
@@ -2207,12 +2280,16 @@ function renderPlayer(discordId, statKey, params) {
     }
   });
   wireEquipmentDetails(discordId, stat.key, showEstimated, equipmentView, chartEquipmentId, panelMetric);
+  renderProfileEquipmentTable(discordId, periodWindow);
   // The weapon/vehicle bands inside the panel are the same collapsibles the
   // leaderboard uses, so they get the same click guard and remembered state.
   wirePanelState();
   for (const summary of app.querySelectorAll(".chart-card > summary.recent-form-summary")) {
     wireSummaryClickGuard(summary);
   }
+  document.getElementById("player-chart-panel").addEventListener("toggle", (event) => {
+    if (event.currentTarget.open) globalThis.Chart?.getChart("player-chart")?.resize();
+  });
 
   const periodChartWindow = periodWindow && statHasPeriodForm(stat.key) ? periodWindow : null;
   if (chartEquipment) {
@@ -2338,7 +2415,7 @@ function wirePanelState() {
   // The profile's Soldier Stats panel is in here too: it used to render with a
   // hardcoded `open`, so any re-render -- including opening the panel below it
   // -- silently re-expanded a panel the user had collapsed.
-  for (const panel of app.querySelectorAll(".stat-panel[id], .equipment-band[id], .player-stats-details[id]")) {
+  for (const panel of app.querySelectorAll(".stat-panel[id], .equipment-band[id], .player-stats-details[id], .profile-equipment-table[id], .player-chart-panel[id]")) {
     wireSummaryClickGuard(panel.querySelector(":scope > summary"));
     panel.addEventListener("toggle", () => writePanelState(panel.id, panel.open));
   }
@@ -2350,22 +2427,6 @@ function panelHtml(id, title, defaultOpen, body, extraClass = "") {
     <summary><span class="panel-title">${esc(title)}</span><span class="panel-toggle" aria-hidden="true"></span></summary>
     <div class="stat-panel-body">${body}</div>
   </details>`;
-}
-
-function deferredEquipmentPanelHtml() {
-  // The marker is what tells the panel's toggle handler that this body is still
-  // waiting for its data. "Empty" alone cannot: a member with nothing recorded
-  // renders the same class and must not be mistaken for unloaded.
-  return `<p class="equipment-empty" data-equipment-deferred="1">Expand to load weapon and vehicle leaderboards.</p>`;
-}
-
-// `metric` defaults to null so the panel highlights nothing when it is mounted
-// as a way in from a soldier-stat board or the players list: a lit-up Kills chip
-// there reads as if it describes the table on screen, which it does not.
-function equipmentBoardPanelBody(defaultOpen, selectedId = null, metric = null) {
-  return panelIsOpen("panel-equipment", defaultOpen)
-    ? equipmentPanelHtml(selectedId, metric)
-    : deferredEquipmentPanelHtml();
 }
 
 function equipmentCatalogue() {
@@ -2507,13 +2568,83 @@ function equipmentProfileContentHtml(discordId, equipmentView, periodWindow, sel
     ${equipmentPanelHtml(selectedId, metric, source)}`;
 }
 
+function renderProfileEquipmentTable(discordId, periodWindow) {
+  const panel = document.getElementById("profile-equipment-table-content");
+  if (!panel) return;
+  const sorting = profileEquipmentTableState;
+  if (sorting.member !== discordId) {
+    sorting.member = discordId;
+    sorting.category = "weapons";
+    sorting.filter = "all";
+    resetSortState(sorting);
+  }
+  const category = sorting.category;
+  const cached = equipmentProfileCache.get(discordId);
+  const data = cached?.data;
+  const member = equipmentProfileMember(data, discordId);
+  const dates = data?.dates ?? [];
+  const usePeriod = Boolean(periodWindow && dates[periodWindow.startIndex] === periodWindow.startDate && dates[periodWindow.endIndex] === periodWindow.endDate);
+  const fields = equipmentMetricFields(category);
+  const source = Object.fromEntries(["weapons", "vehicles"].map((kind) => [kind, {
+    ...equipmentCatalogue()?.[kind], ...member?.[kind]
+  }]));
+  if (!member?.vehicles?.unclassified) delete source.vehicles.unclassified;
+  const groups = equipmentGroups(source)[category];
+  if (category === "vehicles") {
+    groups.push(
+      { key: "helicopters", label: "Helicopters", items: ["attackheli", "scoutheli", "transportheli"] },
+      { key: "jets", label: "Jets", items: ["attackjet", "fighter"] }
+    );
+  }
+  const activeGroup = groups.find((group) => group.key === sorting.filter);
+  const rows = Object.keys(source[category]).map((id, index) => {
+    const entry = member?.[category]?.[id] ?? {};
+    const stats = usePeriod
+      ? equipmentPeriodStats(entry, category, periodWindow.startIndex, periodWindow.endIndex, dates, member?.observed, data?.fieldTrackingStarts)
+      : equipmentCareerStats(entry, category, latestObservedIndex(member?.observed), member?.observed, dates, data?.fieldTrackingStarts);
+    return { id, name: equipmentDisplayName(category, id), stats, originalRank: index,
+      note: usePeriod ? equipmentPeriodTrackingNote(stats.fields, category) : "" };
+  });
+  const filtered = activeGroup ? rows.filter((row) => activeGroup.items.includes(row.id)) : rows;
+  const sorted = sortedRows(filtered, sorting, (row, key) => key === "name" ? row.name : equipmentMetricValue(row.stats, key) ?? 0);
+  const message = !cached ? "Loading equipment data…"
+    : cached.status === "error" ? "Equipment data is temporarily unavailable. Reload to try again."
+    : !filtered.length ? "No equipment data is recorded for this selection." : "";
+  const caption = usePeriod ? periodWindowText(periodWindow)
+    : viewRangeState.view === "period" ? "This Period range is unavailable for equipment — showing Career totals."
+    : "Career totals at the latest observed equipment snapshot.";
+  panel.innerHTML = `<div class="equipment-table-controls"><div class="stat-tabs" role="group" aria-label="Equipment table category">${["weapons", "vehicles"].map((item) => `<button type="button" data-table-category="${item}" class="${item === category ? "active" : ""}" aria-pressed="${item === category}">${item === "weapons" ? "Weapons" : "Vehicles"}</button>`).join("")}</div>
+    <label class="equipment-table-filter">${category === "weapons" ? "Class" : "Type"}<select id="equipment-table-filter"><option value="all">All</option>${groups.map((group) => `<option value="${esc(group.key)}"${activeGroup === group ? " selected" : ""}>${esc(group.label)}</option>`).join("")}</select></label></div>
+    <p class="page-sub">${esc(caption)}${rows.some((row) => row.note) ? " · † Partial coverage; hover the item name for dates." : ""} · Unrecorded values are shown as 0.</p>
+    ${message ? `<p class="equipment-empty">${message}</p>` : `<div class="table-wrap"><table><thead><tr>${sortableHeaderHtml(category === "weapons" ? "Weapon" : "Vehicle", "name", sorting)}${fields.map((field) => sortableHeaderHtml(EQUIPMENT_METRIC_LABELS[field], field, sorting, { numeric: true })).join("")}</tr></thead><tbody>${sorted.map((row) => `<tr><td${row.note ? ` title="${esc(row.note)}"` : ""}>${esc(row.name)}${row.note ? " †" : ""}</td>${fields.map((field) => `<td class="num">${equipmentValueText(field, equipmentMetricValue(row.stats, field) ?? 0)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`}`;
+  for (const button of panel.querySelectorAll("[data-table-category]")) {
+    button.addEventListener("click", () => {
+      sorting.category = button.dataset.tableCategory;
+      sorting.filter = "all";
+      resetSortState(sorting);
+      renderProfileEquipmentTable(discordId, periodWindow);
+    });
+  }
+  panel.querySelector("#equipment-table-filter").addEventListener("change", (event) => {
+    sorting.filter = event.target.value;
+    renderProfileEquipmentTable(discordId, periodWindow);
+  });
+  for (const button of panel.querySelectorAll("[data-sort-key]")) {
+    button.addEventListener("click", () => {
+      advanceSortState(sorting, button.dataset.sortKey);
+      renderProfileEquipmentTable(discordId, periodWindow);
+    });
+  }
+  wireFloatingTableHeaders();
+}
+
 function equipmentDetailsHtml(discordId, equipmentView, periodWindow, selectedId, metric) {
   const cached = equipmentProfileCache.get(discordId);
   const content = cached ? equipmentProfileContentHtml(discordId, equipmentView, periodWindow, selectedId, metric) : equipmentView.open
     ? `<div class="equipment-loading">Loading equipment data…</div>`
     : `<p class="equipment-empty">Expand to load this member’s weapon and vehicle history.</p>`;
   return `<details id="equipment-details" class="chart-card equipment-details" ${equipmentView.open ? "open" : ""}>
-    <summary class="recent-form-summary"><h3>Weapon/Vehicle Stats</h3><span class="panel-toggle" aria-hidden="true"></span></summary>
+    <summary class="recent-form-summary"><h3>Weapon/Vehicle Performance</h3><span class="panel-toggle" aria-hidden="true"></span></summary>
     ${content}
   </details>`;
 }
@@ -2592,10 +2723,10 @@ function wireEquipmentDetails(discordId, statKey, showEstimated, equipmentView, 
       });
     });
   }
-  if (equipmentView.open && !equipmentProfileCache.has(discordId)) {
+  if (!equipmentProfileCache.has(discordId)) {
     fetchEquipmentProfile(discordId).then(() => {
       const route = parseHashRoute(location.hash);
-      if (route.parts[0] === "player" && decodeURIComponent(route.parts[1] ?? "") === discordId && equipmentViewState(route.params).open) {
+      if (route.parts[0] === "player" && decodeURIComponent(route.parts[1] ?? "") === discordId) {
         render();
       }
     });
@@ -2655,7 +2786,7 @@ function recentFormCardHtml(discordId, member) {
     <div class="recent-form-content">
     <div class="table-wrap"><table class="recent-form-table">
       <thead><tr><th></th>${columns
-        .map((column) => `<th class="num period-column ${column.key === "today" ? "today-column" : ""}">${labels[column.key]}${column.window.partialEnd ? "*" : ""}<small>Period</small></th>`)
+        .map((column) => `<th class="num period-column ${column.key === "today" ? "today-column" : ""}">${labels[column.key]}<small>Period</small></th>`)
         .join("")}<th class="num career-column">Lifetime<small>Career</small></th></tr></thead>
       <tbody>${rows
         .map(
@@ -2665,9 +2796,7 @@ function recentFormCardHtml(discordId, member) {
         )
         .join("")}</tbody>
     </table></div>
-    <p class="cached-footnote">Career is the current lifetime total. Period columns are performance during that window only, from daily snapshot differences.${
-      columns.some((column) => column.window.partialEnd) ? " * includes today so far." : ""
-    } Today needs a prior daily snapshot plus the latest refresh. “—” means no coverage yet or nothing derivable (e.g. zero deaths).</p>
+    <p class="cached-footnote">Career is the current lifetime total. Period columns are performance during that window only, including today so far.</p>
     </div>
   </details>`;
 }
@@ -2772,21 +2901,32 @@ function renderCompare() {
         : `Pick players and a stat to overlay their daily Career history · comparing ${esc(careerRangeWindowText(careerHistoryWindow?.window))}`
     }</p>
     ${viewRangeControlHtml()}
-    <div class="group-label">Stat</div>
-    ${statTabsHtml(stat.key)}
-    <div class="group-label compare-players-label"><span>Players</span><span class="compare-player-actions"><button class="compare-favorites" type="button" ${candidates.some((member) => isFavorite(member.discordId)) ? "" : "disabled"} title="Select your favorited players">&hearts; Favorites</button><button class="compare-reset" type="button">Reset to Top 2</button><button class="compare-clear" type="button" ${compareState.selected.length === 0 ? "disabled" : ""}>Unselect all</button></span></div>
-    <div class="chip-row">${candidates
-      .map(
-        (member) =>
-          `<button class="chip ${compareState.selected.includes(member.discordId) ? "active" : ""}" data-id="${member.discordId}">${isFavorite(member.discordId) ? `<span class="chip-fav">&hearts;</span>` : ""}${esc(member.displayName ?? member.discordId)}</button>`
-      )
-      .join("")}</div>
-    <div class="chart-card">
+    <div class="compare-workspace">
+      <aside class="compare-stat-picker" aria-label="Comparison statistic">
+        <div class="group-label">Compare by</div>
+        ${statTabsHtml(stat.key)}
+      </aside>
+      <div class="compare-results">
+        <div class="compare-lineup" aria-label="Selected players">${compareState.selected.map((id) => {
+          const member = candidates.find((candidate) => candidate.discordId === id);
+          return `<span>${esc(member?.displayName ?? id)}</span>`;
+        }).join('<b aria-hidden="true">/</b>') || '<span>Select players to start comparing</span>'}</div>
+<div class="chart-card">
       <h3>${esc(stat.title)}</h3>
       <div class="chart-box"><canvas id="compare-chart"></canvas></div>
+    </div>
+    <section class="compare-player-picker" aria-labelledby="compare-picker-title"><h2 class="compare-picker-title" id="compare-picker-title">Choose players <span>${compareState.selected.length} selected</span></h2><div class="compare-player-toolbar"><label class="compare-search-label">Find a player<input id="compare-player-search" type="search" placeholder="Search the clan…" autocomplete="off" /></label><span class="compare-player-actions"><button class="compare-favorites" type="button" ${candidates.some((member) => isFavorite(member.discordId)) ? "" : "disabled"} title="Select your favorited players">&hearts; Favorites</button><button class="compare-reset" type="button">Reset to Top 2</button><button class="compare-clear" type="button" ${compareState.selected.length === 0 ? "disabled" : ""}>Unselect all</button></span></div>
+    <div class="chip-row compare-roster">${candidates
+      .map(
+        (member) =>
+          `<button class="chip ${compareState.selected.includes(member.discordId) ? "active" : ""}" data-id="${member.discordId}" aria-pressed="${compareState.selected.includes(member.discordId)}">${isFavorite(member.discordId) ? `<span class="chip-fav">&hearts;</span>` : ""}${esc(member.displayName ?? member.discordId)}</button>`
+      )
+      .join("")}</div></section>
+      </div>
     </div>`;
 
   wireStatTabs((key) => replaceHashAndRender(compareHref(key)));
+  wirePanelState();
   wireViewRangeControl(() => compareHref());
   app.querySelector(".compare-clear")?.addEventListener("click", () => {
     compareState.selectionMode = "manual";
@@ -2804,6 +2944,12 @@ function renderCompare() {
       .filter((member) => isFavorite(member.discordId))
       .map((member) => member.discordId);
     replaceHashAndRender(compareHref());
+  });
+  app.querySelector("#compare-player-search")?.addEventListener("input", (event) => {
+    const query = event.target.value.trim().toLocaleLowerCase();
+    for (const chip of app.querySelectorAll(".compare-roster .chip")) {
+      chip.hidden = Boolean(query) && !chip.textContent.toLocaleLowerCase().includes(query);
+    }
   });
   for (const chip of app.querySelectorAll(".chip[data-id]")) {
     chip.addEventListener("click", () => {
@@ -2961,7 +3107,7 @@ function overtakeText(event) {
         stat: stat.key,
         players: [event.overtakerId, event.overtakenId],
         range: "7d"
-      })}">Compare</a>`
+      })}">Compare ↗</a>`
     : "";
   return `<span class="feed-text"><span class="badge overtake">overtake</span>
     <a class="who player-link" href="${playerHref(event.overtakerId)}">${esc(memberName(event.overtakerId))}</a>${favoriteBadgeHtml(event.overtakerId)}
@@ -3129,6 +3275,7 @@ function wireFloatingTableHeader(wrapper) {
 
   const overlay = document.createElement("div");
   overlay.className = "floating-table-header";
+  if (wrapper.closest(".profile-equipment-table")) overlay.classList.add("profile-equipment-table");
   overlay.setAttribute("aria-hidden", "true");
   const cloneTable = table.cloneNode(false);
   cloneTable.append(sourceHead.cloneNode(true));
@@ -3164,7 +3311,7 @@ function wireFloatingTableHeader(wrapper) {
 
   const update = () => {
     const wrapperRect = wrapper.getBoundingClientRect();
-    const headerBottom = siteHeader.getBoundingClientRect().bottom;
+    const headerBottom = Math.max(0, siteHeader.getBoundingClientRect().bottom);
     const headerHeight = sourceHead.getBoundingClientRect().height;
     const visible = wrapperRect.top < headerBottom && wrapperRect.bottom > headerBottom + headerHeight;
     overlay.hidden = !visible;
@@ -3199,10 +3346,15 @@ function wireFloatingTableHeader(wrapper) {
     scheduleUpdate();
   };
   window.addEventListener("resize", handleResize);
+  const observer = new ResizeObserver(handleResize);
+  observer.observe(wrapper);
+  observer.observe(sourceHead);
   floatingHeaderCleanups.push(() => {
     window.removeEventListener("scroll", scheduleUpdate);
     wrapper.removeEventListener("scroll", scheduleUpdate);
     window.removeEventListener("resize", handleResize);
+    observer.disconnect();
+    if (frame !== null) cancelAnimationFrame(frame);
     overlay.remove();
   });
 }
@@ -3211,6 +3363,8 @@ function wireFloatingTableHeader(wrapper) {
 // Audit Log): pin a fixed clone of each table's header row just below the
 // sticky site header while the real header is scrolled out of view.
 function wireFloatingTableHeaders() {
+  for (const cleanup of floatingHeaderCleanups) cleanup();
+  floatingHeaderCleanups = [];
   for (const wrapper of app.querySelectorAll(".table-wrap")) {
     wireFloatingTableHeader(wrapper);
   }
@@ -3285,11 +3439,9 @@ function renderAudit() {
         <tbody>${filtered
           .map(
             (event) => `<tr data-audit-search="${esc(searchIndex(event))}">
-              <td>${fmtDateTime(event.at)}</td>
+              <td><span class="mono">${fmtDateTime(event.at)}</span></td>
               <td><span class="badge ${esc(event.action)}">${esc(auditActionLabel(event.action))}</span></td>
-              <td><span class="badge ${esc(auditOutcome(event))}">${esc(auditOutcome(event))}</span>${
-                event.failureReason ? ` <span class="muted">(${esc(auditFailureLabel(event.failureReason))})</span>` : ""
-              }</td>
+              <td><span class="badge ${esc(auditOutcome(event))}"${event.failureReason ? ` title="${esc(auditFailureLabel(event.failureReason))}"` : ""}>${esc(auditOutcome(event))}</span></td>
               <td>${auditMemberHtml(event)}</td>
               <td>${
                 event.action === "relinked" || event.action === "relink_attempt"
@@ -3678,8 +3830,9 @@ async function ensureRouteData(parts, params) {
   }
   if (route === "activity") loads.push(loadData("notifications", "data/notifications.json", { events: [] }));
   if (route === "audit" || route === "player") loads.push(loadData("audit", "data/audit.json", { events: [] }));
+  if (route === "player") loads.push(loadData("equipmentCatalogue", "data/equipment-catalogue.json", null));
   if (route === "effectiveness") loads.push(loadEffectivenessData());
-  if ((route === "board" && (parts[1] === "equipment" || panelIsOpen("panel-equipment", false))) ||
+  if ((route === "board" && parts[1] === "equipment") ||
       (route === "player" && equipmentViewState(params).open)) loads.push(loadEquipmentData());
   if (route === "player" || route === "compare") loads.push(loadChartJs().catch(() => null));
   await Promise.all(loads);
@@ -3700,30 +3853,6 @@ function prefetchCountersAfterCareerRender(route, params) {
         window.scrollTo(0, scrollY);
       }
     });
-  });
-}
-
-function wireDeferredEquipmentPanel() {
-  const panel = document.getElementById("panel-equipment");
-  if (!panel) return;
-  panel.addEventListener("toggle", async () => {
-    if (!panel.open) return;
-    const body = panel.querySelector(":scope > .stat-panel-body");
-    // Inserting `<details open>` through innerHTML queues a toggle event, and
-    // the panel renders open from persisted state on every later render. Left
-    // unguarded this handler re-renders itself: render writes the panel, the
-    // queued toggle fires, and it renders again about a hundred times a second.
-    // The page never stops repainting, so a real click cannot survive from
-    // mousedown to mouseup and every control inside the app goes dead.
-    // A body that is not the deferred placeholder has already been rendered
-    // with whatever it should show, so this toggle came from a render rather
-    // than from the reader, and there is nothing left to load.
-    if (!body?.querySelector("[data-equipment-deferred]")) return;
-    const scrollY = window.scrollY;
-    body.innerHTML = `<div class="equipment-loading">Loading equipment data…</div>`;
-    await loadEquipmentData();
-    await render();
-    window.scrollTo(0, scrollY);
   });
 }
 
@@ -3748,6 +3877,7 @@ async function render() {
   floatingHeaderCleanups = [];
   const { parts, params } = routeState;
   const [route] = parts;
+  document.body.dataset.route = route || "board";
   const routePath = parts.join("/");
   if (lastRenderedRoutePath != null && routePath !== lastRenderedRoutePath) {
     customCalendarState.open = false;
@@ -3784,6 +3914,8 @@ async function render() {
     renderLeaderboard(state.meta.stats[0].key, params);
   }
 
+  if (nav === "board") wireRankingControls();
+
   const selectedStatKey =
     route === "board"
       ? (statByKey(parts[1]) ?? state.meta.stats[0]).key
@@ -3798,13 +3930,14 @@ async function render() {
     if (link.dataset.nav === "players") link.href = hashRoute("players", persistentParams);
     if (link.dataset.nav === "compare") link.href = hashRoute("compare", { stat: selectedStatKey, ...persistentParams });
     link.classList.toggle("active", link.dataset.nav === nav);
+    if (link.dataset.nav === nav) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
   }
   const failureNotice = bootFailureNoticeHtml();
   if (failureNotice) {
     app.insertAdjacentHTML("afterbegin", failureNotice);
   }
   wireFloatingTableHeaders();
-  wireDeferredEquipmentPanel();
   prefetchCountersAfterCareerRender(route, params);
   window.scrollTo(0, 0);
 }
@@ -3844,6 +3977,7 @@ async function boot() {
     return;
   }
 
+  document.getElementById("field-roster").textContent = `${state.latest.members.length} PLAYERS / ONE CLAN`;
   const updated = document.getElementById("footer-updated");
   const age = dataAge(Date.now(), state.meta.observedAt ?? state.meta.updatedAt ?? null);
   updated.textContent = `Last updated ${fmtDateTime(state.meta.updatedAt)} ET`;
