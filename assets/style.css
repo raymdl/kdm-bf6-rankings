@@ -584,6 +584,14 @@ td.num, th.num {
   font-variant-numeric: tabular-nums;
 }
 
+th.trend-cell {
+  text-align: right;
+}
+
+td.trend-cell .sparkline {
+  margin-left: auto;
+}
+
 /* Ranks 4+ stay faint so the gold/silver/bronze podium colors read clearly;
    silver in particular needs the contrast against ordinary grey rows. */
 .rank-cell {
