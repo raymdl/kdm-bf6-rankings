@@ -1366,7 +1366,7 @@ function renderPeriodLeaderboard(stat, window) {
         }</td>
         <td class="num value-cell">${fmtStat(stat, row.value)}</td>
         <td class="num">${esc(activeTimeText(row.activeSeconds))}</td>
-        <td>${sparklineSvg(spark)}</td>
+        <td class="trend-cell">${sparklineSvg(spark)}</td>
       </tr>`;
     })
     .join("");
@@ -1376,7 +1376,7 @@ function renderPeriodLeaderboard(stat, window) {
         <td><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${favoriteBadgeHtml(row.discordId)} <span class="badge provisional" title="No gameplay recorded in this range">no play</span></td>
         <td class="num">—</td>
         <td class="num">—</td>
-        <td></td>
+        <td class="trend-cell"></td>
       </tr>`)
     .join("");
 
@@ -1396,7 +1396,7 @@ function renderPeriodLeaderboard(stat, window) {
     ${podiumHtml}
     <div class="table-wrap">
       <table>
-        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true })}<th>Daily trend</th></tr></thead>
+        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily trend</th></tr></thead>
         <tbody>${bodyRows}${missingRowsHtml}${bodyRows || missingRowsHtml ? "" : `<tr><td colspan="5" class="empty">No gameplay recorded in this range.</td></tr>`}</tbody>
       </table>
     </div>
@@ -1811,7 +1811,7 @@ function renderEquipmentLeaderboard(params) {
         const trailingCell = usePeriod
           ? `<td class="num">${esc(activeTimeText(row.activeSeconds))}</td>`
           : `<td class="num"><span class="delta ${deltaClass}">${delta}</span></td>`;
-        return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${usePeriod ? `${trackedSinceBadgeHtml(periodWindow, row.coverageStart, EQUIPMENT_COVERAGE_BADGE_TITLE)}${equipmentTimeSinceBadgeHtml(row.activeSince, selected?.category)}` : ""}</td><td class="num value-cell">${equipmentValueText(metric, row.value)}</td>${trailingCell}<td>${sparklineSvg(row.trend)}</td></tr>`;
+        return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${usePeriod ? `${trackedSinceBadgeHtml(periodWindow, row.coverageStart, EQUIPMENT_COVERAGE_BADGE_TITLE)}${equipmentTimeSinceBadgeHtml(row.activeSince, selected?.category)}` : ""}</td><td class="num value-cell">${equipmentValueText(metric, row.value)}</td>${trailingCell}<td class="trend-cell">${sparklineSvg(row.trend)}</td></tr>`;
       }).join("")
     : missingRows.length ? "" : `<tr><td colspan="5" class="empty">No observed ${esc(EQUIPMENT_METRIC_LABELS[metric])} for this equipment item in the selected range.</td></tr>`) + missingRowsHtml;
   const equipmentName = selected ? equipmentDisplayName(selected.category, selected.id) : "Equipment";
@@ -1826,7 +1826,7 @@ function renderEquipmentLeaderboard(params) {
     </section>
     ${artifactNote}${periodNote}
     ${equipmentPodiumHtml(rows, metric, windowText, usePeriod, selected?.category ?? "weapons", equipmentName)}
-    ${selected ? `<div class="table-wrap equipment-leaderboard-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(heading, "value", leaderboardSortState, { numeric: true })}${usePeriod ? sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true }) : sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th>${usePeriod ? "Daily trend" : "Trend"}</th></tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
+    ${selected ? `<div class="table-wrap equipment-leaderboard-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(heading, "value", leaderboardSortState, { numeric: true })}${usePeriod ? sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true }) : sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th class="trend-cell">${usePeriod ? "Daily trend" : "Trend"}</th></tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
   const equipmentHref = (rangeParams) => hashRoute("board/equipment", { equipment: selected?.id ?? null, metric: metric === "kills" ? null : metric, ...rangeParams });
   wireViewRangeControl(equipmentHref);
   wireStatTabs();
@@ -1942,7 +1942,7 @@ function renderLeaderboard(statKey, params) {
         <td><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${favoriteBadgeHtml(row.discordId)}${cached}</td>
         <td class="num value-cell">${fmtStat(stat, row.value)}</td>
         <td class="num"><span class="delta ${deltaClass}">${delta ?? "–"}</span></td>
-        <td>${sparklineSvg(spark)}</td>
+        <td class="trend-cell">${sparklineSvg(spark)}</td>
       </tr>`;
     })
     .join("");
@@ -1958,7 +1958,7 @@ function renderLeaderboard(statKey, params) {
     ${podiumHtml}
     <div class="table-wrap">
       <table>
-        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Δ", "movement", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th>Trend</th></tr></thead>
+        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Δ", "movement", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th class="trend-cell">Trend</th></tr></thead>
         <tbody>${rows || `<tr><td colspan="6" class="empty">No stats yet.</td></tr>`}</tbody>
       </table>
     </div>
