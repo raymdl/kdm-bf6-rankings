@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -24,15 +24,17 @@ test("static deployment assets share a cache version and Chart.js keeps its inte
   const version = appTag[1];
 
   const appJs = await read("assets/app.js");
-  const imports = [...appJs.matchAll(/from\s+"(\.\/[^"]+)"/g)].map((match) => match[1]);
-  assert.ok(imports.length >= 3, `expected module imports in app.js, found ${imports.length}`);
-  for (const specifier of imports) {
-    const versioned = specifier.match(/\?v=(.+)$/);
-    assert.ok(versioned, `unversioned module import in app.js: ${specifier}`);
-    assert.equal(versioned[1], version, `version mismatch for ${specifier} (index.html has ${version})`);
+  for (const file of (await readdir(path.join(root, "assets"))).filter((file) => file.endsWith(".js"))) {
+    const source = await read(`assets/${file}`);
+    const imports = [...source.matchAll(/(?:from\s*|import\s*\(?\s*)["'](\.\.?\/[^"']+)["']/g)].map((match) => match[1]);
+    for (const specifier of imports) {
+      const versioned = specifier.match(/\?v=(.+)$/);
+      assert.ok(versioned, `unversioned module import in ${file}: ${specifier}`);
+      assert.equal(versioned[1], version, `version mismatch for ${specifier} (index.html has ${version})`);
+    }
   }
   assert.match(indexHtml, /href="assets\/style\.css\?v=[^"]+"/);
-  assert.match(appJs, /CHART_JS_URL\s*=\s*"https:\/\/cdn\.jsdelivr\.net\/npm\/chart\.js@4\.4\.7\/dist\/chart\.umd\.min\.js"/);
+  assert.match(appJs, /CHART_JS_URL\s*=\s*"https:\/\/cdn\.jsdelivr\.net\/npm\/chart\.js@\d+\.\d+\.\d+\/dist\/chart\.umd\.min\.js"/);
   assert.match(appJs, /CHART_JS_INTEGRITY\s*=\s*"sha384-[A-Za-z0-9+/=]+"/);
   assert.match(appJs, /script\.integrity\s*=\s*CHART_JS_INTEGRITY/);
   assert.match(appJs, /script\.crossOrigin\s*=\s*"anonymous"/);

@@ -1,3 +1,5 @@
+import { shiftDate, ratio } from "./counter-math.js?v=20260907-review-cleanup";
+
 /* KDM BF6 Rankings — pure Period calculation engine over data/counters.json.
    DOM-free and side-effect-free so it runs identically in the browser and in
    `node --test`. All semantics follow BF6_CAREER_PERIOD_STATS_IMPLEMENTATION_PLAN.md:
@@ -130,11 +132,6 @@ export function periodUnsupportedReason(statKey, counters = null) {
   return def.requires.every((key) => present.has(key)) ? null : "counters_missing";
 }
 
-function ratio(numerator, denominator) {
-  return Number.isFinite(numerator) && Number.isFinite(denominator) && denominator > 0
-    ? numerator / denominator
-    : null;
-}
 
 // Formula versions this engine must refuse outright. Deliberately a denylist,
 // not an equality pin: the bot owns BF6_COUNTERS_FORMULA_VERSION and bumps it
@@ -165,11 +162,6 @@ export function validCounters(counters) {
   );
 }
 
-function shiftDate(date, days) {
-  const d = new Date(`${date}T12:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
-}
 
 function indexOnOrBefore(dates, target) {
   for (let i = dates.length - 1; i >= 0; i -= 1) {
