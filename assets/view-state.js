@@ -1,3 +1,5 @@
+import { shiftDate } from "./counter-math.js?v=20260907-review-cleanup";
+
 export const RANGE_OPTIONS = [
   { key: "today", label: "Today" },
   { key: "3d", label: "3 Days" },
@@ -90,11 +92,6 @@ export function playerProfileRoute(
   });
 }
 
-function shiftDate(date, days) {
-  const shifted = new Date(`${date}T12:00:00Z`);
-  shifted.setUTCDate(shifted.getUTCDate() + days);
-  return shifted.toISOString().slice(0, 10);
-}
 
 function positionOnOrBefore(dates, indexes, target) {
   for (let position = indexes.length - 1; position >= 0; position -= 1) {

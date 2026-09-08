@@ -1,3 +1,5 @@
+import { ratio } from "./counter-math.js?v=20260907-review-cleanup";
+
 /* Sparse equipment counters shared by the profile and equipment leaderboard.
    A missing snapshot is different from an unchanged value: callers need that
    distinction before they can safely derive a window statistic. */
@@ -189,11 +191,6 @@ function fieldValue(fields, field) {
   return fields[field]?.known ? fields[field].value : null;
 }
 
-function ratio(numerator, denominator) {
-  return Number.isFinite(numerator) && Number.isFinite(denominator) && denominator > 0
-    ? numerator / denominator
-    : null;
-}
 
 // A percentage outside 0-100 is not a reading, it is an artifact of counting
 // pellet hits against shells fired. Shotguns land at 131% and worse, so the

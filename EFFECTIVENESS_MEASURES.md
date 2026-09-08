@@ -6,11 +6,24 @@ This document specifies the three experimental measures in the KDM BF6 Effective
 2. **Risk-Adjusted Impact Score (RAIS)** — contribution adjusted for death exposure.
 3. **Win Rate Residual (WRR)** — Breakthrough winning above or below the rate predicted by visible performance.
 
-The formulas run in the bot publisher from the complete cohort for each retained `data/archive/<date>.json` snapshot. The generated `data/effectiveness-history.json` contains compact CEI/RAIS/WRR, Combat, Objective, and Teamwork series plus the detailed current snapshot. Scores are relative to the currently tracked KDM population, so they can move when players are added, removed, or improve.
+The formulas run in the bot publisher from the complete cohort for each retained numeric daily snapshot in private R2 (`bf6/numeric/daily/<date>.json`). The generated `data/effectiveness-history.json` contains compact CEI/RAIS/WRR, Combat, Objective, and Teamwork series plus the detailed current snapshot. Newly calculated scores are relative to the eligible public cohort for that calculation. Unchanged historical columns are preserved; an unlist alone does not recalculate them. Changed source dates, restored members, and model-version changes can recalculate affected history. The current snapshot can move as members or their inputs change.
+
+Source checked 2026-09-07 against the bot model and site display code. These are experimental relative measures, not official Battlefield ratings.
+
+```mermaid
+flowchart LR
+  Inputs["Numeric counters and weapon mix"] --> Rates["Rates and aim residuals"]
+  Rates --> Normalize["Exposure shrinkage and clan percentiles"]
+  Normalize --> Pillars["Combat, Objective, Teamwork"]
+  Pillars --> CEI["CEI: balanced contribution"]
+  Pillars --> RAIS["RAIS: death-adjusted impact"]
+  Pillars --> WRR["WRR: win-rate residual"]
+  Seasons["Breakthrough season records"] --> WRR
+```
 
 ## Design scope
 
-- KDM's primary mode is **Breakthrough**. Objective and win inputs are therefore Breakthrough-specific where mode-level data is available.
+- KDM's primary mode is **Breakthrough**. Win inputs use Breakthrough season records where available. The Objective pillar uses top-level objective totals; it is Breakthrough-oriented but is not filtered to Breakthrough-only actions.
 - Combat uses **player-only kills**. Bot-inclusive top-level kill counters and generic GameTools KPM are not used.
 - Lifetime totals are converted to rates or percentages before comparison, so playing more hours does not automatically produce a higher score.
 - Accuracy and Headshot % remain important, but are adjusted for weapon mix.
@@ -22,7 +35,7 @@ Most raw inputs have different units and distributions. Before combining them, t
 
 ### 1. Rate construction
 
-Counts are divided by total play hours, matches, or play seconds as appropriate. Examples include assists/hour, objective actions/hour, Player Kills/match, and objective-time share.
+The model uses top-level `secondsPlayed` for hours and duration-normalized pillars, falling back to active class seconds when absent. Player Kills/Min uses active class minutes. These denominators differ intentionally in the current implementation; the ordinary site Time Played metric uses active seconds. Counts are divided by the appropriate hours, matches, or seconds. Examples include assists/hour, objective actions/hour, Player Kills/match, and objective-time share.
 
 Player-only combat values use the public tracker definitions:
 
@@ -114,7 +127,7 @@ Weapon usage is approximated by kill share across eight classes:
 - Shotgun
 - Pistol
 
-Per-weapon shot totals and playtime are not present in the GameTools dump, so weapon-kill share is the available usage proxy.
+The model uses weapon-kill share as its usage proxy. Numeric archives began retaining shot and equipment-time counters on 2026-08-10; the current model does not use those fields for weapon-mix weights. Their availability is not a reason to describe kill share as measured time share.
 
 For Accuracy and Headshot % separately:
 
@@ -240,7 +253,7 @@ WRR measures whether a player wins more or less often than expected from their v
 
 ### Step 1: Breakthrough season records
 
-Only the `Breakthrough0` mode record inside each season is used. Each season supplies wins and losses independently.
+The first mode whose key starts with `breakthrough` (case-insensitive), normally `Breakthrough0`, is used within each season. Each season supplies wins and losses independently.
 
 Raw season win rate:
 
@@ -309,7 +322,7 @@ Interpretation:
 
 GameTools does not expose an explicit abandoned-match or early-exit counter. Seasonal `matches` is effectively the sum of recorded wins and losses, so the model cannot distinguish a completed loss from a match that was left before a loss was recorded. Win/loss count still affects confidence through the 25-match prior: large records are trusted more, but raw win volume does not earn a separate score bonus because that would primarily reward playtime.
 
-If season-mode data is temporarily unavailable, the implementation falls back to lifetime wins/losses stabilized by a 50-match clan prior. Current published data includes Breakthrough season records for all tracked players.
+If season-mode data is temporarily unavailable, the implementation falls back to lifetime wins/losses stabilized by a 50-match clan prior. The generated snapshot labels whether a row used season data or the lifetime fallback; do not assume current full-roster coverage from this guide.
 
 ## Player-level breakdowns
 
@@ -325,7 +338,7 @@ Every row in the Full KDM Ranking table has a **Breakdown** control. Expanding i
 - Display definitions: [`assets/effectiveness.js`](assets/effectiveness.js)
 - Page rendering and row breakdowns: [`assets/app.js`](assets/app.js)
 - Canonical formulas and model version: [`kdm-discord-bot/src/bf6-effectiveness.js`](https://github.com/raymdl/kdm-discord-bot/blob/main/src/bf6-effectiveness.js)
-- Generated current/history contract: [`data/effectiveness-history.json`](data/effectiveness-history.json)
-- Current raw snapshots: [`data/archive/`](data/archive/)
+- Generated current/history contract: `effectiveness-history.json` in the pinned public release; the repository copy is frozen
+- Archive ownership and coverage: [bot data ownership guide](https://github.com/raymdl/kdm-discord-bot/blob/main/docs/BF6_DATA_OWNERSHIP_AND_RETENTION.md)
 
-The bot's `EFFECTIVENESS_MODEL_VERSION` must be incremented whenever a formula, weight, normalization rule, input definition, prior, or regression configuration changes. A version change triggers a complete historical rebuild. Raw archives remain the rebuild source.
+The bot's `EFFECTIVENESS_MODEL_VERSION` must be incremented whenever a formula, weight, normalization rule, input definition, prior, or regression configuration changes. A version change triggers a complete historical rebuild. Private numeric archives remain the rebuild source; the next normal publication performs the version-triggered rebuild.

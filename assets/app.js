@@ -1,3 +1,5 @@
+import { renderActivityView } from "./activity-view.js?v=20260907-review-cleanup";
+
 /* KDM BF6 Rankings — static SPA reading the generated JSON published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN.
 
@@ -5,9 +7,9 @@
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20260904-timezone-loading";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20260907-review-cleanup";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260904-timezone-loading";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260907-review-cleanup";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -18,7 +20,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260904-timezone-loading";
+} from "./period.js?v=20260907-review-cleanup";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -32,8 +34,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260904-timezone-loading";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260904-timezone-loading";
+} from "./view-state.js?v=20260907-review-cleanup";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260907-review-cleanup";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -43,7 +45,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260904-timezone-loading";
+} from "./equipment.js?v=20260907-review-cleanup";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -3233,37 +3235,7 @@ function renderActivity() {
     .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
     .slice(0, 120);
 
-  app.innerHTML = `
-    <div class="activity-toolbar">
-      <div class="activity-heading-row">
-        <h1 class="page-title">Activity</h1>
-        <label class="player-search"><span class="sr-only">Search overtake activity</span><input id="activity-search" type="search" placeholder="Search players or stats" autocomplete="off" value="${esc(activityFilterState.text)}"></label>
-      </div>
-      <p class="page-sub">Recent leaderboard overtakes</p>
-    </div>
-    ${
-      items.length
-        ? `<div class="feed">${items
-            .map((item) => `<div class="feed-item${item.favorited ? " favorited" : ""}" data-activity-search="${esc(item.search)}"><span class="feed-date">${fmtDateTime(item.at)}</span>${item.html}</div>`)
-            .join("")}</div><p id="activity-search-empty" class="empty" hidden>No overtake activity matches that search.</p>`
-        : `<div class="empty">No overtakes yet — this feed records leaderboard changes only.</div>`
-    }`;
-
-  const search = document.getElementById("activity-search");
-  const cards = [...app.querySelectorAll("[data-activity-search]")];
-  const empty = document.getElementById("activity-search-empty");
-  const applyFilter = () => {
-    activityFilterState.text = search.value;
-    const query = search.value.trim().toLocaleLowerCase();
-    let visible = 0;
-    for (const card of cards) {
-      card.hidden = Boolean(query) && !card.dataset.activitySearch.includes(query);
-      if (!card.hidden) visible += 1;
-    }
-    if (empty) empty.hidden = visible > 0;
-  };
-  search?.addEventListener("input", applyFilter);
-  if (search) applyFilter();
+  renderActivityView({ app, items, filterState: activityFilterState, esc, fmtDateTime });
 }
 
 const auditFilterState = { text: "", action: "all", outcome: "all" };
