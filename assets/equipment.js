@@ -1,4 +1,4 @@
-import { ratio } from "./counter-math.js?v=20260907-review-cleanup";
+import { ratio } from "./counter-math.js?v=20260910-table-spacing";
 
 /* Sparse equipment counters shared by the profile and equipment leaderboard.
    A missing snapshot is different from an unchanged value: callers need that

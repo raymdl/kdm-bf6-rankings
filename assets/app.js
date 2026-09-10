@@ -1,4 +1,4 @@
-import { renderActivityView } from "./activity-view.js?v=20260907-review-cleanup";
+import { renderActivityView } from "./activity-view.js?v=20260910-table-spacing";
 
 /* KDM BF6 Rankings — static SPA reading the generated JSON published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN.
@@ -7,9 +7,9 @@ import { renderActivityView } from "./activity-view.js?v=20260907-review-cleanup
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20260907-review-cleanup";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20260910-table-spacing";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260907-review-cleanup";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20260910-table-spacing";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -20,7 +20,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260907-review-cleanup";
+} from "./period.js?v=20260910-table-spacing";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -34,8 +34,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260907-review-cleanup";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260907-review-cleanup";
+} from "./view-state.js?v=20260910-table-spacing";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260910-table-spacing";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -45,7 +45,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260907-review-cleanup";
+} from "./equipment.js?v=20260910-table-spacing";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -1396,9 +1396,9 @@ function renderPeriodLeaderboard(stat, window) {
       ${rankingControlsHtml(stat.key)}
     </section>
     ${podiumHtml}
-    <div class="table-wrap">
+    <div class="table-wrap leaderboard-table">
       <table>
-        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily trend</th></tr></thead>
+        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead>
         <tbody>${bodyRows}${missingRowsHtml}${bodyRows || missingRowsHtml ? "" : `<tr><td colspan="5" class="empty">No gameplay recorded in this range.</td></tr>`}</tbody>
       </table>
     </div>
@@ -1828,7 +1828,7 @@ function renderEquipmentLeaderboard(params) {
     </section>
     ${artifactNote}${periodNote}
     ${equipmentPodiumHtml(rows, metric, windowText, usePeriod, selected?.category ?? "weapons", equipmentName)}
-    ${selected ? `<div class="table-wrap equipment-leaderboard-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(heading, "value", leaderboardSortState, { numeric: true })}${usePeriod ? sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true }) : sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th class="trend-cell">${usePeriod ? "Daily trend" : "Trend"}</th></tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
+    ${selected ? `<div class="table-wrap leaderboard-table equipment-leaderboard-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(heading, "value", leaderboardSortState, { numeric: true })}${usePeriod ? sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true }) : sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
   const equipmentHref = (rangeParams) => hashRoute("board/equipment", { equipment: selected?.id ?? null, metric: metric === "kills" ? null : metric, ...rangeParams });
   wireViewRangeControl(equipmentHref);
   wireStatTabs();
@@ -1958,9 +1958,9 @@ function renderLeaderboard(statKey, params) {
       ${rankingControlsHtml(stat.key)}
     </section>
     ${podiumHtml}
-    <div class="table-wrap">
+    <div class="table-wrap leaderboard-table">
       <table>
-        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Δ", "movement", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th class="trend-cell">Trend</th></tr></thead>
+        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Δ", "movement", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead>
         <tbody>${rows || `<tr><td colspan="6" class="empty">No stats yet.</td></tr>`}</tbody>
       </table>
     </div>
@@ -3033,6 +3033,35 @@ function loadTimeMachineState(params) {
   timeMachineState.index = requestedSnapshotIndex >= 0 ? requestedSnapshotIndex : snapshotIndexes.length - 1;
 }
 
+function timeMachineRowsHtml(stat, historyIndex) {
+  const memberIds = state.latest.members.map((member) => member.discordId);
+  const ranking = authoritativeRankingAt(stat.key, historyIndex, memberIds);
+  const rankedIds = new Set(ranking.map((row) => row.discordId));
+  const missingRows = memberIds
+    .filter((discordId) => !rankedIds.has(discordId))
+    .map((discordId) => ({ discordId, trackedSince: memberTrackedSince(discordId) }))
+    .sort((a, b) =>
+      String(a.trackedSince ?? "9999-99-99").localeCompare(String(b.trackedSince ?? "9999-99-99"))
+      || memberName(a.discordId).localeCompare(memberName(b.discordId), undefined, { sensitivity: "base", numeric: true })
+    );
+
+  return `${ranking
+          .map(
+            (row, rankIndex) => `<tr class="r${rankIndex + 1}${isFavorite(row.discordId) ? " fav-row" : ""}">
+              <td class="rank-cell">${rankIndex + 1}</td>
+              <td><a class="player-link" href="${timeMachinePlayerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${favoriteBadgeHtml(row.discordId)}</td>
+              <td class="num value-cell">${fmtStat(stat, row.value)}</td>
+            </tr>`
+          )
+          .join("")}${missingRows
+            .map((row) => `<tr class="time-machine-unranked${isFavorite(row.discordId) ? " fav-row" : ""}">
+              <td class="rank-cell">—</td>
+              <td><a class="player-link" href="${timeMachinePlayerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${favoriteBadgeHtml(row.discordId)} ${timeMachineTrackedSinceBadgeHtml(row.trackedSince)}</td>
+              <td class="num">—</td>
+            </tr>`)
+            .join("")}`;
+}
+
 function renderTimeMachine() {
   const dates = state.history.dates;
   const snapshotIndexes = authoritativeHistoryIndexes();
@@ -3049,16 +3078,6 @@ function renderTimeMachine() {
   const date = dates[historyIndex];
   history.replaceState(null, "", timeMachineHref(stat.key, index));
 
-  const memberIds = state.latest.members.map((member) => member.discordId);
-  const ranking = authoritativeRankingAt(stat.key, historyIndex, memberIds);
-  const rankedIds = new Set(ranking.map((row) => row.discordId));
-  const missingRows = memberIds
-    .filter((discordId) => !rankedIds.has(discordId))
-    .map((discordId) => ({ discordId, trackedSince: memberTrackedSince(discordId) }))
-    .sort((a, b) =>
-      String(a.trackedSince ?? "9999-99-99").localeCompare(String(b.trackedSince ?? "9999-99-99"))
-      || memberName(a.discordId).localeCompare(memberName(b.discordId), undefined, { sensitivity: "base", numeric: true })
-    );
 
   app.innerHTML = `
     <div class="page-heading-row"><h1 class="page-title">Time Machine</h1>${shareButtonHtml()}</div>
@@ -3072,21 +3091,7 @@ function renderTimeMachine() {
     <div class="table-wrap">
       <table>
         <thead><tr><th>#</th><th>Player</th><th class="num">${esc(stat.title)}</th></tr></thead>
-        <tbody>${ranking
-          .map(
-            (row, rankIndex) => `<tr class="r${rankIndex + 1}${isFavorite(row.discordId) ? " fav-row" : ""}">
-              <td class="rank-cell">${rankIndex + 1}</td>
-              <td><a class="player-link" href="${timeMachinePlayerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${favoriteBadgeHtml(row.discordId)}</td>
-              <td class="num value-cell">${fmtStat(stat, row.value)}</td>
-            </tr>`
-          )
-          .join("")}${missingRows
-            .map((row) => `<tr class="time-machine-unranked${isFavorite(row.discordId) ? " fav-row" : ""}">
-              <td class="rank-cell">—</td>
-              <td><a class="player-link" href="${timeMachinePlayerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${favoriteBadgeHtml(row.discordId)} ${timeMachineTrackedSinceBadgeHtml(row.trackedSince)}</td>
-              <td class="num">—</td>
-            </tr>`)
-            .join("")}</tbody>
+        <tbody>${timeMachineRowsHtml(stat, historyIndex)}</tbody>
       </table>
     </div>`;
 
@@ -3095,6 +3100,7 @@ function renderTimeMachine() {
   dateSlider.addEventListener("input", (event) => {
     timeMachineState.index = Number(event.target.value);
     const selectedHistoryIndex = snapshotIndexes[timeMachineState.index];
+    app.querySelector("tbody").innerHTML = timeMachineRowsHtml(stat, selectedHistoryIndex);
     document.getElementById("date-label").textContent = fmtDate(`${dates[selectedHistoryIndex]}T12:00:00`);
     document.getElementById("snapshot-position").textContent = `${timeMachineState.index + 1}/${snapshotIndexes.length} snapshots`;
     history.replaceState(null, "", timeMachineHref(stat.key, timeMachineState.index));
@@ -3250,6 +3256,8 @@ function wireFloatingTableHeader(wrapper) {
 
   const overlay = document.createElement("div");
   overlay.className = "floating-table-header";
+  if (wrapper.classList.contains("leaderboard-table")) overlay.classList.add("leaderboard-table");
+  if (wrapper.classList.contains("effectiveness-table")) overlay.classList.add("effectiveness-table");
   if (wrapper.closest(".profile-equipment-table")) overlay.classList.add("profile-equipment-table");
   overlay.setAttribute("aria-hidden", "true");
   const cloneTable = table.cloneNode(false);
@@ -3632,7 +3640,7 @@ function effectivenessTableHtml(key, ranking) {
     ? `${sortableHeaderHtml("Residual", "score", effectivenessSortState, { numeric: true })}${sortableHeaderHtml("Win%", "win", effectivenessSortState, { numeric: true })}${sortableHeaderHtml("Expected", "expected", effectivenessSortState, { numeric: true })}`
     : key === "sortino"
       ? `${sortableHeaderHtml("Score", "score", effectivenessSortState, { numeric: true })}${sortableHeaderHtml("Upside", "upside", effectivenessSortState, { numeric: true })}${sortableHeaderHtml("Deaths/hr", "deaths", effectivenessSortState, { numeric: true })}`
-      : `${sortableHeaderHtml("Score", "score", effectivenessSortState, { numeric: true })}<th>Support lanes</th>`;
+      : `${sortableHeaderHtml("Score", "score", effectivenessSortState, { numeric: true })}<th class="support-lanes">Support lanes</th>`;
   const columnCount = key === "trident" ? 7 : 8;
   const sortableRanking = ranking.map((row, index) => ({ ...row, originalRank: index + 1 }));
   const sortedRanking = sortedRows(sortableRanking, effectivenessSortState, (row, sortKey) => ({
@@ -3652,7 +3660,7 @@ function effectivenessTableHtml(key, ranking) {
       ? `<td class="num value-cell ${row.scores.alpha >= 0 ? "positive-score" : "negative-score"}">${effectivenessScoreText(key, row.scores.alpha)}</td><td class="num">${row.smoothedWinPercent.toFixed(1)}%</td><td class="num">${row.expectedWinPercent.toFixed(1)}%</td>`
       : key === "sortino"
         ? `<td class="num value-cell">${row.scores.sortino.toFixed(1)}</td><td class="num">${row.sortinoUpside.toFixed(1)}</td><td class="num">${row.adjusted.deathsPerHour.toFixed(1)}</td>`
-        : `<td class="num value-cell">${row.scores.trident.toFixed(1)}</td><td>${row.bestSupportLanes.map((lane) => lane[0].toUpperCase() + lane.slice(1)).join(" + ")}</td>`;
+        : `<td class="num value-cell">${row.scores.trident.toFixed(1)}</td><td class="support-lanes">${row.bestSupportLanes.map((lane) => lane[0].toUpperCase() + lane.slice(1)).join(" + ")}</td>`;
     const detailId = `score-detail-${key}-${row.discordId}`;
     return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><div class="ranking-player-cell"><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${row.cachedStats ? cachedMarkerHtml() : ""}<button class="rank-detail-toggle" type="button" aria-expanded="false" aria-controls="${detailId}" data-detail-id="${detailId}">Breakdown</button></div></td>${detail}<td class="num pillar-score">${row.pillars.combat.toFixed(1)}</td><td class="num pillar-score">${row.pillars.objective.toFixed(1)}</td><td class="num pillar-score">${row.pillars.teamwork.toFixed(1)}</td></tr>
       <tr class="rank-detail-row" id="${detailId}" hidden><td colspan="${columnCount}">${effectivenessBreakdownHtml(key, row)}</td></tr>`;

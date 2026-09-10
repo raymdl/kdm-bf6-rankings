@@ -588,6 +588,50 @@ th.trend-cell {
   text-align: right;
 }
 
+.leaderboard-table th:has([data-sort-key="rank"]),
+.leaderboard-table th:has([data-sort-key="movement"]) {
+  width: 58px;
+}
+
+.leaderboard-table th.num {
+  width: 200px;
+}
+
+.leaderboard-table th.num:nth-last-child(2) {
+  width: 140px;
+}
+
+.leaderboard-table th.trend-cell {
+  width: 206px;
+}
+
+:is(.leaderboard-table, .effectiveness-table) th:not(.sortable-column),
+:is(.leaderboard-table, .effectiveness-table) .sort-button {
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+:is(.leaderboard-table, .effectiveness-table) .sortable-column.num .sort-button {
+  position: relative;
+}
+
+.leaderboard-table th:first-child .sort-button,
+.leaderboard-table td:first-child {
+  padding-left: 36px;
+}
+
+.leaderboard-table th.trend-cell,
+.leaderboard-table td.trend-cell {
+  padding-right: 36px;
+}
+
+:is(.leaderboard-table, .effectiveness-table) .sortable-column.num .sort-indicator {
+  position: absolute;
+  right: 3px;
+  width: 12px;
+  text-align: center;
+}
+
 td.trend-cell .sparkline {
   margin-left: auto;
 }
@@ -1586,6 +1630,12 @@ input[type="search"]::-webkit-search-cancel-button:hover {
 }
 
 .effectiveness-table table { min-width: 850px; }
+.effectiveness-table th:first-child { width: 76px; }
+.effectiveness-table th.num { width: 130px; }
+.effectiveness-table th.num:last-child { width: 148px; }
+.effectiveness-table th.support-lanes { width: 210px; }
+.effectiveness-table th.support-lanes,
+.effectiveness-table td.support-lanes { padding-left: 75px; }
 .pillar-score { color: var(--text-dim); }
 .positive-score { color: var(--up); }
 .negative-score { color: var(--down); }
@@ -3677,3 +3727,26 @@ body[data-route="activity"] .feed { gap:6px; }
 .data-notice button:hover { background:#f4834a18; }
 .data-notice #dismiss-data-notice { padding:2px 4px; border:0; color:var(--text-dim); font-size:18px; }
 @media(max-width:700px) { .data-notice { top:12px; right:16px; gap:8px; } }
+
+/* Roomier outer edges on full-size tables; keep the audit log and mobile layouts compact. */
+@media (min-width: 701px) {
+  body:not([data-route="audit"]) :is(.table-wrap, .floating-table-header) th:first-child:not(.sortable-column),
+  body:not([data-route="audit"]) :is(.table-wrap, .floating-table-header) th:first-child .sort-button,
+  body:not([data-route="audit"]) .table-wrap td:first-child {
+    padding-left: 36px;
+  }
+
+  body:not([data-route="audit"]) :is(.table-wrap, .floating-table-header) th:last-child:not(.sortable-column),
+  body:not([data-route="audit"]) :is(.table-wrap, .floating-table-header) th:last-child .sort-button,
+  body:not([data-route="audit"]) .table-wrap td:last-child {
+    padding-right: 36px;
+  }
+
+  .profile-equipment-table th:last-child .sort-indicator {
+    right: 25px;
+  }
+
+  .effectiveness-table th:last-child .sort-indicator {
+    right: 21px;
+  }
+}
