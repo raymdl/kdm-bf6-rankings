@@ -2,6 +2,11 @@
 
 [Open the site](https://raymdl.github.io/kdm-bf6-rankings/).
 
+[Data-flow atlas](https://raymdl.github.io/kdm-bf6-rankings/atlas/) explains the
+bot, collection pipeline, AI responses, website, storage, and operations.
+Its self-contained HTML is generated from `docs/data-flow/` in the bot
+repository and published here as `atlas/index.html`.
+
 The KDM community's Battlefield 6 statistics site: Career and Period
 leaderboards, player history, head-to-head comparisons, weapon/vehicle data,
 activity, and an experimental Effectiveness Lab. It is a static vanilla
