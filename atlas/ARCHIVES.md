@@ -76,7 +76,7 @@ The July 2026 Tracker.gg backfill was a one-time reconstruction. Its tooling is 
 
 Published `history-provenance.json` (v2) marks estimated cells before the 10 July anchor. The local verbose v1 file also holds source, confidence and grouped-session detail. v1 cannot be rebuilt from v2, so keep the raw captures and the v1 file if the backfill may need re-auditing.
 
-`docs/archive/` holds completed plans, incident evidence and reviews. `docs/deferred/` holds proposals that are not implemented. The repository's `backups/` exports and old `state/` directory are historical files, not ongoing backups.
+`docs/archive/` holds completed plans, incident evidence, reviews and proposals that were not implemented. The repository's `backups/` exports and old `state/` directory are historical files, not ongoing backups.
 
 ## D28 · Mini PC disk loss
 
@@ -121,4 +121,4 @@ No machine-level backup of `C:\ProgramData` or the checkout is currently confirm
 
 ## Source anchors
 
-[Ownership/retention](../BF6_DATA_OWNERSHIP_AND_RETENTION.md), [R2 architecture](../R2_RIGHT_SIZED_ARCHITECTURE.md), [tracker document schema](../../src/tracker-state-schema.js), [tracker CAS adapter](../../src/tracker-state-r2-simple.js), [tracker backups](../../src/tracker-state-r2-backup.js), [numeric R2](../../src/bf6-numeric-archive-r2.js), [raw local archive](../../src/bf6-local-full-archive.js), [raw backup](../../src/bf6-raw-archive-backup.js), [bare mirror script](../../scripts/kdm-backup-mirror.ps1), [historical tooling](../../tools/historical/tracker-backfill/README.md), [local evidence inventory](../../tools/README.md), [frozen archive contract](https://github.com/raymdl/kdm-bf6-archive/blob/e3eaddac203a9a60da572b10b9070b93a669e307/README.md).
+[Ownership/retention](../BF6_DATA_OWNERSHIP_AND_RETENTION.md), [tracker document schema](../../src/tracker-state-schema.js), [tracker CAS adapter](../../src/tracker-state-r2-simple.js), [tracker backups](../../src/tracker-state-r2-backup.js), [numeric R2](../../src/bf6-numeric-archive-r2.js), [raw local archive](../../src/bf6-local-full-archive.js), [raw backup](../../src/bf6-raw-archive-backup.js), [bare mirror script](../../scripts/kdm-backup-mirror.ps1), [historical tooling](../../tools/historical/tracker-backfill/README.md), [local evidence inventory](../../tools/README.md), [frozen archive contract](https://github.com/raymdl/kdm-bf6-archive/blob/e3eaddac203a9a60da572b10b9070b93a669e307/README.md).
