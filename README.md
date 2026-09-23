@@ -4,8 +4,8 @@
 
 [Data-flow atlas](https://raymdl.github.io/kdm-bf6-rankings/atlas/) explains the
 bot, collection pipeline, AI responses, website, storage, and operations.
-Its self-contained HTML is generated from `docs/data-flow/` in the bot
-repository and published here as `atlas/index.html`.
+The Markdown in `atlas/` is a copy of `docs/data-flow/` in the bot repository;
+`atlas/index.html` renders it in the browser. Update it by copying the files again.
 
 The KDM community's Battlefield 6 statistics site: Career and Period
 leaderboards, player history, head-to-head comparisons, weapon/vehicle data,
@@ -58,6 +58,9 @@ A site-code deployment does not collect stats or publish a new R2 data release.
 - [Data loading, release pinning, caching, and recovery](docs/DATA_LOADING.md)
 - [Effectiveness formulas and interpretation](EFFECTIVENESS_MEASURES.md)
 - [Bot documentation index](https://github.com/raymdl/kdm-discord-bot/blob/main/docs/README.md): stats, generated artifacts, schedules, operations, and historical records
+
+[docs/archive/](docs/archive/) holds historical records, such as the prompt and
+provenance of the header image.
 
 The frozen [kdm-bf6-archive](https://github.com/raymdl/kdm-bf6-archive) repository
 is historical rollback material. Current numeric history belongs to private R2.
