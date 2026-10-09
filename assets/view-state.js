@@ -1,4 +1,4 @@
-import { shiftDate } from "./counter-math.js?v=20260910-table-spacing";
+import { shiftDate } from "./counter-math.js?v=20261009-vehicle-tooltips";
 
 export const RANGE_OPTIONS = [
   { key: "today", label: "Today" },

@@ -1,4 +1,4 @@
-import { renderActivityView } from "./activity-view.js?v=20260910-table-spacing";
+import { renderActivityView } from "./activity-view.js?v=20261009-vehicle-tooltips";
 
 /* KDM BF6 Rankings — static SPA reading the generated JSON published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN.
@@ -7,9 +7,9 @@ import { renderActivityView } from "./activity-view.js?v=20260910-table-spacing"
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20260910-table-spacing";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261009-vehicle-tooltips";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20260910-table-spacing";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20261009-vehicle-tooltips";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -20,7 +20,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20260910-table-spacing";
+} from "./period.js?v=20261009-vehicle-tooltips";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -34,8 +34,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20260910-table-spacing";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20260910-table-spacing";
+} from "./view-state.js?v=20261009-vehicle-tooltips";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261009-vehicle-tooltips";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -45,7 +45,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20260910-table-spacing";
+} from "./equipment.js?v=20261009-vehicle-tooltips";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -970,7 +970,7 @@ function movementHtml(prevRank, currentRank, windowText = "the previous day") {
 }
 
 function rankingControlsHtml(statKey, category = "combat", selectedId = null, metric = "kills") {
-  const routeButton = (label, href, active) => `<button type="button" data-ranking-route="${esc(href)}" aria-pressed="${active}">${esc(label)}</button>`;
+  const routeButton = (label, href, active, title = "") => `<button type="button" data-ranking-route="${esc(href)}" aria-pressed="${active}"${title ? ` title="${esc(title)}"` : ""}>${esc(label)}</button>`;
   const groups = category === "combat" ? [] : equipmentGroups()[category];
   const selectedGroup = groups.find((group) => group.items.includes(selectedId)) ?? groups[0];
   const stats = category === "combat"
@@ -981,7 +981,7 @@ function rankingControlsHtml(statKey, category = "combat", selectedId = null, me
     <div class="ranking-options" role="group" aria-label="Statistic">${stats}</div>
     ${groups.length ? `<div class="ranking-equipment">
       <div class="ranking-group-tabs" role="group" aria-label="${category === "weapons" ? "Weapon class" : "Vehicle type"}">${groups.map((group, index) => `<button type="button" data-ranking-group="${index}" aria-pressed="${group === selectedGroup}">${esc(group.label)}</button>`).join("")}</div>
-      ${groups.map((group, index) => `<div class="ranking-options ranking-items" data-ranking-items="${index}" role="group" aria-label="${esc(group.label)}"${group === selectedGroup ? "" : " hidden"}>${group.items.map((id) => routeButton(equipmentDisplayName(category, id), hashRoute("board/equipment", { equipment: id, metric, ...viewRangeParams() }), id === selectedId)).join("")}</div>`).join("")}
+      ${groups.map((group, index) => `<div class="ranking-options ranking-items" data-ranking-items="${index}" role="group" aria-label="${esc(group.label)}"${group === selectedGroup ? "" : " hidden"}>${group.items.map((id) => routeButton(equipmentDisplayName(category, id), hashRoute("board/equipment", { equipment: id, metric, ...viewRangeParams() }), id === selectedId, category === "vehicles" ? vehicleClassTitle(id) : "")).join("")}</div>`).join("")}
     </div>` : ""}
     <span class="ranking-control-status" role="status"></span>
   </div>`;
@@ -1526,7 +1526,7 @@ function equipmentButtonHtml(category, id, selectedId, unavailable = false) {
   const title = unavailable
     ? `Not recorded for ${category === "vehicles" ? "vehicles" : "weapons"} — opens this ${category === "vehicles" ? "vehicle" : "weapon"} on Kills`
     : category === "vehicles"
-      ? (equipmentCatalogue()?.vehicles?.[id]?.vehicles ?? []).join(", ")
+      ? vehicleClassTitle(id)
       : weaponClassLabel(equipmentCatalogue()?.weapons?.[id]?.class ?? weaponClassId(id));
   return `<button type="button" class="equipment-chip${id === selectedId ? " active" : ""}${unavailable ? " unavailable" : ""}" data-equipment="${esc(id)}" data-equipment-category="${esc(category)}"${title ? ` title="${esc(title)}"` : ""}>${esc(equipmentDisplayName(category, id))}</button>`;
 }
@@ -2442,6 +2442,11 @@ function equipmentDisplayName(category, id) {
   return equipmentCatalogue()?.[category]?.[id]?.name ?? id;
 }
 
+// The vehicles a class sums, as hover text on the class name.
+function vehicleClassTitle(id) {
+  return (equipmentCatalogue()?.vehicles?.[id]?.vehicles ?? []).join(", ");
+}
+
 function weaponClassId(id) {
   return String(id).match(/^wp_([^_]+)_/)?.[1] ?? "other";
 }
@@ -2595,12 +2600,6 @@ function renderProfileEquipmentTable(discordId, periodWindow) {
   }]));
   if (!member?.vehicles?.unclassified) delete source.vehicles.unclassified;
   const groups = equipmentGroups(source)[category];
-  if (category === "vehicles") {
-    groups.push(
-      { key: "helicopters", label: "Helicopters", items: ["attackheli", "scoutheli", "transportheli"] },
-      { key: "jets", label: "Jets", items: ["attackjet", "fighter"] }
-    );
-  }
   const activeGroup = groups.find((group) => group.key === sorting.filter);
   const rows = Object.keys(source[category]).map((id, index) => {
     const entry = member?.[category]?.[id] ?? {};
@@ -2612,6 +2611,7 @@ function renderProfileEquipmentTable(discordId, periodWindow) {
   });
   const filtered = activeGroup ? rows.filter((row) => activeGroup.items.includes(row.id)) : rows;
   const sorted = sortedRows(filtered, sorting, (row, key) => key === "name" ? row.name : equipmentMetricValue(row.stats, key) ?? 0);
+  const rowTitle = (row) => [category === "vehicles" ? vehicleClassTitle(row.id) : "", row.note].filter(Boolean).join(" · ");
   const message = !cached ? "Loading equipment data…"
     : cached.status === "error" ? "Equipment data is temporarily unavailable. Reload to try again."
     : !filtered.length ? "No equipment data is recorded for this selection." : "";
@@ -2621,7 +2621,7 @@ function renderProfileEquipmentTable(discordId, periodWindow) {
   panel.innerHTML = `<div class="equipment-table-controls"><div class="stat-tabs" role="group" aria-label="Equipment table category">${["weapons", "vehicles"].map((item) => `<button type="button" data-table-category="${item}" class="${item === category ? "active" : ""}" aria-pressed="${item === category}">${item === "weapons" ? "Weapons" : "Vehicles"}</button>`).join("")}</div>
     <label class="equipment-table-filter">${category === "weapons" ? "Class" : "Type"}<select id="equipment-table-filter"><option value="all">All</option>${groups.map((group) => `<option value="${esc(group.key)}"${activeGroup === group ? " selected" : ""}>${esc(group.label)}</option>`).join("")}</select></label></div>
     <p class="page-sub">${esc(caption)}${rows.some((row) => row.note) ? " · † Partial coverage; hover the item name for dates." : ""} · Unrecorded values are shown as 0.</p>
-    ${message ? `<p class="equipment-empty">${message}</p>` : `<div class="table-wrap"><table><thead><tr>${sortableHeaderHtml(category === "weapons" ? "Weapon" : "Vehicle", "name", sorting)}${fields.map((field) => sortableHeaderHtml(EQUIPMENT_METRIC_LABELS[field], field, sorting, { numeric: true })).join("")}</tr></thead><tbody>${sorted.map((row) => `<tr><td${row.note ? ` title="${esc(row.note)}"` : ""}>${esc(row.name)}${row.note ? " †" : ""}</td>${fields.map((field) => `<td class="num">${equipmentValueText(field, equipmentMetricValue(row.stats, field) ?? 0)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`}`;
+    ${message ? `<p class="equipment-empty">${message}</p>` : `<div class="table-wrap"><table><thead><tr>${sortableHeaderHtml(category === "weapons" ? "Weapon" : "Vehicle", "name", sorting)}${fields.map((field) => sortableHeaderHtml(EQUIPMENT_METRIC_LABELS[field], field, sorting, { numeric: true })).join("")}</tr></thead><tbody>${sorted.map((row) => `<tr><td${rowTitle(row) ? ` title="${esc(rowTitle(row))}"` : ""}>${esc(row.name)}${row.note ? " †" : ""}</td>${fields.map((field) => `<td class="num">${equipmentValueText(field, equipmentMetricValue(row.stats, field) ?? 0)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`}`;
   for (const button of panel.querySelectorAll("[data-table-category]")) {
     button.addEventListener("click", () => {
       sorting.category = button.dataset.tableCategory;

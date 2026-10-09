@@ -1,4 +1,4 @@
-import { shiftDate, ratio } from "./counter-math.js?v=20260910-table-spacing";
+import { shiftDate, ratio } from "./counter-math.js?v=20261009-vehicle-tooltips";
 
 /* KDM BF6 Rankings — pure Period calculation engine over data/counters.json.
    DOM-free and side-effect-free so it runs identically in the browser and in
