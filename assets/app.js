@@ -1,4 +1,4 @@
-import { renderActivityView } from "./activity-view.js?v=20261009-vehicle-tooltips";
+import { renderActivityView } from "./activity-view.js?v=20261011-all-vehicles";
 
 /* KDM BF6 Rankings — static SPA reading the generated JSON published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN.
@@ -7,9 +7,9 @@ import { renderActivityView } from "./activity-view.js?v=20261009-vehicle-toolti
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261009-vehicle-tooltips";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261011-all-vehicles";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20261009-vehicle-tooltips";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20261011-all-vehicles";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -20,7 +20,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20261009-vehicle-tooltips";
+} from "./period.js?v=20261011-all-vehicles";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -34,18 +34,19 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20261009-vehicle-tooltips";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261009-vehicle-tooltips";
+} from "./view-state.js?v=20261011-all-vehicles";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261011-all-vehicles";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
   equipmentFieldsPresent,
   equipmentPeriodStats,
   latestObservedIndex,
+  sumEquipmentEntries,
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20261009-vehicle-tooltips";
+} from "./equipment.js?v=20261011-all-vehicles";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -972,7 +973,24 @@ function movementHtml(prevRank, currentRank, windowText = "the previous day") {
 function rankingControlsHtml(statKey, category = "combat", selectedId = null, metric = "kills") {
   const routeButton = (label, href, active, title = "") => `<button type="button" data-ranking-route="${esc(href)}" aria-pressed="${active}"${title ? ` title="${esc(title)}"` : ""}>${esc(label)}</button>`;
   const groups = category === "combat" ? [] : equipmentGroups()[category];
-  const selectedGroup = groups.find((group) => group.items.includes(selectedId)) ?? groups[0];
+  // All Vehicles belongs to no domain, so no class row is open under it.
+  const allSelected = selectedId === ALL_VEHICLES_ID;
+  const selectedGroup = allSelected
+    ? null
+    : groups.find((group) => group.items.includes(selectedId) || vehicleGroupAllId(group) === selectedId) ?? groups[0];
+  // A domain's own All sits first in its class row; a one-class domain has
+  // nothing to combine.
+  const groupAllButton = (group) => category === "vehicles" && group.items.length > 1
+    ? routeButton("All", hashRoute("board/equipment", { equipment: vehicleGroupAllId(group), metric, ...viewRangeParams() }), vehicleGroupAllId(group) === selectedId, `Every ${group.label} class combined`)
+    : "";
+  // A vehicle domain opens on its own combined board; a weapon class has no
+  // combined board, so its tab only reveals the weapons in it.
+  const groupTab = (group, index) => category === "vehicles"
+    ? routeButton(group.label, hashRoute("board/equipment", { equipment: group.items.length > 1 ? vehicleGroupAllId(group) : group.items[0], metric, ...viewRangeParams() }), group === selectedGroup)
+    : `<button type="button" data-ranking-group="${index}" aria-pressed="${group === selectedGroup}">${esc(group.label)}</button>`;
+  const allTab = category === "vehicles"
+    ? routeButton("All", hashRoute("board/equipment", { equipment: ALL_VEHICLES_ID, metric, ...viewRangeParams() }), allSelected, "Every vehicle class combined")
+    : "";
   const stats = category === "combat"
     ? state.meta.stats.map((stat) => routeButton(stat.title, hashRoute(`board/${stat.key}`, viewRangeParams()), stat.key === statKey)).join("")
     : equipmentMetricFields(category).map((key) => routeButton(EQUIPMENT_METRIC_LABELS[key], hashRoute("board/equipment", { equipment: selectedId, metric: key, ...viewRangeParams() }), key === metric)).join("");
@@ -980,8 +998,8 @@ function rankingControlsHtml(statKey, category = "combat", selectedId = null, me
     <div class="ranking-categories" role="group" aria-label="Statistics category">${[["combat", "Soldier"], ["weapons", "Weapons"], ["vehicles", "Vehicles"]].map(([key, label]) => `<button type="button" data-ranking-category="${key}" aria-pressed="${category === key}">${label}</button>`).join("")}</div>
     <div class="ranking-options" role="group" aria-label="Statistic">${stats}</div>
     ${groups.length ? `<div class="ranking-equipment">
-      <div class="ranking-group-tabs" role="group" aria-label="${category === "weapons" ? "Weapon class" : "Vehicle type"}">${groups.map((group, index) => `<button type="button" data-ranking-group="${index}" aria-pressed="${group === selectedGroup}">${esc(group.label)}</button>`).join("")}</div>
-      ${groups.map((group, index) => `<div class="ranking-options ranking-items" data-ranking-items="${index}" role="group" aria-label="${esc(group.label)}"${group === selectedGroup ? "" : " hidden"}>${group.items.map((id) => routeButton(equipmentDisplayName(category, id), hashRoute("board/equipment", { equipment: id, metric, ...viewRangeParams() }), id === selectedId, category === "vehicles" ? vehicleClassTitle(id) : "")).join("")}</div>`).join("")}
+      <div class="ranking-group-tabs" role="group" aria-label="${category === "weapons" ? "Weapon class" : "Vehicle type"}">${allTab}${groups.map((group, index) => groupTab(group, index)).join("")}</div>
+      ${groups.map((group, index) => `<div class="ranking-options ranking-items" data-ranking-items="${index}" role="group" aria-label="${esc(group.label)}"${group === selectedGroup ? "" : " hidden"}>${groupAllButton(group)}${group.items.map((id) => routeButton(equipmentDisplayName(category, id), hashRoute("board/equipment", { equipment: id, metric, ...viewRangeParams() }), id === selectedId, category === "vehicles" ? vehicleClassTitle(id) : "")).join("")}</div>`).join("")}
     </div>` : ""}
     <span class="ranking-control-status" role="status"></span>
   </div>`;
@@ -1011,7 +1029,8 @@ function wireRankingControls() {
       try {
         await loadEquipmentData();
         if (location.hash !== hash) return;
-        const id = equipmentGroups()[category][0]?.items[0];
+        const firstId = equipmentGroups()[category][0]?.items[0];
+        const id = firstId && category === "vehicles" ? ALL_VEHICLES_ID : firstId;
         if (id) replaceHashAndRender(hashRoute("board/equipment", { equipment: id, ...viewRangeParams() }));
         else status.textContent = "No equipment records available.";
       } catch {
@@ -1612,10 +1631,39 @@ function equipmentMetricAvailable(category, metric) {
   return equipmentMetricRequiredFields(category, metric).every((field) => equipmentIndexHasField(category, field));
 }
 
+function vehicleGroupAllId(group) {
+  return `${ALL_VEHICLES_ID}-${group.key}`;
+}
+
+// The classes a combined vehicle view sums, or null for an ordinary item.
+function vehicleAggregateClasses(category, id) {
+  if (category !== "vehicles") return null;
+  const groups = equipmentGroups().vehicles;
+  if (id === ALL_VEHICLES_ID) return groups.flatMap((group) => group.items);
+  return groups.find((group) => vehicleGroupAllId(group) === id)?.items ?? null;
+}
+
+// All Vehicles and each domain's All are not published classes: they are the
+// member's classes summed on read. Cached per member so a re-render does not
+// redo the merge.
+const vehicleAggregateEntries = new WeakMap();
+
+function equipmentEntry(member, category, id, aggregateClasses = vehicleAggregateClasses(category, id)) {
+  if (!aggregateClasses) return member?.[category]?.[id] ?? null;
+  const vehicles = member?.vehicles;
+  const entries = aggregateClasses.map((classId) => vehicles?.[classId]).filter(Boolean);
+  if (!entries.length) return null;
+  if (!vehicleAggregateEntries.has(vehicles)) vehicleAggregateEntries.set(vehicles, new Map());
+  const cache = vehicleAggregateEntries.get(vehicles);
+  if (!cache.has(id)) cache.set(id, sumEquipmentEntries(entries, EQUIPMENT_FIELDS.vehicles));
+  return cache.get(id);
+}
+
 function equipmentObservedIndexes(selectedId, category) {
   const indexes = new Set();
+  const aggregateClasses = vehicleAggregateClasses(category, selectedId);
   for (const member of Object.values(state.equipmentIndex?.members ?? {})) {
-    if (!member?.[category]?.[selectedId]) continue;
+    if (!equipmentEntry(member, category, selectedId, aggregateClasses)) continue;
     for (const index of member.observed ?? []) indexes.add(index);
   }
   return [...indexes].sort((a, b) => a - b);
@@ -1690,9 +1738,10 @@ function equipmentLeaderboardRows(selectedId, category, metric, periodWindow, us
     : (careerWindow?.indexes ?? []);
   const comparisonStart = comparisonIndexes[0] ?? null;
   const comparisonEnd = comparisonIndexes.at(-1) ?? null;
+  const aggregateClasses = vehicleAggregateClasses(category, selectedId);
   const rows = Object.entries(state.equipmentIndex?.members ?? {})
     .map(([discordId, member]) => {
-      const entry = member?.[category]?.[selectedId];
+      const entry = equipmentEntry(member, category, selectedId, aggregateClasses);
       if (!entry) return null;
       const stats = usePeriod
         ? equipmentPeriodStats(entry, category, periodWindow.startIndex, periodWindow.endIndex, state.equipmentIndex.dates, member.observed, state.equipmentIndex.fieldTrackingStarts)
@@ -1762,6 +1811,8 @@ function renderEquipmentLeaderboard(params) {
   loadViewRange(params);
   const groups = equipmentGroups();
   const allItems = groups.weapons.flatMap((group) => group.items.map((id) => ({ id, category: "weapons" })))
+    .concat(groups.vehicles.length ? [{ id: ALL_VEHICLES_ID, category: "vehicles" }] : [])
+    .concat(groups.vehicles.map((group) => ({ id: vehicleGroupAllId(group), category: "vehicles" })))
     .concat(groups.vehicles.flatMap((group) => group.items.map((id) => ({ id, category: "vehicles" }))));
   const selected = allItems.find((item) => item.id === params.get("equipment")) ?? allItems[0] ?? null;
   const requestedMetric = params.get("metric") ?? "kills";
@@ -2351,6 +2402,10 @@ const EQUIPMENT_CLASS_FALLBACKS = {
   other: "Other"
 };
 
+// Not a catalogue id: the Rankings board's combined view of every vehicle
+// class. A domain's own combined view is this plus its key, e.g. `all-air`.
+const ALL_VEHICLES_ID = "all";
+
 const VEHICLE_DOMAIN_FALLBACKS = [
   { key: "land", label: "Land" },
   { key: "air", label: "Air" },
@@ -2439,6 +2494,11 @@ function equipmentCatalogue() {
 }
 
 function equipmentDisplayName(category, id) {
+  if (category === "vehicles" && id === ALL_VEHICLES_ID) return "All Vehicles";
+  if (category === "vehicles" && String(id).startsWith(`${ALL_VEHICLES_ID}-`)) {
+    const group = equipmentGroups().vehicles.find((candidate) => vehicleGroupAllId(candidate) === id);
+    if (group) return `All ${group.label}`;
+  }
   return equipmentCatalogue()?.[category]?.[id]?.name ?? id;
 }
 

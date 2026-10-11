@@ -19,6 +19,7 @@ import {
 import {
   equipmentCareerStats,
   equipmentPeriodStats,
+  sumEquipmentEntries,
   readSparseValue,
   validEquipmentArtifact,
   validEquipmentMemberFile
@@ -477,6 +478,15 @@ test("a member observed only inside the window reports from their first snapshot
   assert.equal(stats.fields.kills.startDate, "2026-08-11");
   assert.equal(stats.fields.kills.clamped, true);
   assert.equal(stats.timeSeconds, 600);
+});
+
+test("summed equipment entries carry each source's last value into every change date", () => {
+  const summed = sumEquipmentEntries(
+    [{ kills: [0, 5, 3, 9], timeIn: [1, 60] }, { kills: [2, 4] }, { timeIn: [] }],
+    ["kills", "timeIn", "assists"]
+  );
+  assert.deepEqual(summed, { kills: [0, 5, 2, 9, 3, 13], timeIn: [1, 60] });
+  assert.equal(equipmentPeriodStats(summed, "vehicles", 0, 3, ["a", "b", "c", "d"], [0, 3], { vehicles: {} }).kills, 8);
 });
 
 test("equipment metrics that predate their tracking start remain unknown", () => {

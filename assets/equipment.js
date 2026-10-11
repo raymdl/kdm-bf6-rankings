@@ -1,4 +1,4 @@
-import { ratio } from "./counter-math.js?v=20261009-vehicle-tooltips";
+import { ratio } from "./counter-math.js?v=20261011-all-vehicles";
 
 /* Sparse equipment counters shared by the profile and equipment leaderboard.
    A missing snapshot is different from an unchanged value: callers need that
@@ -85,6 +85,24 @@ export function readEquipmentField(entry, field, dateIndex, observedIndexes = en
     return { value: null, known: false, sourceIndex: null, reason: "field_missing" };
   }
   return readSparseValue(entry[field], dateIndex, observedIndexes);
+}
+
+// One entry that reads as the sum of several, for a board that spans items.
+// Each summed list changes wherever any source list changes, and carries every
+// other source's last value into that date, so it reads like a published one.
+export function sumEquipmentEntries(entries, fields) {
+  const summed = {};
+  for (const field of fields) {
+    const lists = entries.map((entry) => entry?.[field]).filter(Array.isArray);
+    if (!lists.length) continue;
+    const indexes = [...new Set(lists.flatMap((list) => list.filter((value, position) => position % 2 === 0 && isValidIndex(value))))]
+      .sort((a, b) => a - b);
+    summed[field] = indexes.flatMap((index) => [
+      index,
+      lists.reduce((total, list) => total + readSparseValue(list, index, [index]).value, 0)
+    ]);
+  }
+  return summed;
 }
 
 function trackingStartIndex(category, field, dates, fieldTrackingStarts = null) {
