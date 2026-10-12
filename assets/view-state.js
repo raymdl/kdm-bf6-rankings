@@ -1,4 +1,4 @@
-import { shiftDate } from "./counter-math.js?v=20261011-all-vehicles";
+import { shiftDate } from "./counter-math.js?v=20261012-profile-period-start";
 
 export const RANGE_OPTIONS = [
   { key: "today", label: "Today" },

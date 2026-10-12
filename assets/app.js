@@ -1,4 +1,4 @@
-import { renderActivityView } from "./activity-view.js?v=20261011-all-vehicles";
+import { renderActivityView } from "./activity-view.js?v=20261012-profile-period-start";
 
 /* KDM BF6 Rankings — static SPA reading the generated JSON published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN.
@@ -7,9 +7,9 @@ import { renderActivityView } from "./activity-view.js?v=20261011-all-vehicles";
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261011-all-vehicles";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261012-profile-period-start";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20261011-all-vehicles";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20261012-profile-period-start";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -20,7 +20,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20261011-all-vehicles";
+} from "./period.js?v=20261012-profile-period-start";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -34,8 +34,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20261011-all-vehicles";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261011-all-vehicles";
+} from "./view-state.js?v=20261012-profile-period-start";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261012-profile-period-start";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -46,7 +46,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20261011-all-vehicles";
+} from "./equipment.js?v=20261012-profile-period-start";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -1115,6 +1115,26 @@ function cachedFootnoteHtml(hasCachedStats) {
   return hasCachedStats
     ? `<p class="cached-footnote">${cachedMarkerHtml()} Cached stats are from the last successful GameTools refresh.</p>`
     : "";
+}
+
+function renderMarkerFootnotes() {
+  document.getElementById("marker-footnotes")?.remove();
+  const notes = [];
+  if (app.querySelector(".tracked-since .badge-mark")) {
+    notes.push(`<span class="badge tracked-since">stat${COVERAGE_MARK_SVG}date</span> Stats cover only the part of the selected range from the date shown. Tracking for the player or metric began after the range started.`);
+  }
+  if (app.querySelector(".time-since .badge-mark")) {
+    notes.push(`<span class="badge time-since">time${COVERAGE_MARK_SVG}date</span> Active Time covers only the part of the range from the date shown. The stat beside it covers the full range.`);
+  }
+  if (app.querySelector('.cached-marker[aria-label="Tracker-backfilled history displayed"]')) {
+    notes.push(`${backfillMarkerHtml()} Backfilled history is estimated from Tracker sessions. Match dates are approximate.`);
+  }
+  if (app.querySelector('.cached-marker[aria-label="Cached stats"]') && !app.querySelector('.cached-footnote .cached-marker[aria-label="Cached stats"]')) {
+    notes.push(`${cachedMarkerHtml()} Cached stats are from the last successful GameTools refresh.`);
+  }
+  if (notes.length) {
+    app.insertAdjacentHTML("beforeend", `<div id="marker-footnotes" role="note" aria-label="Stat footnotes">${notes.map((note) => `<p class="cached-footnote">${note}</p>`).join("")}</div>`);
+  }
 }
 
 const CHART_COLORS = ["#f26522", "#60a5fa", "#4ade80", "#c084fc", "#facc15", "#22d3ee", "#fb7185", "#a3e635"];
@@ -2348,8 +2368,10 @@ function renderPlayer(discordId, statKey, params) {
   });
 
   const periodChartWindow = periodWindow && statHasPeriodForm(stat.key) ? periodWindow : null;
+  const chartTrackingStart = periodWindow ? memberTrackedSince(discordId) : null;
   if (chartEquipment) {
-    const points = equipmentChartPoints(chartEquipment, periodWindow, equipmentMetric ?? "kills");
+    const points = equipmentChartPoints(chartEquipment, periodWindow, equipmentMetric ?? "kills")
+      .filter((point) => !chartTrackingStart || point.date >= chartTrackingStart);
     lineChart(
       document.getElementById("player-chart"),
       points.map((point) => point.date),
@@ -2357,7 +2379,8 @@ function renderPlayer(discordId, statKey, params) {
       equipmentChartStatDescriptor
     );
   } else if (periodChartWindow) {
-    const points = memberDailySeries(state.counters, discordId, stat.key, periodChartWindow);
+    const points = memberDailySeries(state.counters, discordId, stat.key, periodChartWindow)
+      .filter((point) => !chartTrackingStart || point.date >= chartTrackingStart);
     lineChart(
       document.getElementById("player-chart"),
       points.map((point) => point.date),
@@ -2680,8 +2703,9 @@ function renderProfileEquipmentTable(discordId, periodWindow) {
     : "Career totals at the latest observed equipment snapshot.";
   panel.innerHTML = `<div class="equipment-table-controls"><div class="stat-tabs" role="group" aria-label="Equipment table category">${["weapons", "vehicles"].map((item) => `<button type="button" data-table-category="${item}" class="${item === category ? "active" : ""}" aria-pressed="${item === category}">${item === "weapons" ? "Weapons" : "Vehicles"}</button>`).join("")}</div>
     <label class="equipment-table-filter">${category === "weapons" ? "Class" : "Type"}<select id="equipment-table-filter"><option value="all">All</option>${groups.map((group) => `<option value="${esc(group.key)}"${activeGroup === group ? " selected" : ""}>${esc(group.label)}</option>`).join("")}</select></label></div>
-    <p class="page-sub">${esc(caption)}${rows.some((row) => row.note) ? " · † Partial coverage; hover the item name for dates." : ""} · Unrecorded values are shown as 0.</p>
-    ${message ? `<p class="equipment-empty">${message}</p>` : `<div class="table-wrap"><table><thead><tr>${sortableHeaderHtml(category === "weapons" ? "Weapon" : "Vehicle", "name", sorting)}${fields.map((field) => sortableHeaderHtml(EQUIPMENT_METRIC_LABELS[field], field, sorting, { numeric: true })).join("")}</tr></thead><tbody>${sorted.map((row) => `<tr><td${rowTitle(row) ? ` title="${esc(rowTitle(row))}"` : ""}>${esc(row.name)}${row.note ? " †" : ""}</td>${fields.map((field) => `<td class="num">${equipmentValueText(field, equipmentMetricValue(row.stats, field) ?? 0)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`}`;
+    <p class="page-sub">${esc(caption)} · Unrecorded values are shown as 0.</p>
+    ${message ? `<p class="equipment-empty">${message}</p>` : `<div class="table-wrap"><table><thead><tr>${sortableHeaderHtml(category === "weapons" ? "Weapon" : "Vehicle", "name", sorting)}${fields.map((field) => sortableHeaderHtml(EQUIPMENT_METRIC_LABELS[field], field, sorting, { numeric: true })).join("")}</tr></thead><tbody>${sorted.map((row) => `<tr><td${rowTitle(row) ? ` title="${esc(rowTitle(row))}"` : ""}>${esc(row.name)}${row.note ? " †" : ""}</td>${fields.map((field) => `<td class="num">${equipmentValueText(field, equipmentMetricValue(row.stats, field) ?? 0)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`}
+    ${!message && sorted.some((row) => row.note) ? `<p class="cached-footnote" role="note"><strong>†</strong> Some stats for this item cover only part of the selected period, or have no data in it, because tracking began later. Hover the item name for the affected stats and dates. Unrecorded values are shown as 0.</p>` : ""}`;
   for (const button of panel.querySelectorAll("[data-table-category]")) {
     button.addEventListener("click", () => {
       sorting.category = button.dataset.tableCategory;
@@ -3964,6 +3988,7 @@ async function render() {
   if (failureNotice) {
     app.insertAdjacentHTML("afterbegin", failureNotice);
   }
+  renderMarkerFootnotes();
   wireFloatingTableHeaders();
   window.scrollTo(0, 0);
 }
