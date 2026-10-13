@@ -95,7 +95,7 @@ shared; history, counters, and provenance load for routes that need them, while 
 their route or panel is opened. Per-player equipment files load
 only when that profile section is expanded. Chart.js is pinned with SRI and is
 injected only for Player and Compare views; if the CDN is unavailable, the rest
-of those pages remains usable. Successful optional loads are cached for the browser session, while failed optional fetches remain retryable. Career and Period routes await counters with their initial required data so a later counter fetch does not rebuild the rendered chart. Load failures offer Retry. A full Reload keeps the route and resolves a consistent new release. Timestamps use `America/New_York`, including daylight-saving time.
+of those pages remains usable. Successful optional loads are cached for the browser session, while failed optional fetches remain retryable. Career and Period routes await counters with their initial required data so a later counter fetch does not rebuild the rendered chart. At startup the first route's data is requested together with meta and current standings as soon as the pointer resolves, and `index.html` preconnects to the Worker, so the first view costs two request rounds, not three. Load failures offer Retry. A full Reload keeps the route and resolves a consistent new release. Timestamps use `America/New_York`, including daylight-saving time.
 
 ## Tests
 
