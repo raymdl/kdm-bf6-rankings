@@ -1,4 +1,4 @@
-import { renderActivityView } from "./activity-view.js?v=20261012-profile-period-start";
+import { renderActivityView } from "./activity-view.js?v=20261012-parallel-boot-load";
 
 /* KDM BF6 Rankings — static SPA reading the generated JSON published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN.
@@ -7,9 +7,9 @@ import { renderActivityView } from "./activity-view.js?v=20261012-profile-period
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261012-profile-period-start";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261012-parallel-boot-load";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20261012-profile-period-start";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20261012-parallel-boot-load";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -20,7 +20,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20261012-profile-period-start";
+} from "./period.js?v=20261012-parallel-boot-load";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -34,8 +34,8 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20261012-profile-period-start";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261012-profile-period-start";
+} from "./view-state.js?v=20261012-parallel-boot-load";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261012-parallel-boot-load";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -46,7 +46,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20261012-profile-period-start";
+} from "./equipment.js?v=20261012-parallel-boot-load";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -4021,6 +4021,10 @@ async function boot() {
     return;
   }
 
+  // Route data needs only the pointer and the URL, so it downloads alongside
+  // the base files instead of after them. render() awaits these same loads.
+  const routeState = parsedHashRoute();
+  ensureRouteData(routeState.parts, routeState.params).catch(() => {});
   await loadBaseData();
 
   if (!state.meta) {
