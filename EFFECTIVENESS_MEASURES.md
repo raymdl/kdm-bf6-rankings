@@ -1,10 +1,10 @@
 # KDM Battlefield Effectiveness Measures
 
-This document describes the three measures in the KDM BF6 Effectiveness Lab, model version 2. All three are **Breakthrough-only**: every input comes from the Breakthrough slice of a member's GameTools payload or from the Breakthrough rows of their per-season record. Lifetime all-mode counters, tracker win rates and win-rate regressions are not used.
+This document describes the three measures in the KDM BF6 Effectiveness Lab, model version 4. All three are **Breakthrough-only**: every input comes from the Breakthrough slice of a member's GameTools payload, kept day by day in the numeric archive. Lifetime all-mode counters, tracker win rates and win-rate regressions are not used.
 
 1. **Effectiveness Index (EI)** — a clan percentile combining combat, objective and teamwork per Breakthrough hour.
 2. **Impact Rate (IR)** — raw in-game score per Breakthrough minute, in absolute units.
-3. **Form Index** — the same percentile machinery over recency-weighted per-season Breakthrough rates.
+3. **Form Index** — the same percentile machinery over the last ~30 days of Breakthrough play, taken as a delta of the daily archive.
 
 The formulas run in the bot publisher from the complete cohort in each retained private numeric-archive snapshot. The generated `data/effectiveness-history.json` (history version 2) carries compact `ei`, `ir`, `form`, `combat`, `objective` and `teamwork` series plus the detailed current snapshot. The browser only sorts and renders; it never recalculates.
 
@@ -62,24 +62,25 @@ Rows under 25 Breakthrough hours carry `provisional: true`. The site marks them 
 
 ## 3. Form Index (`form`)
 
-Per-season Breakthrough rows carry kills, deaths, revives, score and seconds played. Form takes the newest three seasons with play time, weights them 0.5 / 0.3 / 0.2 newest first (renormalized over the seasons a member actually has), and blends the recency-weighted rates:
+Who is effective now. GameTools stopped returning per-season stats on 2026-09-12, so Form is a trailing window taken from the numeric archive itself: today's Breakthrough counters minus the same counters on the newest archive day at least 30 days earlier (the oldest day when the span still reaches 14 days; no window otherwise). The window's rates go through the same shrink-and-percentile machinery with a lighter 10-hour prior, because a month of Breakthrough is a small sample:
 
 | Input | Weight |
 | --- | --- |
-| K/D | 0.30 |
-| Score per minute | 0.30 |
-| Kills per minute | 0.25 |
+| K/D | 0.25 |
+| Score per minute | 0.25 |
+| Kills per minute | 0.20 |
+| Time on objective | 0.15 |
 | Revives per hour | 0.15 |
 
-Shrinkage uses only the hours in those seasons, so early in a season everyone sits nearer the middle. Objective time and captures are not broken out per season, so score per minute stands in for objective play.
+A counter that went down between the two days marks a relinked account and discards the window. Members without a window (too little history, no Breakthrough play, or a relink) have their rates replaced by the clan median. Windows exist from 2026-08-12 plus the window length, since that is where the backfilled Breakthrough slice begins.
 
 ## Player-level breakdowns
 
-Every row in the Full KDM Ranking table has a **Breakdown** control. Expanding it shows the equation with the member's own values, the pillar scores with their weights, each input's raw rate and clan percentile, the support lanes, and for Form the seasons counted with their weights and rates.
+Every row in the Full KDM Ranking table has a **Breakdown** control. Expanding it shows the equation with the member's own values, the pillar scores with their weights, each input's raw rate and clan percentile, the support lanes, and for Form the window (dates, hours, matches) with its rates.
 
 ## Row contract
 
-Version 2 rows expose `scores.{ei,ir,form}`, `provisional`, `pillars.*`, `lanes.{medic,engineer,intel}`, `bestSupportLanes`, `laneScore`, `percentiles.*`, `raw.*`, `adjusted.*`, `formSeasons`, `formHours`, `breakthroughWinPercent`, `hours` and `matches`. Constants published with the snapshot: `priorHours`, `provisionalHours`, `geometricOffset`, `seasonRecencyWeights`, `pillarWeights`, `combatWeights`, `objectiveWeights`, `laneBonus`, `teamworkWeights`, `formWeights`, `medianScorePerMinute`, `medianDeathsPerHour` and `cohortBreakthroughWinPercent`.
+Version 2 rows expose `scores.{ei,ir,form}`, `provisional`, `pillars.*`, `lanes.{medic,engineer,intel}`, `bestSupportLanes`, `laneScore`, `percentiles.*`, `raw.*`, `adjusted.*`, `formWindow`, `formHours`, `breakthroughWinPercent`, `hours` and `matches`. Constants published with the snapshot: `priorHours`, `provisionalHours`, `geometricOffset`, `formWindowDays`, `formMinWindowDays`, `formPriorHours`, `formBaselineDate`, `pillarWeights`, `combatWeights`, `objectiveWeights`, `laneBonus`, `teamworkWeights`, `formWeights`, `medianScorePerMinute`, `medianDeathsPerHour` and `cohortBreakthroughWinPercent`.
 
 Numeric-archive dates before the projection kept the Breakthrough slice have no v2 values. Dates from 2026-08-12 onward were re-projected from the raw gzip archive; earlier dates publish as null.
 

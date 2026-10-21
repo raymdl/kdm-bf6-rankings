@@ -3581,10 +3581,6 @@ function laneLabel(lane) {
   return LANE_LABELS[lane] ?? lane;
 }
 
-function seasonLabel(seasonId) {
-  return String(seasonId).replace(/^Season(\d+)$/i, "Season $1");
-}
-
 function effectivenessConstants() {
   return state.effectiveness?.constants ?? {};
 }
@@ -3606,7 +3602,7 @@ function effectivenessRanking(key, rows) {
 }
 
 function effectivenessTabsHtml(activeKey) {
-  const subtitles = { ei: "combat, objective and teamwork per hour", ir: "in-game score per minute", form: "the newest three seasons, latest weighted most" };
+  const subtitles = { ei: "combat, objective and teamwork per hour", ir: "in-game score per minute", form: "the last 30 days of Breakthrough play" };
   return `<div class="effectiveness-tabs" role="navigation" aria-label="Effectiveness measures">${EFFECTIVENESS_KEYS.map((key, index) => {
     const definition = effectivenessDefinitions[key];
     return `<a class="effectiveness-tab ${key === activeKey ? "active" : ""}" href="#/effectiveness/${key}">
@@ -3655,19 +3651,21 @@ function effectivenessMethodHtml(key, constants) {
       </div>
     </div>`;
   }
-  const form = constants.formWeights ?? { formKillDeath: 0.3, formKillsPerMinute: 0.25, formRevivesPerHour: 0.15, formScorePerMinute: 0.3 };
-  const recency = constants.seasonRecencyWeights ?? [0.5, 0.3, 0.2];
+  const form = constants.formWeights ?? { formKillDeath: 0.25, formKillsPerMinute: 0.2, formScorePerMinute: 0.25, formObjectivePresence: 0.15, formRevivesPerHour: 0.15 };
+  const windowDays = constants.formWindowDays ?? 30;
+  const minWindowDays = constants.formMinWindowDays ?? 14;
+  const formPrior = constants.formPriorHours ?? 10;
   return `<div class="effectiveness-method-grid">
     <div class="formula-card">
       <div class="formula-kicker">The equation</div>
       <p class="measure-summary">Who is effective <em>now</em>. Lifetime numbers barely move for a member with hundreds of Breakthrough hours; Form is where recent play shows.</p>
-      <div class="formula formula-small">Form = percentile blend of season rates weighted ${recency.map((weight) => weightText(weight)).join(" / ")}</div>
-      <p>The newest ${recency.length} seasons with Breakthrough play time count, newest first, with weights renormalized over the seasons a member actually has. Rates are shrunk with only those seasons' hours, so early in a season everyone sits nearer the middle.</p>
+      <div class="formula formula-small">Form = percentile blend of your Breakthrough rates over the last ${windowDays} days</div>
+      <p>The window is today's Breakthrough counters minus the same counters on the newest archive day at least ${windowDays} days earlier${constants.formBaselineDate ? ` (${esc(constants.formBaselineDate)} for this snapshot)` : ""}. Rates are shrunk toward the clan median with a lighter ${formPrior}-hour prior, so a quiet month sits nearer the middle. A member needs at least ${minWindowDays} days of archive history to have a window at all.</p>
     </div>
     <div class="pillar-list">
-      <div><span class="pillar-letter combat">K</span><p><strong>Trade and tempo</strong><br>Season K/D (${weightText(form.formKillDeath)}) and kills per minute (${weightText(form.formKillsPerMinute)}).</p></div>
-      <div><span class="pillar-letter objective">S</span><p><strong>Score per minute</strong><br>Season score rate (${weightText(form.formScorePerMinute)}) stands in for objective play, which the per-season data does not break out.</p></div>
-      <div><span class="pillar-letter teamwork">R</span><p><strong>Revives</strong><br>Season revives per hour (${weightText(form.formRevivesPerHour)}), the highest-leverage support action in the mode.</p></div>
+      <div><span class="pillar-letter combat">K</span><p><strong>Trade and tempo</strong><br>Window K/D (${weightText(form.formKillDeath)}) and kills per minute (${weightText(form.formKillsPerMinute)}).</p></div>
+      <div><span class="pillar-letter objective">O</span><p><strong>Score and objective</strong><br>Window score per minute (${weightText(form.formScorePerMinute)}) and share of time on the objective (${weightText(form.formObjectivePresence)}).</p></div>
+      <div><span class="pillar-letter teamwork">R</span><p><strong>Revives</strong><br>Window revives per hour (${weightText(form.formRevivesPerHour)}), the highest-leverage support action in the mode.</p></div>
     </div>
   </div>`;
 }
@@ -3774,23 +3772,26 @@ function effectivenessBreakdownHtml(key, row) {
   }
 
   const form = constants.formWeights ?? {};
-  const seasons = Object.entries(row.formSeasons ?? {}).sort((a, b) => (b[1].weight ?? 0) - (a[1].weight ?? 0));
-  const seasonHtml = seasons.length
-    ? seasons.map(([seasonId, season]) => breakdownStatHtml(`${seasonLabel(seasonId)} · ${weightText(season.weight)}`, `${fixed(season.killDeath, 2)} K/D`, `${fixed(season.scorePerMinute, 0)} score/min · ${fixed(season.killsPerMinute, 2)} kills/min · ${fixed(season.revivesPerHour, 1)} revives/hr · ${fixed((season.seconds ?? 0) / 3600, 0)} h`)).join("")
-    : breakdownStatHtml("Seasons", "No Breakthrough season record", "rates fall back to the clan median");
+  const window = row.formWindow;
+  const windowHtml = window
+    ? `${breakdownStatHtml("Window", `${window.days ?? "&mdash;"} days`, `${esc(window.from ?? "?")} to ${esc(window.to ?? "?")}`)}
+       ${breakdownStatHtml("Breakthrough hours", fixed(row.formHours, 1), `${window.matches ?? 0} matches in the window`)}
+       ${breakdownStatHtml("Kills / deaths", `${window.kills ?? 0} / ${window.deaths ?? 0}`, "in the window")}
+       ${breakdownStatHtml("Score", Number.isFinite(window.score) ? window.score.toLocaleString() : "&mdash;", `${window.revives ?? 0} revives`)}`
+    : breakdownStatHtml("Window", "None", `fewer than ${constants.formMinWindowDays ?? 14} days of history, no Breakthrough play, or a relinked account; rates fall back to the clan median`);
   return `<div class="score-breakdown">
-    <div class="breakdown-equation"><span>Form calculation</span><div>Form = ${fixed(row.percentiles.formKillDeath, 0)}<sup>${(form.formKillDeath ?? 0.3).toFixed(2)}</sup> &times; ${fixed(row.percentiles.formScorePerMinute, 0)}<sup>${(form.formScorePerMinute ?? 0.3).toFixed(2)}</sup> &times; ${fixed(row.percentiles.formKillsPerMinute, 0)}<sup>${(form.formKillsPerMinute ?? 0.25).toFixed(2)}</sup> &times; ${fixed(row.percentiles.formRevivesPerHour, 0)}<sup>${(form.formRevivesPerHour ?? 0.15).toFixed(2)}</sup> = <strong>${fixed(row.scores.form)}</strong></div></div>
-    <div class="breakdown-subhead">Seasons counted</div>
-    <div class="breakdown-season-grid">${seasonHtml}</div>
-    <div class="breakdown-subhead">Recency-weighted rates</div>
+    <div class="breakdown-equation"><span>Form calculation</span><div>Form = ${fixed(row.percentiles.formKillDeath, 0)}<sup>${(form.formKillDeath ?? 0.25).toFixed(2)}</sup> &times; ${fixed(row.percentiles.formScorePerMinute, 0)}<sup>${(form.formScorePerMinute ?? 0.25).toFixed(2)}</sup> &times; ${fixed(row.percentiles.formKillsPerMinute, 0)}<sup>${(form.formKillsPerMinute ?? 0.2).toFixed(2)}</sup> &times; ${fixed(row.percentiles.formObjectivePresence, 0)}<sup>${(form.formObjectivePresence ?? 0.15).toFixed(2)}</sup> &times; ${fixed(row.percentiles.formRevivesPerHour, 0)}<sup>${(form.formRevivesPerHour ?? 0.15).toFixed(2)}</sup> = <strong>${fixed(row.scores.form)}</strong></div></div>
+    <div class="breakdown-subhead">The window</div>
+    <div class="breakdown-pillar-grid">${windowHtml}</div>
+    <div class="breakdown-subhead">Window rates</div>
     <div class="breakdown-input-grid">
-      ${breakdownStatHtml("K/D", fixed(row.raw.formKillDeath, 2), inputContext(row, "formKillDeath", weightText(form.formKillDeath ?? 0.3)))}
-      ${breakdownStatHtml("Score / min", fixed(row.raw.formScorePerMinute, 0), inputContext(row, "formScorePerMinute", weightText(form.formScorePerMinute ?? 0.3)))}
-      ${breakdownStatHtml("Kills / min", fixed(row.raw.formKillsPerMinute, 2), inputContext(row, "formKillsPerMinute", weightText(form.formKillsPerMinute ?? 0.25)))}
+      ${breakdownStatHtml("K/D", fixed(row.raw.formKillDeath, 2), inputContext(row, "formKillDeath", weightText(form.formKillDeath ?? 0.25)))}
+      ${breakdownStatHtml("Score / min", fixed(row.raw.formScorePerMinute, 0), inputContext(row, "formScorePerMinute", weightText(form.formScorePerMinute ?? 0.25)))}
+      ${breakdownStatHtml("Kills / min", fixed(row.raw.formKillsPerMinute, 2), inputContext(row, "formKillsPerMinute", weightText(form.formKillsPerMinute ?? 0.2)))}
+      ${breakdownStatHtml("Time on objective", percentText(row.raw.formObjectivePresence), inputContext(row, "formObjectivePresence", weightText(form.formObjectivePresence ?? 0.15)))}
       ${breakdownStatHtml("Revives / hr", fixed(row.raw.formRevivesPerHour, 1), inputContext(row, "formRevivesPerHour", weightText(form.formRevivesPerHour ?? 0.15)))}
-      ${breakdownStatHtml("Form hours", fixed(row.formHours, 0), "hours in the counted seasons; shrinkage uses only these")}
     </div>
-    <p class="breakdown-note">Percentiles use the softened geometric mean with the same ${constants.geometricOffset ?? 20}-point offset as the Effectiveness Index. Per-season data carries kills, deaths, revives, score and time, but not objective play, so score per minute stands in for it.</p>
+    <p class="breakdown-note">Percentiles use the softened geometric mean with the same ${constants.geometricOffset ?? 20}-point offset as the Effectiveness Index, shrunk with a ${constants.formPriorHours ?? 10}-hour prior over the window's own hours.</p>
   </div>`;
 }
 
@@ -3798,7 +3799,7 @@ function effectivenessTableHtml(key, ranking) {
   const header = key === "ir"
     ? `${sortableHeaderHtml("Score/min", "score", effectivenessSortState, { numeric: true })}${sortableHeaderHtml("Hours", "hours", effectivenessSortState, { numeric: true })}${sortableHeaderHtml("Win%", "win", effectivenessSortState, { numeric: true })}`
     : key === "form"
-      ? `${sortableHeaderHtml("Score", "score", effectivenessSortState, { numeric: true })}${sortableHeaderHtml("Form hrs", "formHours", effectivenessSortState, { numeric: true })}<th>Seasons</th>`
+      ? `${sortableHeaderHtml("Score", "score", effectivenessSortState, { numeric: true })}${sortableHeaderHtml("Form hrs", "formHours", effectivenessSortState, { numeric: true })}<th>Window</th>`
       : `${sortableHeaderHtml("Score", "score", effectivenessSortState, { numeric: true })}<th class="support-lanes">Support lanes</th>`;
   const columnCount = key === "ei" ? 7 : 8;
   const sortableRanking = ranking.map((row, index) => ({ ...row, originalRank: index + 1 }));
@@ -3817,7 +3818,7 @@ function effectivenessTableHtml(key, ranking) {
     const detail = key === "ir"
       ? `<td class="num value-cell">${fixed(row.scores.ir, 0)}</td><td class="num">${fixed(row.hours, 0)}</td><td class="num">${fixed(row.breakthroughWinPercent, 1)}%</td>`
       : key === "form"
-        ? `<td class="num value-cell">${fixed(row.scores.form)}</td><td class="num">${fixed(row.formHours, 0)}</td><td>${Object.keys(row.formSeasons ?? {}).map(seasonLabel).sort().join(", ") || "&mdash;"}</td>`
+        ? `<td class="num value-cell">${fixed(row.scores.form)}</td><td class="num">${fixed(row.formHours, 0)}</td><td>${row.formWindow ? `${row.formWindow.days} days` : "&mdash;"}</td>`
         : `<td class="num value-cell">${fixed(row.scores.ei)}</td><td>${(row.bestSupportLanes ?? []).map(laneLabel).join(" + ")}</td>`;
     const detailId = `score-detail-${key}-${row.discordId}`;
     return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><div class="ranking-player-cell"><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${row.cachedStats ? cachedMarkerHtml() : ""}${provisionalMarkerHtml(row)}<button class="rank-detail-toggle" type="button" aria-expanded="false" aria-controls="${detailId}" data-detail-id="${detailId}">Breakdown</button></div></td>${detail}<td class="num pillar-score">${fixed(row.pillars.combat)}</td><td class="num pillar-score">${fixed(row.pillars.objective)}</td><td class="num pillar-score">${fixed(row.pillars.teamwork)}</td></tr>
@@ -3942,7 +3943,7 @@ async function loadEquipmentData() {
 
 async function loadEffectivenessData() {
   const history = await loadData("effectivenessHistory", "data/effectiveness-history.json", null);
-  state.effectivenessHistory = history?.version === 2 && history?.modelVersion === 2 ? history : null;
+  state.effectivenessHistory = history?.version === 2 && Number.isInteger(history?.modelVersion) ? history : null;
   state.effectiveness = state.effectivenessHistory?.current ?? null;
 }
 
