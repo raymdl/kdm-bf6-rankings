@@ -1,344 +1,95 @@
 # KDM Battlefield Effectiveness Measures
 
-This document specifies the three experimental measures in the KDM BF6 Effectiveness Lab:
+This document describes the three measures in the KDM BF6 Effectiveness Lab, model version 4. All three are **Breakthrough-only**: every input comes from the Breakthrough slice of a member's GameTools payload, kept day by day in the numeric archive. Lifetime all-mode counters, tracker win rates and win-rate regressions are not used.
 
-1. **Composite Effectiveness Index (CEI)** — balanced overall contribution.
-2. **Risk-Adjusted Impact Score (RAIS)** — contribution adjusted for death exposure.
-3. **Win Rate Residual (WRR)** — Breakthrough winning above or below the rate predicted by visible performance.
+1. **Effectiveness Index (EI)** — a clan percentile combining combat, objective and teamwork per Breakthrough hour.
+2. **Impact Rate (IR)** — raw in-game score per Breakthrough minute, in absolute units.
+3. **Form Index** — the same percentile machinery over the last ~30 days of Breakthrough play, taken as a delta of the daily archive.
 
-The formulas run in the bot publisher from the complete cohort for each retained numeric daily snapshot in private R2 (`bf6/numeric/daily/<date>.json`). The generated `data/effectiveness-history.json` contains compact CEI/RAIS/WRR, Combat, Objective, and Teamwork series plus the detailed current snapshot. Newly calculated scores are relative to the eligible public cohort for that calculation. Unchanged historical columns are preserved; an unlist alone does not recalculate them. Changed source dates, restored members, and model-version changes can recalculate affected history. The current snapshot can move as members or their inputs change.
+The formulas run in the bot publisher from the complete cohort in each retained private numeric-archive snapshot. The generated `data/effectiveness-history.json` (history version 2) carries compact `ei`, `ir`, `form`, `combat`, `objective` and `teamwork` series plus the detailed current snapshot. The browser only sorts and renders; it never recalculates.
 
-Source checked 2026-09-07 against the bot model and site display code. These are experimental relative measures, not official Battlefield ratings.
+## Why Breakthrough-only
 
-```mermaid
-flowchart LR
-  Inputs["Numeric counters and weapon mix"] --> Rates["Rates and aim residuals"]
-  Rates --> Normalize["Exposure shrinkage and clan percentiles"]
-  Normalize --> Pillars["Combat, Objective, Teamwork"]
-  Pillars --> CEI["CEI: balanced contribution"]
-  Pillars --> RAIS["RAIS: death-adjusted impact"]
-  Pillars --> WRR["WRR: win-rate residual"]
-  Seasons["Breakthrough season records"] --> WRR
+Members spend anywhere from a small fraction to nearly all of their play time in Breakthrough. The earlier model (CEI, RAIS, WRR) scored lifetime all-mode counters and a win-rate residual that explained almost none of the win-rate spread. The objective pillar in particular correlated only weakly with a Breakthrough-native version because it counted all-mode captures and had no defend counter. The evidence is in the bot repository's `docs/EFFECTIVENESS_LAB_REVIEW.md`.
+
+Breakthrough is asymmetric: attacker deaths cost tickets and defender deaths do not, and the payload does not say which side a player was on. The model therefore has no death penalty; K/D already prices the trade. Win rate is a squad and server outcome with no rank relationship to any individual stat in the cohort, so it is shown but never scored.
+
+## Shared pipeline
+
+### Rates
+
+Every input is a rate over Breakthrough time: K/D, kills per minute, damage per minute, headshot share, share of time on the objective, captures plus defends per hour, revives, repairs, spots and kill assists per hour, and score per minute.
+
+### Shrinkage
+
+Each rate is pulled toward the clan median with a 25 Breakthrough-hour prior: a member with 25 hours is weighted half their own rate and half the median; with 100 hours, four fifths their own. Breakthrough hours are smaller than lifetime hours, so the prior does real work for members with one or two seasons.
+
+### Percentiles
+
+Shrunk rates are ranked within the tracked clan and mapped to 2–98 with tied ranks averaged.
+
+### Softened geometric mean
+
+Pillars and the Effectiveness Index are weighted geometric means with 20 added to every percentile before the logarithm and subtracted after. One weak pillar dents the score instead of sinking it: a member at the 2nd percentile on objective and the 50th on the other two scores in the mid thirties rather than the teens.
+
+## Pillars
+
+| Pillar (weight in EI) | Inputs |
+| --- | --- |
+| Combat (0.40) | K/D 0.35, kills per minute 0.30, damage per minute 0.25, headshot share 0.10 |
+| Objective (0.30) | time on objective 0.50, captures + defends per hour 0.50 |
+| Teamwork (0.30) | lane score 0.70, kill assists per hour 0.30 |
+
+**Lane score.** The three support lanes are Medic (revives per hour), Engineer (repairs per hour) and Intel (spots per hour). The lane score is the member's best lane percentile plus 0.15 × their second-best lane, capped at 98. A pure medic scores their full medic percentile; a flexible player earns a bonus. Specialists are never docked for a lane they do not play.
+
+## 1. Effectiveness Index (`ei`)
+
+```
+EI = (C + 20)^0.40 × (O + 20)^0.30 × (T + 20)^0.30 − 20
 ```
 
-## Design scope
+Combat and objective percentiles are negatively related in the cohort, which is the expected trade-off between farming and playing the point and the reason a multiplicative combination is kept over a sum.
 
-- KDM's primary mode is **Breakthrough**. Win inputs use Breakthrough season records where available. The Objective pillar uses top-level objective totals; it is Breakthrough-oriented but is not filtered to Breakthrough-only actions.
-- Combat uses **player-only kills**. Bot-inclusive top-level kill counters and generic GameTools KPM are not used.
-- Lifetime totals are converted to rates or percentages before comparison, so playing more hours does not automatically produce a higher score.
-- Accuracy and Headshot % remain important, but are adjusted for weapon mix.
-- Support specialists receive credit through Medic, Logistics, and Intel lanes rather than one universal support counter.
+## 2. Impact Rate (`ir`)
 
-## Shared normalization pipeline
-
-Most raw inputs have different units and distributions. Before combining them, the model converts each input to a clan-relative percentile.
-
-### 1. Rate construction
-
-The model uses top-level `secondsPlayed` for hours and duration-normalized pillars, falling back to active class seconds when absent. Player Kills/Min uses active class minutes. These denominators differ intentionally in the current implementation; the ordinary site Time Played metric uses active seconds. Counts are divided by the appropriate hours, matches, or seconds. Examples include assists/hour, objective actions/hour, Player Kills/match, and objective-time share.
-
-Player-only combat values use the public tracker definitions:
-
-- Player K/D: `infantryKillDeath`
-- Player Kills: `dividedKills.human`
-- Player Kills/Min: tracked player kills divided by active class minutes
-
-### 2. Exposure shrinkage
-
-Each rate is pulled slightly toward the clan median to reduce small-sample volatility:
-
-```text
-w = hours / (hours + 25)
-adjusted value = w × player value + (1 - w) × clan median
+```
+IR = Breakthrough score ÷ Breakthrough minutes
 ```
 
-At 25 hours, the player and clan median receive equal weight. At the hundreds of hours held by most tracked members, the adjustment is small.
+Published raw: no shrinkage and no percentile. It is the figure a member could compute from their own Breakthrough tab, so it is comparable across dates and rosters and shows real improvement. It relies on the game's own scoring, which already credits captures, defends, revives, resupplies, repairs, spots and squad play, with a weighting that is EA's and opaque. Squad-leader and vehicle bonuses can inflate a short sample.
 
-### 3. Robust percentiles
+Rows under 25 Breakthrough hours carry `provisional: true`. The site marks them and, on the Impact Rate tab, ranks them after every member with a full sample.
 
-Adjusted inputs are ranked across the current clan and mapped onto a 2–98 scale:
+## 3. Form Index (`form`)
 
-```text
-percentile = 2 + rank_position / (player_count - 1) × 96
-```
+Who is effective now. GameTools stopped returning per-season stats on 2026-09-12, so Form is a trailing window taken from the numeric archive itself: today's Breakthrough counters minus the same counters on the newest archive day at least 30 days earlier (the oldest day when the span still reaches 14 days; no window otherwise). The window's rates go through the same shrink-and-percentile machinery with a lighter 10-hour prior, because a month of Breakthrough is a small sample:
 
-- Higher values are better for productive inputs.
-- Tied values receive their average rank.
-- The 2–98 bounds stop a single extreme observation from becoming zero or infinitely dominant in a geometric mean.
+| Input | Weight |
+| --- | --- |
+| K/D | 0.25 |
+| Score per minute | 0.25 |
+| Kills per minute | 0.20 |
+| Time on objective | 0.15 |
+| Revives per hour | 0.15 |
 
-### 4. Weighted geometric means
-
-Several components use a weighted geometric mean:
-
-```text
-weighted geometric mean = exp(Σ weight_i × ln(value_i) / Σ weight_i)
-```
-
-Unlike an arithmetic mean, this rewards balance: an exceptional value cannot completely erase a neglected component.
-
-## Pillar calculations
-
-CEI and RAIS share three underlying pillars: Combat (`C`), Breakthrough Objective (`O`), and Teamwork (`T`). WRR also uses these pillars to estimate expected winning.
-
-### Combat pillar (`C`)
-
-Combat blends two summaries of the same six clan-relative percentiles: 70% weighted geometric mean and 30% weighted arithmetic mean. The geometric portion continues to reward a balanced combat profile, while the arithmetic portion softens an excessive penalty from one unusually weak input.
-
-| Input | Combat weight | Raw definition |
-| --- | ---: | --- |
-| Player K/D | 30% | Tracked `infantryKillDeath` |
-| Player Kills/Min | 30% | Player-only kills per active minute |
-| Player Kills/match | 10% | `dividedKills.human / matchesPlayed` |
-| Assists/hour | 10% | Tracked assists divided by hours |
-| Weapon-adjusted Accuracy | 10% | Accuracy residual percentile |
-| Weapon-adjusted Headshot % | 10% | Headshot residual percentile |
-
-```text
-G = geometric_mean(
-  Player K/D percentile             weight 0.30,
-  Player Kills/Min percentile       weight 0.30,
-  Player Kills/match percentile     weight 0.10,
-  Assists/hour percentile           weight 0.10,
-  adjusted Accuracy percentile      weight 0.10,
-  adjusted Headshot % percentile    weight 0.10
-)
-
-A = arithmetic_mean(same inputs and weights)
-
-C = 0.70 × G + 0.30 × A
-```
-
-The blend retains most of the geometric mean's resistance to one-stat specialization. The 30% arithmetic component gives proportionate credit for the rest of a player's combat production when one submetric is exceptionally low.
-
-Weapon-adjusted aim is **inside Combat**. It is not a separate CEI pillar.
-
-#### Weapon-mix aim adjustment
-
-Raw Accuracy and Headshot % favor precision weapons. The model estimates the value expected from each player's weapon mix, then scores the residual above or below that expectation.
-
-Weapon usage is approximated by kill share across eight classes:
-
-- Assault rifle
-- SMG
-- Carbine
-- Machine gun
-- DMR
-- Sniper rifle
-- Shotgun
-- Pistol
-
-The model uses weapon-kill share as its usage proxy. Numeric archives began retaining shot and equipment-time counters on 2026-08-10; the current model does not use those fields for weapon-mix weights. Their availability is not a reason to describe kill share as measured time share.
-
-For Accuracy and Headshot % separately:
-
-1. Calculate each weapon class's share of the player's categorized weapon kills.
-2. Standardize those eight shares across the clan.
-3. Fit a ridge regression with an unpenalized intercept and `λ = 1`.
-4. Predict the player's expected Accuracy or Headshot % from their weapon mix.
-5. Calculate the residual:
-
-```text
-accuracy residual = actual Accuracy - weapon-mix expected Accuracy
-headshot residual = actual Headshot % - weapon-mix expected Headshot %
-```
-
-6. Apply exposure shrinkage and convert each residual to a clan percentile.
-
-The displayed Aim-adjusted subscore is the 50/50 geometric mean of those two residual percentiles. It is shown in player breakdowns for explanation, but only enters overall scores through Combat.
-
-### Breakthrough Objective pillar (`O`)
-
-The Objective pillar is a weighted geometric mean of three Breakthrough-relevant percentiles:
-
-| Input | Objective weight | Raw definition |
-| --- | ---: | --- |
-| Captures and neutralizations/hour | 50% | `(captured + neutralized) / hours` |
-| Objective-zone presence | 30% | `objective time total / seconds played` |
-| Attack/defense pressure | 20% | `(objective time attacked + defended) / seconds played` |
-
-```text
-O = geometric_mean(
-  objective actions/hour percentile     weight 0.50,
-  objective presence percentile         weight 0.30,
-  attack/defense pressure percentile    weight 0.20
-)
-```
-
-### Teamwork pillar (`T`)
-
-Teamwork first creates three role lanes.
-
-#### Medic lane
-
-```text
-Medic = geometric_mean(
-  revives/hour percentile          weight 0.45,
-  squad revives/hour percentile    weight 0.20,
-  heals/hour percentile            weight 0.35
-)
-```
-
-#### Logistics lane
-
-```text
-Logistics = geometric_mean(
-  resupplies/hour percentile    weight 0.55,
-  repairs/hour percentile       weight 0.45
-)
-```
-
-#### Intel lane
-
-```text
-Intel = geometric_mean(
-  spots/hour percentile         weight 0.55,
-  spot assists/hour percentile  weight 0.45
-)
-```
-
-The final Teamwork pillar uses the player's two strongest lanes:
-
-```text
-T = 0.70 × best support lane + 0.30 × second-best support lane
-```
-
-This rewards meaningful specialization while requiring more than one narrow support behavior.
-
-## 1. Composite Effectiveness Index (CEI)
-
-CEI is the default balanced overall measure. It combines Combat, Breakthrough Objective, and Teamwork with a geometric mean:
-
-```text
-CEI = C^0.40 × O^0.30 × T^0.30
-```
-
-Interpretation:
-
-- A higher score means stronger balanced contribution relative to the current tracked clan.
-- Combat has the largest weight, but Objective and Teamwork together make up 60%.
-- Because the formula is geometric, a weak pillar materially lowers the total.
-- CEI is best treated as the primary all-around leaderboard.
-
-## 2. Risk-Adjusted Impact Score (RAIS)
-
-RAIS measures productive impact relative to death exposure. It begins with an arithmetic upside score:
-
-```text
-upside = 0.40 × C + 0.30 × O + 0.30 × T
-```
-
-The downside multiplier compares adjusted deaths/hour with the current clan median:
-
-```text
-downside = (player deaths/hour / clan median deaths/hour)^0.35
-```
-
-The downside multiplier is capped to the range `0.72–1.40`. The exponent and cap deliberately make death exposure a soft adjustment rather than allowing low-death passive play to dominate.
-
-```text
-RAIS_raw = upside / downside
-```
-
-`RAIS_raw` is then converted to a 2–98 clan percentile. The published RAIS number is that percentile.
-
-Interpretation:
-
-- High impact with controlled death exposure ranks well.
-- Aggression is not automatically punished because Combat, Objective, and Teamwork create the numerator.
-- A value of 90 means the player ranks above roughly 90% of the current tracked population on risk-adjusted impact.
-
-## 3. Win Rate Residual (WRR)
-
-WRR measures whether a player wins more or less often than expected from their visible Combat, Objective, and Teamwork profile.
-
-### Step 1: Breakthrough season records
-
-The first mode whose key starts with `breakthrough` (case-insensitive), normally `Breakthrough0`, is used within each season. Each season supplies wins and losses independently.
-
-Raw season win rate:
-
-```text
-season raw win rate = wins / (wins + losses)
-```
-
-### Step 2: Stabilize each season
-
-Each season is smoothed toward that season's clan-wide Breakthrough win rate with a 25-match prior:
-
-```text
-season stabilized rate =
-  (player wins + 25 × clan season win rate)
-  / (player wins + player losses + 25)
-```
-
-This prevents a very small seasonal record from receiving the same confidence as hundreds of matches.
-
-### Step 3: Weight recent seasons more heavily
-
-```text
-weighted Breakthrough win rate =
-  0.20 × Season 1 stabilized rate
-  + 0.35 × Season 2 stabilized rate
-  + 0.45 × Season 3 stabilized rate
-```
-
-If a season is unavailable, the remaining weights are renormalized. Season 3 therefore has the largest influence, allowing recent improvement or decline to affect WRR more strongly.
-
-### Step 4: Estimate expected winning
-
-Combat, Objective, and Teamwork pillar scores are standardized across the clan:
-
-```text
-zC = (C - clan mean C) / clan standard deviation C
-zO = (O - clan mean O) / clan standard deviation O
-zT = (T - clan mean T) / clan standard deviation T
-```
-
-For each player, the model fits a ridge regression on the other tracked members only:
-
-```text
-expected win rate = β0 + βC × zC + βO × zO + βT × zT
-```
-
-- Ridge penalty: `λ = 4`
-- The intercept is not penalized.
-- Leave-one-player-out fitting prevents a player's own win rate from pulling their expectation toward itself.
-- Expected values are clamped to `0–100%`.
-
-### Step 5: Calculate the residual
-
-```text
-WRR = weighted Breakthrough win rate - expected win rate
-```
-
-WRR is expressed in percentage points, not as a 0–100 score.
-
-Interpretation:
-
-- Positive WRR: the player wins more often than their visible pillar profile predicts.
-- Near-zero WRR: their winning is broadly consistent with their measured profile.
-- Negative WRR: their weighted win rate is below the model expectation.
-- WRR may reflect positioning, coordination, communication, timing, leadership, or recurring team composition. It identifies unexplained winning association; it does not prove individual causation.
-
-GameTools does not expose an explicit abandoned-match or early-exit counter. Seasonal `matches` is effectively the sum of recorded wins and losses, so the model cannot distinguish a completed loss from a match that was left before a loss was recorded. Win/loss count still affects confidence through the 25-match prior: large records are trusted more, but raw win volume does not earn a separate score bonus because that would primarily reward playtime.
-
-If season-mode data is temporarily unavailable, the implementation falls back to lifetime wins/losses stabilized by a 50-match clan prior. The generated snapshot labels whether a row used season data or the lifetime fallback; do not assume current full-roster coverage from this guide.
+A counter that went down between the two days marks a relinked account and discards the window. Members without a window (too little history, no Breakthrough play, or a relink) have their rates replaced by the clan median. Windows exist from 2026-08-12 plus the window length, since that is where the backfilled Breakthrough slice begins.
 
 ## Player-level breakdowns
 
-Every row in the Full KDM Ranking table has a **Breakdown** control. Expanding it displays:
+Every row in the Full KDM Ranking table has a **Breakdown** control. Expanding it shows the equation with the member's own values, the pillar scores with their weights, each input's raw rate and clan percentile, the support lanes, and for Form the window (dates, hours, matches) with its rates.
 
-- The exact selected-measure equation with that player's values.
-- CEI's three weighted pillars, Combat construction, and the player-level Combat inputs and percentiles when viewing CEI.
-- RAIS upside composition, player and median death exposure, downside multiplier, raw score, and final clan percentile when viewing RAIS.
-- Season 1/2/3 Breakthrough records, stabilized rates and weights, expected-win pillar inputs, expected win rate, and final residual when viewing WRR.
+## Row contract
+
+Version 2 rows expose `scores.{ei,ir,form}`, `provisional`, `pillars.*`, `lanes.{medic,engineer,intel}`, `bestSupportLanes`, `laneScore`, `percentiles.*`, `raw.*`, `adjusted.*`, `formWindow`, `formHours`, `breakthroughWinPercent`, `hours` and `matches`. Constants published with the snapshot: `priorHours`, `provisionalHours`, `geometricOffset`, `formWindowDays`, `formMinWindowDays`, `formPriorHours`, `formBaselineDate`, `pillarWeights`, `combatWeights`, `objectiveWeights`, `laneBonus`, `teamworkWeights`, `formWeights`, `medianScorePerMinute`, `medianDeathsPerHour` and `cohortBreakthroughWinPercent`.
+
+Numeric-archive dates before the projection kept the Breakthrough slice have no v2 values. Dates from 2026-08-12 onward were re-projected from the raw gzip archive; earlier dates publish as null.
 
 ## Implementation reference
 
 - Display definitions: [`assets/effectiveness.js`](assets/effectiveness.js)
 - Page rendering and row breakdowns: [`assets/app.js`](assets/app.js)
-- Canonical formulas and model version: [`kdm-discord-bot/src/bf6-effectiveness.js`](https://github.com/raymdl/kdm-discord-bot/blob/main/src/bf6-effectiveness.js)
-- Generated current/history contract: `effectiveness-history.json` in the pinned public release; the repository copy is frozen
-- Archive ownership and coverage: [bot data ownership guide](https://github.com/raymdl/kdm-discord-bot/blob/main/docs/BF6_DATA_OWNERSHIP_AND_RETENTION.md)
+- Canonical formulas and model version: `src/bf6-effectiveness.js` in the private `kdm-discord-bot` repository
+- Design review and evidence: `docs/EFFECTIVENESS_LAB_REVIEW.md` in the same repository
+- Generated current/history contract: [`data/effectiveness-history.json`](data/effectiveness-history.json) (the repository copy is a frozen rollback snapshot; production is in R2)
 
-The bot's `EFFECTIVENESS_MODEL_VERSION` must be incremented whenever a formula, weight, normalization rule, input definition, prior, or regression configuration changes. A version change triggers a complete historical rebuild. Private numeric archives remain the rebuild source; the next normal publication performs the version-triggered rebuild.
+The bot's `EFFECTIVENESS_MODEL_VERSION` must be incremented whenever a formula, weight, normalization rule, input definition or prior changes. A version change triggers a complete historical rebuild from the private numeric archive.

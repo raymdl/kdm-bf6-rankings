@@ -1,4 +1,4 @@
-import { shiftDate } from "./counter-math.js?v=20261012-parallel-boot-load";
+import { shiftDate } from "./counter-math.js?v=20261021-effectiveness-lab-v2";
 
 export const RANGE_OPTIONS = [
   { key: "today", label: "Today" },
