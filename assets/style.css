@@ -735,6 +735,20 @@ tr.r3 .rank-cell { color: var(--bronze); }
   vertical-align: baseline;
 }
 
+.provisional-marker {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
 .cached-footnote {
   margin: 0.85rem 0 0;
   color: var(--text-faint);
