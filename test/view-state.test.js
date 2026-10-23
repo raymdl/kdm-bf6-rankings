@@ -87,3 +87,30 @@ test("custom validation blocks incomplete, reversed, and out-of-coverage ranges"
   assert.equal(validateCustomRange("2026-07-09", "2026-07-15", dates[0], dates.at(-1)).valid, false);
   assert.equal(validateCustomRange("2026-07-12", "2026-07-15", dates[0], dates.at(-1)).valid, true);
 });
+
+test("Career This Season compares against the day before the season began", () => {
+  const seasonDates = ["2026-10-10", "2026-10-12", "2026-10-13", "2026-10-20", "2026-10-23"];
+  const window = resolveCareerWindow(seasonDates, seasonDates.map((_, index) => index), "season");
+  assert.deepEqual([window.startDate, window.endDate], ["2026-10-12", "2026-10-23"]);
+  assert.deepEqual(window.indexes, [1, 2, 3, 4]);
+  assert.equal(window.season.label, "Season 5");
+  // In July 2026 the season in progress is Season 3, which began before these dates.
+  assert.equal(resolveCareerWindow(dates, indexes, "season").clamped, true);
+  const preSeason = ["2025-10-01", "2025-10-10"];
+  assert.equal(resolveCareerWindow(preSeason, [0, 1], "season").reason, "no_season");
+});
+
+test("This Season survives the URL round trip", () => {
+  const state = normalizedViewRange(new URLSearchParams("view=period&range=season"));
+  assert.deepEqual(state, { view: "period", range: "season", custom: null });
+  assert.deepEqual(viewRangeParams(state), { view: "period", range: "season" });
+});
+
+test("Career named seasons use the season's own endpoints and survive the URL", () => {
+  const seasonDates = ["2026-05-11", "2026-07-20", "2026-08-30", "2026-10-12", "2026-10-23"];
+  const window = resolveCareerWindow(seasonDates, seasonDates.map((_, index) => index), "season-4");
+  assert.deepEqual([window.startDate, window.endDate], ["2026-07-20", "2026-10-12"]);
+  assert.deepEqual(window.indexes, [1, 2, 3]);
+  assert.deepEqual(normalizedViewRange(new URLSearchParams("range=season-4")), { view: "career", range: "season-4", custom: null });
+  assert.deepEqual(normalizedViewRange(new URLSearchParams("range=season-x")).range, "7d");
+});

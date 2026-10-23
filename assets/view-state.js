@@ -1,4 +1,5 @@
-import { shiftDate } from "./counter-math.js?v=20261021-effectiveness-lab-v2";
+import { shiftDate } from "./counter-math.js?v=20261023-this-season";
+import { isSeasonRangeKey, seasonForRangeKey, seasonTargets } from "./seasons.js?v=20261023-this-season";
 
 export const RANGE_OPTIONS = [
   { key: "today", label: "Today" },
@@ -45,7 +46,7 @@ export function normalizedViewRange(params, { periodAvailable = true, defaultRan
   }
   return {
     view: requestedView === "period" && periodAvailable ? "period" : "career",
-    range: RANGE_OPTIONS.some((option) => option.key === normalized) ? normalized : defaultRange,
+    range: RANGE_OPTIONS.some((option) => option.key === normalized) || isSeasonRangeKey(normalized) ? normalized : defaultRange,
     custom: null
   };
 }
@@ -115,9 +116,21 @@ export function resolveCareerWindow(dates, authoritativeIndexes, rangeKey, custo
   let endPosition = endPositionDefault;
   let requested = rangeKey;
   let clamped = false;
+  let season = null;
 
   if (rangeKey === "today") {
     startPosition = endPositionDefault - 1;
+  } else if (isSeasonRangeKey(rangeKey)) {
+    const latestDate = dates[indexes[endPositionDefault]];
+    const found = seasonForRangeKey(rangeKey, latestDate);
+    if (!found.season) return { unavailable: true, reason: found.reason };
+    season = found.season;
+    const targets = seasonTargets(season, latestDate);
+    const resolved = positionOnOrBefore(dates, indexes, targets.startTarget);
+    startPosition = Math.max(0, resolved);
+    endPosition = positionOnOrBefore(dates, indexes, targets.endTarget);
+    clamped = resolved < 0;
+    if (endPosition <= startPosition) return { unavailable: true, reason: season.lastDate ? "season_not_tracked" : "season_not_started" };
   } else if (rangeKey === "all") {
     startPosition = 0;
   } else if (/^(\d+)d$/.test(rangeKey ?? "")) {
@@ -148,7 +161,8 @@ export function resolveCareerWindow(dates, authoritativeIndexes, rangeKey, custo
     startDate: dates[selectedIndexes[0]],
     endDate: dates[selectedIndexes.at(-1)],
     indexes: selectedIndexes,
-    clamped
+    clamped,
+    ...(season ? { season } : {})
   };
 }
 

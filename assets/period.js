@@ -1,4 +1,5 @@
-import { shiftDate, ratio } from "./counter-math.js?v=20261021-effectiveness-lab-v2";
+import { shiftDate, ratio } from "./counter-math.js?v=20261023-this-season";
+import { isSeasonRangeKey, seasonForRangeKey, seasonTargets } from "./seasons.js?v=20261023-this-season";
 
 /* KDM BF6 Rankings — pure Period calculation engine over data/counters.json.
    DOM-free and side-effect-free so it runs identically in the browser and in
@@ -40,7 +41,7 @@ export function minActiveSecondsForWindow(window) {
   return MIN_ACTIVE_SECONDS_PER_DAY_TO_RANK * windowDaySpan(window);
 }
 
-export const PERIOD_RANGE_KEYS = ["today", "3d", "7d", "14d", "30d", "all", "custom"];
+export const PERIOD_RANGE_KEYS = ["today", "3d", "7d", "14d", "30d", "season", "all", "custom"]; // plus season-N
 export const CUSTOM_RANGE_RE = /^(\d{4}-\d{2}-\d{2})\.\.(\d{4}-\d{2}-\d{2})$/;
 
 // Site stat key → how its Period value derives from window counter deltas.
@@ -201,6 +202,29 @@ export function resolveRange(counters, rangeKey, customRange = null) {
       return { unavailable: true, reason: "single_snapshot" };
     }
     return window_(dates, 0, endIndex, { requested: "all", partialEnd });
+  }
+
+  // A season subtracts the final snapshot before its first day (Season 5:
+  // end of Oct 12), like Today subtracts the end of yesterday, and ends on its
+  // last day or, while in progress, today.
+  if (isSeasonRangeKey(rangeKey)) {
+    const { season, reason } = seasonForRangeKey(rangeKey, dates[endIndex]);
+    if (!season) {
+      return { unavailable: true, reason };
+    }
+    const targets = seasonTargets(season, dates[endIndex]);
+    const target = indexOnOrBefore(dates, targets.startTarget);
+    const startIndex = Math.max(0, target);
+    const seasonEnd = indexOnOrBefore(dates, targets.endTarget);
+    if (seasonEnd <= startIndex) {
+      return { unavailable: true, reason: season.lastDate ? "season_not_tracked" : "season_not_started" };
+    }
+    return window_(dates, startIndex, seasonEnd, {
+      requested: rangeKey,
+      season,
+      partialEnd: partialEnd && seasonEnd === endIndex,
+      clamped: target < 0
+    });
   }
 
   // Presets and custom starts that predate the first tracked column clamp to

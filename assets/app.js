@@ -1,4 +1,4 @@
-import { renderActivityView } from "./activity-view.js?v=20261021-effectiveness-lab-v2";
+import { renderActivityView } from "./activity-view.js?v=20261023-this-season";
 
 /* KDM BF6 Rankings — static SPA reading the generated JSON published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN.
@@ -7,9 +7,9 @@ import { renderActivityView } from "./activity-view.js?v=20261021-effectiveness-
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261021-effectiveness-lab-v2";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261023-this-season";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20261021-effectiveness-lab-v2";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20261023-this-season";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -20,7 +20,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20261021-effectiveness-lab-v2";
+} from "./period.js?v=20261023-this-season";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -34,8 +34,9 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20261021-effectiveness-lab-v2";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261021-effectiveness-lab-v2";
+} from "./view-state.js?v=20261023-this-season";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261023-this-season";
+import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261023-this-season";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -46,7 +47,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20261021-effectiveness-lab-v2";
+} from "./equipment.js?v=20261023-this-season";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -655,12 +656,13 @@ function periodWindowText(window) {
   if (window.requested === "today") {
     return `Today's performance · as of ${asOfEasternText(window.asOf)} ET`;
   }
-  const label = RANGE_OPTIONS.find((option) => option.key === window.requested)?.label
+  const label = window.season?.label
+    ?? RANGE_OPTIONS.find((option) => option.key === window.requested)?.label
     ?? (window.requested === "custom" ? "Custom" : "Period");
   // Preset Period values are daily intervals after the baseline snapshot.
   // Label the dates the chart/table actually shows (e.g. a 3-day window has
   // points for Jul 15–17 even though Jul 14 is the subtraction baseline).
-  const displayStartDate = /^\d+d$/.test(window.requested ?? "")
+  const displayStartDate = /^\d+d$/.test(window.requested ?? "") || isSeasonRangeKey(window.requested)
     ? shiftDateString(window.startDate, 1)
     : window.startDate;
   const clampNote = window.clamped ? " · tracking began " + fmtShortDate(window.startDate) : "";
@@ -674,6 +676,12 @@ function careerRangeWindowText(window, { includeLabel = false, includeClamp = tr
   if (!includeLabel) return `${dateRange}${clampNote}`;
   if (window.requested === "today") {
     return `Current career · change since ${fmtShortDate(window.startDate)}`;
+  }
+  if (window.season && window.requested === "season") {
+    return `Current career · ${window.season.label} change since ${fmtShortDate(window.startDate)}${clampNote}`;
+  }
+  if (window.season) {
+    return `Current career · ${window.season.label} change ${dateRange}${clampNote}`;
   }
   if (window.requested === "all") {
     return `Current career · change since tracking began ${fmtShortDate(window.startDate)}`;
@@ -693,12 +701,47 @@ function rangeChipAvailability(key) {
     no_refresh_today: "Available after today's first refresh",
     not_enough_history: `Needs more tracked history (daily counters start ${fmtShortDate(state.counters.dates[0])})`,
     no_prior_baseline: "Needs a prior day's snapshot",
-    single_snapshot: "Needs at least two snapshots"
+    single_snapshot: "Needs at least two snapshots",
+    season_not_started: "Available after the season's first tracked refresh",
+    season_not_tracked: "This season ended before tracking began",
+    no_season: "No season is in progress"
   };
   return { enabled: false, title: reasons[window.reason] ?? "Unavailable" };
 }
 
 const customCalendarState = { open: false, from: null, to: null, selecting: "from", month: null };
+const seasonMenuState = { open: false };
+
+// Season choices, newest first. Daily counters mark where measured tracking
+// begins; earlier history is mostly backfill estimates.
+function seasonMenuChoices() {
+  const latestDate = state.counters?.dates?.at(-1) ?? state.history?.dates?.at(-1);
+  return menuSeasons(latestDate, state.counters?.dates?.[0] ?? state.history?.dates?.[0]);
+}
+
+function seasonMenuHtml(choices) {
+  if (!seasonMenuState.open) return "";
+  const items = choices.map(({ season, key, partial }) => {
+    const availability = rangeChipAvailability(key);
+    const current = key === "season";
+    const dates = `${fmtBadgeDate(season.firstDate)} → ${current ? "today" : fmtBadgeDate(season.lastDate)}`;
+    const note = current ? "current" : partial ? "partly tracked" : "";
+    return `<button type="button" role="menuitemradio" aria-checked="${viewRangeState.range === key}" class="season-option ${viewRangeState.range === key ? "active" : ""}" data-season-range="${key}" ${availability.enabled ? "" : "disabled"} title="${esc(availability.title)}">
+      <strong>${esc(season.label)}</strong><span>${esc(dates)}${note ? ` · ${note}` : ""}</span>
+    </button>`;
+  }).join("");
+  return `<div class="season-menu-popover" role="menu" aria-label="Choose season">${items}</div>`;
+}
+
+function seasonChipHtml() {
+  const choices = seasonMenuChoices();
+  if (!choices.length) return "";
+  const selected = isSeasonRangeKey(viewRangeState.range)
+    ? choices.find((choice) => choice.key === viewRangeState.range)
+    : null;
+  const label = selected ? selected.season.label : "Season";
+  return `<span class="season-menu-anchor"><button type="button" class="chip range-chip season-chip ${selected ? "active" : ""}" data-season-toggle title="Pick a BF6 season" aria-haspopup="menu" aria-expanded="${seasonMenuState.open}">${esc(label)}&nbsp;<span aria-hidden="true">▾</span></button>${seasonMenuHtml(choices)}</span>`;
+}
 
 function monthKey(date) {
   return String(date ?? "").slice(0, 7);
@@ -800,6 +843,7 @@ function viewRangeControlHtml(trailingControl = "") {
         const availability = rangeChipAvailability(option.key);
         return `<button type="button" class="chip range-chip ${viewRangeState.range === option.key ? "active" : ""}" data-range="${option.key}" ${availability.enabled ? "" : "disabled"} title="${esc(availability.title)}">${option.label}</button>`;
       }).join("")}
+      ${seasonChipHtml()}
       <span class="range-calendar-anchor"><button type="button" class="chip range-chip ${isCustom ? "active" : ""}" data-range="custom" title="Pick an exact date range" aria-expanded="${customCalendarState.open}">Custom…</button>${rangeCalendarHtml(dates)}</span>
     </div>
     ${trailingControl}
@@ -816,9 +860,23 @@ function wireViewRangeControl(hrefFor) {
       navigate();
     });
   }
+  app.querySelector("[data-season-toggle]")?.addEventListener("click", () => {
+    customCalendarState.open = false;
+    seasonMenuState.open = !seasonMenuState.open;
+    rerender();
+  });
+  for (const option of app.querySelectorAll("[data-season-range]")) {
+    option.addEventListener("click", () => {
+      seasonMenuState.open = false;
+      viewRangeState.range = option.dataset.seasonRange;
+      viewRangeState.custom = null;
+      navigate();
+    });
+  }
   for (const chip of app.querySelectorAll(".range-chip[data-range]")) {
     chip.addEventListener("click", () => {
       const key = chip.dataset.range;
+      seasonMenuState.open = false;
       if (key === "custom") {
         openCustomCalendar(state.counters?.dates ?? state.history.dates);
         rerender();
@@ -883,14 +941,18 @@ function wireViewRangeControl(hrefFor) {
 }
 
 document.addEventListener("click", (event) => {
-  if (!customCalendarState.open || event.target.closest?.(".range-calendar-anchor")) return;
-  customCalendarState.open = false;
+  const closeCalendar = customCalendarState.open && !event.target.closest?.(".range-calendar-anchor");
+  const closeSeasons = seasonMenuState.open && !event.target.closest?.(".season-menu-anchor");
+  if (!closeCalendar && !closeSeasons) return;
+  if (closeCalendar) customCalendarState.open = false;
+  if (closeSeasons) seasonMenuState.open = false;
   replaceHashAndRender(location.hash);
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.key !== "Escape" || !customCalendarState.open) return;
+  if (event.key !== "Escape" || (!customCalendarState.open && !seasonMenuState.open)) return;
   customCalendarState.open = false;
+  seasonMenuState.open = false;
   replaceHashAndRender(location.hash);
 });
 
@@ -2833,13 +2895,14 @@ function recentFormCardHtml(discordId, member) {
   if (!periodDataAvailable() || !state.counters.members?.[discordId]) {
     return "";
   }
-  const columns = ["today", "3d", "7d", "14d", "30d", "all"]
+  const columns = ["today", "3d", "7d", "14d", "30d", "season", "all"]
     .map((key) => ({ key, window: resolveRange(state.counters, key) }))
     .filter((column) => column.key === "today" || !column.window.unavailable);
   if (!columns.length) {
     return "";
   }
-  const labels = { today: "Today", "3d": "3 days", "7d": "7 days", "14d": "14 days", "30d": "30 days", all: "All tracked" };
+  const seasonWindow = columns.find((column) => column.key === "season")?.window;
+  const labels = { today: "Today", "3d": "3 days", "7d": "7 days", "14d": "14 days", "30d": "30 days", season: seasonWindow?.season?.label ?? "This season", all: "All tracked" };
   const decimal = { format: "decimal", decimals: 2 };
   const integer = { format: "integer" };
   const hours = { format: "hours" };
@@ -4008,6 +4071,7 @@ async function render() {
   const routePath = parts.join("/");
   if (lastRenderedRoutePath != null && routePath !== lastRenderedRoutePath) {
     customCalendarState.open = false;
+    seasonMenuState.open = false;
   }
   lastRenderedRoutePath = routePath;
 

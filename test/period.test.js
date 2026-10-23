@@ -569,3 +569,46 @@ test("equipment validators keep the member profile and kills index contracts sep
   assert.equal(validEquipmentArtifact(killsIndex), true);
   assert.equal(validEquipmentMemberFile(killsIndex), false);
 });
+
+test("This Season subtracts the final snapshot before the season began", () => {
+  const dates = ["2026-10-10", "2026-10-11", "2026-10-12", "2026-10-13", "2026-10-23"];
+  const data = counters({
+    dates,
+    settled: false,
+    members: { a: member("A", [[10, 10, 10, 0, 0], [20, 20, 12, 3600, 100], [30, 30, 15, 7200, 200], [40, 40, 20, 9000, 300], [90, 90, 30, 30000, 900]]) }
+  });
+  const window = resolveRange(data, "season");
+  assert.equal(window.requested, "season");
+  assert.equal(window.season.label, "Season 5");
+  assert.deepEqual([window.startDate, window.endDate], ["2026-10-12", "2026-10-23"]);
+  assert.equal(window.partialEnd, true);
+  assert.equal(memberPeriodStat(data, "a", "kills", window).value, 60);
+  assert.equal(windowDaySpan(window), 11);
+});
+
+test("This Season handles pre-season, missing-baseline and first-day data", () => {
+  const before = counters({ dates: ["2025-10-01", "2025-10-12"], members: { a: member("A", [[1, 1, 1, 1, 1], [2, 2, 2, 2, 2]]) } });
+  assert.equal(resolveRange(before, "season").reason, "no_season");
+  const sameDay = counters({ dates: ["2026-10-11", "2026-10-13"], members: { a: member("A", [[1, 1, 1, 1, 1], [2, 2, 2, 2, 2]]) } });
+  assert.deepEqual([resolveRange(sameDay, "season").startDate, resolveRange(sameDay, "season").endDate], ["2026-10-11", "2026-10-13"]);
+  const onlyBaseline = counters({ dates: ["2026-10-13"], members: { a: member("A", [[1, 1, 1, 1, 1]]) } });
+  assert.equal(resolveRange(onlyBaseline, "season").reason, "season_not_started");
+});
+
+test("A finished season ends on its last day and clamps to tracked history", () => {
+  const dates = ["2026-07-10", "2026-07-20", "2026-08-30", "2026-10-12", "2026-10-13", "2026-10-23"];
+  const data = counters({
+    dates,
+    settled: false,
+    members: { a: member("A", [[0, 0, 0, 0, 0], [10, 10, 5, 3600, 10], [40, 40, 10, 9000, 50], [70, 70, 20, 20000, 90], [75, 75, 21, 21000, 95], [99, 99, 30, 30000, 120]]) }
+  });
+  const four = resolveRange(data, "season-4");
+  assert.deepEqual([four.startDate, four.endDate, four.partialEnd, four.clamped], ["2026-07-20", "2026-10-12", false, false]);
+  assert.equal(four.season.label, "Season 4");
+  assert.equal(memberPeriodStat(data, "a", "kills", four).value, 60);
+  const three = resolveRange(data, "season-3");
+  assert.deepEqual([three.startDate, three.endDate, three.clamped], ["2026-07-10", "2026-07-20", true]);
+  assert.equal(resolveRange(data, "season-2").reason, "season_not_tracked");
+  assert.equal(resolveRange(data, "season-6").reason, "unknown_season");
+  assert.equal(resolveRange(data, "season-5").endDate, "2026-10-23");
+});
