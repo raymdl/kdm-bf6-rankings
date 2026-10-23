@@ -1,4 +1,5 @@
-import { shiftDate } from "./counter-math.js?v=20261021-effectiveness-lab-v2";
+import { shiftDate } from "./counter-math.js?v=20261023-this-season";
+import { currentSeason, seasonBaselineDate } from "./seasons.js?v=20261023-this-season";
 
 export const RANGE_OPTIONS = [
   { key: "today", label: "Today" },
@@ -6,6 +7,7 @@ export const RANGE_OPTIONS = [
   { key: "7d", label: "7 Days" },
   { key: "14d", label: "14 Days" },
   { key: "30d", label: "30 Days" },
+  { key: "season", label: "This Season" },
   { key: "all", label: "All Time" }
 ];
 
@@ -115,9 +117,17 @@ export function resolveCareerWindow(dates, authoritativeIndexes, rangeKey, custo
   let endPosition = endPositionDefault;
   let requested = rangeKey;
   let clamped = false;
+  let season = null;
 
   if (rangeKey === "today") {
     startPosition = endPositionDefault - 1;
+  } else if (rangeKey === "season") {
+    season = currentSeason(dates[indexes[endPositionDefault]]);
+    if (!season) return { unavailable: true, reason: "no_season" };
+    const resolved = positionOnOrBefore(dates, indexes, seasonBaselineDate(season));
+    startPosition = Math.max(0, resolved);
+    clamped = resolved < 0;
+    if (startPosition >= endPosition) return { unavailable: true, reason: "season_not_started" };
   } else if (rangeKey === "all") {
     startPosition = 0;
   } else if (/^(\d+)d$/.test(rangeKey ?? "")) {
@@ -148,7 +158,8 @@ export function resolveCareerWindow(dates, authoritativeIndexes, rangeKey, custo
     startDate: dates[selectedIndexes[0]],
     endDate: dates[selectedIndexes.at(-1)],
     indexes: selectedIndexes,
-    clamped
+    clamped,
+    ...(season ? { season } : {})
   };
 }
 

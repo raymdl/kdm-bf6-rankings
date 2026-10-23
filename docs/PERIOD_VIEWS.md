@@ -5,11 +5,12 @@ Current source reference, reviewed 2026-09-07.
 Every cohort page (leaderboards, Players, Compare) has two independent controls:
 
 - **View** — `Career` shows lifetime totals and ratios (the default, always). `Period` shows stats **earned during the selected range only**, derived in [`assets/period.js`](../assets/period.js) from `data/counters.json`, a per-day series of cumulative counters: a range's Player K/D is Δ player kills ÷ Δ deaths across the range endpoints, never a change in a career ratio and never an average of daily ratios.
-- **Range** — `Today · 3 Days · 7 Days · 14 Days · 30 Days · All Time · Custom…`, shared by both views. In Career view it only sets the movement/delta/sparkline window; in Period view it sets the calculation endpoints. Requested ranges snap to actual snapshot dates and the resolved dates are always displayed.
+- **Range** — `Today · 3 Days · 7 Days · 14 Days · 30 Days · This Season · All Time · Custom…`, shared by both views. In Career view it only sets the movement/delta/sparkline window; in Period view it sets the calculation endpoints. Requested ranges snap to actual snapshot dates and the resolved dates are always displayed.
 
 Semantics worth knowing:
 
 - **Today** means today-so-far (since the previous day's final snapshot, per the artifact's current-day metadata; date keys follow Pacific midnight) and is labeled in progress; it is unavailable before the day's first refresh rather than shown as zero.
+- **This Season** runs from the final snapshot of the day before the current season began (Season 5: end of Oct 12) through today, in progress. The season calendar lives in [`assets/seasons.js`](../assets/seasons.js); add a row when a new season starts. The bot keeps the same list in `src/bf6-query-windows.js` for AI answers, so update both.
 - In **Period**, **All Time** means all *tracked* history (daily counters start 2026-07-10), not lifetime — each member ranks from their own first tracked snapshot, and late joiners carry a `tracked since <date>` badge.
 - Rate stats (K/D, KPM, Score/Min, HS%) need **15 active minutes per calendar day in the resolved window** to rank (45 minutes for three days, 450 for 30 days); under-threshold rows remain visible as unranked "low time" entries. Count stats have no threshold.
 - Player Rank is a progression stat with no Period form and always shows Career values with a notice.

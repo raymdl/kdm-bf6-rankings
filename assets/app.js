@@ -1,4 +1,4 @@
-import { renderActivityView } from "./activity-view.js?v=20261021-effectiveness-lab-v2";
+import { renderActivityView } from "./activity-view.js?v=20261023-this-season";
 
 /* KDM BF6 Rankings — static SPA reading the generated JSON published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN.
@@ -7,9 +7,9 @@ import { renderActivityView } from "./activity-view.js?v=20261021-effectiveness-
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261021-effectiveness-lab-v2";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261023-this-season";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20261021-effectiveness-lab-v2";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20261023-this-season";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -20,7 +20,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20261021-effectiveness-lab-v2";
+} from "./period.js?v=20261023-this-season";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -34,8 +34,9 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20261021-effectiveness-lab-v2";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261021-effectiveness-lab-v2";
+} from "./view-state.js?v=20261023-this-season";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261023-this-season";
+import { currentSeason } from "./seasons.js?v=20261023-this-season";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -46,7 +47,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20261021-effectiveness-lab-v2";
+} from "./equipment.js?v=20261023-this-season";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -655,12 +656,13 @@ function periodWindowText(window) {
   if (window.requested === "today") {
     return `Today's performance · as of ${asOfEasternText(window.asOf)} ET`;
   }
-  const label = RANGE_OPTIONS.find((option) => option.key === window.requested)?.label
+  const label = window.season?.label
+    ?? RANGE_OPTIONS.find((option) => option.key === window.requested)?.label
     ?? (window.requested === "custom" ? "Custom" : "Period");
   // Preset Period values are daily intervals after the baseline snapshot.
   // Label the dates the chart/table actually shows (e.g. a 3-day window has
   // points for Jul 15–17 even though Jul 14 is the subtraction baseline).
-  const displayStartDate = /^\d+d$/.test(window.requested ?? "")
+  const displayStartDate = /^\d+d$/.test(window.requested ?? "") || window.requested === "season"
     ? shiftDateString(window.startDate, 1)
     : window.startDate;
   const clampNote = window.clamped ? " · tracking began " + fmtShortDate(window.startDate) : "";
@@ -675,25 +677,37 @@ function careerRangeWindowText(window, { includeLabel = false, includeClamp = tr
   if (window.requested === "today") {
     return `Current career · change since ${fmtShortDate(window.startDate)}`;
   }
+  if (window.requested === "season" && window.season) {
+    return `Current career · ${window.season.label} change since ${fmtShortDate(window.startDate)}${clampNote}`;
+  }
   if (window.requested === "all") {
     return `Current career · change since tracking began ${fmtShortDate(window.startDate)}`;
   }
   return `Current career · change ${dateRange}${clampNote}`;
 }
 
+function rangeChipTitle(key) {
+  if (key !== "season") return "";
+  const latestDate = state.counters?.dates?.at(-1) ?? state.history?.dates?.at(-1);
+  const season = currentSeason(latestDate);
+  return season ? `${season.label} · since ${fmtShortDate(season.firstDate)}` : "";
+}
+
 function rangeChipAvailability(key) {
   if (viewRangeState.view !== "period") {
-    return { enabled: true, title: "" };
+    return { enabled: true, title: rangeChipTitle(key) };
   }
   const window = resolveRange(state.counters, key);
   if (!window.unavailable) {
-    return { enabled: true, title: "" };
+    return { enabled: true, title: rangeChipTitle(key) };
   }
   const reasons = {
     no_refresh_today: "Available after today's first refresh",
     not_enough_history: `Needs more tracked history (daily counters start ${fmtShortDate(state.counters.dates[0])})`,
     no_prior_baseline: "Needs a prior day's snapshot",
-    single_snapshot: "Needs at least two snapshots"
+    single_snapshot: "Needs at least two snapshots",
+    season_not_started: "Available after the season's first tracked refresh",
+    no_season: "No season is in progress"
   };
   return { enabled: false, title: reasons[window.reason] ?? "Unavailable" };
 }
@@ -2833,13 +2847,14 @@ function recentFormCardHtml(discordId, member) {
   if (!periodDataAvailable() || !state.counters.members?.[discordId]) {
     return "";
   }
-  const columns = ["today", "3d", "7d", "14d", "30d", "all"]
+  const columns = ["today", "3d", "7d", "14d", "30d", "season", "all"]
     .map((key) => ({ key, window: resolveRange(state.counters, key) }))
     .filter((column) => column.key === "today" || !column.window.unavailable);
   if (!columns.length) {
     return "";
   }
-  const labels = { today: "Today", "3d": "3 days", "7d": "7 days", "14d": "14 days", "30d": "30 days", all: "All tracked" };
+  const seasonWindow = columns.find((column) => column.key === "season")?.window;
+  const labels = { today: "Today", "3d": "3 days", "7d": "7 days", "14d": "14 days", "30d": "30 days", season: seasonWindow?.season?.label ?? "This season", all: "All tracked" };
   const decimal = { format: "decimal", decimals: 2 };
   const integer = { format: "integer" };
   const hours = { format: "hours" };
