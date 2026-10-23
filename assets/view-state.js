@@ -1,5 +1,5 @@
 import { shiftDate } from "./counter-math.js?v=20261023-this-season";
-import { currentSeason, seasonBaselineDate } from "./seasons.js?v=20261023-this-season";
+import { isSeasonRangeKey, seasonForRangeKey, seasonTargets } from "./seasons.js?v=20261023-this-season";
 
 export const RANGE_OPTIONS = [
   { key: "today", label: "Today" },
@@ -7,7 +7,6 @@ export const RANGE_OPTIONS = [
   { key: "7d", label: "7 Days" },
   { key: "14d", label: "14 Days" },
   { key: "30d", label: "30 Days" },
-  { key: "season", label: "This Season" },
   { key: "all", label: "All Time" }
 ];
 
@@ -47,7 +46,7 @@ export function normalizedViewRange(params, { periodAvailable = true, defaultRan
   }
   return {
     view: requestedView === "period" && periodAvailable ? "period" : "career",
-    range: RANGE_OPTIONS.some((option) => option.key === normalized) ? normalized : defaultRange,
+    range: RANGE_OPTIONS.some((option) => option.key === normalized) || isSeasonRangeKey(normalized) ? normalized : defaultRange,
     custom: null
   };
 }
@@ -121,13 +120,17 @@ export function resolveCareerWindow(dates, authoritativeIndexes, rangeKey, custo
 
   if (rangeKey === "today") {
     startPosition = endPositionDefault - 1;
-  } else if (rangeKey === "season") {
-    season = currentSeason(dates[indexes[endPositionDefault]]);
-    if (!season) return { unavailable: true, reason: "no_season" };
-    const resolved = positionOnOrBefore(dates, indexes, seasonBaselineDate(season));
+  } else if (isSeasonRangeKey(rangeKey)) {
+    const latestDate = dates[indexes[endPositionDefault]];
+    const found = seasonForRangeKey(rangeKey, latestDate);
+    if (!found.season) return { unavailable: true, reason: found.reason };
+    season = found.season;
+    const targets = seasonTargets(season, latestDate);
+    const resolved = positionOnOrBefore(dates, indexes, targets.startTarget);
     startPosition = Math.max(0, resolved);
+    endPosition = positionOnOrBefore(dates, indexes, targets.endTarget);
     clamped = resolved < 0;
-    if (startPosition >= endPosition) return { unavailable: true, reason: "season_not_started" };
+    if (endPosition <= startPosition) return { unavailable: true, reason: season.lastDate ? "season_not_tracked" : "season_not_started" };
   } else if (rangeKey === "all") {
     startPosition = 0;
   } else if (/^(\d+)d$/.test(rangeKey ?? "")) {

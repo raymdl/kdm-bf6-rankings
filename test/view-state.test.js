@@ -105,3 +105,12 @@ test("This Season survives the URL round trip", () => {
   assert.deepEqual(state, { view: "period", range: "season", custom: null });
   assert.deepEqual(viewRangeParams(state), { view: "period", range: "season" });
 });
+
+test("Career named seasons use the season's own endpoints and survive the URL", () => {
+  const seasonDates = ["2026-05-11", "2026-07-20", "2026-08-30", "2026-10-12", "2026-10-23"];
+  const window = resolveCareerWindow(seasonDates, seasonDates.map((_, index) => index), "season-4");
+  assert.deepEqual([window.startDate, window.endDate], ["2026-07-20", "2026-10-12"]);
+  assert.deepEqual(window.indexes, [1, 2, 3]);
+  assert.deepEqual(normalizedViewRange(new URLSearchParams("range=season-4")), { view: "career", range: "season-4", custom: null });
+  assert.deepEqual(normalizedViewRange(new URLSearchParams("range=season-x")).range, "7d");
+});

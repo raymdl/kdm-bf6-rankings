@@ -12,3 +12,11 @@ test("season calendar is contiguous and the current season resolves by date", ()
   assert.equal(currentSeason("2026-10-13").label, "Season 5");
   assert.equal(currentSeason("2025-10-01"), null);
 });
+
+test("season menu lists started, tracked seasons newest first", async () => {
+  const { menuSeasons, seasonForRangeKey } = await import("../assets/seasons.js");
+  const choices = menuSeasons("2026-10-23", "2026-07-10");
+  assert.deepEqual(choices.map((choice) => [choice.key, choice.partial]), [["season", false], ["season-4", false], ["season-3", true]]);
+  assert.equal(seasonForRangeKey("season", "2026-10-23").season.number, 5);
+  assert.equal(seasonForRangeKey("season-5", "2026-08-01").reason, "unknown_season");
+});

@@ -26,3 +26,50 @@ export function currentSeason(date) {
 export function seasonBaselineDate(season) {
   return season ? shiftDate(season.firstDate, -1) : null;
 }
+
+export function seasonByNumber(number) {
+  return SEASONS.find((season) => season.number === number) ?? null;
+}
+
+// Range keys: "season" is whichever season is in progress (a shared link keeps
+// following it), "season-4" is always Season 4.
+export const SEASON_RANGE_RE = /^season(?:-(\d+))?$/;
+
+export function isSeasonRangeKey(rangeKey) {
+  return SEASON_RANGE_RE.test(String(rangeKey ?? ""));
+}
+
+export function seasonRangeKey(season, latestDate) {
+  return season === currentSeason(latestDate) ? "season" : `season-${season.number}`;
+}
+
+// The season a range key names as of `latestDate`, or { reason } when none.
+export function seasonForRangeKey(rangeKey, latestDate) {
+  const match = SEASON_RANGE_RE.exec(String(rangeKey ?? ""));
+  if (!match) return { reason: "unknown_range" };
+  const current = currentSeason(latestDate);
+  if (!current) return { reason: "no_season" };
+  if (!match[1]) return { season: current };
+  const season = seasonByNumber(Number(match[1]));
+  return season && season.number <= current.number ? { season } : { reason: "unknown_season" };
+}
+
+// Snapshot targets for a season: from the end of the day before it began to
+// the end of its last day, or through `latestDate` while it is in progress.
+export function seasonTargets(season, latestDate) {
+  return {
+    startTarget: seasonBaselineDate(season),
+    endTarget: season.lastDate && season.lastDate < latestDate ? season.lastDate : latestDate
+  };
+}
+
+// Seasons worth offering in the menu: started by `latestDate` and not over
+// before tracking began on `firstTrackedDate`. Newest first.
+export function menuSeasons(latestDate, firstTrackedDate) {
+  const current = currentSeason(latestDate);
+  if (!current) return [];
+  return SEASONS
+    .filter((season) => season.number <= current.number && (!season.lastDate || !firstTrackedDate || season.lastDate > firstTrackedDate))
+    .map((season) => ({ season, key: seasonRangeKey(season, latestDate), partial: Boolean(firstTrackedDate && seasonBaselineDate(season) < firstTrackedDate) }))
+    .reverse();
+}
