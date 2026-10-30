@@ -1,4 +1,4 @@
-import { renderActivityView } from "./activity-view.js?v=20261023-this-season";
+import { renderActivityView } from "./activity-view.js?v=20261030-route-guard";
 
 /* KDM BF6 Rankings — static SPA reading the generated JSON published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN.
@@ -7,9 +7,9 @@ import { renderActivityView } from "./activity-view.js?v=20261023-this-season";
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261023-this-season";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261030-route-guard";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20261023-this-season";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20261030-route-guard";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -20,7 +20,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20261023-this-season";
+} from "./period.js?v=20261030-route-guard";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -34,9 +34,9 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20261023-this-season";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261023-this-season";
-import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261023-this-season";
+} from "./view-state.js?v=20261030-route-guard";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261030-route-guard";
+import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261030-route-guard";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -47,7 +47,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20261023-this-season";
+} from "./equipment.js?v=20261030-route-guard";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -636,9 +636,18 @@ function fmtBadgeDate(date) {
   return new Date(`${date}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-// Snapshot dates use the Eastern calendar day.
-function easternDateKey(iso) {
-  return new Date(iso).toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+// Whether the last plotted column is still an open tracker day. The publisher
+// says so directly (counters.current.settled is false until the Pacific-midnight
+// close), so no clock or timezone is consulted. Displayed times stay Eastern.
+function lastColumnInProgress(labels) {
+  const current = state.counters?.current;
+  const lastLabel = labels[labels.length - 1];
+  if (current && typeof current.settled === "boolean") {
+    return current.settled === false && lastLabel === current.date;
+  }
+  // Older releases carry no settled flag: fall back to the tracker day, which
+  // rolls at Pacific midnight (3 AM Eastern), not at the Eastern calendar day.
+  return lastLabel === new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
 }
 
 function asOfEasternText(iso) {
@@ -1240,8 +1249,7 @@ function lineChart(canvas, labels, datasets, stat, options = {}) {
   if (!globalThis.Chart || !canvas) return null;
   chartBase();
   const lastIndex = labels.length - 1;
-  const todayInProgress =
-    lastIndex > 0 && labels[lastIndex] === easternDateKey(new Date().toISOString());
+  const todayInProgress = lastIndex > 0 && lastColumnInProgress(labels);
   const chart = new Chart(canvas, {
     type: "line",
     data: {
@@ -2191,6 +2199,17 @@ function renderPlayers(params) {
     }, 0);
     empty.hidden = visibleCount > 0;
   });
+}
+
+// A malformed percent-escape in a shared link must not throw out of render()
+// and leave the page on its loading state; the raw segment simply matches no
+// player and falls through to the "Player not found" view.
+function decodeRouteSegment(segment) {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return segment;
+  }
 }
 
 function renderPlayer(discordId, statKey, params) {
@@ -4083,7 +4102,7 @@ async function render() {
     renderPlayers(params);
   } else if (route === "player") {
     nav = "players";
-    renderPlayer(decodeURIComponent(parts[1] ?? ""), parts[2], params);
+    renderPlayer(decodeRouteSegment(parts[1] ?? ""), parts[2], params);
   } else if (route === "compare") {
     nav = "compare";
     loadCompareState(params);

@@ -1,5 +1,5 @@
-import { shiftDate } from "./counter-math.js?v=20261023-this-season";
-import { isSeasonRangeKey, seasonForRangeKey, seasonTargets } from "./seasons.js?v=20261023-this-season";
+import { shiftDate } from "./counter-math.js?v=20261030-route-guard";
+import { isSeasonRangeKey, seasonForRangeKey, seasonTargets } from "./seasons.js?v=20261030-route-guard";
 
 export const RANGE_OPTIONS = [
   { key: "today", label: "Today" },
