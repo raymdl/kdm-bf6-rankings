@@ -1,6 +1,6 @@
 # Site data loading
 
-Current source reference, reviewed 2026-09-07.
+Current source reference, reviewed 2026-10-30.
 
 ## Data source
 
@@ -43,9 +43,10 @@ caching and carry a one-year immutable policy from the Worker. Only
 `current.json` needs revalidation and it is served `no-cache`; it is never
 fetched through `dataFetchOptions()`.
 
-Caching is *not* a substitute for the cache-busting `?v=` string on
-`index.html`'s module imports — that governs the site's own code, which is still
-deployed through Pages.
+Caching is *not* a substitute for the cache-busting `?v=` string — that governs
+the site's own code, which is still deployed through Pages. It is one shared
+value on `index.html`'s stylesheet and `app.js` URLs and on every relative
+module import in `assets/*.js` (enforced by `test/asset-versions.test.js`).
 
 ### Local preview
 
@@ -95,7 +96,7 @@ shared; history, counters, and provenance load for routes that need them, while 
 their route or panel is opened. Per-player equipment files load
 only when that profile section is expanded. Chart.js is pinned with SRI and is
 injected only for Player and Compare views; if the CDN is unavailable, the rest
-of those pages remains usable. Successful optional loads are cached for the browser session, while failed optional fetches remain retryable. Career and Period routes await counters with their initial required data so a later counter fetch does not rebuild the rendered chart. At startup the first route's data is requested together with meta and current standings as soon as the pointer resolves, and `index.html` preconnects to the Worker, so the first view costs two request rounds, not three. Load failures offer Retry. A full Reload keeps the route and resolves a consistent new release. Timestamps use `America/New_York`, including daylight-saving time.
+of those pages remains usable. Successful optional loads are cached for the browser session, while failed optional fetches remain retryable. Career and Period routes await counters with their initial required data so a later counter fetch does not rebuild the rendered chart. At startup the first route's data is requested together with meta and current standings as soon as the pointer resolves, and `index.html` preconnects to the Worker, so the first view costs two request rounds, not three. Load failures offer Retry. A full Reload keeps the route and resolves a consistent new release. The player route decodes its id segment tolerantly: a malformed percent-escape in a shared link (for example `#/player/%E0%A4%A`) does not throw out of `render()`; the raw segment matches no member, so the page shows "Player not found" with a link back to Players instead of staying on its loading state. Timestamps use `America/New_York`, including daylight-saving time.
 
 ## Tests
 

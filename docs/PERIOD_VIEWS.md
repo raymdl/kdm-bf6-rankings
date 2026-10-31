@@ -1,6 +1,6 @@
 # Career and Period views
 
-Current source reference, reviewed 2026-09-07.
+Current source reference, reviewed 2026-10-30.
 
 Every cohort page (leaderboards, Players, Compare) has two independent controls:
 
@@ -9,7 +9,7 @@ Every cohort page (leaderboards, Players, Compare) has two independent controls:
 
 Semantics worth knowing:
 
-- **Today** means today-so-far (since the previous day's final snapshot, per the artifact's current-day metadata; date keys follow Pacific midnight) and is labeled in progress; it is unavailable before the day's first refresh rather than shown as zero.
+- **Today** means today-so-far (since the previous day's final snapshot, per the artifact's current-day metadata; date keys follow Pacific midnight) and is labeled in progress; it is unavailable before the day's first refresh rather than shown as zero. "In progress" keys on the published `counters.current.settled` flag: it is shown while `settled` is `false` and the last column is `counters.current.date`, with no browser clock involved. Only a release that carries no `settled` boolean falls back to comparing the last chart column with today's Pacific tracker day. The same rule decides the chart's last-point styling (hollow final point, dashed final segment) and its "today · in progress" tooltip line, so the marker follows the tracker day (rolling at Pacific midnight, 3 AM Eastern) and not the Eastern calendar day; displayed times stay Eastern.
 - **Season ▾** opens a menu of seasons, newest first. A season runs from the final snapshot of the day before it began (Season 5: end of Oct 12) to the end of its last day, or through today (in progress) for the current season. `range=season` always means the season in progress, so a shared link follows it into the next season; `range=season-4` always means Season 4. Seasons that ended before daily counters began are left out, and one that began before them (Season 3) is marked partly tracked and clamps to the tracked part. The calendar lives in [`assets/seasons.js`](../assets/seasons.js); add a row and close the previous season when a new one starts. The bot keeps the same list in `src/bf6-query-windows.js` for AI answers, so update both.
 - In **Period**, **All Time** means all *tracked* history (daily counters start 2026-07-10), not lifetime — each member ranks from their own first tracked snapshot, and late joiners carry a `tracked since <date>` badge.
 - Rate stats (K/D, KPM, Score/Min, HS%) need **15 active minutes per calendar day in the resolved window** to rank (45 minutes for three days, 450 for 30 days); under-threshold rows remain visible as unranked "low time" entries. Count stats have no threshold.
@@ -35,7 +35,7 @@ Find your case:
 
 `requires` is load-bearing, not documentation — it is what makes a rename cost one stat instead of the whole view. Keep it in sync with `derive`; note the stat key is not always the counter key (`kills` reads `playerKills`). `test/period.test.js` asserts every def declares its counters and that removing any declared counter actually costs that stat its value, so a `requires` list that drifts from its `derive` fails the suite.
 
-After any change here: run `npm test`, and bump the `?v=` string in `index.html` and the `assets/app.js` imports (one shared value — `test/asset-versions.test.js` enforces it) or browsers keep the old modules.
+After any change here: run `npm test`, and bump the `?v=` string in `index.html` (stylesheet and `app.js` URLs) and in every module import under `assets/` (one shared value — `test/asset-versions.test.js` enforces it) or browsers keep the old modules.
 
 ## Favorites
 

@@ -86,7 +86,7 @@ flowchart TB
   AI --> SEND
 ```
 
-The gateway client subscribes to guild messages, DMs, message content and interactions. Message and channel partials let the speedrun service see deletions of messages that are not in the process cache. A merged commit reaches the bot only after the supervisor updates and restarts it ([D21](OPERATIONS.md#d21--code-deployment-and-data-publication)).
+The gateway client subscribes to guild messages, DMs, message content and interactions. An error while handling one message is logged and does not stop the process. Message and channel partials let the speedrun service see deletions of messages that are not in the process cache. A merged commit reaches the bot only after the supervisor updates and restarts it ([D21](OPERATIONS.md#d21--code-deployment-and-data-publication)).
 
 | Interaction | Effect |
 |---|---|
@@ -95,7 +95,7 @@ The gateway client subscribes to guild messages, DMs, message content and intera
 | `!bf6-site-stat <stat> [@member]` | Keeps and publishes only the selected site field; no standings rewrite or overtake message |
 | `!bf6-mute` / `!bf6-unmute` | Turn overtake tags off or on; collection and display continue |
 | Owner roster DM | Unlist, relist, list unlisted, remove, each with confirmation; only the configured owner ID in a one-to-one DM |
-| Dyno presence messages | Validated leave and rejoin messages from the Dyno moderation bot drive roster changes; missed messages are caught up |
+| Dyno presence messages | Validated leave and rejoin messages from the Dyno moderation bot drive roster changes. A leave matches one linked member by Discord username only, never by game or profile name. Missed messages are caught up at startup, except one that a later roster change has already superseded |
 | Other conversation | Ignored unless it meets the [AI reply rules](AI.md) |
 
 The BF6 rankings channel holds six Top-10 stat embeds and a Profiles message. The website carries the full stat list. Board sync finds the bot's own messages and recreates any that are missing.
