@@ -38,15 +38,19 @@ release data. The command can download the serve package if it is not installed.
 To use the frozen local snapshot deliberately, follow the
 [data-loading guide](docs/DATA_LOADING.md#local-preview).
 
-Run `npm test` with Node 20 or later. Tests use Node's built-in test runner;
-there is no application build or package-install step for these tests.
+Run `npm test` with Node 20 or later. It runs `node --test` over `test/`
+(the `test` script in `package.json`), using Node's built-in test runner; there
+is no application build or package-install step for these tests.
 
 ## Change and deploy
 
 Edit `index.html` and `assets/`. Keep data URL resolution in
 [assets/data-source.js](assets/data-source.js). When changing shipped JavaScript
-or CSS, update the relevant `?v=` import cache version in `index.html`.
-Preview the affected routes and run the relevant tests before publication.
+or CSS, change the `?v=` cache version. It is one shared value: the stylesheet
+and `app.js` URLs in `index.html` and every relative module import in
+`assets/*.js` carry the same string, and `test/asset-versions.test.js` fails if
+any of them differ or is unversioned. Preview the affected routes and run the
+tests before publication.
 
 Site code is deployed through the repository's GitHub Pages configuration.
 After an authorized merge/deployment, verify the live page and its cache version.

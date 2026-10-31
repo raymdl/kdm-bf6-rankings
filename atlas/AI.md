@@ -13,6 +13,8 @@ flowchart TB
   EXEC["RUN · Node validation and execution<br/>all authoritative BF6 calculations"]
   DATA["STORE · Pinned local generation<br/>and selected numeric-cache endpoints"]
   WRITE["RUN · Model call 2: writer<br/>explain validated ExecutionResult"]
+  NUMS["POLICY · Picture prompt number check<br/>every number must match validated results"]
+  IMG["RUN · Image model<br/>picture requests only"]
   OUT["OUT · Sanitized Discord response<br/>marked for eligible follow-ups"]
   MSG --> GATE
   GATE --> COMP
@@ -21,15 +23,19 @@ flowchart TB
   DATA --> EXEC
   EXEC --> WRITE
   WRITE --> OUT
+  WRITE -.->|"picture request"| NUMS
+  NUMS -.-> IMG
+  IMG -.->|"picture attached to the reply"| OUT
 ```
 
 A message is eligible if it tags the bot in a configured BF6 channel, or replies directly to an AI answer or to an overtake message (both carry an invisible marker). Replies to other bot messages, messages from bots and webhooks, and untagged conversation are ignored. BF6 commands take priority. Quoted messages and earlier reply-chain text are passed as bounded, untrusted context.
 
-1. **Compiler.** Receives the question, the bounded context, member identities and names, and a catalogue of approved subjects, metrics, items, categories and operations. It does not receive the numeric dataset. It returns a symbolic `QueryPlan`.
+1. **Compiler.** Receives the question, the bounded context, member identities and names, and a catalogue of approved subjects, metrics, items, categories and operations. It does not receive the numeric dataset. It returns a symbolic `QueryPlan` and a flag saying whether the member asked for a picture. The host strips the flag before validation, so the plan format is unchanged. Pronouns such as "he" or "his" resolve to the player the conversation is about, never to the person asking.
 2. **Executor.** Node validates the plan, loads only the local data it needs, resolves windows and subjects, performs every calculation, and builds an `ExecutionResult`. Full-cohort operations evaluate the whole eligible roster before slicing the output. Explicitly requested subjects are never dropped by truncation.
-3. **Writer.** Receives the plan and the result, has no tools, and is instructed to explain the result without computing new numbers. Its output is not checked number by number. Partial coverage and unavailable rows must appear in the answer.
+3. **Writer.** Receives the plan and the result, has no tools, and is instructed to explain the result without computing new numbers. Its reply text is not checked number by number. Partial coverage and unavailable rows must appear in the answer. When a reply is about a particular player, such as a roast or a picture, the host also gives the writer that player's most-used weapons, vehicles and gadgets and their time per class, read from the same local data with no extra model call. Tagged players reach the writer by name.
+4. **Image (picture requests only).** When images are enabled and the monthly picture cap has room, a picture writer returns the reply text and an image prompt. The host checks every number in that prompt against the validated results before an image model draws it, and the picture is attached to the same reply. If the prompt is missing after one retry, a number fails the check, or drawing fails, the text reply posts alone. When pictures are off or the cap is spent, the writer says so in text.
 
-Ordinary chat follows the same path with an empty result and no numeric reads. A compiler, schema or validation failure stops after call 1 with a fixed "please rephrase" reply. An incomplete writer response is not retried.
+Ordinary chat follows the same path with an empty result and no numeric reads. A compiler outage or incomplete compiler response stops after call 1 with a fixed "try again" reply. A plan that cannot be parsed or fails validation is not retried: the host answers from a local career profile of the player the message is about, or as chat when there is none, and the writer says the exact statistic could not be looked up. An incomplete writer response is not retried.
 
 ### Data sent to each stage
 
@@ -37,10 +43,11 @@ Ordinary chat follows the same path with an empty result and no numeric reads. A
 |---|---|---|
 | Compiler | Question, bounded quoted context, symbolic catalogue, identities and names | Numeric history, raw GameTools payloads, credentials, tools |
 | Executor | Validated plan and local data | Instructions from quoted context |
-| Writer | Plan, computed results, required caveats, bounded context | Tools or data access |
-| Discord | Sanitized final text with mentions suppressed | Model-control objects, credentials, query datasets |
+| Writer | Plan, computed results, required caveats, bounded context, and for player-focused replies that player's own equipment and class time | Tools or data access |
+| Image model | One picture prompt whose numbers passed the host check | Plan, results, Discord IDs, credentials, tools |
+| Discord | Sanitized final text with mentions suppressed, and the picture when one was drawn | Model-control objects, credentials, query datasets |
 
-The model, reasoning effort, output-token limits, per-user cooldown and monthly message cap are set in configuration; see the [AI guide](../BF6_AI_REPLIES.md). The compiler and writer have separate token accounting.
+The models, reasoning effort, output-token limits, per-user cooldown, monthly message cap, image settings and monthly picture cap are set in configuration; see the [AI guide](../BF6_AI_REPLIES.md). The compiler, writer and image calls have separate accounting.
 
 ## D13 · Local-only statistics access
 
@@ -80,6 +87,7 @@ flowchart TB
   COMP["RUN · Compiler attempt"]
   EXEC["RUN · Host execution"]
   WRITE["RUN · Writer attempt"]
+  IMG["RUN · Image attempt<br/>picture requests only"]
   HIST["STORE · ai-reply-history.jsonl<br/>v2 plan, results, outcome and usage"]
   USAGE["STORE · ai-reply-usage.json<br/>accepted messages and per-role tokens"]
   MISS["STORE · ai-unanswered-questions.jsonl<br/>host-determined missing answers"]
@@ -95,17 +103,21 @@ flowchart TB
   COMP --> USAGE
   WRITE --> USAGE
   WRITE --> OUT
-  COMP -->|"static rephrase on failure"| OUT
+  WRITE -.->|"picture request"| IMG
+  IMG --> USAGE
+  IMG -->|"picture, or text alone on failure"| OUT
+  USAGE -.->|"unreadable file pauses replies"| ACCEPT
+  COMP -->|"static retry reply on failure"| OUT
   EXEC -->|"controlled failure"| OUT
 ```
 
 | Local file | Contents |
 |---|---|
-| `data/ai-reply-history.jsonl` | Version 2 rows: validated plan and result, missing reasons, compiler and writer settings, timing, tokens, outcome. Version 1 rows are from the retired single-call design |
-| `data/ai-reply-usage.json` | Version 2 counters: accepted messages, compiler and writer requests, input and output tokens per role. The monthly cap counts accepted messages, not tokens. Version 1 files migrate with their spent budget |
+| `data/ai-reply-history.jsonl` | Version 2 rows: validated plan and result, missing reasons, player equipment context, compiler and writer settings, timing, tokens, outcome, and for picture requests the image prompt and its result. Version 1 rows are from the retired single-call design |
+| `data/ai-reply-usage.json` | Version 2 counters: accepted messages, compiler and writer requests, input and output tokens per role, and image calls and tokens. The monthly cap counts accepted messages, not tokens; the picture cap counts image calls. Version 1 files migrate with their spent budget |
 | `data/ai-unanswered-questions.jsonl` | Questions the executor could not fully answer, with message and channel context. The executor decides completeness, not the writer |
 
-`AI_REPLY_HISTORY_PATH`, `AI_REPLY_USAGE_PATH` and `AI_UNANSWERED_LOG_PATH` override the paths; production uses the defaults. These files are gitignored and have no offsite backup ([D28](ARCHIVES.md#d28--mini-pc-disk-loss)). A writer failure can still cost tokens. Malformed usage files are reported as errors, not read as zero spend.
+`AI_REPLY_HISTORY_PATH`, `AI_REPLY_USAGE_PATH` and `AI_UNANSWERED_LOG_PATH` override the paths; production uses the defaults. These files are gitignored and have no offsite backup ([D28](ARCHIVES.md#d28--mini-pc-disk-loss)). A writer failure can still cost tokens. A usage file that exists but cannot be read is never treated as zero spend: AI replies pause and the owner is alerted until the file is repaired or removed and the bot restarted.
 
 The bot's voice allows playful competitive replies but no administrative actions. User, role, `@everyone` and `@here` pings are suppressed. Questions about command syntax point to the pinned instructions.
 

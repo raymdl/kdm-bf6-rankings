@@ -64,7 +64,7 @@ flowchart LR
 ```
 
 - **Career** shows lifetime values. Its range selects the change and trend window.
-- **Period** shows performance between two resolved tracked endpoints. Today is in progress, as defined by artifact metadata. All Time in Period means each member's tracked history, not lifetime play.
+- **Period** shows performance between two resolved tracked endpoints. Today is in progress, as defined by artifact metadata: the last column is open while the published `counters.current.settled` flag is `false` and `counters.current.date` names it. Only a release without that flag falls back to comparing the last column with the Pacific tracker day. All Time in Period means each member's tracked history, not lifetime play.
 - Rate stats need 15 active minutes per resolved calendar day to rank. Rows below the threshold stay visible, unranked.
 - A negative counter difference is treated as a reset or correction.
 
@@ -87,9 +87,9 @@ flowchart LR
   URL -->|"shared link opens current release"| DATA
 ```
 
-A shared URL keeps the route and filters; it opens against the current release, not the one the sender saw. Favorites live in `localStorage` in one browser. JavaScript and CSS changes deploy through the shared `?v=` import version, separate from data caching.
+A shared URL keeps the route and filters; it opens against the current release, not the one the sender saw. The player route decodes its id segment tolerantly: a malformed percent-escape matches no member and shows "Player not found" with a link back to Players, rather than leaving the page on its loading state. Favorites live in `localStorage` in one browser. JavaScript and CSS changes deploy through the shared `?v=` import version, separate from data caching.
 
-Data older than eight hours is marked stale. The cause can be a missed collection, a stuck publication, a bad pointer or a delivery failure; reloading the page does not fix any of them. Timestamps display in Eastern time; tracker-day arithmetic uses Pacific midnight.
+Data older than eight hours is marked stale. The cause can be a missed collection, a stuck publication, a bad pointer or a delivery failure; reloading the page does not fix any of them. Timestamps display in Eastern time; tracker-day arithmetic uses Pacific midnight, including the chart's "today · in progress" marker, which follows the settled flag instead of the Eastern calendar day.
 
 ## D19 · Delivery Worker
 
@@ -146,7 +146,7 @@ The dashboard can show either site or both. Dimensions are pages, referrers, cou
 
 ## Source anchors
 
-Site: [entry module](https://github.com/raymdl/kdm-bf6-rankings/blob/94af6b1a2e9c87c917153d591da5b13ffbe184c0/assets/app.js), [data source](https://github.com/raymdl/kdm-bf6-rankings/blob/94af6b1a2e9c87c917153d591da5b13ffbe184c0/assets/data-source.js), [Period engine](https://github.com/raymdl/kdm-bf6-rankings/blob/94af6b1a2e9c87c917153d591da5b13ffbe184c0/assets/period.js), [equipment](https://github.com/raymdl/kdm-bf6-rankings/blob/94af6b1a2e9c87c917153d591da5b13ffbe184c0/assets/equipment.js), [route state](https://github.com/raymdl/kdm-bf6-rankings/blob/94af6b1a2e9c87c917153d591da5b13ffbe184c0/assets/view-state.js), [loading guide](https://github.com/raymdl/kdm-bf6-rankings/blob/94af6b1a2e9c87c917153d591da5b13ffbe184c0/docs/DATA_LOADING.md).
+Site: [entry module](https://github.com/raymdl/kdm-bf6-rankings/blob/686db1a4f9245ad25baff1f84bf71c872a379452/assets/app.js), [data source](https://github.com/raymdl/kdm-bf6-rankings/blob/686db1a4f9245ad25baff1f84bf71c872a379452/assets/data-source.js), [Period engine](https://github.com/raymdl/kdm-bf6-rankings/blob/686db1a4f9245ad25baff1f84bf71c872a379452/assets/period.js), [equipment](https://github.com/raymdl/kdm-bf6-rankings/blob/686db1a4f9245ad25baff1f84bf71c872a379452/assets/equipment.js), [route state](https://github.com/raymdl/kdm-bf6-rankings/blob/686db1a4f9245ad25baff1f84bf71c872a379452/assets/view-state.js), [loading guide](https://github.com/raymdl/kdm-bf6-rankings/blob/686db1a4f9245ad25baff1f84bf71c872a379452/docs/DATA_LOADING.md).
 
 Delivery: [Worker source](../../cloudflare/bf6-data-worker/src/index.js), [configuration](../../cloudflare/bf6-data-worker/README.md), [operations](../BF6_R2_OPERATIONS_RUNBOOK.md).
 

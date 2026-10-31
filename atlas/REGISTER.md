@@ -13,12 +13,12 @@
 | Change identity or relink behavior | Resolver, nucleus comparison, registry schema, cache clearing, Actions link poll, audit and profile output | One account's history or cache attached to another |
 | Change visibility or removal | Registry, roster filtering, cached republish, AI invalidation, boards and intents, per-member files, retained releases | Unlisting mistaken for erasure, or an unfiltered roster published |
 | Change an artifact schema or path | Producer, manifest and roster validator, Worker URL resolution, lazy loaders, AI reader, hydration, recovery, parity | A mixed or unreadable release |
-| Change pipeline or recovery state | Pipeline loader, v2 / v3 compatibility, Actions restore and persist, receipts, retry tooling | Completed work replayed, or resumable envelopes lost |
+| Change refresh or receipt state | `refresh()`, notification receipts, publication-state pointer, schedule state | Completed work replayed, or Discord posts duplicated |
 | Change public retention | Pointer validation, concurrent-release protection, public storage limits | Active bytes deleted |
-| Change private retention | Numeric rebuild range, raw-only fields, backup and restore | Permanent loss of unique observations, especially 10 July – 11 August |
-| Change schedules | Occurrence definitions and reconciler, Actions UTC slots, stale threshold, end-of-day timing, heartbeat period | Daylight-saving errors, or a stale dataset that looks healthy |
-| Change AI prompts, models or metrics | Compiler schema, executor validation, writer caveats, usage accounting, offline evaluator, history format | The writer producing numbers, or hidden cost and failures |
-| Deploy bot code | Deployed supervisor copy, launcher, dependency install, running revision on the host | Assuming a merge restarted the bot |
+| Change private retention or the numeric day format | Numeric rebuild range, raw-only fields, late-day sealing window, backup and restore, weekly cold-backup export and verify | Permanent loss of unique observations, especially 10 July – 11 August |
+| Change schedules | Occurrence definitions and reconciler, Actions UTC slots, late-run day filing, stale threshold, end-of-day timing, heartbeat period | Daylight-saving errors, a late run filed under the wrong day, or a stale dataset that looks healthy |
+| Change AI prompts, models or metrics | Compiler schema and its structured-output support on each model provider, executor validation, writer caveats, picture-prompt number check, usage accounting including image calls, offline evaluator, history format | The writer or a picture producing numbers, or hidden cost and failures |
+| Deploy bot code | Deployed supervisor copy, launcher, dependency install, startup check and rollback marker, running revision on the host | Assuming a merge restarted the bot, or missing that it was rolled back |
 | Change website JS / CSS | `?v=` import version, affected routes and tests, Pages deploy | Browsers running stale cached modules against new code |
 | Change traffic analytics | Site definitions, GraphQL selection, D1 migrations, Worker secrets, dashboard range contract | Credentials exposed, or traffic data mixed with member data |
 
@@ -26,11 +26,10 @@
 
 | Contract | Current behavior |
 |---|---|
-| Pipeline state | Version 3; version 2 normalized on load |
-| Legacy stage names | `archiveGit` writes numeric history to private R2; `siteGit` renders a local generation |
 | Tracker state | One object with CAS updates and daily backups |
 | Period rate qualification | 15 active minutes per calendar day of the resolved window |
-| Git data snapshots | Frozen; current data is published through R2 |
+| Site repository `data/` | Frozen; current data is published through R2 |
+| Archive repository | Weekly one-way copy of the private numeric days; nothing reads it back |
 
 ## Observations
 
