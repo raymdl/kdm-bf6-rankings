@@ -1,4 +1,4 @@
-import { shiftDate } from "./counter-math.js?v=20261030-route-guard";
+import { shiftDate } from "./counter-math.js?v=20261031-player-default";
 
 // BF6 seasons, oldest first. `firstDate`/`lastDate` are Pacific tracker days,
 // so "This Season" subtracts the final snapshot of the day before the season

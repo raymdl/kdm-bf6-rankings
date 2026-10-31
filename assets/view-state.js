@@ -1,5 +1,5 @@
-import { shiftDate } from "./counter-math.js?v=20261030-route-guard";
-import { isSeasonRangeKey, seasonForRangeKey, seasonTargets } from "./seasons.js?v=20261030-route-guard";
+import { shiftDate } from "./counter-math.js?v=20261031-player-default";
+import { isSeasonRangeKey, seasonForRangeKey, seasonTargets } from "./seasons.js?v=20261031-player-default";
 
 export const RANGE_OPTIONS = [
   { key: "today", label: "Today" },
@@ -55,7 +55,8 @@ export function viewRangeParams(viewRange) {
   const range = viewRange.range === "custom" ? viewRange.custom : viewRange.range;
   return {
     view: viewRange.view === "period" ? "period" : null,
-    range: viewRange.view === "career" && range === DEFAULT_RANGE ? null : range
+    // Omit the range only when it is the current page's default (the player page defaults to All Time).
+    range: viewRange.view === "career" && range === (viewRange.defaultRange ?? DEFAULT_RANGE) ? null : range
   };
 }
 
