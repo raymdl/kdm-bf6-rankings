@@ -1,4 +1,4 @@
-import { renderActivityView } from "./activity-view.js?v=20261030-route-guard";
+import { renderActivityView } from "./activity-view.js?v=20261031-player-default";
 
 /* KDM BF6 Rankings — static SPA reading the generated JSON published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN.
@@ -7,9 +7,9 @@ import { renderActivityView } from "./activity-view.js?v=20261030-route-guard";
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261030-route-guard";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261031-player-default";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20261030-route-guard";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20261031-player-default";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -20,7 +20,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20261030-route-guard";
+} from "./period.js?v=20261031-player-default";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -34,9 +34,9 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20261030-route-guard";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261030-route-guard";
-import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261030-route-guard";
+} from "./view-state.js?v=20261031-player-default";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261031-player-default";
+import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261031-player-default";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -47,7 +47,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20261030-route-guard";
+} from "./equipment.js?v=20261031-player-default";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -605,13 +605,15 @@ function loadViewRange(params, defaultRange = DEFAULT_RANGE) {
   Object.assign(viewRangeState, normalizedViewRange(params, {
     periodAvailable: periodDataAvailable(),
     defaultRange
-  }));
+  }), { defaultRange });
 }
 
 // Params to merge into every in-site navigation so the selection follows the
-// user; defaults are omitted so a clean URL stays clean.
+// user; defaults are omitted so a clean URL stays clean. These links lead to
+// pages that use the site-wide default, so omit against that, not against the
+// current page's default (the player page's All Time).
 function viewRangeParams() {
-  return serializedViewRangeParams(viewRangeState);
+  return serializedViewRangeParams({ ...viewRangeState, defaultRange: DEFAULT_RANGE });
 }
 
 function activePeriodWindow() {
@@ -860,7 +862,8 @@ function viewRangeControlHtml(trailingControl = "") {
 }
 
 function wireViewRangeControl(hrefFor) {
-  const navigate = () => replaceHashAndRender(hrefFor(viewRangeParams()));
+  // The range control stays on the current page, so omit against its own default.
+  const navigate = () => replaceHashAndRender(hrefFor(serializedViewRangeParams(viewRangeState)));
   const rerender = () => replaceHashAndRender(location.hash);
   for (const button of app.querySelectorAll(".view-toggle-option[data-view]")) {
     button.addEventListener("click", () => {
