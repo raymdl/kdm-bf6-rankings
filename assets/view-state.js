@@ -1,5 +1,5 @@
-import { shiftDate } from "./counter-math.js?v=20261106-kps-columns";
-import { isSeasonRangeKey, seasonForRangeKey, seasonTargets } from "./seasons.js?v=20261106-kps-columns";
+import { shiftDate } from "./counter-math.js?v=20261106-ratio-layout";
+import { isSeasonRangeKey, seasonForRangeKey, seasonTargets } from "./seasons.js?v=20261106-ratio-layout";
 
 export const RANGE_OPTIONS = [
   { key: "today", label: "Today" },

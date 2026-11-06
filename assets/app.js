@@ -1,4 +1,4 @@
-import { renderActivityView } from "./activity-view.js?v=20261106-kps-columns";
+import { renderActivityView } from "./activity-view.js?v=20261106-ratio-layout";
 
 /* KDM BF6 Rankings — static SPA reading the generated JSON published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN.
@@ -7,9 +7,9 @@ import { renderActivityView } from "./activity-view.js?v=20261106-kps-columns";
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261106-kps-columns";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261106-ratio-layout";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20261106-kps-columns";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20261106-ratio-layout";
 import {
   memberDailySeries,
   memberLatestCounters,
@@ -21,7 +21,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20261106-kps-columns";
+} from "./period.js?v=20261106-ratio-layout";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -35,9 +35,9 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20261106-kps-columns";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261106-kps-columns";
-import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261106-kps-columns";
+} from "./view-state.js?v=20261106-ratio-layout";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261106-ratio-layout";
+import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261106-ratio-layout";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -48,7 +48,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20261106-kps-columns";
+} from "./equipment.js?v=20261106-ratio-layout";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -1453,7 +1453,7 @@ function soldierComponentText(column, value) {
 }
 
 function soldierComponentCellsHtml(columns, inputs) {
-  return columns.map((column) => `<td class="num">${esc(soldierComponentText(column, inputs?.[column.key]))}</td>`).join("");
+  return columns.map((column) => `<td class="num component-cell">${esc(soldierComponentText(column, inputs?.[column.key]))}</td>`).join("");
 }
 
 function soldierComponentHeadersHtml(columns) {
@@ -1517,8 +1517,8 @@ function renderPeriodLeaderboard(stat, window) {
         }${trackedSinceBadgeHtml(window, row.trackedSince)}${
           carried ? ` <span class="cached-marker" role="img" aria-label="Endpoint carried from an earlier snapshot" title="One endpoint was carried from this member's most recent earlier snapshot (they were missing from a refresh)">◷</span>` : ""
         }</td>
-        <td class="num value-cell">${fmtStat(stat, row.value)}</td>
         ${soldierComponentCellsHtml(componentColumns, row.deltas)}
+        <td class="num value-cell">${fmtStat(stat, row.value)}</td>
         <td class="num">${esc(activeTimeText(row.activeSeconds))}</td>
         <td class="trend-cell">${sparklineSvg(spark)}</td>
       </tr>`;
@@ -1528,8 +1528,8 @@ function renderPeriodLeaderboard(stat, window) {
     .map((row) => `<tr class="time-machine-unranked${isFavorite(row.discordId) ? " fav-row" : ""}">
         <td class="rank-cell">—</td>
         <td><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${favoriteBadgeHtml(row.discordId)} <span class="badge provisional" title="No gameplay recorded in this range">no play</span></td>
-        <td class="num">—</td>
         ${soldierComponentCellsHtml(componentColumns, null)}
+        <td class="num">—</td>
         <td class="num">—</td>
         <td class="trend-cell"></td>
       </tr>`)
@@ -1551,7 +1551,7 @@ function renderPeriodLeaderboard(stat, window) {
     ${podiumHtml}
     <div class="table-wrap leaderboard-table">
       <table>
-        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${soldierComponentHeadersHtml(componentColumns)}${sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead>
+        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${soldierComponentHeadersHtml(componentColumns)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead>
         <tbody>${bodyRows}${missingRowsHtml}${bodyRows || missingRowsHtml ? "" : `<tr><td colspan="${5 + componentColumns.length}" class="empty">No gameplay recorded in this range.</td></tr>`}</tbody>
       </table>
     </div>
@@ -2025,7 +2025,7 @@ function renderEquipmentLeaderboard(params) {
         const trailingCell = usePeriod
           ? `<td class="num">${esc(activeTimeText(row.activeSeconds))}</td>`
           : `<td class="num"><span class="delta ${deltaClass}">${delta}</span></td>`;
-        return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${usePeriod ? `${trackedSinceBadgeHtml(periodWindow, row.coverageStart, EQUIPMENT_COVERAGE_BADGE_TITLE)}${equipmentTimeSinceBadgeHtml(row.activeSince, selected?.category)}` : ""}</td><td class="num value-cell">${equipmentValueText(metric, row.value)}</td>${componentColumns.map((column) => `<td class="num">${equipmentValueText(column.format, row.inputs?.[column.key])}</td>`).join("")}${trailingCell}<td class="trend-cell">${sparklineSvg(row.trend)}</td></tr>`;
+        return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${usePeriod ? `${trackedSinceBadgeHtml(periodWindow, row.coverageStart, EQUIPMENT_COVERAGE_BADGE_TITLE)}${equipmentTimeSinceBadgeHtml(row.activeSince, selected?.category)}` : ""}</td>${componentColumns.map((column) => `<td class="num component-cell">${equipmentValueText(column.format, row.inputs?.[column.key])}</td>`).join("")}<td class="num value-cell">${equipmentValueText(metric, row.value)}</td>${trailingCell}<td class="trend-cell">${sparklineSvg(row.trend)}</td></tr>`;
       }).join("")
     : missingRows.length ? "" : `<tr><td colspan="${5 + componentColumns.length}" class="empty">No observed ${esc(EQUIPMENT_METRIC_LABELS[metric])} for this equipment item in the selected range.</td></tr>`) + missingRowsHtml;
   const equipmentName = selected ? equipmentDisplayName(selected.category, selected.id) : "Equipment";
@@ -2040,7 +2040,7 @@ function renderEquipmentLeaderboard(params) {
     </section>
     ${artifactNote}${periodNote}
     ${equipmentPodiumHtml(rows, metric, windowText, usePeriod, selected?.category ?? "weapons", equipmentName)}
-    ${selected ? `<div class="table-wrap leaderboard-table equipment-leaderboard-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(heading, "value", leaderboardSortState, { numeric: true })}${componentColumns.map((column) => sortableHeaderHtml(column.label, column.key, leaderboardSortState, { numeric: true })).join("")}${usePeriod ? sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true }) : sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
+    ${selected ? `<div class="table-wrap leaderboard-table equipment-leaderboard-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${componentColumns.map((column, index) => sortableHeaderHtml(index ? column.label : `${equipmentName} ${column.label}`, column.key, leaderboardSortState, { numeric: true })).join("")}${sortableHeaderHtml(componentColumns.length ? EQUIPMENT_METRIC_LABELS[metric] : heading, "value", leaderboardSortState, { numeric: true })}${usePeriod ? sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true }) : sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
   const equipmentHref = (rangeParams) => hashRoute("board/equipment", { equipment: selected?.id ?? null, metric: metric === "kills" ? null : metric, ...rangeParams });
   wireViewRangeControl(equipmentHref);
   wireStatTabs();
@@ -2157,8 +2157,8 @@ function renderLeaderboard(statKey, params) {
         <td class="rank-cell">${rank}</td>
         <td>${movementHtml(prevRank, endRank, windowText)}</td>
         <td><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${favoriteBadgeHtml(row.discordId)}${cached}</td>
-        <td class="num value-cell">${fmtStat(stat, row.value)}</td>
         ${soldierComponentCellsHtml(componentColumns, row.inputs)}
+        <td class="num value-cell">${fmtStat(stat, row.value)}</td>
         <td class="num"><span class="delta ${deltaClass}">${delta ?? "–"}</span></td>
         <td class="trend-cell">${sparklineSvg(spark)}</td>
       </tr>`;
@@ -2176,7 +2176,7 @@ function renderLeaderboard(statKey, params) {
     ${podiumHtml}
     <div class="table-wrap leaderboard-table">
       <table>
-        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Δ", "movement", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${soldierComponentHeadersHtml(componentColumns)}${sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead>
+        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Δ", "movement", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${soldierComponentHeadersHtml(componentColumns)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead>
         <tbody>${rows || `<tr><td colspan="${6 + componentColumns.length}" class="empty">No stats yet.</td></tr>`}</tbody>
       </table>
     </div>

@@ -661,7 +661,14 @@ tr.r3 .rank-cell { color: var(--bronze); }
 .value-cell {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1.02rem;
+  font-size: 1.12rem;
+  color: var(--text);
+}
+
+/* Counts behind a ratio read as supporting detail next to the ratio. */
+.component-cell {
+  color: var(--text-dim);
+  font-size: 0.86rem;
 }
 
 .movement {
