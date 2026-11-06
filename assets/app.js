@@ -1,4 +1,4 @@
-import { renderActivityView } from "./activity-view.js?v=20261031-player-default";
+import { renderActivityView } from "./activity-view.js?v=20261106-kills-per-spawn";
 
 /* KDM BF6 Rankings — static SPA reading the generated JSON published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN.
@@ -7,9 +7,9 @@ import { renderActivityView } from "./activity-view.js?v=20261031-player-default
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261031-player-default";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261106-kills-per-spawn";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20261031-player-default";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20261106-kills-per-spawn";
 import {
   memberDailySeries,
   memberPeriodDeltas,
@@ -20,7 +20,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20261031-player-default";
+} from "./period.js?v=20261106-kills-per-spawn";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -34,9 +34,9 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20261031-player-default";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261031-player-default";
-import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261031-player-default";
+} from "./view-state.js?v=20261106-kills-per-spawn";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261106-kills-per-spawn";
+import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261106-kills-per-spawn";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -47,7 +47,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20261031-player-default";
+} from "./equipment.js?v=20261106-kills-per-spawn";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -328,10 +328,10 @@ function equipmentChartStat(metric, name) {
   const label = EQUIPMENT_METRIC_LABELS[metric] ?? "Kills";
   const format = metric === "timeEquipped" || metric === "timeIn"
     ? "hours"
-    : metric === "kpm" || metric === "accuracy" || metric === "hsPercent"
+    : metric === "kpm" || metric === "killsPerSpawn" || metric === "accuracy" || metric === "hsPercent"
       ? "decimal"
       : "integer";
-  return { key: metric, title: `${name} ${label}`, format, decimals: metric === "kpm" ? 2 : 1, label };
+  return { key: metric, title: `${name} ${label}`, format, decimals: metric === "kpm" || metric === "killsPerSpawn" ? 2 : 1, label };
 }
 
 function playerHistoryHref(discordId, statKey, showEstimated, equipment = equipmentViewState()) {
@@ -1600,7 +1600,7 @@ function equipmentGroups(source = null) {
 // Time Played is one button over two differently named fields, so the panel
 // reasons in shared names and only resolves to a real field once a category is
 // known. Every other metric is its own shared name.
-const EQUIPMENT_SHARED_METRICS = ["kills", "assists", "kpm", "timePlayed", "accuracy", "hsPercent", "vehiclesDestroyed", "roadKills"];
+const EQUIPMENT_SHARED_METRICS = ["kills", "assists", "kpm", "killsPerSpawn", "timePlayed", "accuracy", "hsPercent", "vehiclesDestroyed", "roadKills"];
 
 // Which categories a stat can be read for. Accuracy and Headshot % are weapon
 // readings; Vehicles Destroyed, Assists and Roadkills are vehicle readings --
@@ -1714,6 +1714,7 @@ function equipmentIndexHasField(category, field) {
 
 function equipmentMetricRequiredFields(category, metric) {
   if (metric === "kpm") return ["kills", category === "weapons" ? "timeEquipped" : "timeIn"];
+  if (metric === "killsPerSpawn") return ["kills", "spawns"];
   if (metric === "accuracy") return ["shotsHit", "shotsFired"];
   if (metric === "hsPercent") return ["headshotKills", "kills"];
   if (metric === "vehiclesDestroyed") return ["vehiclesDestroyedWith"];
@@ -2527,7 +2528,9 @@ const EQUIPMENT_METRIC_LABELS = {
   timeIn: "Time Played",
   shotsHit: "Accuracy",
   headshotKills: "Headshot %",
-  kpm: "KPM",
+  kpm: "Kills/Min",
+  killsPerSpawn: "Kills/Spawn",
+  spawns: "Kills/Spawn",
   vehiclesDestroyed: "Vehicles Destroyed",
   vehiclesDestroyedWith: "Vehicles Destroyed",
   assists: "Assists",
@@ -2631,14 +2634,14 @@ function equipmentValueText(metric, value) {
     return hours ? `${hours}h ${remaining}m` : `${remaining}m`;
   }
   if (metric === "accuracy" || metric === "hsPercent") return `${value.toFixed(1)}%`;
-  if (metric === "kpm") return value.toFixed(2);
+  if (metric === "kpm" || metric === "killsPerSpawn") return value.toFixed(2);
   return Math.round(value).toLocaleString("en-US");
 }
 
 function equipmentMetricFields(category) {
   return category === "weapons"
-    ? ["kills", "kpm", "accuracy", "hsPercent", "timeEquipped"]
-    : ["kills", "assists", "kpm", "vehiclesDestroyed", "roadKills", "timeIn"];
+    ? ["kills", "kpm", "killsPerSpawn", "accuracy", "hsPercent", "timeEquipped"]
+    : ["kills", "assists", "kpm", "killsPerSpawn", "vehiclesDestroyed", "roadKills", "timeIn"];
 }
 
 function equipmentMetricValue(stats, metric) {
