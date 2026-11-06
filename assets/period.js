@@ -1,5 +1,5 @@
-import { shiftDate, ratio } from "./counter-math.js?v=20261106-kills-per-spawn";
-import { isSeasonRangeKey, seasonForRangeKey, seasonTargets } from "./seasons.js?v=20261106-kills-per-spawn";
+import { shiftDate, ratio } from "./counter-math.js?v=20261106-kps-columns";
+import { isSeasonRangeKey, seasonForRangeKey, seasonTargets } from "./seasons.js?v=20261106-kps-columns";
 
 /* KDM BF6 Rankings — pure Period calculation engine over data/counters.json.
    DOM-free and side-effect-free so it runs identically in the browser and in
@@ -366,8 +366,22 @@ export function memberPeriodStat(counters, discordId, statKey, window) {
     qualifies: !def.rate || (resolved.activeSeconds ?? 0) >= minActiveSecondsForWindow(window),
     isRate: def.rate,
     provenance: { startCarried: resolved.startCarried, endCarried: resolved.endCarried },
-    trackedSince: counters.dates[resolved.trackedSinceIndex] ?? null
+    trackedSince: counters.dates[resolved.trackedSinceIndex] ?? null,
+    // The window's counter deltas, so a ratio can show what it was divided from.
+    deltas: resolved.deltas
   };
+}
+
+// A member's latest value for every counter: the Career inputs behind the
+// ratio stats, which the bot derives from these same counters.
+export function memberLatestCounters(counters, discordId) {
+  const values = counters?.members?.[discordId]?.values ?? {};
+  const latest = {};
+  for (const [key, series] of Object.entries(values)) {
+    const end = Array.isArray(series) ? endpointValue(series, series.length - 1) : null;
+    latest[key] = end ? end.value : null;
+  }
+  return latest;
 }
 
 // Day-by-day Period values across a window for trend charts. Each point:

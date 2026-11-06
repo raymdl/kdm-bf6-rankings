@@ -1,4 +1,4 @@
-import { ratio } from "./counter-math.js?v=20261106-kills-per-spawn";
+import { ratio } from "./counter-math.js?v=20261106-kps-columns";
 
 /* Sparse equipment counters shared by the profile and equipment leaderboard.
    A missing snapshot is different from an unchanged value: callers need that
@@ -251,6 +251,13 @@ function statsFromFields(category, fields, mode = "career", alignedPair = null) 
     // All kills with the item, bots included: GameTools has no per-item
     // player-only kill count.
     killsPerSpawn: ratio(spawnKills, spawns),
+    // The inputs behind each ratio, over the same aligned span as the ratio.
+    spawnKills,
+    spawns,
+    kpmKills: rateKills,
+    kpmSeconds: rateSeconds,
+    hsKills: headshotKills,
+    hsKillsTotal: headshotDenominator,
     vehiclesDestroyed: fieldValue(fields, CATEGORY_STATS[category].vehiclesDestroyed),
     assists: fieldValue(fields, CATEGORY_STATS[category].assists),
     roadKills: fieldValue(fields, CATEGORY_STATS[category].roadKills)
