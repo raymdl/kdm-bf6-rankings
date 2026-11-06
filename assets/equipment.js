@@ -1,14 +1,14 @@
-import { ratio } from "./counter-math.js?v=20261031-player-default";
+import { ratio } from "./counter-math.js?v=20261106-kills-per-spawn";
 
 /* Sparse equipment counters shared by the profile and equipment leaderboard.
    A missing snapshot is different from an unchanged value: callers need that
    distinction before they can safely derive a window statistic. */
 
 export const EQUIPMENT_FIELDS = {
-  weapons: ["kills", "headshotKills", "shotsHit", "shotsFired", "accuracy", "timeEquipped"],
+  weapons: ["kills", "headshotKills", "shotsHit", "shotsFired", "accuracy", "timeEquipped", "spawns"],
   // GameTools has no per-weapon assists counter, so Assists is a vehicle-only
   // stat rather than a gap in the weapon list.
-  vehicles: ["kills", "timeIn", "vehiclesDestroyedWith", "assists", "roadKills"]
+  vehicles: ["kills", "timeIn", "vehiclesDestroyedWith", "assists", "roadKills", "spawns"]
 };
 
 export const EQUIPMENT_TRACKING_STARTS = {
@@ -21,7 +21,8 @@ export const EQUIPMENT_TRACKING_STARTS = {
   timeIn: "2026-08-10",
   vehiclesDestroyedWith: "2026-08-10",
   assists: "2026-08-10",
-  roadKills: "2026-08-10"
+  roadKills: "2026-08-10",
+  spawns: "2026-11-07"
 };
 
 const CATEGORY_STATS = {
@@ -236,6 +237,7 @@ function statsFromFields(category, fields, mode = "career", alignedPair = null) 
   const [hits, shots] = category === "weapons" ? pair("shotsHit", "shotsFired") : [null, null];
   const [headshotKills, headshotDenominator] = category === "weapons" ? pair("headshotKills", "kills") : [null, null];
   const [rateKills, rateSeconds] = pair("kills", timeField);
+  const [spawnKills, spawns] = pair("kills", "spawns");
   const accuracyRatio = ratio(hits, shots);
   const derivedAccuracy = accuracyRatio === null ? null : sanePercent(accuracyRatio * 100);
   const publishedAccuracy = category === "weapons" ? fieldValue(fields, "accuracy") : null;
@@ -246,6 +248,9 @@ function statsFromFields(category, fields, mode = "career", alignedPair = null) 
     accuracy: mode === "career" ? publishedAccuracy ?? derivedAccuracy : derivedAccuracy,
     hsPercent: hsRatio === null ? null : hsRatio * 100,
     kpm: ratio(rateKills, Number.isFinite(rateSeconds) ? rateSeconds / 60 : null),
+    // All kills with the item, bots included: GameTools has no per-item
+    // player-only kill count.
+    killsPerSpawn: ratio(spawnKills, spawns),
     vehiclesDestroyed: fieldValue(fields, CATEGORY_STATS[category].vehiclesDestroyed),
     assists: fieldValue(fields, CATEGORY_STATS[category].assists),
     roadKills: fieldValue(fields, CATEGORY_STATS[category].roadKills)
