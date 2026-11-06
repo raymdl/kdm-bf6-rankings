@@ -1,4 +1,4 @@
-import { shiftDate } from "./counter-math.js?v=20261106-bot-kills-sup";
+import { shiftDate } from "./counter-math.js?v=20261106-bot-mark";
 
 // BF6 seasons, oldest first. `firstDate`/`lastDate` are Pacific tracker days,
 // so "This Season" subtracts the final snapshot of the day before the season

@@ -3842,3 +3842,12 @@ body[data-route="activity"] .feed { gap:6px; }
     right: 21px;
   }
 }
+
+/* Superscript * marking bot-inclusive ratios; raised without changing line height. */
+.bot-mark {
+  position: relative;
+  top: -0.4em;
+  vertical-align: baseline;
+  line-height: 0;
+  font-size: 0.75em;
+}

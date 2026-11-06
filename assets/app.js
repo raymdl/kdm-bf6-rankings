@@ -1,4 +1,4 @@
-import { renderActivityView } from "./activity-view.js?v=20261106-bot-kills-sup";
+import { renderActivityView } from "./activity-view.js?v=20261106-bot-mark";
 
 /* KDM BF6 Rankings — static SPA reading the generated JSON published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN.
@@ -7,9 +7,9 @@ import { renderActivityView } from "./activity-view.js?v=20261106-bot-kills-sup"
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261106-bot-kills-sup";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261106-bot-mark";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20261106-bot-kills-sup";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20261106-bot-mark";
 import {
   memberDailySeries,
   memberLatestCounters,
@@ -21,7 +21,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20261106-bot-kills-sup";
+} from "./period.js?v=20261106-bot-mark";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -35,9 +35,9 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20261106-bot-kills-sup";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261106-bot-kills-sup";
-import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261106-bot-kills-sup";
+} from "./view-state.js?v=20261106-bot-mark";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261106-bot-mark";
+import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261106-bot-mark";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -48,7 +48,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20261106-bot-kills-sup";
+} from "./equipment.js?v=20261106-bot-mark";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -98,7 +98,7 @@ function esc(value) {
 
 // Escaped label with a trailing * (bot-kill marker) drawn as superscript.
 function labelHtml(value) {
-  return esc(value).replace(/\*$/, "<sup>*</sup>");
+  return esc(value).replace(/\*$/, '<sup class="bot-mark">*</sup>');
 }
 
 function fmtStat(stat, value) {
@@ -2037,7 +2037,7 @@ function renderEquipmentLeaderboard(params) {
   const heading = `${equipmentName} ${EQUIPMENT_METRIC_LABELS[metric]}`;
   const windowText = usePeriod ? periodWindowText(periodWindow) : careerRangeWindowText(careerWindow);
   app.innerHTML = `
-    <h1 class="page-title">${labelHtml(heading)} Leaderboard <span class="period-title-tag ${usePeriod ? "" : "career-title-tag"}">${esc(usePeriod ? periodWindowText(periodWindow) : careerRangeWindowText(careerWindow, { includeLabel: true }))}</span></h1>
+    <h1 class="page-title"><span>${labelHtml(heading)} Leaderboard</span> <span class="period-title-tag ${usePeriod ? "" : "career-title-tag"}">${esc(usePeriod ? periodWindowText(periodWindow) : careerRangeWindowText(careerWindow, { includeLabel: true }))}</span></h1>
     <p class="page-sub">${usePeriod ? "Stats earned during this range only, from daily snapshot differences · active time and daily trend per player" : "Current Career values · movement, deltas, and sparkline show change over " + esc(windowText)}</p>
     <section class="ranking-toolbar" aria-label="Ranking filters">
       ${viewRangeControlHtml()}
@@ -2598,7 +2598,7 @@ const VEHICLE_DOMAIN_FALLBACKS = [
 
 // Ratios marked * are built from weapon/vehicle kills, which include bots:
 // GameTools has no per-item player-only kills counter.
-const BOT_KILLS_FOOTNOTE = `<p class="cached-footnote" role="note"><sup>*</sup> Includes kills on bots. Player-only kills aren't recorded per weapon or vehicle.</p>`;
+const BOT_KILLS_FOOTNOTE = `<p class="cached-footnote" role="note"><sup class="bot-mark">*</sup> Includes kills on bots. Player-only kills aren't recorded per weapon or vehicle.</p>`;
 
 function botKillsFootnoteHtml(labels) {
   return labels.some((label) => label?.endsWith("*")) ? BOT_KILLS_FOOTNOTE : "";
