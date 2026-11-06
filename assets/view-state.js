@@ -1,5 +1,5 @@
-import { shiftDate } from "./counter-math.js?v=20261106-kills-per-spawn";
-import { isSeasonRangeKey, seasonForRangeKey, seasonTargets } from "./seasons.js?v=20261106-kills-per-spawn";
+import { shiftDate } from "./counter-math.js?v=20261106-kps-columns";
+import { isSeasonRangeKey, seasonForRangeKey, seasonTargets } from "./seasons.js?v=20261106-kps-columns";
 
 export const RANGE_OPTIONS = [
   { key: "today", label: "Today" },

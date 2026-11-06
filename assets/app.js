@@ -1,4 +1,4 @@
-import { renderActivityView } from "./activity-view.js?v=20261106-kills-per-spawn";
+import { renderActivityView } from "./activity-view.js?v=20261106-kps-columns";
 
 /* KDM BF6 Rankings — static SPA reading the generated JSON published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN.
@@ -7,11 +7,12 @@ import { renderActivityView } from "./activity-view.js?v=20261106-kills-per-spaw
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261106-kills-per-spawn";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261106-kps-columns";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20261106-kills-per-spawn";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20261106-kps-columns";
 import {
   memberDailySeries,
+  memberLatestCounters,
   memberPeriodDeltas,
   memberPeriodStat,
   minActiveSecondsForWindow,
@@ -20,7 +21,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20261106-kills-per-spawn";
+} from "./period.js?v=20261106-kps-columns";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -34,9 +35,9 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20261106-kills-per-spawn";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261106-kills-per-spawn";
-import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261106-kills-per-spawn";
+} from "./view-state.js?v=20261106-kps-columns";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261106-kps-columns";
+import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261106-kps-columns";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -47,7 +48,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20261106-kills-per-spawn";
+} from "./equipment.js?v=20261106-kps-columns";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -1423,9 +1424,46 @@ function activeTimeText(activeSeconds) {
   return minutes < 90 ? `${minutes} min` : `${(activeSeconds / 3600).toFixed(1)}h`;
 }
 
+// Soldier ratio stats show the counters they were divided from: the same
+// counters the bot derives them from. Period boards already show Active Time,
+// so the per-minute stats drop their own Time column there. Headshot % is left
+// out: its numerator is a weighted figure, not a count.
+const SOLDIER_COMPONENT_COLUMNS = {
+  infantryKillDeath: [
+    { key: "playerKills", label: "Kills" },
+    { key: "deaths", label: "Deaths" }
+  ],
+  playerKillsPerMinute: [
+    { key: "playerKills", label: "Kills" },
+    { key: "activeSeconds", label: "Time", time: true, careerOnly: true }
+  ],
+  scorePerMinute: [
+    { key: "score", label: "Score" },
+    { key: "activeSeconds", label: "Time", time: true, careerOnly: true }
+  ]
+};
+
+function soldierComponentColumns(statKey, period) {
+  return (SOLDIER_COMPONENT_COLUMNS[statKey] ?? []).filter((column) => !(period && column.careerOnly));
+}
+
+function soldierComponentText(column, value) {
+  if (!Number.isFinite(value)) return "—";
+  return column.time ? activeTimeText(value) : Math.round(value).toLocaleString("en-US");
+}
+
+function soldierComponentCellsHtml(columns, inputs) {
+  return columns.map((column) => `<td class="num">${esc(soldierComponentText(column, inputs?.[column.key]))}</td>`).join("");
+}
+
+function soldierComponentHeadersHtml(columns) {
+  return columns.map((column) => sortableHeaderHtml(column.label, column.key, leaderboardSortState, { numeric: true })).join("");
+}
+
 function renderPeriodLeaderboard(stat, window) {
   prepareSortState(leaderboardSortState, `period:${stat.key}:${window.startDate}:${window.endDate}`);
   const { ranked, provisional, invalid } = periodRanking(state.counters, stat.key, window);
+  const componentColumns = soldierComponentColumns(stat.key, true);
   // Active-playtime floor to rank scales with the range length (15 min/day).
   const floorMin = Math.round(minActiveSecondsForWindow(window) / 60);
 
@@ -1451,6 +1489,7 @@ function renderPeriodLeaderboard(stat, window) {
     rank: row.originalRank,
     player: memberName(row.discordId),
     value: row.value,
+    ...Object.fromEntries(componentColumns.map((column) => [column.key, row.deltas?.[column.key]])),
     time: row.activeSeconds
   })[key]);
   // Members with no derivable stats in this range (didn't play, or not yet
@@ -1479,6 +1518,7 @@ function renderPeriodLeaderboard(stat, window) {
           carried ? ` <span class="cached-marker" role="img" aria-label="Endpoint carried from an earlier snapshot" title="One endpoint was carried from this member's most recent earlier snapshot (they were missing from a refresh)">◷</span>` : ""
         }</td>
         <td class="num value-cell">${fmtStat(stat, row.value)}</td>
+        ${soldierComponentCellsHtml(componentColumns, row.deltas)}
         <td class="num">${esc(activeTimeText(row.activeSeconds))}</td>
         <td class="trend-cell">${sparklineSvg(spark)}</td>
       </tr>`;
@@ -1489,6 +1529,7 @@ function renderPeriodLeaderboard(stat, window) {
         <td class="rank-cell">—</td>
         <td><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${favoriteBadgeHtml(row.discordId)} <span class="badge provisional" title="No gameplay recorded in this range">no play</span></td>
         <td class="num">—</td>
+        ${soldierComponentCellsHtml(componentColumns, null)}
         <td class="num">—</td>
         <td class="trend-cell"></td>
       </tr>`)
@@ -1510,8 +1551,8 @@ function renderPeriodLeaderboard(stat, window) {
     ${podiumHtml}
     <div class="table-wrap leaderboard-table">
       <table>
-        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead>
-        <tbody>${bodyRows}${missingRowsHtml}${bodyRows || missingRowsHtml ? "" : `<tr><td colspan="5" class="empty">No gameplay recorded in this range.</td></tr>`}</tbody>
+        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${soldierComponentHeadersHtml(componentColumns)}${sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead>
+        <tbody>${bodyRows}${missingRowsHtml}${bodyRows || missingRowsHtml ? "" : `<tr><td colspan="${5 + componentColumns.length}" class="empty">No gameplay recorded in this range.</td></tr>`}</tbody>
       </table>
     </div>
     ${invalidNote}`;
@@ -1826,6 +1867,28 @@ function equipmentTimeSinceBadgeHtml(since, category) {
   return ` <span class="badge time-since" title="${esc(noun)} has only been recorded since ${esc(fmtShortDate(since))}, so the Active Time total covers that part of the range while the figure beside it covers all of it">time${COVERAGE_MARK_SVG}${esc(fmtBadgeDate(since))}</span>`;
 }
 
+// Ratio stats show the counts they were divided from, read off the same stats
+// object so they cover the same span as the ratio. Period boards already show
+// Active Time, so Kills/Min drops its own Time column there.
+const EQUIPMENT_COMPONENT_COLUMNS = {
+  kpm: [
+    { key: "kpmKills", label: "Kills", format: "kills" },
+    { key: "kpmSeconds", label: "Time", format: "timeEquipped", careerOnly: true }
+  ],
+  killsPerSpawn: [
+    { key: "spawnKills", label: "Kills", format: "kills" },
+    { key: "spawns", label: "Spawns", format: "kills" }
+  ],
+  hsPercent: [
+    { key: "hsKills", label: "Headshot Kills", format: "kills" },
+    { key: "hsKillsTotal", label: "Kills", format: "kills" }
+  ]
+};
+
+function equipmentComponentColumns(metric, usePeriod) {
+  return (EQUIPMENT_COMPONENT_COLUMNS[metric] ?? []).filter((column) => !(usePeriod && column.careerOnly));
+}
+
 function equipmentLeaderboardRows(selectedId, category, metric, periodWindow, usePeriod, careerWindow) {
   const comparisonIndexes = usePeriod
     ? Array.from({ length: periodWindow.endIndex - periodWindow.startIndex + 1 }, (_, offset) => periodWindow.startIndex + offset)
@@ -1852,6 +1915,8 @@ function equipmentLeaderboardRows(selectedId, category, metric, periodWindow, us
         name: member.name ?? memberName(discordId),
         value,
         change,
+        // The counts each ratio was divided from, for the component columns.
+        inputs: stats,
         // Rows on one board can cover different spans — a metric that started
         // being recorded mid-window, or a member linked after it began — so each
         // row carries the date its own figure starts from.
@@ -1920,6 +1985,7 @@ function renderEquipmentLeaderboard(params) {
   const resolvedCareerWindow = selected ? resolveCareerWindow(state.equipmentIndex?.dates ?? [], observedIndexes, viewRangeState.range, viewRangeState.custom) : null;
   const careerWindow = resolvedCareerWindow?.unavailable ? null : resolvedCareerWindow;
   const rows = selected ? equipmentLeaderboardRows(selected.id, selected.category, metric, periodWindow, usePeriod, careerWindow) : [];
+  const componentColumns = equipmentComponentColumns(metric, usePeriod);
   const rankedIds = new Set(rows.map((row) => row.discordId));
   const missingRows = state.latest.members
     .filter((member) => !rankedIds.has(member.discordId))
@@ -1927,13 +1993,14 @@ function renderEquipmentLeaderboard(params) {
   const missingRowsHtml = missingRows.map((member) => `<tr class="time-machine-unranked${isFavorite(member.discordId) ? " fav-row" : ""}">
     <td class="rank-cell">—</td>
     <td><a class="player-link" href="${playerHref(member.discordId)}">${esc(memberName(member.discordId))}</a>${favoriteBadgeHtml(member.discordId)} <span class="badge provisional" title="No tracked stats for this equipment and metric in the selected view">no play</span></td>
-    <td class="num">—</td><td class="num">—</td><td></td>
+    <td class="num">—</td>${componentColumns.map(() => `<td class="num">—</td>`).join("")}<td class="num">—</td><td></td>
   </tr>`).join("");
   prepareSortState(leaderboardSortState, `equipment:${selected?.id ?? "none"}:${metric}:${usePeriod ? `period:${periodWindow?.startDate}:${periodWindow?.endDate}` : "career"}`);
   const sorted = sortedRows(rows, leaderboardSortState, (row, key) => ({
     rank: row.originalRank,
     player: row.name,
     value: row.value,
+    ...Object.fromEntries(componentColumns.map((column) => [column.key, row.inputs?.[column.key]])),
     change: row.change,
     time: row.activeSeconds
   })[key]);
@@ -1958,9 +2025,9 @@ function renderEquipmentLeaderboard(params) {
         const trailingCell = usePeriod
           ? `<td class="num">${esc(activeTimeText(row.activeSeconds))}</td>`
           : `<td class="num"><span class="delta ${deltaClass}">${delta}</span></td>`;
-        return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${usePeriod ? `${trackedSinceBadgeHtml(periodWindow, row.coverageStart, EQUIPMENT_COVERAGE_BADGE_TITLE)}${equipmentTimeSinceBadgeHtml(row.activeSince, selected?.category)}` : ""}</td><td class="num value-cell">${equipmentValueText(metric, row.value)}</td>${trailingCell}<td class="trend-cell">${sparklineSvg(row.trend)}</td></tr>`;
+        return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${usePeriod ? `${trackedSinceBadgeHtml(periodWindow, row.coverageStart, EQUIPMENT_COVERAGE_BADGE_TITLE)}${equipmentTimeSinceBadgeHtml(row.activeSince, selected?.category)}` : ""}</td><td class="num value-cell">${equipmentValueText(metric, row.value)}</td>${componentColumns.map((column) => `<td class="num">${equipmentValueText(column.format, row.inputs?.[column.key])}</td>`).join("")}${trailingCell}<td class="trend-cell">${sparklineSvg(row.trend)}</td></tr>`;
       }).join("")
-    : missingRows.length ? "" : `<tr><td colspan="5" class="empty">No observed ${esc(EQUIPMENT_METRIC_LABELS[metric])} for this equipment item in the selected range.</td></tr>`) + missingRowsHtml;
+    : missingRows.length ? "" : `<tr><td colspan="${5 + componentColumns.length}" class="empty">No observed ${esc(EQUIPMENT_METRIC_LABELS[metric])} for this equipment item in the selected range.</td></tr>`) + missingRowsHtml;
   const equipmentName = selected ? equipmentDisplayName(selected.category, selected.id) : "Equipment";
   const heading = `${equipmentName} ${EQUIPMENT_METRIC_LABELS[metric]}`;
   const windowText = usePeriod ? periodWindowText(periodWindow) : careerRangeWindowText(careerWindow);
@@ -1973,7 +2040,7 @@ function renderEquipmentLeaderboard(params) {
     </section>
     ${artifactNote}${periodNote}
     ${equipmentPodiumHtml(rows, metric, windowText, usePeriod, selected?.category ?? "weapons", equipmentName)}
-    ${selected ? `<div class="table-wrap leaderboard-table equipment-leaderboard-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(heading, "value", leaderboardSortState, { numeric: true })}${usePeriod ? sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true }) : sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
+    ${selected ? `<div class="table-wrap leaderboard-table equipment-leaderboard-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(heading, "value", leaderboardSortState, { numeric: true })}${componentColumns.map((column) => sortableHeaderHtml(column.label, column.key, leaderboardSortState, { numeric: true })).join("")}${usePeriod ? sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true }) : sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
   const equipmentHref = (rangeParams) => hashRoute("board/equipment", { equipment: selected?.id ?? null, metric: metric === "kills" ? null : metric, ...rangeParams });
   wireViewRangeControl(equipmentHref);
   wireStatTabs();
@@ -2049,6 +2116,7 @@ function renderLeaderboard(statKey, params) {
         .join("")}</div>`
     : "";
 
+  const componentColumns = soldierComponentColumns(stat.key, false);
   const sortableRanking = ranking.map((row, index) => {
     const rank = index + 1;
     const prevRank = prevRankById.get(row.discordId) ?? null;
@@ -2059,7 +2127,8 @@ function renderLeaderboard(statKey, params) {
       ...row,
       originalRank: rank,
       movement: prevRank === null || endRank === null ? null : prevRank - endRank,
-      change: Number.isFinite(prevValue) && Number.isFinite(endValue) ? endValue - prevValue : null
+      change: Number.isFinite(prevValue) && Number.isFinite(endValue) ? endValue - prevValue : null,
+      inputs: componentColumns.length ? memberLatestCounters(state.counters, row.discordId) : null
     };
   });
   const sortedRanking = sortedRows(sortableRanking, leaderboardSortState, (row, key) => ({
@@ -2067,6 +2136,7 @@ function renderLeaderboard(statKey, params) {
     movement: row.movement,
     player: memberName(row.discordId),
     value: row.value,
+    ...Object.fromEntries(componentColumns.map((column) => [column.key, row.inputs?.[column.key]])),
     change: row.change
   })[key]);
   const rows = sortedRanking
@@ -2088,6 +2158,7 @@ function renderLeaderboard(statKey, params) {
         <td>${movementHtml(prevRank, endRank, windowText)}</td>
         <td><a class="player-link" href="${playerHref(row.discordId, stat.key)}">${esc(memberName(row.discordId))}</a>${favoriteBadgeHtml(row.discordId)}${cached}</td>
         <td class="num value-cell">${fmtStat(stat, row.value)}</td>
+        ${soldierComponentCellsHtml(componentColumns, row.inputs)}
         <td class="num"><span class="delta ${deltaClass}">${delta ?? "–"}</span></td>
         <td class="trend-cell">${sparklineSvg(spark)}</td>
       </tr>`;
@@ -2105,8 +2176,8 @@ function renderLeaderboard(statKey, params) {
     ${podiumHtml}
     <div class="table-wrap leaderboard-table">
       <table>
-        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Δ", "movement", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead>
-        <tbody>${rows || `<tr><td colspan="6" class="empty">No stats yet.</td></tr>`}</tbody>
+        <thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Δ", "movement", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${sortableHeaderHtml(stat.title, "value", leaderboardSortState, { numeric: true })}${soldierComponentHeadersHtml(componentColumns)}${sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="${6 + componentColumns.length}" class="empty">No stats yet.</td></tr>`}</tbody>
       </table>
     </div>
     ${cachedFootnoteHtml(ranking.some((row) => row.member?.cachedStats))}`;
