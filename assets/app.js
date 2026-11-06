@@ -1,4 +1,4 @@
-import { renderActivityView } from "./activity-view.js?v=20261106-bot-kills-note";
+import { renderActivityView } from "./activity-view.js?v=20261106-bot-kills-sup";
 
 /* KDM BF6 Rankings — static SPA reading the generated JSON published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN.
@@ -7,9 +7,9 @@ import { renderActivityView } from "./activity-view.js?v=20261106-bot-kills-note
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261106-bot-kills-note";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261106-bot-kills-sup";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20261106-bot-kills-note";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20261106-bot-kills-sup";
 import {
   memberDailySeries,
   memberLatestCounters,
@@ -21,7 +21,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20261106-bot-kills-note";
+} from "./period.js?v=20261106-bot-kills-sup";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -35,9 +35,9 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20261106-bot-kills-note";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261106-bot-kills-note";
-import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261106-bot-kills-note";
+} from "./view-state.js?v=20261106-bot-kills-sup";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261106-bot-kills-sup";
+import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261106-bot-kills-sup";
 import {
   EQUIPMENT_FIELDS,
   equipmentCareerStats,
@@ -48,7 +48,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20261106-bot-kills-note";
+} from "./equipment.js?v=20261106-bot-kills-sup";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -94,6 +94,11 @@ function esc(value) {
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
+}
+
+// Escaped label with a trailing * (bot-kill marker) drawn as superscript.
+function labelHtml(value) {
+  return esc(value).replace(/\*$/, "<sup>*</sup>");
 }
 
 function fmtStat(stat, value) {
@@ -1046,7 +1051,7 @@ function movementHtml(prevRank, currentRank, windowText = "the previous day") {
 }
 
 function rankingControlsHtml(statKey, category = "combat", selectedId = null, metric = "kills") {
-  const routeButton = (label, href, active, title = "") => `<button type="button" data-ranking-route="${esc(href)}" aria-pressed="${active}"${title ? ` title="${esc(title)}"` : ""}>${esc(label)}</button>`;
+  const routeButton = (label, href, active, title = "") => `<button type="button" data-ranking-route="${esc(href)}" aria-pressed="${active}"${title ? ` title="${esc(title)}"` : ""}>${labelHtml(label)}</button>`;
   const groups = category === "combat" ? [] : equipmentGroups()[category];
   // All Vehicles belongs to no domain, so no class row is open under it.
   const allSelected = selectedId === ALL_VEHICLES_ID;
@@ -1375,7 +1380,7 @@ function sortableHeaderHtml(label, key, sortState, { numeric = false } = {}) {
     ? direction === "desc" ? "ascending" : "descending"
     : direction === "desc" ? "ascending" : direction === "asc" ? "unsorted" : "descending";
   const indicator = direction === "desc" ? "&#9660;" : direction === "asc" ? "&#9650;" : "&#8645;";
-  return `<th class="sortable-column${numeric ? " num" : ""}" aria-sort="${direction === "desc" ? "descending" : direction === "asc" ? "ascending" : "none"}"><button class="sort-button" type="button" data-sort-key="${key}" aria-label="Sort ${esc(label)} ${nextAction}"><span>${esc(label)}</span><span class="sort-indicator" aria-hidden="true">${indicator}</span></button></th>`;
+  return `<th class="sortable-column${numeric ? " num" : ""}" aria-sort="${direction === "desc" ? "descending" : direction === "asc" ? "ascending" : "none"}"><button class="sort-button" type="button" data-sort-key="${key}" aria-label="Sort ${esc(label)} ${nextAction}"><span>${labelHtml(label)}</span><span class="sort-indicator" aria-hidden="true">${indicator}</span></button></th>`;
 }
 
 function sortedRows(rows, sortState, valueFor) {
@@ -1704,7 +1709,7 @@ function equipmentMetricTabsHtml(selectedCategory, activeMetric, selectedId, fir
       const active = sharedMetric === activeShared;
       const label = EQUIPMENT_METRIC_LABELS[metric];
       const title = applies ? "" : ` title="Not recorded for ${selectedCategory === "vehicles" ? "vehicles" : "weapons"}"`;
-      return `<button type="button" class="${active ? "active" : ""}${applies ? "" : " unavailable"}" data-equipment-metric="${esc(metric)}" data-equipment-target="${esc(targetId)}"${title}>${esc(label)}</button>`;
+      return `<button type="button" class="${active ? "active" : ""}${applies ? "" : " unavailable"}" data-equipment-metric="${esc(metric)}" data-equipment-target="${esc(targetId)}"${title}>${labelHtml(label)}</button>`;
     })
     .join("")}</div>`;
 }
@@ -1959,7 +1964,7 @@ function equipmentPodiumHtml(rows, metric, windowText, usePeriod = false, catego
         return `<div class="podium-card p${index + 1}">
           <div class="podium-rank">#${index + 1}${index === 0 ? " · TOP DOG" : ""}</div>
           <div class="podium-name"><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a></div>
-          <div class="podium-value">${equipmentValueText(metric, row.value)} <span class="podium-stat-label">${esc(`${equipmentName} ${EQUIPMENT_METRIC_LABELS[metric]}`.trim())}</span></div>
+          <div class="podium-value">${equipmentValueText(metric, row.value)} <span class="podium-stat-label">${labelHtml(`${equipmentName} ${EQUIPMENT_METRIC_LABELS[metric]}`.trim())}</span></div>
           <div class="podium-delta">${footer}</div>
         </div>`;
       }).join("")}</div>`
@@ -2032,7 +2037,7 @@ function renderEquipmentLeaderboard(params) {
   const heading = `${equipmentName} ${EQUIPMENT_METRIC_LABELS[metric]}`;
   const windowText = usePeriod ? periodWindowText(periodWindow) : careerRangeWindowText(careerWindow);
   app.innerHTML = `
-    <h1 class="page-title">${esc(heading)} Leaderboard <span class="period-title-tag ${usePeriod ? "" : "career-title-tag"}">${esc(usePeriod ? periodWindowText(periodWindow) : careerRangeWindowText(careerWindow, { includeLabel: true }))}</span></h1>
+    <h1 class="page-title">${labelHtml(heading)} Leaderboard <span class="period-title-tag ${usePeriod ? "" : "career-title-tag"}">${esc(usePeriod ? periodWindowText(periodWindow) : careerRangeWindowText(careerWindow, { includeLabel: true }))}</span></h1>
     <p class="page-sub">${usePeriod ? "Stats earned during this range only, from daily snapshot differences · active time and daily trend per player" : "Current Career values · movement, deltas, and sparkline show change over " + esc(windowText)}</p>
     <section class="ranking-toolbar" aria-label="Ranking filters">
       ${viewRangeControlHtml()}
@@ -2040,7 +2045,7 @@ function renderEquipmentLeaderboard(params) {
     </section>
     ${artifactNote}${periodNote}
     ${equipmentPodiumHtml(rows, metric, windowText, usePeriod, selected?.category ?? "weapons", equipmentName)}
-    ${selected ? `${botKillsFootnoteHtml([EQUIPMENT_METRIC_LABELS[metric]])}<div class="table-wrap leaderboard-table equipment-leaderboard-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${componentColumns.map((column, index) => sortableHeaderHtml(index ? column.label : `${equipmentName} ${column.label}`, column.key, leaderboardSortState, { numeric: true })).join("")}${sortableHeaderHtml(componentColumns.length ? EQUIPMENT_METRIC_LABELS[metric] : heading, "value", leaderboardSortState, { numeric: true })}${usePeriod ? sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true }) : sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead><tbody>${body}</tbody></table></div>` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
+    ${selected ? `<div class="table-wrap leaderboard-table equipment-leaderboard-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${componentColumns.map((column, index) => sortableHeaderHtml(index ? column.label : `${equipmentName} ${column.label}`, column.key, leaderboardSortState, { numeric: true })).join("")}${sortableHeaderHtml(componentColumns.length ? EQUIPMENT_METRIC_LABELS[metric] : heading, "value", leaderboardSortState, { numeric: true })}${usePeriod ? sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true }) : sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead><tbody>${body}</tbody></table></div>${botKillsFootnoteHtml([EQUIPMENT_METRIC_LABELS[metric]])}` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
   const equipmentHref = (rangeParams) => hashRoute("board/equipment", { equipment: selected?.id ?? null, metric: metric === "kills" ? null : metric, ...rangeParams });
   wireViewRangeControl(equipmentHref);
   wireStatTabs();
@@ -2593,7 +2598,7 @@ const VEHICLE_DOMAIN_FALLBACKS = [
 
 // Ratios marked * are built from weapon/vehicle kills, which include bots:
 // GameTools has no per-item player-only kills counter.
-const BOT_KILLS_FOOTNOTE = `<p class="cached-footnote" role="note"><strong>*</strong> Includes kills on bots. Player-only kills aren't recorded per weapon or vehicle.</p>`;
+const BOT_KILLS_FOOTNOTE = `<p class="cached-footnote" role="note"><sup>*</sup> Includes kills on bots. Player-only kills aren't recorded per weapon or vehicle.</p>`;
 
 function botKillsFootnoteHtml(labels) {
   return labels.some((label) => label?.endsWith("*")) ? BOT_KILLS_FOOTNOTE : "";
