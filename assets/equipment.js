@@ -1,4 +1,4 @@
-import { ratio } from "./counter-math.js?v=20261106-bot-mark";
+import { ratio } from "./counter-math.js?v=20261106-spawn-floor";
 
 /* Sparse equipment counters shared by the profile and equipment leaderboard.
    A missing snapshot is different from an unchanged value: callers need that
@@ -22,8 +22,14 @@ export const EQUIPMENT_TRACKING_STARTS = {
   vehiclesDestroyedWith: "2026-08-10",
   assists: "2026-08-10",
   roadKills: "2026-08-10",
-  spawns: "2026-11-07"
+  // Backfilled over the whole history by the bot's formula version 3 rebuild
+  // (2026-11-06), so it has no start date, like kills.
+  spawns: null
 };
+
+// A Kills/Spawn ranking needs a minimum sample, or a weapon picked up once tops
+// the board. The bot's AI rankings use the same floor.
+export const MIN_RANKED_SPAWNS = 10;
 
 const CATEGORY_STATS = {
   weapons: {

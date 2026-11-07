@@ -1,4 +1,4 @@
-import { renderActivityView } from "./activity-view.js?v=20261106-bot-mark";
+import { renderActivityView } from "./activity-view.js?v=20261106-spawn-floor";
 
 /* KDM BF6 Rankings — static SPA reading the generated JSON published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN.
@@ -7,9 +7,9 @@ import { renderActivityView } from "./activity-view.js?v=20261106-bot-mark";
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261106-bot-mark";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261106-spawn-floor";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20261106-bot-mark";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20261106-spawn-floor";
 import {
   memberDailySeries,
   memberLatestCounters,
@@ -21,7 +21,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20261106-bot-mark";
+} from "./period.js?v=20261106-spawn-floor";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -35,11 +35,12 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20261106-bot-mark";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261106-bot-mark";
-import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261106-bot-mark";
+} from "./view-state.js?v=20261106-spawn-floor";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261106-spawn-floor";
+import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261106-spawn-floor";
 import {
   EQUIPMENT_FIELDS,
+  MIN_RANKED_SPAWNS,
   equipmentCareerStats,
   equipmentFieldsPresent,
   equipmentPeriodStats,
@@ -48,7 +49,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20261106-bot-mark";
+} from "./equipment.js?v=20261106-spawn-floor";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -1940,7 +1941,12 @@ function equipmentLeaderboardRows(selectedId, category, metric, periodWindow, us
     })
     .filter((row) => row && Number.isFinite(row.value))
     .sort((a, b) => b.value - a.value || a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }));
-  return rows.map((row, index) => ({ ...row, originalRank: index + 1 }));
+  // Kills/Spawn rows under the spawn floor keep their value but rank after
+  // everyone with a real sample, the way the soldier Period boards treat low
+  // active time.
+  const provisional = (row) => metric === "killsPerSpawn" && !((row.inputs?.spawns ?? 0) >= MIN_RANKED_SPAWNS);
+  return [...rows.filter((row) => !provisional(row)), ...rows.filter(provisional)]
+    .map((row, index) => ({ ...row, provisionalRow: provisional(row), originalRank: index + 1 }));
 }
 
 function equipmentDeltaText(metric, value) {
@@ -2011,17 +2017,17 @@ function renderEquipmentLeaderboard(params) {
   })[key]);
   const periodNote = viewRangeState.view === "period"
     ? !periodWindow
-      ? `<p class="period-unsupported-note" role="note">The selected Period range is not available yet — showing Career ${esc(EQUIPMENT_METRIC_LABELS[metric])}.</p>`
+      ? `<p class="period-unsupported-note" role="note">The selected Period range is not available yet — showing Career ${labelHtml(EQUIPMENT_METRIC_LABELS[metric])}.</p>`
       : !periodMatches
-        ? `<p class="period-unsupported-note" role="note">The selected Period range is not available in the equipment archive — showing Career ${esc(EQUIPMENT_METRIC_LABELS[metric])}.</p>`
+        ? `<p class="period-unsupported-note" role="note">The selected Period range is not available in the equipment archive — showing Career ${labelHtml(EQUIPMENT_METRIC_LABELS[metric])}.</p>`
         : selected && !metricReady
-          ? `<p class="period-unsupported-note" role="note">This equipment item has no Period ${esc(EQUIPMENT_METRIC_LABELS[metric])} data — showing Career values.</p>`
+          ? `<p class="period-unsupported-note" role="note">This equipment item has no Period ${labelHtml(EQUIPMENT_METRIC_LABELS[metric])} data — showing Career values.</p>`
           : ""
     : "";
   const artifactNote = !artifactReady
     ? `<p class="period-unsupported-note" role="note">Equipment data has not been published yet. This leaderboard is unavailable until the next equipment refresh.</p>`
     : !metricReady
-      ? `<p class="period-unsupported-note" role="note">The equipment artifact has no usable ${esc(EQUIPMENT_METRIC_LABELS[metric])} data for this selection.</p>`
+      ? `<p class="period-unsupported-note" role="note">The equipment artifact has no usable ${labelHtml(EQUIPMENT_METRIC_LABELS[metric])} data for this selection.</p>`
       : "";
   const body = (sorted.length
     ? sorted.map((row) => {
@@ -2030,9 +2036,12 @@ function renderEquipmentLeaderboard(params) {
         const trailingCell = usePeriod
           ? `<td class="num">${esc(activeTimeText(row.activeSeconds))}</td>`
           : `<td class="num"><span class="delta ${deltaClass}">${delta}</span></td>`;
-        return `<tr class="r${row.originalRank}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${usePeriod ? `${trackedSinceBadgeHtml(periodWindow, row.coverageStart, EQUIPMENT_COVERAGE_BADGE_TITLE)}${equipmentTimeSinceBadgeHtml(row.activeSince, selected?.category)}` : ""}</td>${componentColumns.map((column) => `<td class="num component-cell">${equipmentValueText(column.format, row.inputs?.[column.key])}</td>`).join("")}<td class="num value-cell">${equipmentValueText(metric, row.value)}</td>${trailingCell}<td class="trend-cell">${sparklineSvg(row.trend)}</td></tr>`;
+        const lowSpawns = row.provisionalRow
+          ? ` <span class="badge provisional" title="Under ${MIN_RANKED_SPAWNS} spawns — too small a sample to rank">low spawns</span>`
+          : "";
+        return `<tr class="${row.provisionalRow ? "period-provisional" : `r${row.originalRank}`}${isFavorite(row.discordId) ? " fav-row" : ""}"><td class="rank-cell">${row.provisionalRow ? "–" : row.originalRank}</td><td><a class="player-link" href="${playerHref(row.discordId)}">${esc(row.name)}</a>${favoriteBadgeHtml(row.discordId)}${lowSpawns}${usePeriod ? `${trackedSinceBadgeHtml(periodWindow, row.coverageStart, EQUIPMENT_COVERAGE_BADGE_TITLE)}${equipmentTimeSinceBadgeHtml(row.activeSince, selected?.category)}` : ""}</td>${componentColumns.map((column) => `<td class="num component-cell">${equipmentValueText(column.format, row.inputs?.[column.key])}</td>`).join("")}<td class="num value-cell">${equipmentValueText(metric, row.value)}</td>${trailingCell}<td class="trend-cell">${sparklineSvg(row.trend)}</td></tr>`;
       }).join("")
-    : missingRows.length ? "" : `<tr><td colspan="${5 + componentColumns.length}" class="empty">No observed ${esc(EQUIPMENT_METRIC_LABELS[metric])} for this equipment item in the selected range.</td></tr>`) + missingRowsHtml;
+    : missingRows.length ? "" : `<tr><td colspan="${5 + componentColumns.length}" class="empty">No observed ${labelHtml(EQUIPMENT_METRIC_LABELS[metric])} for this equipment item in the selected range.</td></tr>`) + missingRowsHtml;
   const equipmentName = selected ? equipmentDisplayName(selected.category, selected.id) : "Equipment";
   const heading = `${equipmentName} ${EQUIPMENT_METRIC_LABELS[metric]}`;
   const windowText = usePeriod ? periodWindowText(periodWindow) : careerRangeWindowText(careerWindow);
@@ -2044,7 +2053,7 @@ function renderEquipmentLeaderboard(params) {
       ${rankingControlsHtml(null, selected?.category ?? "weapons", selected?.id, metric)}
     </section>
     ${artifactNote}${periodNote}
-    ${equipmentPodiumHtml(rows, metric, windowText, usePeriod, selected?.category ?? "weapons", equipmentName)}
+    ${equipmentPodiumHtml(rows.filter((row) => !row.provisionalRow), metric, windowText, usePeriod, selected?.category ?? "weapons", equipmentName)}
     ${selected ? `<div class="table-wrap leaderboard-table equipment-leaderboard-table"><table><thead><tr>${sortableHeaderHtml("#", "rank", leaderboardSortState)}${sortableHeaderHtml("Player", "player", leaderboardSortState)}${componentColumns.map((column, index) => sortableHeaderHtml(index ? column.label : `${equipmentName} ${column.label}`, column.key, leaderboardSortState, { numeric: true })).join("")}${sortableHeaderHtml(componentColumns.length ? EQUIPMENT_METRIC_LABELS[metric] : heading, "value", leaderboardSortState, { numeric: true })}${usePeriod ? sortableHeaderHtml("Active Time", "time", leaderboardSortState, { numeric: true }) : sortableHeaderHtml("Change", "change", leaderboardSortState, { numeric: true })}<th class="trend-cell">Daily Trend</th></tr></thead><tbody>${body}</tbody></table></div>${botKillsFootnoteHtml([EQUIPMENT_METRIC_LABELS[metric]])}` : `<div class="empty">No weapon or vehicle records are available yet.</div>`}`;
   const equipmentHref = (rangeParams) => hashRoute("board/equipment", { equipment: selected?.id ?? null, metric: metric === "kills" ? null : metric, ...rangeParams });
   wireViewRangeControl(equipmentHref);
@@ -2410,7 +2419,7 @@ function renderPlayer(discordId, statKey, params) {
   const panelMetric = chartEquipmentId ? equipmentMetric ?? "kills" : requestedEquipmentMetric;
   const equipmentChartStatDescriptor = chartEquipment ? equipmentChartStat(equipmentMetric ?? "kills", chartEquipment.name) : null;
   const chartHeading = chartEquipment
-    ? `${esc(chartEquipment.name)} ${esc(equipmentChartStatDescriptor.label)} ${periodWindow ? "· daily Period form" : "over time"}`
+    ? `${esc(chartEquipment.name)} ${labelHtml(equipmentChartStatDescriptor.label)} ${periodWindow ? "· daily Period form" : "over time"}`
     : `${esc(stat.title)} ${
         periodWindow && statHasPeriodForm(stat.key)
           ? `· daily Period form${
