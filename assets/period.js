@@ -1,5 +1,5 @@
-import { shiftDate, ratio } from "./counter-math.js?v=20261106-bot-mark";
-import { isSeasonRangeKey, seasonForRangeKey, seasonTargets } from "./seasons.js?v=20261106-bot-mark";
+import { shiftDate, ratio } from "./counter-math.js?v=20261106-spawn-floor";
+import { isSeasonRangeKey, seasonForRangeKey, seasonTargets } from "./seasons.js?v=20261106-spawn-floor";
 
 /* KDM BF6 Rankings — pure Period calculation engine over data/counters.json.
    DOM-free and side-effect-free so it runs identically in the browser and in
