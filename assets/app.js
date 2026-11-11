@@ -1886,7 +1886,7 @@ const EQUIPMENT_COMPONENT_COLUMNS = {
     { key: "spawns", label: "Spawns", format: "kills" }
   ],
   hsPercent: [
-    { key: "hsKills", label: "Headshot Kills", format: "kills" },
+    { key: "hsKills", label: "Headshot Kills*", format: "kills" },
     { key: "hsKillsTotal", label: "Kills*", format: "kills" }
   ]
 };
@@ -2626,8 +2626,8 @@ const EQUIPMENT_METRIC_LABELS = {
   spawns: "Kills/Spawn*",
   vehiclesDestroyed: "Vehicles Destroyed",
   vehiclesDestroyedWith: "Vehicles Destroyed",
-  assists: "Assists",
-  roadKills: "Roadkills"
+  assists: "Assists*",
+  roadKills: "Roadkills*"
 };
 
 // One indicator, not a stacked pair: [+] when collapsed, [-] when open. The
