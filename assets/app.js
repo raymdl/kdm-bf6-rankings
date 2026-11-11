@@ -1,4 +1,4 @@
-import { renderActivityView } from "./activity-view.js?v=20261106-spawn-floor";
+import { renderActivityView } from "./activity-view.js?v=20261111-kills-mark";
 
 /* KDM BF6 Rankings — static SPA reading the generated JSON published by the
    kdm-discord-bot daily update. No build step; Chart.js from CDN.
@@ -7,9 +7,9 @@ import { renderActivityView } from "./activity-view.js?v=20261106-spawn-floor";
    literal path, so the app does not care whether they come from R2 or from this
    repository. */
 
-import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261106-spawn-floor";
+import { checkForNewRelease, dataAge, dataFetchOptions, dataSourceStatus, dataUrl, initDataSource } from "./data-source.js?v=20261111-kills-mark";
 
-import { effectivenessDefinitions } from "./effectiveness.js?v=20261106-spawn-floor";
+import { effectivenessDefinitions } from "./effectiveness.js?v=20261111-kills-mark";
 import {
   memberDailySeries,
   memberLatestCounters,
@@ -21,7 +21,7 @@ import {
   periodUnsupportedReason,
   resolveRange,
   validCounters
-} from "./period.js?v=20261106-spawn-floor";
+} from "./period.js?v=20261111-kills-mark";
 import {
   CUSTOM_RANGE_RE,
   DEFAULT_RANGE,
@@ -35,9 +35,9 @@ import {
   resolveCareerWindow,
   validateCustomRange,
   viewRangeParams as serializedViewRangeParams
-} from "./view-state.js?v=20261106-spawn-floor";
-import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261106-spawn-floor";
-import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261106-spawn-floor";
+} from "./view-state.js?v=20261111-kills-mark";
+import { pairwiseOvertakeFlags } from "./overtakes.js?v=20261111-kills-mark";
+import { isSeasonRangeKey, menuSeasons } from "./seasons.js?v=20261111-kills-mark";
 import {
   EQUIPMENT_FIELDS,
   MIN_RANKED_SPAWNS,
@@ -49,7 +49,7 @@ import {
   validEquipmentArtifact,
   validEquipmentCatalogue,
   validEquipmentMemberFile
-} from "./equipment.js?v=20261106-spawn-floor";
+} from "./equipment.js?v=20261111-kills-mark";
 
 const app = document.getElementById("app");
 const skipLink = document.querySelector(".skip-link");
@@ -1878,16 +1878,16 @@ function equipmentTimeSinceBadgeHtml(since, category) {
 // Active Time, so Kills/Min drops its own Time column there.
 const EQUIPMENT_COMPONENT_COLUMNS = {
   kpm: [
-    { key: "kpmKills", label: "Kills", format: "kills" },
+    { key: "kpmKills", label: "Kills*", format: "kills" },
     { key: "kpmSeconds", label: "Time", format: "timeEquipped", careerOnly: true }
   ],
   killsPerSpawn: [
-    { key: "spawnKills", label: "Kills", format: "kills" },
+    { key: "spawnKills", label: "Kills*", format: "kills" },
     { key: "spawns", label: "Spawns", format: "kills" }
   ],
   hsPercent: [
     { key: "hsKills", label: "Headshot Kills", format: "kills" },
-    { key: "hsKillsTotal", label: "Kills", format: "kills" }
+    { key: "hsKillsTotal", label: "Kills*", format: "kills" }
   ]
 };
 
@@ -2605,16 +2605,16 @@ const VEHICLE_DOMAIN_FALLBACKS = [
   { key: "naval", label: "Naval" }
 ];
 
-// Ratios marked * are built from weapon/vehicle kills, which include bots:
+// Stats marked * are built from weapon/vehicle kills, which may include bots:
 // GameTools has no per-item player-only kills counter.
-const BOT_KILLS_FOOTNOTE = `<p class="cached-footnote" role="note"><sup class="bot-mark">*</sup> Includes kills on bots. Player-only kills aren't recorded per weapon or vehicle.</p>`;
+const BOT_KILLS_FOOTNOTE = `<p class="cached-footnote" role="note"><sup class="bot-mark">*</sup> May include bot kills. Player-only kills aren't recorded per weapon or vehicle.</p>`;
 
 function botKillsFootnoteHtml(labels) {
   return labels.some((label) => label?.endsWith("*")) ? BOT_KILLS_FOOTNOTE : "";
 }
 
 const EQUIPMENT_METRIC_LABELS = {
-  kills: "Kills",
+  kills: "Kills*",
   accuracy: "Accuracy",
   hsPercent: "Headshot %*",
   timeEquipped: "Time Played",
