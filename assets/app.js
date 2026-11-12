@@ -2605,9 +2605,9 @@ const VEHICLE_DOMAIN_FALLBACKS = [
   { key: "naval", label: "Naval" }
 ];
 
-// Stats marked * are built from weapon/vehicle kills, which may include bots:
-// GameTools has no per-item player-only kills counter.
-const BOT_KILLS_FOOTNOTE = `<p class="cached-footnote" role="note"><sup class="bot-mark">*</sup> May include bot kills. Player-only kills aren't recorded per weapon or vehicle.</p>`;
+// Stats marked * are built from weapon/vehicle counters, which may include bots:
+// GameTools has no per-item player-only counters.
+const BOT_KILLS_FOOTNOTE = `<p class="cached-footnote" role="note"><sup class="bot-mark">*</sup> May include bots. Player-only stats aren't recorded per weapon or vehicle.</p>`;
 
 function botKillsFootnoteHtml(labels) {
   return labels.some((label) => label?.endsWith("*")) ? BOT_KILLS_FOOTNOTE : "";
