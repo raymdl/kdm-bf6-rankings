@@ -1,5 +1,5 @@
-import { shiftDate } from "./counter-math.js?v=20261106-spawn-floor";
-import { isSeasonRangeKey, seasonForRangeKey, seasonTargets } from "./seasons.js?v=20261106-spawn-floor";
+import { shiftDate } from "./counter-math.js?v=20261111-kills-mark";
+import { isSeasonRangeKey, seasonForRangeKey, seasonTargets } from "./seasons.js?v=20261111-kills-mark";
 
 export const RANGE_OPTIONS = [
   { key: "today", label: "Today" },
